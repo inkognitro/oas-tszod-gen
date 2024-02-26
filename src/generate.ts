@@ -1,15 +1,20 @@
-import {Oas3Specification} from './Oas3Specification';
+import {Specification} from './oas3';
 const fs = require('fs');
 
 export function generate() {
   const filePath = './oasTestSpecs.json';
   fs.readFile(filePath, 'utf-8', (error: any, data: object) => {
     if (error) {
-      console.error('could not load file from filePath', filePath);
+      console.error(`could not load file from filePath "${filePath}"`, error);
       return;
     }
-    const specs = new Oas3Specification(data);
-    specs.print();
+    const specs = new Specification(data);
+    specs.generateFiles({
+      createFile: (filePath, content) => {
+        console.log(`filePath: ${filePath}`);
+        console.log(content);
+      },
+    });
   });
 }
 
