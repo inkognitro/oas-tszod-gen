@@ -1,0 +1,24 @@
+{
+  "name": "oas2ts",
+  "version": "0.0.1",
+  "description": "A tool to convert OpenApi specifications into callable endpoint functions in TS.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inkognitro/oas2ts.git"
+  },
+  "keywords": [
+    "oas2ts",
+    "oas3",
+    "ts-api"
+  ],
+  "author": "Marcel Fischer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/inkognitro/oas2ts/issues"
+  },
+  "homepage": "https://github.com/inkognitro/oas2ts#readme"
+}
