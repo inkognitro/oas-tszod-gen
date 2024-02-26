@@ -1,4 +1,3 @@
-import {GenericSchema} from './core';
 export function isStringSchema(anyValue: any): anyValue is StringSchema {
   const value = anyValue as StringSchema;
   if (typeof value !== 'object') {
@@ -31,18 +30,15 @@ export function isStringSchema(anyValue: any): anyValue is StringSchema {
   return true;
 }
 
-export type StringSchema = GenericSchema<
-  'string',
-  {
-    type: 'string';
-    format?: string;
-    enum?: string[];
-    nullable?: boolean;
-    minLength?: number;
-    maxLength?: number;
-  }
->;
+export type StringSchema = {
+  type: 'string';
+  format?: string;
+  enum?: string[];
+  nullable?: boolean;
+  minLength?: number;
+  maxLength?: number;
+};
 
 export function createStringSchemaTsDefinition(): string {
-  // todo: implement
+  return ''; // todo: implement
 }

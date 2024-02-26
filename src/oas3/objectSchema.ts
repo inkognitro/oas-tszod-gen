@@ -1,5 +1,4 @@
-import {GenericSchema} from './core';
-import {Schema} from './schema';
+import {isSchema, Schema} from './schema';
 export function isObjectSchema(anyValue: any): anyValue is ObjectSchema {
   const value = anyValue as ObjectSchema;
   if (typeof value !== 'object') {
@@ -8,30 +7,40 @@ export function isObjectSchema(anyValue: any): anyValue is ObjectSchema {
   if (value.type !== 'object') {
     return false;
   }
-  if (!!value.required && Array.isArray(value.required)) {
+  if (value.required !== undefined && !Array.isArray(value.required)) {
+    return false;
+  }
+  if (value.required) {
     const invalidEntry = value.required.find(e => typeof e !== 'string');
     if (invalidEntry) {
       return false;
     }
   }
-  if (Array.isArray(value.required)) {
-    const invalidEntry = value.required.find(e => typeof e !== 'string');
-    if (invalidEntry) {
-      return false;
+  if (
+    !value.properties ||
+    typeof value.properties !== 'object' ||
+    Array.isArray(value.properties)
+  ) {
+    return false;
+  }
+  if (value.properties) {
+    for (const propName in value.properties) {
+      const propValue = value.properties[propName];
+      if (!isSchema(propValue)) {
+        return false;
+      }
     }
   }
+
   return true;
 }
 
-export type ObjectSchema = GenericSchema<
-  'object',
-  {
-    type: 'object';
-    required?: string[];
-    properties: {[propName: string]: Schema};
-  }
->;
+export type ObjectSchema = {
+  type: 'object';
+  required?: string[];
+  properties: {[propName: string]: Schema};
+};
 
 export function createObjectSchemaTsDefinition(): string {
-  // todo: implement
+  return ''; // todo: implement
 }
