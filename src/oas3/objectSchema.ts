@@ -31,7 +31,12 @@ export function isObjectSchema(anyValue: any): anyValue is ObjectSchema {
       }
     }
   }
-
+  if (
+    value.additionalProperties !== undefined &&
+    !isSchema(value.additionalProperties)
+  ) {
+    return false;
+  }
   return true;
 }
 
@@ -39,8 +44,11 @@ export type ObjectSchema = {
   type: 'object';
   required?: string[];
   properties: {[propName: string]: Schema};
+  additionalProperties?: Schema;
 };
 
-export function createObjectSchemaTsDefinition(): string {
+export function createObjectSchemaCodeForTypescript(
+  schema: ObjectSchema
+): string {
   return ''; // todo: implement
 }

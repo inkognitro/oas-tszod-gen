@@ -39,6 +39,12 @@ export type StringSchema = {
   maxLength?: number;
 };
 
-export function createStringSchemaTsDefinition(): string {
-  return ''; // todo: implement
+export function createStringSchemaCodeForTypescript(
+  schema: StringSchema
+): string {
+  let ts = 'string';
+  if (schema.nullable) {
+    ts = `null | ${ts}`;
+  }
+  return ts;
 }

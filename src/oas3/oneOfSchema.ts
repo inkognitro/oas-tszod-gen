@@ -36,6 +36,8 @@ export type OneOfSchema = {
   };
 };
 
-export function createOneOfSchemaTsDefinition(): string {
+export function createOneOfSchemaCodeForTypescript(
+  schema: OneOfSchema
+): string {
   return ''; // todo: implement
 }
