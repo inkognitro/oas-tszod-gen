@@ -7,4 +7,4 @@ Easy one to answer:
 - to have the possibility for an automatic compatibility check of your api endpoints with your TS frontends
 - to write less code that could lie
 - to reduce the need for integration tests due to early type checks in a CI pipeline
-- to have more a bigger customer satisfaction due to fewer bugs
+- to have a bigger customer satisfaction due to fewer bugs
