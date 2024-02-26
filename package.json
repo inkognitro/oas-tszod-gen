@@ -4,7 +4,9 @@
   "description": "A tool to convert OpenApi specifications into callable endpoint functions in TS.",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "start": "npx tsc -w",
+    "test": "test",
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
@@ -20,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/inkognitro/oas2ts/issues"
   },
-  "homepage": "https://github.com/inkognitro/oas2ts#readme"
+  "homepage": "https://github.com/inkognitro/oas2ts#readme",
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
 }
