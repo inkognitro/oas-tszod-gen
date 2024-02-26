@@ -1,4 +1,4 @@
 .idea
-src/oasTestSpecs.json
+oasTestSpecs.json
 build
 node_modules
