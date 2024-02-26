@@ -6,7 +6,14 @@
   "scripts": {
     "start": "npx tsc -w",
     "test": "test",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm.cmd run compile",
+    "pretest": "npm.cmd run compile",
+    "posttest": "npm.cmd run lint"
   },
   "repository": {
     "type": "git",
@@ -24,6 +31,8 @@
   },
   "homepage": "https://github.com/inkognitro/oas2ts#readme",
   "devDependencies": {
-    "typescript": "^5.3.3"
+    "gts": "^5.2.0",
+    "typescript": "~5.2.0",
+    "@types/node": "20.8.2"
   }
 }
