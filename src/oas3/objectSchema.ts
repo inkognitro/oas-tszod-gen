@@ -1,4 +1,5 @@
 import {isSchema, Schema} from './schema';
+import {SchemaCode} from './core';
 export function isObjectSchema(anyValue: any): anyValue is ObjectSchema {
   const value = anyValue as ObjectSchema;
   if (typeof value !== 'object') {
@@ -47,8 +48,12 @@ export type ObjectSchema = {
   additionalProperties?: Schema;
 };
 
-export function createObjectSchemaCodeForTypescript(
-  schema: ObjectSchema
-): string {
+function createObjectSchemaCodeForTypescript(schema: ObjectSchema): string {
   return ''; // todo: implement
+}
+
+export function createObjectSchemaCode(schema: ObjectSchema): SchemaCode {
+  return {
+    typeScriptCode: createObjectSchemaCodeForTypescript(schema),
+  };
 }

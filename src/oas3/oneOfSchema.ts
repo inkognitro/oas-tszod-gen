@@ -1,4 +1,5 @@
 import {isSchema, Schema} from './schema';
+import {SchemaCode} from './core';
 export function isOneOfSchema(anyValue: any): anyValue is OneOfSchema {
   const value = anyValue as OneOfSchema;
   if (typeof value !== 'object') {
@@ -36,8 +37,11 @@ export type OneOfSchema = {
   };
 };
 
-export function createOneOfSchemaCodeForTypescript(
-  schema: OneOfSchema
-): string {
+function createOneOfSchemaCodeForTypescript(schema: OneOfSchema): string {
   return ''; // todo: implement
+}
+export function createOneOfSchemaCode(schema: OneOfSchema): SchemaCode {
+  return {
+    typeScriptCode: createOneOfSchemaCodeForTypescript(schema),
+  };
 }

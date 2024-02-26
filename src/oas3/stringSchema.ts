@@ -1,3 +1,5 @@
+import {SchemaCode} from './core';
+
 export function isStringSchema(anyValue: any): anyValue is StringSchema {
   const value = anyValue as StringSchema;
   if (typeof value !== 'object') {
@@ -39,12 +41,17 @@ export type StringSchema = {
   maxLength?: number;
 };
 
-export function createStringSchemaCodeForTypescript(
-  schema: StringSchema
-): string {
+export function createStringSchemaCode(schema: StringSchema): SchemaCode {
+  let codeComment: undefined | string = undefined;
   let ts = 'string';
   if (schema.nullable) {
     ts = `null | ${ts}`;
   }
-  return ts;
+  if (schema.format) {
+    codeComment = schema.format;
+  }
+  return {
+    typeScriptCode: ts,
+    codeComment,
+  };
 }

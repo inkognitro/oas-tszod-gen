@@ -1,3 +1,5 @@
+import {SchemaCode} from './core';
+
 export function isBooleanSchema(anyValue: any): anyValue is BooleanSchema {
   const value = anyValue as BooleanSchema;
   if (typeof value !== 'object') {
@@ -17,12 +19,12 @@ export type BooleanSchema = {
   nullable?: boolean;
 };
 
-export function createBooleanSchemaCodeForTypescript(
-  schema: BooleanSchema
-): string {
+export function createBooleanSchemaCode(schema: BooleanSchema): SchemaCode {
   let ts = 'boolean';
   if (schema.nullable) {
     ts = `null | ${ts}`;
   }
-  return ts;
+  return {
+    typeScriptCode: ts,
+  };
 }
