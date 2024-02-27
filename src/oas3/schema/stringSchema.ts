@@ -44,6 +44,9 @@ export type StringSchema = {
 export function createStringSchemaCode(schema: StringSchema): SchemaCode {
   let codeComment: undefined | string = undefined;
   let ts = 'string';
+  if (schema.enum && schema.enum.length > 0) {
+    ts = `'${schema.enum.join("' | '")}'`;
+  }
   if (schema.nullable) {
     ts = `null | ${ts}`;
   }
