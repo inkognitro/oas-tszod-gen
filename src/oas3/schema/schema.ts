@@ -41,7 +41,8 @@ export type Schema =
   | ArraySchema
   | ObjectSchema
   | OneOfSchema; // todo: implement other schemas here!
-export function createSchemaCodeForTypescript(schema: Schema): SchemaCode {
+
+export function createSchemaCode(schema: Schema): SchemaCode {
   if (isBooleanSchema(schema)) {
     return createBooleanSchemaCode(schema);
   }

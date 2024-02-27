@@ -1,4 +1,4 @@
-import {Specification} from './oas3';
+import {Specification} from './oas3/schema';
 const fs = require('fs');
 
 export function generate() {
