@@ -65,6 +65,18 @@ export function createObjectSchemaCode(
       `${propName}${undefinableMark}: ${propSchemaCode.typeScriptCode};${propComment}`
     );
   }
+  if (schema.additionalProperties) {
+    const propSchemaCode = createSchemaCode(
+      schema.additionalProperties,
+      codeManager
+    );
+    const propComment = propSchemaCode.codeComment
+      ? ` // ${propSchemaCode.codeComment}`
+      : '';
+    tsRows.push(
+      `[key: string]: ${propSchemaCode.typeScriptCode};${propComment}`
+    );
+  }
   return {
     typeScriptCode: `{\n${tsRows.join('\n')}\n}`,
   };
