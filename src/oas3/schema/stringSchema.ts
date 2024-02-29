@@ -1,4 +1,4 @@
-import {SchemaCode} from './core';
+import {SchemaCode, SchemaCodeManager} from './core';
 
 export function isStringSchema(anyValue: any): anyValue is StringSchema {
   const value = anyValue as StringSchema;

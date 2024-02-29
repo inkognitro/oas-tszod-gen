@@ -1,7 +1,7 @@
 export type FileGenerationConfig = {
   createFile: (filePath: string, content: string) => void;
 };
-export class Specification {
+export class CodeGenerator {
   private readonly specification: object;
   constructor(specification: object) {
     this.specification = specification;

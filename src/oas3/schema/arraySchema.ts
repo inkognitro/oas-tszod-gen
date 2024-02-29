@@ -1,5 +1,5 @@
-import {SchemaCode} from './core';
-import {isSchema, Schema} from './schema';
+import {SchemaCode, SchemaCodeManager} from './core';
+import {createSchemaCode, isSchema, Schema} from './schema';
 
 export function isArraySchema(anyValue: any): anyValue is ArraySchema {
   const value = anyValue as ArraySchema;
@@ -24,8 +24,11 @@ export type ArraySchema = {
   items: Schema;
 };
 
-export function createArraySchemaCode(schema: ArraySchema): SchemaCode {
+export function createArraySchemaCode(
+  schema: ArraySchema,
+  codeManager: SchemaCodeManager
+): SchemaCode {
   return {
-    typeScriptCode: 'any[]', // todo: implement
+    typeScriptCode: `${createSchemaCode(schema.items, codeManager)}[]`,
   };
 }
