@@ -1,5 +1,6 @@
-import {isSchema, Schema} from './schema';
-import {SchemaCode} from './core';
+import {createSchemaCode, isSchema, Schema} from './schema';
+import {SchemaCode, SchemaCodeManager} from './core';
+
 export function isObjectSchema(anyValue: any): anyValue is ObjectSchema {
   const value = anyValue as ObjectSchema;
   if (typeof value !== 'object') {
@@ -48,12 +49,23 @@ export type ObjectSchema = {
   additionalProperties?: Schema;
 };
 
-function createObjectSchemaCodeForTypescript(schema: ObjectSchema): string {
-  return ''; // todo: implement
-}
-
-export function createObjectSchemaCode(schema: ObjectSchema): SchemaCode {
+export function createObjectSchemaCode(
+  schema: ObjectSchema,
+  codeManager: SchemaCodeManager
+): SchemaCode {
+  const tsRows: string[] = [];
+  for (const propName in schema.properties) {
+    const propSchema = schema.properties[propName];
+    const propSchemaCode = createSchemaCode(propSchema, codeManager);
+    const undefinableMark = !schema.required?.includes(propName) ? '?' : '';
+    const propComment = propSchemaCode.codeComment
+      ? ` // ${propSchemaCode.codeComment}`
+      : '';
+    tsRows.push(
+      `${propName}${undefinableMark}: ${propSchemaCode.typeScriptCode};${propComment}`
+    );
+  }
   return {
-    typeScriptCode: createObjectSchemaCodeForTypescript(schema),
+    typeScriptCode: `{\n${tsRows.join('\n')}\n}`,
   };
 }
