@@ -119,6 +119,7 @@ export function createNumberSchemaCode(
 export function createComponentSchemaCode(
   schema: ComponentSchema,
   codeManager: CodeGenerator
+  // todo: add discriminatorConfig
 ): CodeGenerationSummary {
   const componentName = schema.$ref.replace('#/components/schemas/', '');
   const typeName = codeManager.createTypeNameByComponentName(componentName);
@@ -129,6 +130,7 @@ export function createComponentSchemaCode(
         type: IndirectOutputType.COMPONENT_REF,
         typeName: typeName,
         componentName,
+        // todo: extend with other prop to make it more important than without discriminatorConfig was sent (for mergeIndirectOutputs function)
       },
     ],
   };
@@ -210,9 +212,48 @@ type ExactFoo = {
 type Foo = DailyFoo | WeekdaysFoo | ExactFoo;
 */
 
+export type DiscriminatorConfig = {
+  propertyNameToReplace: string;
+  replacerInCode: string;
+};
+
 export function createOneOfSchemaCode(
   schema: OneOfSchema,
-  codeManager: CodeGenerator
+  codeGenerator: CodeGenerator
 ): CodeGenerationSummary {
-  throw new Error('implement me!'); // todo: implement
+  const codeParts: string[] = [];
+  let indirectOutputs: IndirectOutput[] = [];
+  const discriminatorPropName = schema.discriminator?.propertyName;
+  schema.oneOf.forEach(itemSchema => {
+    let itemSummary: undefined | CodeGenerationSummary;
+    if (discriminatorPropName) {
+      if (isObjectSchema(itemSchema)) {
+        const discriminatorConfig = {};
+        itemSummary = createObjectSchemaCode(itemSchema, codeGenerator); // todo: overwrite discriminatorProp with enum somehow instead of string
+      } else if (isComponentSchema(itemSchema)) {
+        itemSummary = createComponentSchemaCode(itemSchema, codeGenerator); // todo: overwrite discriminatorPropName with enum somehow instead of string
+      } else {
+        throw new Error(
+          `oneOf with defined discriminator.propertyName "${discriminatorPropName}" must only contain objectSchema, but following schema was given: ${JSON.stringify(
+            itemSchema
+          )}`
+        );
+      }
+    }
+    if (!itemSummary) {
+      itemSummary = createSchemaCode(itemSchema, codeGenerator);
+    }
+    indirectOutputs = mergeIndirectOutputs(
+      indirectOutputs,
+      itemSummary.indirectOutputs
+    );
+    const itemComment = itemSummary.directOutput.codeComment
+      ? ` // ${itemSummary.directOutput.codeComment}`
+      : '';
+    codeParts.push(`| ${itemSummary.directOutput.code}${itemComment}`);
+  });
+  return {
+    directOutput: {code: `${codeParts.join('\n')}`},
+    indirectOutputs,
+  };
 }
