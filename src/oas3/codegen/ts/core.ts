@@ -15,10 +15,16 @@ export type TypeDefinitionOutput = {
   codeComment?: string;
 };
 
+export type ObjectDiscriminatorConfig = {
+  propName: string;
+  propValueCode: string;
+};
+
 export type ComponentRefOutput = {
   type: IndirectOutputType.COMPONENT_REF;
   componentName: string;
   typeName: string;
+  objectDiscriminatorConfig?: ObjectDiscriminatorConfig;
 };
 
 export type IndirectOutput = TypeDefinitionOutput | ComponentRefOutput;
@@ -43,6 +49,8 @@ export function mergeIndirectOutputs(
               o.componentName === outputToAdd.componentName
           )
         ) {
+          // todo: replace with "outputToAdd" in case of "objectDiscriminatorConfig" is set and does not exist in current output object
+          // todo: throw new Error in case of different and defined "objectDiscriminatorConfig" on both objects
           return;
         }
         // eslint-disable-next-line no-case-declarations
