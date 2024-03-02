@@ -11,8 +11,10 @@ export enum IndirectOutputType {
 export type TypeDefinitionOutput = {
   type: IndirectOutputType.TYPE_DEFINITION;
   typeName: string;
+  codeType: 'enum' | 'type';
   code: string;
   codeComment?: string;
+  relatedComponentName?: string; // todo: use or remove
 };
 
 export type ObjectDiscriminatorConfig = {

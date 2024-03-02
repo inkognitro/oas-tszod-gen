@@ -1,6 +1,5 @@
 import {
   CodeGenerationSummary,
-  ObjectDiscriminatorConfig,
   IndirectOutput,
   IndirectOutputType,
   mergeIndirectOutputs,
@@ -137,6 +136,11 @@ export function createComponentSchemaCode(
   };
 }
 
+type ObjectDiscriminatorConfig = {
+  propName: string;
+  propValueCode: string;
+};
+
 export function createObjectSchemaCode(
   schema: ObjectSchema,
   codeManager: CodeGenerator,
@@ -223,19 +227,82 @@ type ExactFoo = {
 type Foo = DailyFoo | WeekdaysFoo | ExactFoo;
 */
 
+function capitalizeFirstLetterOnly(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+function getEnumValueFromItemSchema(
+  itemSchema: Schema,
+  discriminatorPropName: string
+): string {
+  if (!isObjectSchema(itemSchema)) {
+    throw new Error(
+      `every item of oneOfSchema must have the discriminator property "${discriminatorPropName}": ${JSON.stringify(
+        itemSchema
+      )}`
+    );
+  }
+
+  const discriminatorSchema = itemSchema.properties[discriminatorPropName];
+  if (
+    !isStringSchema(discriminatorSchema) ||
+    discriminatorSchema.enum?.length !== 1
+  ) {
+    throw new Error(
+      `only StringSchema with one specific enum value is supported for discriminators, but following schema was given for property "${discriminatorPropName}": ${JSON.stringify(
+        itemSchema
+      )}`
+    );
+  }
+
+  return discriminatorSchema.enum[0];
+}
+
+function createEnumDiscriminatorOutputType(
+  oneOfSchema: OneOfSchema,
+  discriminatorPropName: string
+): IndirectOutput {
+  const enumParts: string[] = [];
+  oneOfSchema.oneOf.forEach(itemSchema => {
+    enumParts.push(
+      getEnumValueFromItemSchema(itemSchema, discriminatorPropName)
+    );
+  });
+  const enumsCodeLines: string[] = [];
+  enumParts.forEach(e => {
+    const entryName = capitalizeFirstLetterOnly(e);
+    enumsCodeLines.push(`${entryName} = "${entryName}"`);
+  });
+  return {
+    type: IndirectOutputType.TYPE_DEFINITION,
+    typeName: '', // todo: implement
+    codeType: 'enum',
+    code: `enum ${capitalizeFirstLetterOnly(
+      discriminatorPropName
+    )} {\n${enumsCodeLines.join('\n')}\n}`,
+  };
+}
+
 export function createOneOfSchemaCode(
   schema: OneOfSchema,
   codeGenerator: CodeGenerator
 ): CodeGenerationSummary {
   const codeParts: string[] = [];
   let indirectOutputs: IndirectOutput[] = [];
+
   const discriminatorPropName = schema.discriminator?.propertyName;
+  if (discriminatorPropName) {
+    indirectOutputs.push(
+      createEnumDiscriminatorOutputType(schema, discriminatorPropName)
+    );
+  }
+
   schema.oneOf.forEach(itemSchema => {
     let itemSummary: undefined | CodeGenerationSummary;
     if (discriminatorPropName) {
       const objectDiscriminatorConfig: ObjectDiscriminatorConfig = {
         propName: discriminatorPropName,
-        propValueCode: '', // todo: implement
+        propValueCode: '', // todo: implement: "getEnumValueFromItemSchema(itemSchema, discriminatorPropName)"
       };
       if (isObjectSchema(itemSchema)) {
         itemSummary = createObjectSchemaCode(
