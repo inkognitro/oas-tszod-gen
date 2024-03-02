@@ -38,19 +38,40 @@ export function mergeIndirectOutputs(
   existingOutputs: IndirectOutput[],
   additionalOutputs: IndirectOutput[]
 ): IndirectOutput[] {
-  const nextOutputs = [...existingOutputs];
+  let nextOutputs = [...existingOutputs];
   additionalOutputs.forEach(outputToAdd => {
     switch (outputToAdd.type) {
       case IndirectOutputType.COMPONENT_REF:
-        if (
-          nextOutputs.find(
-            o =>
-              o.type === IndirectOutputType.COMPONENT_REF &&
-              o.componentName === outputToAdd.componentName
-          )
-        ) {
-          // todo: replace with "outputToAdd" in case of "objectDiscriminatorConfig" is set and does not exist in current output object
-          // todo: throw new Error in case of different and defined "objectDiscriminatorConfig" on both objects
+        // eslint-disable-next-line no-case-declarations
+        const foundComponentRefOutput = nextOutputs.find(
+          o =>
+            o.type === IndirectOutputType.COMPONENT_REF &&
+            o.componentName === outputToAdd.componentName
+        ) as undefined | ComponentRefOutput;
+        if (foundComponentRefOutput && outputToAdd.objectDiscriminatorConfig) {
+          if (!outputToAdd.objectDiscriminatorConfig) {
+            return;
+          }
+          if (!foundComponentRefOutput.objectDiscriminatorConfig) {
+            nextOutputs = nextOutputs.filter(
+              o =>
+                o.type !== IndirectOutputType.COMPONENT_REF ||
+                o.componentName !== outputToAdd.componentName
+            );
+            nextOutputs.push(outputToAdd);
+          }
+          if (
+            JSON.stringify(
+              foundComponentRefOutput.objectDiscriminatorConfig
+            ) !== JSON.stringify(outputToAdd.objectDiscriminatorConfig)
+          ) {
+            throw new Error(
+              `conflicting "objectDiscriminatorConfig" property for type ComponentRefOutput with componentName "${outputToAdd.componentName}":` +
+                `${JSON.stringify(
+                  foundComponentRefOutput.objectDiscriminatorConfig
+                )} Vs. ${JSON.stringify(outputToAdd.objectDiscriminatorConfig)}`
+            );
+          }
           return;
         }
         // eslint-disable-next-line no-case-declarations
@@ -65,7 +86,7 @@ export function mergeIndirectOutputs(
           }
           if (conflictingOutput.type === IndirectOutputType.TYPE_DEFINITION) {
             throw new Error(
-              `conflicting typeName "${outputToAdd.typeName}" for component with name "${outputToAdd.componentName}"`
+              `conflicting typeName "${outputToAdd.typeName}" for component with name "${outputToAdd.componentName}": multiple types with same typeName name defined`
             );
           }
           throw new Error(`conflicting typeName "${outputToAdd.typeName}"`);
