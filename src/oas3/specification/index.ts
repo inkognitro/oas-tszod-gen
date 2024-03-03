@@ -1,4 +1,5 @@
-export * from './schema';
+export * from './specification';
+export * from './endpoint';
 export * from './request';
 export * from './response';
-export * from './endpoint';
+export * from './schema';
