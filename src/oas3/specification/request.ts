@@ -6,6 +6,7 @@ export type RequestParameter = {
   required: boolean;
   schema: Schema;
 };
+
 export function isRequestParameter(
   anyValue: any
 ): anyValue is RequestParameter {
@@ -25,6 +26,7 @@ export type RequestBodyByContentTypes = {
     [contentType: 'application/json' | string]: RequestBody;
   };
 };
+
 export function isRequestBodyByContentTypes(
   anyValue: any
 ): anyValue is RequestBodyByContentTypes {

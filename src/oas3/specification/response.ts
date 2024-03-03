@@ -28,6 +28,7 @@ export type ResponseByStatusCodes = {
     [contentType: 'application/json' | string]: Response | ResponseRef;
   };
 };
+
 export function isResponseByStatusCodes(
   anyValue: any
 ): anyValue is ResponseByStatusCodes {

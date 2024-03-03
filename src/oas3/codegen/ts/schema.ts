@@ -23,16 +23,17 @@ import {
   StringSchema,
 } from '@oas3/specification';
 
-interface CodeGenerator {
+export interface SchemaCodeGenerator {
   createTypeNameByComponentName(oas3ComponentName: string): string;
 }
 
 type SchemaCodeGenerationConfig = {
   contextOutputId?: string;
 };
+
 export function createSchemaCode(
   schema: Schema,
-  codeGenerator: CodeGenerator,
+  codeGenerator: SchemaCodeGenerator,
   config: SchemaCodeGenerationConfig = {}
 ): CodeGenerationSummary {
   if (isComponentSchema(schema)) {
@@ -101,7 +102,7 @@ function createStringSchemaCode(
 
 export function createArraySchemaCode(
   schema: ArraySchema,
-  codeManager: CodeGenerator,
+  codeManager: SchemaCodeGenerator,
   config: SchemaCodeGenerationConfig = {}
 ): CodeGenerationSummary {
   const outputId = v4();
@@ -151,7 +152,7 @@ function createComponentNameByOasSchemaRef(oas3SchemaRef: string): string {
 
 function createTypeNameByOasSchemaRef(
   oas3SchemaRef: string,
-  codeManager: CodeGenerator
+  codeManager: SchemaCodeGenerator
 ): string {
   const componentName = createComponentNameByOasSchemaRef(oas3SchemaRef);
   return codeManager.createTypeNameByComponentName(componentName);
@@ -159,7 +160,7 @@ function createTypeNameByOasSchemaRef(
 
 export function createComponentSchemaCode(
   schema: ComponentSchema,
-  codeManager: CodeGenerator,
+  codeManager: SchemaCodeGenerator,
   config: SchemaCodeGenerationConfig = {},
   objectDiscriminatorConfig?: ObjectDiscriminatorConfig
 ): CodeGenerationSummary {
@@ -186,7 +187,7 @@ type ObjectDiscriminatorConfig = {
 
 export function createObjectSchemaCode(
   schema: ObjectSchema,
-  codeManager: CodeGenerator,
+  codeManager: SchemaCodeGenerator,
   config: SchemaCodeGenerationConfig = {},
   discriminatorConfig?: ObjectDiscriminatorConfig
 ): CodeGenerationSummary {
@@ -308,7 +309,7 @@ function createEnumDiscriminatorOutputType(
 
 export function createOneOfSchemaCode(
   schema: OneOfSchema,
-  codeGenerator: CodeGenerator,
+  codeGenerator: SchemaCodeGenerator,
   config: SchemaCodeGenerationConfig
 ): CodeGenerationSummary {
   const outputId = v4();

@@ -16,6 +16,7 @@ export type Endpoint = {
     [statusCode: string]: Response;
   };
 };
+
 export function isEndpoint(anyValue: any): anyValue is Endpoint {
   const value = anyValue as Endpoint;
   if (typeof value !== 'object' || !Array.isArray(value)) {

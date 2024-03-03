@@ -171,6 +171,7 @@ export type OneOfSchema = {
     propertyName: string;
   };
 };
+
 export function isOneOfSchema(anyValue: any): anyValue is OneOfSchema {
   const value = anyValue as OneOfSchema;
   if (typeof value !== 'object') {
