@@ -1,3 +1,4 @@
+import {v4} from 'uuid';
 import {
   CodeGenerationSummary,
   IndirectOutput,
@@ -26,48 +27,56 @@ interface CodeGenerator {
   createTypeNameByComponentName(oas3ComponentName: string): string;
 }
 
+type SchemaCodeGenerationConfig = {
+  contextOutputId?: string;
+};
 export function createSchemaCode(
   schema: Schema,
-  codeGenerator: CodeGenerator
+  codeGenerator: CodeGenerator,
+  config: SchemaCodeGenerationConfig = {}
 ): CodeGenerationSummary {
   if (isComponentSchema(schema)) {
-    return createComponentSchemaCode(schema, codeGenerator);
+    return createComponentSchemaCode(schema, codeGenerator, config);
   }
   if (isBooleanSchema(schema)) {
-    return createBooleanSchemaCode(schema);
+    return createBooleanSchemaCode(schema, config);
   }
   if (isStringSchema(schema)) {
-    return createStringSchemaCode(schema);
+    return createStringSchemaCode(schema, config);
   }
   if (isNumberSchema(schema)) {
-    return createNumberSchemaCode(schema);
+    return createNumberSchemaCode(schema, config);
   }
   if (isArraySchema(schema)) {
-    return createArraySchemaCode(schema, codeGenerator);
+    return createArraySchemaCode(schema, codeGenerator, config);
   }
   if (isObjectSchema(schema)) {
-    return createObjectSchemaCode(schema, codeGenerator);
+    return createObjectSchemaCode(schema, codeGenerator, config);
   }
   if (isOneOfSchema(schema)) {
-    return createOneOfSchemaCode(schema, codeGenerator);
+    return createOneOfSchemaCode(schema, codeGenerator, config);
   }
   throw new Error(`schema not supported: ${JSON.stringify(schema)}`);
 }
 
 export function createBooleanSchemaCode(
-  schema: BooleanSchema
+  schema: BooleanSchema,
+  config: SchemaCodeGenerationConfig = {}
 ): CodeGenerationSummary {
   let code = 'boolean';
   if (schema.nullable) {
     code = `null | ${code}`;
   }
   return {
-    directOutput: {code},
+    directOutput: {id: v4(), code, contextOutputId: config.contextOutputId},
     indirectOutputs: [],
   };
 }
 
-function createStringSchemaCode(schema: StringSchema): CodeGenerationSummary {
+function createStringSchemaCode(
+  schema: StringSchema,
+  config: SchemaCodeGenerationConfig = {}
+): CodeGenerationSummary {
   let codeComment: undefined | string = undefined;
   let code = 'string';
   if (schema.enum && schema.enum.length > 0) {
@@ -80,27 +89,42 @@ function createStringSchemaCode(schema: StringSchema): CodeGenerationSummary {
     codeComment = schema.format;
   }
   return {
-    directOutput: {code, codeComment},
+    directOutput: {
+      id: v4(),
+      code,
+      contextOutputId: config.contextOutputId,
+      codeComment,
+    },
     indirectOutputs: [],
   };
 }
 
 export function createArraySchemaCode(
   schema: ArraySchema,
-  codeManager: CodeGenerator
+  codeManager: CodeGenerator,
+  config: SchemaCodeGenerationConfig = {}
 ): CodeGenerationSummary {
-  const itemSummary = createSchemaCode(schema.items, codeManager);
+  const outputId = v4();
+  const itemSummary = createSchemaCode(schema.items, codeManager, {
+    contextOutputId: outputId,
+  });
   const codeComment = itemSummary.directOutput.codeComment
     ? `item: ${itemSummary.directOutput.codeComment}`
     : undefined;
   return {
-    directOutput: {code: `${itemSummary.directOutput}[]`, codeComment},
+    directOutput: {
+      id: outputId,
+      code: `${itemSummary.directOutput}[]`,
+      codeComment,
+      contextOutputId: config.contextOutputId,
+    },
     indirectOutputs: itemSummary.indirectOutputs,
   };
 }
 
 export function createNumberSchemaCode(
-  schema: NumberSchema
+  schema: NumberSchema,
+  config: SchemaCodeGenerationConfig = {}
 ): CodeGenerationSummary {
   let codeComment: undefined | string = undefined;
   let code = 'number';
@@ -111,26 +135,45 @@ export function createNumberSchemaCode(
     codeComment = schema.format;
   }
   return {
-    directOutput: {code, codeComment},
+    directOutput: {
+      id: v4(),
+      code,
+      codeComment,
+      contextOutputId: config.contextOutputId,
+    },
     indirectOutputs: [],
   };
+}
+
+function createComponentNameByOasSchemaRef(oas3SchemaRef: string): string {
+  return oas3SchemaRef.replace('#/components/schemas/', '');
+}
+
+function createTypeNameByOasSchemaRef(
+  oas3SchemaRef: string,
+  codeManager: CodeGenerator
+): string {
+  const componentName = createComponentNameByOasSchemaRef(oas3SchemaRef);
+  return codeManager.createTypeNameByComponentName(componentName);
 }
 
 export function createComponentSchemaCode(
   schema: ComponentSchema,
   codeManager: CodeGenerator,
+  config: SchemaCodeGenerationConfig = {},
   objectDiscriminatorConfig?: ObjectDiscriminatorConfig
 ): CodeGenerationSummary {
-  const componentName = schema.$ref.replace('#/components/schemas/', '');
-  const typeName = codeManager.createTypeNameByComponentName(componentName);
+  const typeName = createTypeNameByOasSchemaRef(schema.$ref, codeManager);
   return {
-    directOutput: {code: typeName},
+    directOutput: {id: v4(), code: typeName},
     indirectOutputs: [
       {
+        id: v4(),
         type: IndirectOutputType.COMPONENT_REF,
-        typeName: typeName,
-        componentName,
+        typeName,
+        componentName: createComponentNameByOasSchemaRef(schema.$ref),
         objectDiscriminatorConfig,
+        contextOutputId: config.contextOutputId,
       },
     ],
   };
@@ -144,14 +187,18 @@ type ObjectDiscriminatorConfig = {
 export function createObjectSchemaCode(
   schema: ObjectSchema,
   codeManager: CodeGenerator,
+  config: SchemaCodeGenerationConfig = {},
   discriminatorConfig?: ObjectDiscriminatorConfig
 ): CodeGenerationSummary {
+  const outputId = v4();
   const codeRows: string[] = [];
   let indirectOutputs: IndirectOutput[] = [];
   for (const propName in schema.properties) {
     const propSchema = schema.properties[propName];
     if (discriminatorConfig && propName === discriminatorConfig.propName) {
-      const propSummary = createSchemaCode(propSchema, codeManager);
+      const propSummary = createSchemaCode(propSchema, codeManager, {
+        contextOutputId: outputId,
+      });
       indirectOutputs = mergeIndirectOutputs(
         indirectOutputs,
         propSummary.indirectOutputs
@@ -159,7 +206,9 @@ export function createObjectSchemaCode(
       codeRows.push(`${propName}: ${discriminatorConfig.propValueCode}`);
       continue;
     }
-    const propSummary = createSchemaCode(propSchema, codeManager);
+    const propSummary = createSchemaCode(propSchema, codeManager, {
+      contextOutputId: outputId,
+    });
     indirectOutputs = mergeIndirectOutputs(
       indirectOutputs,
       propSummary.indirectOutputs
@@ -175,7 +224,8 @@ export function createObjectSchemaCode(
   if (schema.additionalProperties) {
     const propSummary = createSchemaCode(
       schema.additionalProperties,
-      codeManager
+      codeManager,
+      {contextOutputId: outputId}
     );
     indirectOutputs = mergeIndirectOutputs(
       indirectOutputs,
@@ -189,7 +239,11 @@ export function createObjectSchemaCode(
     );
   }
   return {
-    directOutput: {code: `{\n${codeRows.join('\n')}\n}`},
+    directOutput: {
+      id: outputId,
+      code: `{\n${codeRows.join('\n')}\n}`,
+      contextOutputId: config.contextOutputId,
+    },
     indirectOutputs,
   };
 }
@@ -227,8 +281,8 @@ type ExactFoo = {
 type Foo = DailyFoo | WeekdaysFoo | ExactFoo;
 */
 
-function capitalizeFirstLetterOnly(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+function capitalizeFirstLetter(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 function getEnumValueFromItemSchema(
@@ -260,7 +314,9 @@ function getEnumValueFromItemSchema(
 
 function createEnumDiscriminatorOutputType(
   oneOfSchema: OneOfSchema,
-  discriminatorPropName: string
+  discriminatorPropName: string,
+  config: SchemaCodeGenerationConfig,
+  typeName: string
 ): IndirectOutput {
   const enumParts: string[] = [];
   oneOfSchema.oneOf.forEach(itemSchema => {
@@ -270,30 +326,47 @@ function createEnumDiscriminatorOutputType(
   });
   const enumsCodeLines: string[] = [];
   enumParts.forEach(e => {
-    const entryName = capitalizeFirstLetterOnly(e);
+    const entryName = capitalizeFirstLetter(e);
     enumsCodeLines.push(`${entryName} = "${entryName}"`);
   });
   return {
+    id: v4(),
     type: IndirectOutputType.TYPE_DEFINITION,
-    typeName: '', // todo: implement
+    typeName,
     codeType: 'enum',
-    code: `enum ${capitalizeFirstLetterOnly(
-      discriminatorPropName
-    )} {\n${enumsCodeLines.join('\n')}\n}`,
+    code: `{\n${enumsCodeLines.join(',\n')}\n}`,
+    contextOutputId: config.contextOutputId,
   };
 }
 
 export function createOneOfSchemaCode(
   schema: OneOfSchema,
-  codeGenerator: CodeGenerator
+  codeGenerator: CodeGenerator,
+  config: SchemaCodeGenerationConfig
 ): CodeGenerationSummary {
+  const outputId = v4();
+  const subSchemaGenerationConfig: SchemaCodeGenerationConfig = {
+    contextOutputId: outputId,
+  };
+
   const codeParts: string[] = [];
   let indirectOutputs: IndirectOutput[] = [];
 
+  let enumTypeName = '';
   const discriminatorPropName = schema.discriminator?.propertyName;
   if (discriminatorPropName) {
+    enumTypeName = isComponentSchema(schema)
+      ? capitalizeFirstLetter(
+          createTypeNameByOasSchemaRef(schema.$ref, codeGenerator)
+        )
+      : capitalizeFirstLetter(discriminatorPropName);
     indirectOutputs.push(
-      createEnumDiscriminatorOutputType(schema, discriminatorPropName)
+      createEnumDiscriminatorOutputType(
+        schema,
+        discriminatorPropName,
+        subSchemaGenerationConfig,
+        enumTypeName
+      )
     );
   }
 
@@ -302,20 +375,25 @@ export function createOneOfSchemaCode(
     if (discriminatorPropName) {
       const objectDiscriminatorConfig: ObjectDiscriminatorConfig = {
         propName: discriminatorPropName,
-        propValueCode: '', // todo: implement: "getEnumValueFromItemSchema(itemSchema, discriminatorPropName)"
+        propValueCode: `${enumTypeName}.${getEnumValueFromItemSchema(
+          itemSchema,
+          discriminatorPropName
+        )}`,
       };
       if (isObjectSchema(itemSchema)) {
         itemSummary = createObjectSchemaCode(
           itemSchema,
           codeGenerator,
+          subSchemaGenerationConfig,
           objectDiscriminatorConfig
-        ); // todo: overwrite discriminatorProp with enum somehow instead of string
+        );
       } else if (isComponentSchema(itemSchema)) {
         itemSummary = createComponentSchemaCode(
           itemSchema,
           codeGenerator,
+          subSchemaGenerationConfig,
           objectDiscriminatorConfig
-        ); // todo: overwrite discriminatorPropName with enum somehow instead of string
+        );
       } else {
         throw new Error(
           `oneOf with defined discriminator.propertyName "${discriminatorPropName}" must only contain objectSchema, but following schema was given: ${JSON.stringify(
@@ -325,7 +403,11 @@ export function createOneOfSchemaCode(
       }
     }
     if (!itemSummary) {
-      itemSummary = createSchemaCode(itemSchema, codeGenerator);
+      itemSummary = createSchemaCode(
+        itemSchema,
+        codeGenerator,
+        subSchemaGenerationConfig
+      );
     }
     indirectOutputs = mergeIndirectOutputs(
       indirectOutputs,
@@ -337,7 +419,11 @@ export function createOneOfSchemaCode(
     codeParts.push(`| ${itemSummary.directOutput.code}${itemComment}`);
   });
   return {
-    directOutput: {code: `${codeParts.join('\n')}`},
+    directOutput: {
+      id: outputId,
+      code: `${codeParts.join('\n')}`,
+      contextOutputId: config.contextOutputId,
+    },
     indirectOutputs,
   };
 }

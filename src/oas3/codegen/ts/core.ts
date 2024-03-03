@@ -1,4 +1,9 @@
-export type DirectOutput = {
+type OutputBase = {
+  id: string;
+  contextOutputId?: string;
+};
+
+export type DirectOutput = OutputBase & {
   code: string;
   codeComment?: string;
 };
@@ -8,13 +13,12 @@ export enum IndirectOutputType {
   COMPONENT_REF = 'COMPONENT_REF',
 }
 
-export type TypeDefinitionOutput = {
+export type TypeDefinitionOutput = OutputBase & {
   type: IndirectOutputType.TYPE_DEFINITION;
   typeName: string;
   codeType: 'enum' | 'type';
   code: string;
   codeComment?: string;
-  relatedComponentName?: string; // todo: use or remove
 };
 
 export type ObjectDiscriminatorConfig = {
@@ -22,7 +26,7 @@ export type ObjectDiscriminatorConfig = {
   propValueCode: string;
 };
 
-export type ComponentRefOutput = {
+export type ComponentRefOutput = OutputBase & {
   type: IndirectOutputType.COMPONENT_REF;
   componentName: string;
   typeName: string;
