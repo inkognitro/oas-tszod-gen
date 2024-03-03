@@ -16,7 +16,7 @@ export type Endpoint = {
     [statusCode: string]: Response;
   };
 };
-function isEndpoint(anyValue: any): anyValue is Endpoint {
+export function isEndpoint(anyValue: any): anyValue is Endpoint {
   const value = anyValue as Endpoint;
   if (typeof value !== 'object' || !Array.isArray(value)) {
     return false;
@@ -49,26 +49,6 @@ function isEndpoint(anyValue: any): anyValue is Endpoint {
   }
   if (!isResponseByStatusCodes(value.responses)) {
     return false;
-  }
-  return true;
-}
-
-export type EndpointsByPath = {
-  [requestMethod: string]: Endpoint;
-}; // todo: implement
-
-export function isEndpointsByPathDefinition(
-  anyValue: any
-): anyValue is EndpointsByPath {
-  const value = anyValue as EndpointsByPath;
-  if (typeof value !== 'object' || !Array.isArray(value)) {
-    return false;
-  }
-  for (const requestMethod in value) {
-    const endpoint = value[requestMethod];
-    if (!isEndpoint(endpoint)) {
-      return false;
-    }
   }
   return true;
 }
