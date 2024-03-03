@@ -10,11 +10,8 @@ Easy one to answer:
 - to have a bigger customer satisfaction due to fewer bugs
 
 ## Why did you write yet another library for this task?
-Good question. There are a lot of libraries out there which try to achieve the very same:
-Type safe calls to API endpoints.
-
-The aim of this library is not only to guarantee type-safety but also to generate
-endpoint caller functions with standalone types which can be used in your code base.
+Good question. The aim of this library is not only to guarantee type-safety but also to generate
+endpoint caller functions with standalone types which then can be used in your code base.
 
 > **Worried?**
 > 
