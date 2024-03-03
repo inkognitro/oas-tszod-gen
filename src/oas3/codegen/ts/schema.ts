@@ -21,7 +21,7 @@ import {
   OneOfSchema,
   Schema,
   StringSchema,
-} from '../../specification';
+} from '@oas3/specification';
 
 interface CodeGenerator {
   createTypeNameByComponentName(oas3ComponentName: string): string;
