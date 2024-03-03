@@ -16,7 +16,7 @@ Type safe calls to API endpoints.
 The aim of this library is not only to guarantee type-safety but also to generate
 endpoint caller functions with standalone types which can be used in your code base.
 
-> **Some worries about that?**
+> **Worried?**
 > 
 > As long as the API contract on the backend site was not violated through breaking changes,
 > there is no need to worry about different code generation outputs,
