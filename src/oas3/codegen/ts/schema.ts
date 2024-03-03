@@ -248,39 +248,6 @@ export function createObjectSchemaCode(
   };
 }
 
-/*
-type X =
-  | 'sdfkjsdklfsddfdfj'
-  | 'sdfkljsdfklsdjdsflkdsf'
-  | 'sdflkjsdfjklsdfklsdfljkldf'
-  | '2349324lsdfsdfödfklö';
-*/
-
-/*
-enum FooType {
-  daily = 'daily',
-  weekdays = 'weekdays',
-  exact = 'exact',
-}
-
-type DailyFoo = {
-  type: FooType.daily;
-  day: string;
-};
-
-type WeekdaysFoo = {
-  type: FooType.weekdays;
-  weekdays: string;
-};
-
-type ExactFoo = {
-  type: FooType.exact;
-  weekdays: string;
-};
-
-type Foo = DailyFoo | WeekdaysFoo | ExactFoo;
-*/
-
 function capitalizeFirstLetter(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
