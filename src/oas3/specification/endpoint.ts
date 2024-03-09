@@ -5,6 +5,10 @@ import {
   RequestBodyByContentTypes,
   RequestParameter,
 } from './request';
+import {
+  isPermissionsBySecurityNameArray,
+  PermissionsBySecurityNameArray,
+} from './security';
 
 export type Endpoint = {
   operationId: string;
@@ -15,6 +19,7 @@ export type Endpoint = {
   responses: {
     [statusCode: string]: Response;
   };
+  security: null | PermissionsBySecurityNameArray;
 };
 
 export function isEndpoint(anyValue: any): anyValue is Endpoint {
@@ -49,6 +54,9 @@ export function isEndpoint(anyValue: any): anyValue is Endpoint {
     return false;
   }
   if (!isResponseByStatusCodes(value.responses)) {
+    return false;
+  }
+  if (!!value.security && isPermissionsBySecurityNameArray(value.security)) {
     return false;
   }
   return true;

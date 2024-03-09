@@ -1,3 +1,37 @@
+function getUrlVariableNames(endpointPath: string): string[] {
+  const urlVariableNameRegex = /[^{}]+(?=})/g;
+  const urlVariableNames = endpointPath.match(urlVariableNameRegex);
+  return urlVariableNames ?? [];
+}
+
+type UrlParameters = {
+  [paramName: string]: number | string;
+};
+
+function createRequestUrl(endpointPath: string, params: UrlParameters): string {
+  const urlVariableNames = getUrlVariableNames(endpointPath);
+  let url = endpointPath;
+  urlVariableNames.forEach(urlVariableName => {
+    const paramPropNames = Object.keys(params);
+    if (!paramPropNames.includes(urlVariableName)) {
+      console.error(
+        `url variable "${urlVariableName}" not available in params: ${params}`
+      );
+      return;
+    }
+    // @ts-ignore
+    const paramValue = params[urlVariableName];
+    if (typeof paramValue !== 'string' && typeof paramValue !== 'number') {
+      console.error(
+        `url variable "${urlVariableName}" must either be a string or a number, following params were given: ${params}`
+      );
+      return;
+    }
+    url = url.replaceAll(`{${urlVariableName}}`, `${paramValue}`);
+  });
+  return url;
+}
+
 export type EndpointId = {
   method: string;
   path: string;
@@ -6,10 +40,29 @@ export type EndpointId = {
 export type Request = {
   endpointId: EndpointId;
   url: string;
+  supportedSecuritySchemes: string[];
   headers: object;
   queryParams: object;
   body: object;
 };
+
+type RequestCreationSettings = {
+  endpointId: EndpointId;
+  urlParams?: UrlParameters;
+  queryParams?: object;
+  body?: object;
+};
+
+export function createRequest(settings: RequestCreationSettings): Request {
+  return {
+    endpointId: settings.endpointId,
+    url: createRequestUrl(settings.endpointId.path, settings.urlParams ?? {}),
+    supportedSecuritySchemes: [],
+    headers: {},
+    queryParams: {},
+    body: {},
+  };
+}
 
 export enum StatusCode {
   OK = 200,
@@ -32,36 +85,13 @@ export type RequestResult<
   hasRequestBeenCancelled: boolean;
 };
 
-export interface Core {
-  execute(request: Request): RequestResult;
-}
-
-// todo: remove following experimental code
-export const authenticateEndpointId: EndpointId = {
-  method: 'post',
-  path: '/v1/authenticate',
+export type RequestExecutionConfig = {
+  onUploadProgress?: () => void;
 };
 
-export type AuthenticateRequest = Request & {};
-
-type OkAuthenticateResponse = Response<StatusCode.OK, {accessToken: string}>;
-type BadRequestAuthenticateResponse = Response<StatusCode.BAD_REQUEST>;
-
-export type AuthenticateResponse =
-  | OkAuthenticateResponse
-  | BadRequestAuthenticateResponse;
-
-export type AuthenticateRequestResult = RequestResult<
-  AuthenticateRequest,
-  AuthenticateResponse
->;
-
-export function authenticate(
-  requestHandler: Core,
-  request: AuthenticateRequest
-): Promise<AuthenticateRequestResult> {
-  // todo: implement url transformation
-  return new Promise<AuthenticateRequestResult>(resolve => {
-    resolve(requestHandler.execute(request) as AuthenticateRequestResult);
-  });
+export interface RequestHandler {
+  execute(
+    request: Request,
+    config?: RequestExecutionConfig
+  ): Promise<RequestResult>;
 }
