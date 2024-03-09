@@ -81,7 +81,7 @@ export type RequestResult<
   Res extends Response = any,
 > = {
   request: Req;
-  response: undefined | Res;
+  response: null | Res;
   hasRequestBeenCancelled: boolean;
 };
 
