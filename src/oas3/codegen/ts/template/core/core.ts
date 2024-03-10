@@ -41,6 +41,7 @@ export type Request = {
   endpointId: EndpointId;
   url: string;
   supportedSecuritySchemes: string[];
+  securityScheme: null | string;
   headers: object;
   queryParams: object;
   body: object;
@@ -56,8 +57,9 @@ type RequestCreationSettings = {
 export function createRequest(settings: RequestCreationSettings): Request {
   return {
     endpointId: settings.endpointId,
-    url: createRequestUrl(settings.endpointId.path, settings.urlParams ?? {}),
     supportedSecuritySchemes: [],
+    securityScheme: null,
+    url: createRequestUrl(settings.endpointId.path, settings.urlParams ?? {}),
     headers: {},
     queryParams: {},
     body: {},
