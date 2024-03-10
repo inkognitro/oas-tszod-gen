@@ -25,7 +25,7 @@ export type EnumDefinitionOutput = GenericOutput<
   OutputType.ENUM_DEFINITION,
   {
     localTypeName: string;
-    createTypeName: (context: string) => string;
+    createTypeName: (referencingContext: string) => string;
     createCode: CreateCodeFunc;
     codeComment?: string;
   }

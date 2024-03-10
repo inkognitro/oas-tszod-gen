@@ -28,7 +28,11 @@ import {
 } from '@oas3/specification';
 
 export interface SchemaCodeGenerator {
-  createComponentTypeName(ref: string, referencingContext?: string): string;
+  createComponentTypeName(
+    ref: string,
+    context: string,
+    referencingContext?: string
+  ): string;
 }
 
 type SchemaCodeGenerationConfig = {
@@ -42,7 +46,7 @@ export function createSchemaCode(
   config: SchemaCodeGenerationConfig = {}
 ): CodeGenerationSummary {
   if (isComponentRefSchema(schema)) {
-    return createComponentRefSchemaCode(schema, codeGenerator, config);
+    return createComponentRefSchemaCode(schema, context, codeGenerator, config);
   }
   if (isBooleanSchema(schema)) {
     return createBooleanSchemaCode(schema, context, config);
@@ -187,7 +191,11 @@ export function createComponentRefSchemaCode(
       type: OutputType.DIRECT,
       id: v4(),
       createCode: referencingContext =>
-        codeManager.createComponentTypeName(referencingContext),
+        codeManager.createComponentTypeName(
+          schema.$ref,
+          context,
+          referencingContext
+        ),
       context,
     },
     indirectOutputs: [
@@ -400,10 +408,10 @@ export function createOneOfSchemaCode(
         requiredOutputId: discriminatorEnumDefinitionOutput.id,
         propName: discriminatorPropName,
         createCode: referencingContext => {
-          // todo: check where referencingContext should be used instead
-
           const enumTypeName =
-            discriminatorEnumDefinitionOutput.createTypeName(context);
+            discriminatorEnumDefinitionOutput.createTypeName(
+              referencingContext
+            );
           return `${enumTypeName}.${getEnumValueFromItemSchema(
             itemSchema,
             discriminatorPropName
