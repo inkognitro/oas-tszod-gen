@@ -11,22 +11,22 @@ type GenericSecurityScheme<
   P extends object = {},
 > = P & {type: T; name: string};
 
-type HttpBasicSecurityScheme = GenericSecurityScheme<
+export type HttpBasicSecurityScheme = GenericSecurityScheme<
   SecuritySchemeType.httpBasic,
   {findToken: () => null | string}
 >;
 
-type HttpBearerSecurityScheme = GenericSecurityScheme<
+export type HttpBearerSecurityScheme = GenericSecurityScheme<
   SecuritySchemeType.httpBearer,
   {findToken: () => null | string}
 >;
 
-type CustomSecuritySchemeRequestModificationResult = {
+export type CustomSecuritySchemeRequestModificationResult = {
   request: Request;
   securityWasAppliedToRequest: boolean;
 };
 
-type CustomSecurityScheme = GenericSecurityScheme<
+export type CustomSecurityScheme = GenericSecurityScheme<
   SecuritySchemeType.custom,
   {
     createModifiedRequest: (
