@@ -1,39 +1,52 @@
-type OutputBase = {
-  id: string;
-  contextOutputId?: string;
-};
+export type CreateCodeFunc = (referencingContext: string) => string;
 
-export type DirectOutput = OutputBase & {
-  code: string;
-  codeComment?: string;
-};
-
-export enum IndirectOutputType {
-  TYPE_DEFINITION = 'TYPE_DEFINITION',
+export enum OutputType {
+  DIRECT = 'DIRECT',
+  ENUM_DEFINITION = 'ENUM_DEFINITION',
   COMPONENT_REF = 'COMPONENT_REF',
 }
 
-export type TypeDefinitionOutput = OutputBase & {
-  type: IndirectOutputType.TYPE_DEFINITION;
-  typeName: string;
-  codeType: 'enum' | 'type';
-  code: string;
-  codeComment?: string;
+type GenericOutput<T extends OutputType, P extends object = {}> = P & {
+  type: T;
+  id: string;
+  context: string;
+  contextOutputId?: string;
 };
+
+export type DirectOutput = GenericOutput<
+  OutputType.DIRECT,
+  {
+    createCode: CreateCodeFunc;
+    codeComment?: string;
+  }
+>;
+
+export type EnumDefinitionOutput = GenericOutput<
+  OutputType.ENUM_DEFINITION,
+  {
+    localTypeName: string;
+    createTypeName: (context: string) => string;
+    createCode: CreateCodeFunc;
+    codeComment?: string;
+  }
+>;
 
 export type ObjectDiscriminatorConfig = {
   propName: string;
-  propValueCode: string;
+  createCode: CreateCodeFunc;
+  codeComment?: string;
+  requiredOutputId: string; // todo: remove and define "requiredOutputIds" property for "DirectOutput" type (reverse dependency pointer)
 };
 
-export type ComponentRefOutput = OutputBase & {
-  type: IndirectOutputType.COMPONENT_REF;
-  componentName: string;
-  typeName: string;
-  objectDiscriminatorConfig?: ObjectDiscriminatorConfig;
-};
+export type ComponentRefOutput = GenericOutput<
+  OutputType.COMPONENT_REF,
+  {
+    componentRef: string;
+    objectDiscriminatorConfig?: ObjectDiscriminatorConfig;
+  }
+>;
 
-export type IndirectOutput = TypeDefinitionOutput | ComponentRefOutput;
+export type IndirectOutput = EnumDefinitionOutput | ComponentRefOutput;
 
 export type CodeGenerationSummary = {
   directOutput: DirectOutput;
@@ -47,12 +60,12 @@ export function mergeIndirectOutputs(
   let nextOutputs = [...existingOutputs];
   additionalOutputs.forEach(outputToAdd => {
     switch (outputToAdd.type) {
-      case IndirectOutputType.COMPONENT_REF:
+      case OutputType.COMPONENT_REF:
         // eslint-disable-next-line no-case-declarations
         const foundComponentRefOutput = nextOutputs.find(
           o =>
-            o.type === IndirectOutputType.COMPONENT_REF &&
-            o.componentName === outputToAdd.componentName
+            o.type === OutputType.COMPONENT_REF &&
+            o.componentRef === outputToAdd.componentRef
         ) as undefined | ComponentRefOutput;
         if (foundComponentRefOutput && outputToAdd.objectDiscriminatorConfig) {
           if (!outputToAdd.objectDiscriminatorConfig) {
@@ -61,8 +74,8 @@ export function mergeIndirectOutputs(
           if (!foundComponentRefOutput.objectDiscriminatorConfig) {
             nextOutputs = nextOutputs.filter(
               o =>
-                o.type !== IndirectOutputType.COMPONENT_REF ||
-                o.componentName !== outputToAdd.componentName
+                o.type !== OutputType.COMPONENT_REF ||
+                o.componentRef !== outputToAdd.componentRef
             );
             nextOutputs.push(outputToAdd);
           }
@@ -72,7 +85,7 @@ export function mergeIndirectOutputs(
             ) !== JSON.stringify(outputToAdd.objectDiscriminatorConfig)
           ) {
             throw new Error(
-              `conflicting "objectDiscriminatorConfig" property for type ComponentRefOutput with componentName "${outputToAdd.componentName}":` +
+              `conflicting "objectDiscriminatorConfig" property for type ComponentRefOutput with componentName "${outputToAdd.componentRef}":` +
                 `${JSON.stringify(
                   foundComponentRefOutput.objectDiscriminatorConfig
                 )} Vs. ${JSON.stringify(outputToAdd.objectDiscriminatorConfig)}`
@@ -80,35 +93,19 @@ export function mergeIndirectOutputs(
           }
           return;
         }
-        // eslint-disable-next-line no-case-declarations
-        const conflictingOutput = nextOutputs.find(
-          o => o.typeName === outputToAdd.typeName
-        );
-        if (conflictingOutput) {
-          if (conflictingOutput.type === IndirectOutputType.COMPONENT_REF) {
-            throw new Error(
-              `conflicting typeName "${outputToAdd.typeName}" for components with name "${outputToAdd.componentName}" and "${conflictingOutput.componentName}"`
-            );
-          }
-          if (conflictingOutput.type === IndirectOutputType.TYPE_DEFINITION) {
-            throw new Error(
-              `conflicting typeName "${outputToAdd.typeName}" for component with name "${outputToAdd.componentName}": multiple types with same typeName name defined`
-            );
-          }
-          throw new Error(`conflicting typeName "${outputToAdd.typeName}"`);
-        }
         nextOutputs.push(outputToAdd);
         return;
-      case IndirectOutputType.TYPE_DEFINITION:
+      case OutputType.ENUM_DEFINITION:
         if (
           nextOutputs.find(
             o =>
-              o.type === IndirectOutputType.TYPE_DEFINITION &&
-              o.typeName === outputToAdd.typeName
+              o.type === OutputType.ENUM_DEFINITION &&
+              o.localTypeName === outputToAdd.localTypeName &&
+              o.context === outputToAdd.context
           )
         ) {
           throw new Error(
-            `ambiguous typeName "${outputToAdd.typeName}" for type definition`
+            `ambiguous typeName "${outputToAdd.localTypeName}" for type definition`
           );
         }
         nextOutputs.push(outputToAdd);
