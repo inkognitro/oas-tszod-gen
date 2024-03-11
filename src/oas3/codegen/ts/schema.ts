@@ -363,11 +363,13 @@ function createNullableDiscriminatorEnumDefinitionOutput(
     const entryName = capitalizeFirstLetter(e);
     enumsCodeLines.push(`${entryName} = "${entryName}"`);
   });
+  const localName = `${capitalizeFirstLetter(discriminatorPropName)}`;
   return {
     id: v4(),
     type: OutputType.ENUM_DEFINITION,
-    createTypeName: referencingContext =>
-      codeGenerator.createEnumTypeName(referencingContext),
+    createTypeName: referencingContext => {
+      codeGenerator.createEnumTypeName(referencingContext);
+    },
     createCode: () => `{\n${enumsCodeLines.join(',\n')}\n}`,
     context,
     contextOutputId: config.contextOutputId,
