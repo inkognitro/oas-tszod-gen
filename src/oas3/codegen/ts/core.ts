@@ -42,6 +42,7 @@ export type EnumDefinitionOutput = GenericOutput<
 
 export type ObjectDiscriminatorConfig = {
   propName: string;
+  requiredOutputPaths: OutputPath[];
   createCode: CreateCodeFunc;
   codeComment?: string;
 };
