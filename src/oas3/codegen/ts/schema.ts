@@ -218,17 +218,16 @@ export function createObjectSchemaSummary(
       codeComment?: string;
     };
   } = {};
+  const requiredOutputPaths: OutputPath[];
   let indirectOutputs: IndirectOutput[] = [];
   for (const propName in schema.properties) {
     const propSchema = schema.properties[propName];
+    const subSchemaPath = [...path, propName];
     if (discriminatorConfig && propName === discriminatorConfig.propName) {
       const propSummary = createSchemaSummary(
         propSchema,
-        context,
-        codeGenerator,
-        {
-          contextOutputId: outputId,
-        }
+        subSchemaPath,
+        codeGenerator
       );
       indirectOutputs = mergeIndirectOutputs(
         indirectOutputs,
@@ -239,11 +238,8 @@ export function createObjectSchemaSummary(
     }
     const propSummary = createSchemaSummary(
       propSchema,
-      context,
-      codeGenerator,
-      {
-        contextOutputId: outputId,
-      }
+      subSchemaPath,
+      codeGenerator
     );
     indirectOutputs = mergeIndirectOutputs(
       indirectOutputs,
@@ -256,8 +252,7 @@ export function createObjectSchemaSummary(
     const propSummary = createSchemaSummary(
       schema.additionalProperties,
       context,
-      codeGenerator,
-      {contextOutputId: outputId}
+      codeGenerator
     );
     additionalPropertiesDirectOutput = propSummary.directOutput;
     indirectOutputs = mergeIndirectOutputs(
@@ -383,17 +378,12 @@ export function createOneOfSchemaSummary(
   path: OutputPath,
   codeGenerator: SchemaCodeGenerator
 ): CodeGenerationSummary {
-  const outputId = v4();
-  const subSchemaGenerationConfig: SchemaCodeGenerationConfig = {
-    contextOutputId: outputId,
-  };
   let indirectOutputs: IndirectOutput[] = [];
   const discriminatorEnumDefinitionOutput =
     createNullableDiscriminatorEnumDefinitionOutput(
       schema,
-      context,
-      codeGenerator,
-      subSchemaGenerationConfig
+      path,
+      codeGenerator
     );
   if (discriminatorEnumDefinitionOutput) {
     indirectOutputs.push(discriminatorEnumDefinitionOutput);
@@ -408,7 +398,7 @@ export function createOneOfSchemaSummary(
         throw new Error('this case should never happen');
       }
       const objectDiscriminatorConfig: ObjectDiscriminatorConfig = {
-        requiredOutputId: discriminatorEnumDefinitionOutput.id,
+        requiredOutputPaths: [discriminatorEnumDefinitionOutput.path],
         propName: discriminatorPropName,
         createCode: referencingContext => {
           const enumTypeName =
@@ -424,17 +414,15 @@ export function createOneOfSchemaSummary(
       if (isObjectSchema(itemSchema)) {
         itemSummary = createObjectSchemaSummary(
           itemSchema,
-          context,
+          path,
           codeGenerator,
-          subSchemaGenerationConfig,
           objectDiscriminatorConfig
         );
       } else if (isComponentRefSchema(itemSchema)) {
         itemSummary = createComponentRefSchemaSummary(
           itemSchema,
-          context,
+          path,
           codeGenerator,
-          subSchemaGenerationConfig,
           objectDiscriminatorConfig
         );
       } else {
@@ -462,7 +450,7 @@ export function createOneOfSchemaSummary(
   return {
     directOutput: {
       type: OutputType.DIRECT,
-      id: outputId,
+      id: v4(),
       createCode: referencingContext => {
         const codeParts: string[] = [];
         itemDirectOutputs.forEach(directOutput => {
