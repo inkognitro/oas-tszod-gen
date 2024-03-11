@@ -1,16 +1,26 @@
-export type CreateCodeFunc = (referencingContext: string) => string;
-
 export enum OutputType {
   DIRECT = 'DIRECT',
   ENUM_DEFINITION = 'ENUM_DEFINITION',
   COMPONENT_REF = 'COMPONENT_REF',
 }
 
+export const arrayItemPathPart = 'array-item-5acf7fae';
+
+export type OutputPath = string[];
+
+export function areOutputPathsEqual(a: OutputPath, b: OutputPath): boolean {
+  return (
+    a.length === b.length && a.every((element, index) => element === b[index])
+  );
+}
+
+export type CreateCodeFunc = (referencingPath: OutputPath) => string;
+
 type GenericOutput<T extends OutputType, P extends object = {}> = P & {
   type: T;
   id: string;
-  context: string;
-  contextOutputId?: string;
+  path: OutputPath;
+  requiredOutputPaths: OutputPath[];
 };
 
 export type DirectOutput = GenericOutput<
@@ -24,7 +34,7 @@ export type DirectOutput = GenericOutput<
 export type EnumDefinitionOutput = GenericOutput<
   OutputType.ENUM_DEFINITION,
   {
-    createTypeName: (referencingContext?: string) => string;
+    createTypeName: (referencingPath?: OutputPath) => string;
     createCode: CreateCodeFunc;
     codeComment?: string;
   }
@@ -34,12 +44,12 @@ export type ObjectDiscriminatorConfig = {
   propName: string;
   createCode: CreateCodeFunc;
   codeComment?: string;
-  requiredOutputId: string; // todo: remove and define "requiredOutputIds" property for "DirectOutput" type (reverse dependency pointer)
 };
 
 export type ComponentRefOutput = GenericOutput<
   OutputType.COMPONENT_REF,
   {
+    createTypeName: (referencingPath: OutputPath) => string;
     componentRef: string;
     objectDiscriminatorConfig?: ObjectDiscriminatorConfig;
   }
@@ -99,12 +109,13 @@ export function mergeIndirectOutputs(
           nextOutputs.find(
             o =>
               o.type === OutputType.ENUM_DEFINITION &&
-              o.localTypeName === outputToAdd.localTypeName &&
-              o.context === outputToAdd.context
+              areOutputPathsEqual(o.path, outputToAdd.path)
           )
         ) {
           throw new Error(
-            `ambiguous typeName "${outputToAdd.localTypeName}" for type definition`
+            `ambiguous outputPath "${JSON.stringify(
+              outputToAdd.path
+            )}" for enum definition`
           );
         }
         nextOutputs.push(outputToAdd);

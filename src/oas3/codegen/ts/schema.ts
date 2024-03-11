@@ -8,6 +8,8 @@ import {
   ObjectDiscriminatorConfig,
   OutputType,
   EnumDefinitionOutput,
+  OutputPath,
+  arrayItemPathPart,
 } from './core';
 import {
   ArraySchema,
@@ -28,51 +30,42 @@ import {
 } from '@oas3/specification';
 
 export interface SchemaCodeGenerator {
-  createComponentTypeName(
-    ref: string,
-    context: string,
-    referencingContext?: string
-  ): string;
+  createComponentTypeName(ref: string, referencingPath: OutputPath): string;
+  createEnumName(path: OutputPath, referencingPath: OutputPath): string;
 }
 
-type SchemaCodeGenerationConfig = {
-  contextOutputId?: string;
-};
-
-export function createSchemaCode(
+export function createSchemaSummary(
   schema: Schema,
-  context: string,
-  codeGenerator: SchemaCodeGenerator,
-  config: SchemaCodeGenerationConfig = {}
+  path: OutputPath,
+  codeGenerator: SchemaCodeGenerator
 ): CodeGenerationSummary {
   if (isComponentRefSchema(schema)) {
-    return createComponentRefSchemaCode(schema, context, codeGenerator, config);
+    return createComponentRefSchemaSummary(schema, path, codeGenerator);
   }
   if (isBooleanSchema(schema)) {
-    return createBooleanSchemaCode(schema, context, config);
+    return createBooleanSchemaSummary(schema, path);
   }
   if (isStringSchema(schema)) {
-    return createStringSchemaCode(schema, context, config);
+    return createStringSchemaSummary(schema, path);
   }
   if (isNumberSchema(schema)) {
-    return createNumberSchemaCode(schema, context, config);
+    return createNumberSchemaSummary(schema, path);
   }
   if (isArraySchema(schema)) {
-    return createArraySchemaCode(schema, context, codeGenerator, config);
+    return createArraySchemaSummary(schema, path, codeGenerator);
   }
   if (isObjectSchema(schema)) {
-    return createObjectSchemaCode(schema, context, codeGenerator, config);
+    return createObjectSchemaSummary(schema, path, codeGenerator);
   }
   if (isOneOfSchema(schema)) {
-    return createOneOfSchemaCode(schema, context, codeGenerator, config);
+    return createOneOfSchemaSummary(schema, path, codeGenerator);
   }
   throw new Error(`schema not supported: ${JSON.stringify(schema)}`);
 }
 
-export function createBooleanSchemaCode(
+export function createBooleanSchemaSummary(
   schema: BooleanSchema,
-  context: string,
-  config: SchemaCodeGenerationConfig = {}
+  path: OutputPath
 ): CodeGenerationSummary {
   let code = 'boolean';
   if (schema.nullable) {
@@ -85,17 +78,16 @@ export function createBooleanSchemaCode(
       createCode: () => {
         return code;
       },
-      context,
-      contextOutputId: config.contextOutputId,
+      path,
+      requiredOutputPaths: [],
     },
     indirectOutputs: [],
   };
 }
 
-function createStringSchemaCode(
+function createStringSchemaSummary(
   schema: StringSchema,
-  context: string,
-  config: SchemaCodeGenerationConfig = {}
+  path: OutputPath
 ): CodeGenerationSummary {
   let codeComment: undefined | string = undefined;
   let code = 'string';
@@ -115,24 +107,25 @@ function createStringSchemaCode(
       createCode: () => {
         return code;
       },
-      contextOutputId: config.contextOutputId,
-      context,
+      path,
+      requiredOutputPaths: [],
       codeComment,
     },
     indirectOutputs: [],
   };
 }
 
-export function createArraySchemaCode(
+export function createArraySchemaSummary(
   schema: ArraySchema,
-  context: string,
-  codeManager: SchemaCodeGenerator,
-  config: SchemaCodeGenerationConfig = {}
+  path: OutputPath,
+  codeGenerator: SchemaCodeGenerator
 ): CodeGenerationSummary {
   const outputId = v4();
-  const itemSummary = createSchemaCode(schema.items, context, codeManager, {
-    contextOutputId: outputId,
-  });
+  const itemSummary = createSchemaSummary(
+    schema.items,
+    [...path, arrayItemPathPart],
+    codeGenerator
+  );
   const codeComment = itemSummary.directOutput.codeComment
     ? `item: ${itemSummary.directOutput.codeComment}`
     : undefined;
@@ -144,17 +137,16 @@ export function createArraySchemaCode(
         return `(${itemSummary.directOutput.createCode(referencingContext)})[]`;
       },
       codeComment,
-      context,
-      contextOutputId: config.contextOutputId,
+      path,
+      requiredOutputPaths: [itemSummary.directOutput.path],
     },
     indirectOutputs: itemSummary.indirectOutputs,
   };
 }
 
-export function createNumberSchemaCode(
+export function createNumberSchemaSummary(
   schema: NumberSchema,
-  context: string,
-  config: SchemaCodeGenerationConfig = {}
+  path: OutputPath
 ): CodeGenerationSummary {
   let codeComment: undefined | string = undefined;
   let code = 'number';
@@ -172,50 +164,51 @@ export function createNumberSchemaCode(
         return code;
       },
       codeComment,
-      context,
-      contextOutputId: config.contextOutputId,
+      path,
+      requiredOutputPaths: [],
     },
     indirectOutputs: [],
   };
 }
 
-export function createComponentRefSchemaCode(
+export function createComponentRefSchemaSummary(
   schema: ComponentRefSchema,
-  context: string,
-  codeManager: SchemaCodeGenerator,
-  config: SchemaCodeGenerationConfig = {},
+  path: OutputPath,
+  codeGenerator: SchemaCodeGenerator,
   objectDiscriminatorConfig?: ObjectDiscriminatorConfig
 ): CodeGenerationSummary {
   return {
     directOutput: {
       type: OutputType.DIRECT,
       id: v4(),
-      createCode: referencingContext =>
-        codeManager.createComponentTypeName(
-          schema.$ref,
-          context,
-          referencingContext
-        ),
-      context,
+      createCode: referencingPath =>
+        codeGenerator.createComponentTypeName(schema.$ref, referencingPath),
+      path,
+      requiredOutputPaths: [],
     },
     indirectOutputs: [
       {
         id: v4(),
         type: OutputType.COMPONENT_REF,
+        createTypeName: referencingPath => {
+          return codeGenerator.createComponentTypeName(
+            schema.$ref,
+            referencingPath
+          );
+        },
         componentRef: schema.$ref,
         objectDiscriminatorConfig,
-        context,
-        contextOutputId: config.contextOutputId,
+        path,
+        requiredOutputPaths: [],
       },
     ],
   };
 }
 
-export function createObjectSchemaCode(
+export function createObjectSchemaSummary(
   schema: ObjectSchema,
-  context: string,
-  codeManager: SchemaCodeGenerator,
-  config: SchemaCodeGenerationConfig = {},
+  path: OutputPath,
+  codeGenerator: SchemaCodeGenerator,
   discriminatorConfig?: ObjectDiscriminatorConfig
 ): CodeGenerationSummary {
   const outputId = v4();
@@ -229,9 +222,14 @@ export function createObjectSchemaCode(
   for (const propName in schema.properties) {
     const propSchema = schema.properties[propName];
     if (discriminatorConfig && propName === discriminatorConfig.propName) {
-      const propSummary = createSchemaCode(propSchema, context, codeManager, {
-        contextOutputId: outputId,
-      });
+      const propSummary = createSchemaSummary(
+        propSchema,
+        context,
+        codeGenerator,
+        {
+          contextOutputId: outputId,
+        }
+      );
       indirectOutputs = mergeIndirectOutputs(
         indirectOutputs,
         propSummary.indirectOutputs
@@ -239,9 +237,14 @@ export function createObjectSchemaCode(
       directOutputByPropNameMap[propName] = discriminatorConfig;
       continue;
     }
-    const propSummary = createSchemaCode(propSchema, context, codeManager, {
-      contextOutputId: outputId,
-    });
+    const propSummary = createSchemaSummary(
+      propSchema,
+      context,
+      codeGenerator,
+      {
+        contextOutputId: outputId,
+      }
+    );
     indirectOutputs = mergeIndirectOutputs(
       indirectOutputs,
       propSummary.indirectOutputs
@@ -250,10 +253,10 @@ export function createObjectSchemaCode(
   }
   let additionalPropertiesDirectOutput: undefined | DirectOutput;
   if (schema.additionalProperties) {
-    const propSummary = createSchemaCode(
+    const propSummary = createSchemaSummary(
       schema.additionalProperties,
       context,
-      codeManager,
+      codeGenerator,
       {contextOutputId: outputId}
     );
     additionalPropertiesDirectOutput = propSummary.directOutput;
@@ -363,12 +366,15 @@ function createNullableDiscriminatorEnumDefinitionOutput(
     const entryName = capitalizeFirstLetter(e);
     enumsCodeLines.push(`${entryName} = "${entryName}"`);
   });
-  const localName = `${capitalizeFirstLetter(discriminatorPropName)}`;
   return {
     id: v4(),
     type: OutputType.ENUM_DEFINITION,
-    createTypeName: referencingContext => {
-      codeGenerator.createEnumTypeName(referencingContext);
+    createTypeName: (prefixes: string[], referencingContext?: string) => {
+      return codeGenerator.createEnumName(
+        [...prefixes, discriminatorPropName],
+        context,
+        referencingContext
+      );
     },
     createCode: () => `{\n${enumsCodeLines.join(',\n')}\n}`,
     context,
@@ -376,7 +382,7 @@ function createNullableDiscriminatorEnumDefinitionOutput(
   };
 }
 
-export function createOneOfSchemaCode(
+export function createOneOfSchemaSummary(
   schema: OneOfSchema,
   context: string,
   codeGenerator: SchemaCodeGenerator,
@@ -421,7 +427,7 @@ export function createOneOfSchemaCode(
         },
       };
       if (isObjectSchema(itemSchema)) {
-        itemSummary = createObjectSchemaCode(
+        itemSummary = createObjectSchemaSummary(
           itemSchema,
           context,
           codeGenerator,
@@ -429,7 +435,7 @@ export function createOneOfSchemaCode(
           objectDiscriminatorConfig
         );
       } else if (isComponentRefSchema(itemSchema)) {
-        itemSummary = createComponentRefSchemaCode(
+        itemSummary = createComponentRefSchemaSummary(
           itemSchema,
           context,
           codeGenerator,
@@ -446,7 +452,7 @@ export function createOneOfSchemaCode(
       itemDirectOutputs.push(itemSummary.directOutput);
     }
     if (!itemSummary) {
-      itemSummary = createSchemaCode(
+      itemSummary = createSchemaSummary(
         itemSchema,
         context,
         codeGenerator,
