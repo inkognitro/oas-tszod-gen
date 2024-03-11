@@ -34,7 +34,7 @@ export type DirectOutput = GenericOutput<
 export type EnumDefinitionOutput = GenericOutput<
   OutputType.ENUM_DEFINITION,
   {
-    createTypeName: (referencingPath?: OutputPath) => string;
+    createTypeName: (referencingPath: OutputPath) => string;
     createCode: CreateCodeFunc;
     codeComment?: string;
   }

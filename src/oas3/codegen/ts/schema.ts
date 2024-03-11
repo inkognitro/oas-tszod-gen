@@ -347,9 +347,8 @@ function getEnumValueFromItemSchema(
 
 function createNullableDiscriminatorEnumDefinitionOutput(
   oneOfSchema: OneOfSchema,
-  context: string,
-  codeGenerator: SchemaCodeGenerator,
-  config: SchemaCodeGenerationConfig
+  path: OutputPath,
+  codeGenerator: SchemaCodeGenerator
 ): null | EnumDefinitionOutput {
   const discriminatorPropName = oneOfSchema.discriminator?.propertyName;
   if (!discriminatorPropName) {
@@ -366,27 +365,23 @@ function createNullableDiscriminatorEnumDefinitionOutput(
     const entryName = capitalizeFirstLetter(e);
     enumsCodeLines.push(`${entryName} = "${entryName}"`);
   });
+  const enumOutputPath = [...path, discriminatorPropName];
   return {
     id: v4(),
     type: OutputType.ENUM_DEFINITION,
-    createTypeName: (prefixes: string[], referencingContext?: string) => {
-      return codeGenerator.createEnumName(
-        [...prefixes, discriminatorPropName],
-        context,
-        referencingContext
-      );
+    createTypeName: (referencingPath: OutputPath) => {
+      return codeGenerator.createEnumName(enumOutputPath, referencingPath);
     },
     createCode: () => `{\n${enumsCodeLines.join(',\n')}\n}`,
-    context,
-    contextOutputId: config.contextOutputId,
+    path: enumOutputPath,
+    requiredOutputPaths: [],
   };
 }
 
 export function createOneOfSchemaSummary(
   schema: OneOfSchema,
-  context: string,
-  codeGenerator: SchemaCodeGenerator,
-  config: SchemaCodeGenerationConfig
+  path: OutputPath,
+  codeGenerator: SchemaCodeGenerator
 ): CodeGenerationSummary {
   const outputId = v4();
   const subSchemaGenerationConfig: SchemaCodeGenerationConfig = {
