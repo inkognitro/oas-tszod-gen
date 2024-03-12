@@ -1,6 +1,7 @@
 export enum OutputType {
   DIRECT = 'DIRECT',
   ENUM_DEFINITION = 'ENUM_DEFINITION',
+  TYPE_DEFINITION = 'TYPE_DEFINITION',
   COMPONENT_REF = 'COMPONENT_REF',
 }
 
@@ -34,6 +35,15 @@ export type DirectOutput = GenericOutput<
   }
 >;
 
+export type TypeDefinitionOutput = GenericOutput<
+  OutputType.TYPE_DEFINITION,
+  {
+    createTypeName: (referencingPath: OutputPath) => string;
+    createCode: CreateCodeFunc;
+    codeComment?: string;
+  }
+>;
+
 export type EnumDefinitionOutput = GenericOutput<
   OutputType.ENUM_DEFINITION,
   {
@@ -59,7 +69,10 @@ export type ComponentRefOutput = GenericOutput<
   }
 >;
 
-export type IndirectOutput = EnumDefinitionOutput | ComponentRefOutput;
+export type IndirectOutput =
+  | EnumDefinitionOutput
+  | TypeDefinitionOutput
+  | ComponentRefOutput;
 
 export type CodeGenerationSummary = {
   directOutput: DirectOutput;
@@ -109,17 +122,12 @@ export function mergeIndirectOutputs(
         nextOutputs.push(outputToAdd);
         return;
       case OutputType.ENUM_DEFINITION:
+      case OutputType.TYPE_DEFINITION:
         if (
-          nextOutputs.find(
-            o =>
-              o.type === OutputType.ENUM_DEFINITION &&
-              areOutputPathsEqual(o.path, outputToAdd.path)
-          )
+          nextOutputs.find(o => areOutputPathsEqual(o.path, outputToAdd.path))
         ) {
           throw new Error(
-            `ambiguous outputPath "${JSON.stringify(
-              outputToAdd.path
-            )}" for enum definition`
+            `ambiguous path definition: ${JSON.stringify(outputToAdd.path)}"`
           );
         }
         nextOutputs.push(outputToAdd);
