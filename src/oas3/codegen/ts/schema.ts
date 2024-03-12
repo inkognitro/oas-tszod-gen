@@ -9,8 +9,9 @@ import {
   OutputType,
   EnumDefinitionOutput,
   OutputPath,
-  arrayItemPathPart,
-  oneOfItemPathPart,
+  arrayItemOutputPathPart,
+  oneOfItemOutputPathPart,
+  objectAdditionalPropOutputPathPart,
 } from './core';
 import {
   ArraySchema,
@@ -124,7 +125,7 @@ export function createArraySchemaSummary(
   const outputId = v4();
   const itemSummary = createSchemaSummary(
     schema.items,
-    [...path, arrayItemPathPart],
+    [...path, arrayItemOutputPathPart],
     codeGenerator
   );
   const codeComment = itemSummary.directOutput.codeComment
@@ -219,11 +220,12 @@ export function createObjectSchemaSummary(
       codeComment?: string;
     };
   } = {};
-  const requiredOutputPaths: OutputPath[];
+  const requiredOutputPaths: OutputPath[] = [];
   let indirectOutputs: IndirectOutput[] = [];
   for (const propName in schema.properties) {
     const propSchema = schema.properties[propName];
     const subSchemaPath = [...path, propName];
+    requiredOutputPaths.push(subSchemaPath);
     if (discriminatorConfig && propName === discriminatorConfig.propName) {
       const propSummary = createSchemaSummary(
         propSchema,
@@ -252,7 +254,7 @@ export function createObjectSchemaSummary(
   if (schema.additionalProperties) {
     const propSummary = createSchemaSummary(
       schema.additionalProperties,
-      context,
+      [...path, objectAdditionalPropOutputPathPart],
       codeGenerator
     );
     additionalPropertiesDirectOutput = propSummary.directOutput;
@@ -303,8 +305,8 @@ export function createObjectSchemaSummary(
 
         return `{\n${codeRows.join('\n')}\n}`;
       },
-      context,
-      contextOutputId: config.contextOutputId,
+      path,
+      requiredOutputPaths,
     },
     indirectOutputs,
   };
@@ -402,7 +404,11 @@ export function createOneOfSchemaSummary(
         itemSchema,
         discriminatorPropName
       );
-      const itemPath: OutputPath = [...path, oneOfItemPathPart, enumValue];
+      const itemPath: OutputPath = [
+        ...path,
+        oneOfItemOutputPathPart,
+        enumValue,
+      ];
       requiredOutputPaths.push(itemPath);
       const objectDiscriminatorConfig: ObjectDiscriminatorConfig = {
         requiredOutputPaths: [discriminatorEnumDefinitionOutput.path],
@@ -439,7 +445,11 @@ export function createOneOfSchemaSummary(
       oneOfItemDirectOutputs.push(itemSummary.directOutput);
     }
     if (!itemSummary) {
-      const itemPath: OutputPath = [...path, oneOfItemPathPart, `${index}`];
+      const itemPath: OutputPath = [
+        ...path,
+        oneOfItemOutputPathPart,
+        `${index}`,
+      ];
       requiredOutputPaths.push(itemPath);
       itemSummary = createSchemaSummary(itemSchema, itemPath, codeGenerator);
     }

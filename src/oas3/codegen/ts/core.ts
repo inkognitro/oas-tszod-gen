@@ -4,8 +4,10 @@ export enum OutputType {
   COMPONENT_REF = 'COMPONENT_REF',
 }
 
-export const arrayItemPathPart = 'array-item-5acf7fae';
-export const oneOfItemPathPart = 'oneOf-item-5acf7fae';
+export const arrayItemOutputPathPart = 'array-item-5acf7fae';
+export const oneOfItemOutputPathPart = 'oneOf-item-5acf7fae';
+export const objectAdditionalPropOutputPathPart =
+  'object-additionalProp-5acf7fae';
 
 export type OutputPath = string[];
 
