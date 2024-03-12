@@ -5,6 +5,7 @@ export enum OutputType {
 }
 
 export const arrayItemPathPart = 'array-item-5acf7fae';
+export const oneOfItemPathPart = 'oneOf-item-5acf7fae';
 
 export type OutputPath = string[];
 

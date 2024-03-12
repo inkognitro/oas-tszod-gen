@@ -10,6 +10,7 @@ import {
   EnumDefinitionOutput,
   OutputPath,
   arrayItemPathPart,
+  oneOfItemPathPart,
 } from './core';
 import {
   ArraySchema,
@@ -388,15 +389,21 @@ export function createOneOfSchemaSummary(
   if (discriminatorEnumDefinitionOutput) {
     indirectOutputs.push(discriminatorEnumDefinitionOutput);
   }
-
-  const itemDirectOutputs: DirectOutput[] = [];
-  schema.oneOf.forEach(itemSchema => {
+  const oneOfItemDirectOutputs: DirectOutput[] = [];
+  const requiredOutputPaths: OutputPath[] = [];
+  schema.oneOf.forEach((itemSchema, index) => {
     let itemSummary: undefined | CodeGenerationSummary;
     if (discriminatorEnumDefinitionOutput) {
       const discriminatorPropName = schema.discriminator?.propertyName;
       if (!discriminatorPropName) {
         throw new Error('this case should never happen');
       }
+      const enumValue = getEnumValueFromItemSchema(
+        itemSchema,
+        discriminatorPropName
+      );
+      const itemPath: OutputPath = [...path, oneOfItemPathPart, enumValue];
+      requiredOutputPaths.push(itemPath);
       const objectDiscriminatorConfig: ObjectDiscriminatorConfig = {
         requiredOutputPaths: [discriminatorEnumDefinitionOutput.path],
         propName: discriminatorPropName,
@@ -405,23 +412,20 @@ export function createOneOfSchemaSummary(
             discriminatorEnumDefinitionOutput.createTypeName(
               referencingContext
             );
-          return `${enumTypeName}.${getEnumValueFromItemSchema(
-            itemSchema,
-            discriminatorPropName
-          )}`;
+          return `${enumTypeName}.${enumValue}`;
         },
       };
       if (isObjectSchema(itemSchema)) {
         itemSummary = createObjectSchemaSummary(
           itemSchema,
-          path,
+          itemPath,
           codeGenerator,
           objectDiscriminatorConfig
         );
       } else if (isComponentRefSchema(itemSchema)) {
         itemSummary = createComponentRefSchemaSummary(
           itemSchema,
-          path,
+          itemPath,
           codeGenerator,
           objectDiscriminatorConfig
         );
@@ -432,15 +436,12 @@ export function createOneOfSchemaSummary(
           )}`
         );
       }
-      itemDirectOutputs.push(itemSummary.directOutput);
+      oneOfItemDirectOutputs.push(itemSummary.directOutput);
     }
     if (!itemSummary) {
-      itemSummary = createSchemaSummary(
-        itemSchema,
-        context,
-        codeGenerator,
-        subSchemaGenerationConfig
-      );
+      const itemPath: OutputPath = [...path, oneOfItemPathPart, `${index}`];
+      requiredOutputPaths.push(itemPath);
+      itemSummary = createSchemaSummary(itemSchema, itemPath, codeGenerator);
     }
     indirectOutputs = mergeIndirectOutputs(
       indirectOutputs,
@@ -453,7 +454,7 @@ export function createOneOfSchemaSummary(
       id: v4(),
       createCode: referencingContext => {
         const codeParts: string[] = [];
-        itemDirectOutputs.forEach(directOutput => {
+        oneOfItemDirectOutputs.forEach(directOutput => {
           const itemComment = directOutput.codeComment
             ? ` // ${directOutput.codeComment}`
             : '';
@@ -463,8 +464,8 @@ export function createOneOfSchemaSummary(
         });
         return `${codeParts.join('\n')}`;
       },
-      context,
-      contextOutputId: config.contextOutputId,
+      path,
+      requiredOutputPaths,
     },
     indirectOutputs,
   };
