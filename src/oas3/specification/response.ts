@@ -1,8 +1,20 @@
-import {Schema} from './schema';
+import {isSchema, Schema} from './schema';
+import {ComponentRef, isComponentRef} from '@oas3/specification/componentRef';
 
 type ResponseBodyContent = {
   schema: Schema;
 };
+
+function isResponseBodyContent(anyValue: any): anyValue is ResponseBodyContent {
+  const value = anyValue as ResponseBodyContent;
+  if (typeof value !== 'object') {
+    return false;
+  }
+  if (!isSchema(value.schema)) {
+    return false;
+  }
+  return true;
+}
 
 export type Response = {
   description?: string;
@@ -12,25 +24,44 @@ export type Response = {
 };
 
 export function isResponse(anyValue: any): anyValue is Response {
-  return false; // todo: implement
+  const value = anyValue as Response;
+  if (typeof value !== 'object') {
+    return false;
+  }
+  if (!!value.description && typeof value.description !== 'string') {
+    return false;
+  }
+  for (const contentType in value.content) {
+    const responseBodyContent = value.content[contentType];
+    if (!isResponseBodyContent(responseBodyContent)) {
+      return false;
+    }
+  }
+  return true;
 }
 
-export type ResponseRef = {
-  $ref: string;
-};
+export type ResponseRef = ComponentRef;
 
 export function isResponseRef(anyValue: any): anyValue is ResponseRef {
-  return false; // todo: implement
+  return isComponentRef(anyValue);
 }
 
-export type ResponseByStatusCodes = {
-  content: {
-    [contentType: 'application/json' | string]: Response | ResponseRef;
-  };
+export type ResponseByStatusCodeMap = {
+  [statusCode: string]: Response | ResponseRef;
 };
 
-export function isResponseByStatusCodes(
+export function isResponseByStatusCodeMap(
   anyValue: any
-): anyValue is ResponseByStatusCodes {
-  return false; // todo: implement
+): anyValue is ResponseByStatusCodeMap {
+  if (typeof anyValue !== 'object' || Array.isArray(anyValue)) {
+    return false;
+  }
+  const value = anyValue as ResponseByStatusCodeMap;
+  for (const statusCode in value) {
+    const responseOrRef = value[statusCode];
+    if (!isResponseRef(responseOrRef) && !isResponse(responseOrRef)) {
+      return false;
+    }
+  }
+  return false;
 }

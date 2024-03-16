@@ -1,6 +1,8 @@
+import {ComponentRef, isComponentRef} from './componentRef';
+
 export function isSchema(anyValue: any): anyValue is Schema {
   return (
-    isComponentRefSchema(anyValue) ||
+    isComponentRef(anyValue) ||
     isBooleanSchema(anyValue) ||
     isStringSchema(anyValue) ||
     isNumberSchema(anyValue) ||
@@ -11,30 +13,13 @@ export function isSchema(anyValue: any): anyValue is Schema {
 }
 
 export type Schema =
-  | ComponentRefSchema
+  | ComponentRef
   | BooleanSchema
   | StringSchema
   | NumberSchema
   | ArraySchema
   | ObjectSchema
   | OneOfSchema;
-
-export type ComponentRefSchema = {
-  $ref: 'string';
-};
-
-export function isComponentRefSchema(
-  anyValue: any
-): anyValue is ComponentRefSchema {
-  const value = anyValue as ComponentRefSchema;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (value.$ref !== 'string') {
-    return false;
-  }
-  return true;
-}
 
 export type ArraySchema = {
   type: 'array';

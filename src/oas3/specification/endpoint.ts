@@ -1,4 +1,4 @@
-import {isResponseByStatusCodes, Response} from './response';
+import {isResponseByStatusCodeMap, ResponseByStatusCodeMap} from './response';
 import {
   isRequestBodyByContentTypes,
   isRequestParameter,
@@ -16,9 +16,7 @@ export type Endpoint = {
   parameters: RequestParameter[];
   requestBody: RequestBodyByContentTypes;
   summary?: string;
-  responses: {
-    [statusCode: string]: Response;
-  };
+  responses: ResponseByStatusCodeMap;
   security: null | PermissionsBySecurityNameArray;
 };
 
@@ -53,7 +51,7 @@ export function isEndpoint(anyValue: any): anyValue is Endpoint {
   if (value.summary !== undefined && typeof value.summary !== 'string') {
     return false;
   }
-  if (!isResponseByStatusCodes(value.responses)) {
+  if (!isResponseByStatusCodeMap(value.responses)) {
     return false;
   }
   if (!!value.security && isPermissionsBySecurityNameArray(value.security)) {
