@@ -6,7 +6,7 @@ import {
 import {
   CodeGenerationSummary,
   CodeGenerator,
-  DirectOutput,
+  ApplySchemaOutput,
   OutputPath,
   IndirectOutputType,
   TypeDefinitionOutput,
@@ -23,7 +23,7 @@ function createResponseSummary(
   schema: ResponseBodyContent,
   path: OutputPath,
   codeGenerator: CodeGenerator
-): DirectOutput {
+): ApplySchemaOutput {
   const jsonResponseBodySummary = applySchema(codeGenerator, schema.schema, [
     ...path,
     'body',
@@ -56,7 +56,7 @@ function applyResponsesSummary(
   codeGenerator: CodeGenerator,
   schema: ResponseByStatusCodeMap,
   path: OutputPath
-): DirectOutput {
+): ApplySchemaOutput {
   const responseTypeDefinitionOutputs: TypeDefinitionOutput[] = []; // todo: use
   const requiredOutputPaths: OutputPath[] = [];
   for (const statusCode in schema) {

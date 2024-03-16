@@ -1,10 +1,10 @@
-import {CodeGenerator, DirectOutput, IndirectOutputType} from './core';
+import {CodeGenerator, ApplySchemaOutput, IndirectOutputType} from './core';
 import {Endpoint} from '@oas3/specification';
 
 export function createEndpointSummary(
   codeGenerator: CodeGenerator,
   schema: Endpoint
-): DirectOutput {
+): ApplySchemaOutput {
   const path = codeGenerator.createOutputPathByOperationId(schema.operationId);
   /*
   const responsesSummary = createResponsesSummary(schema.responses, [

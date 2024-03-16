@@ -31,21 +31,24 @@ export function areOutputPathsEqual(a: OutputPath, b: OutputPath): boolean {
 
 export type CreateCodeFunc = (referencingPath: OutputPath) => string;
 
-type GenericOutput<T extends IndirectOutputType, P extends object = {}> = P & {
-  type: T;
-  path: OutputPath;
-  requiredOutputPaths: OutputPath[];
-};
-
-export type DirectOutput = {
+export type ApplySchemaOutput = {
   path: OutputPath;
   requiredOutputPaths: OutputPath[];
   createCode: CreateCodeFunc;
   codeComment?: string;
 };
 
+type GenericIndirectOutput<
+  T extends IndirectOutputType,
+  P extends object = {},
+> = P & {
+  type: T;
+  path: OutputPath;
+  requiredOutputPaths: OutputPath[];
+};
+
 export function createTypeDefinitionFromDirectOutput(
-  directOutput: DirectOutput,
+  directOutput: ApplySchemaOutput,
   createTypeName: (referencingPath: OutputPath) => string
 ): TypeDefinitionOutput {
   return {
@@ -60,7 +63,7 @@ export function createTypeDefinitionFromDirectOutput(
   };
 }
 
-export type TypeDefinitionOutput = GenericOutput<
+export type TypeDefinitionOutput = GenericIndirectOutput<
   IndirectOutputType.TYPE_DEFINITION,
   {
     createTypeName: (referencingPath: OutputPath) => string;
@@ -69,7 +72,7 @@ export type TypeDefinitionOutput = GenericOutput<
   }
 >;
 
-export type FunctionDefinitionOutput = GenericOutput<
+export type FunctionDefinitionOutput = GenericIndirectOutput<
   IndirectOutputType.FUNCTION_DEFINITION,
   {
     createFunctionName: (referencingPath: OutputPath) => string;
@@ -78,7 +81,7 @@ export type FunctionDefinitionOutput = GenericOutput<
   }
 >;
 
-export type EnumDefinitionOutput = GenericOutput<
+export type EnumDefinitionOutput = GenericIndirectOutput<
   IndirectOutputType.ENUM_DEFINITION,
   {
     createTypeName: (referencingPath: OutputPath) => string;
@@ -94,7 +97,7 @@ export type ObjectDiscriminatorConfig = {
   codeComment?: string;
 };
 
-export type ComponentRefOutput = GenericOutput<
+export type ComponentRefOutput = GenericIndirectOutput<
   IndirectOutputType.COMPONENT_REF,
   {
     createTypeName: (referencingPath: OutputPath) => string;
@@ -110,7 +113,7 @@ export type IndirectOutput =
   | ComponentRefOutput;
 
 export type CodeGenerationSummary = {
-  directOutput: DirectOutput;
+  directOutput: ApplySchemaOutput;
 };
 
 export function mergeIndirectOutputs(
