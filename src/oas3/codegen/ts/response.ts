@@ -1,4 +1,3 @@
-import {v4} from 'uuid';
 import {
   isResponseRef,
   ResponseBodyContent,
@@ -8,7 +7,6 @@ import {
   CodeGenerationSummary,
   CodeGenerator,
   DirectOutput,
-  IndirectOutput,
   OutputPath,
   IndirectOutputType,
   TypeDefinitionOutput,
