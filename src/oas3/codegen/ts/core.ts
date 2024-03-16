@@ -1,14 +1,25 @@
-export enum OutputType {
-  DIRECT = 'DIRECT',
+export interface CodeGenerator {
+  createComponentTypeName(ref: string, referencingPath: OutputPath): string;
+  createEnumName(path: OutputPath, referencingPath: OutputPath): string;
+  createResponseTypeName(path: OutputPath, referencingPath: OutputPath): string;
+
+  createOutputPathByOperationId(operationId: string): OutputPath;
+  createOutputPathByComponentRef(componentRef: string): OutputPath;
+
+  addIndirectOutput(output: IndirectOutput): void;
+}
+
+export enum IndirectOutputType {
   ENUM_DEFINITION = 'ENUM_DEFINITION',
   TYPE_DEFINITION = 'TYPE_DEFINITION',
+  FUNCTION_DEFINITION = 'FUNCTION_DEFINITION',
   COMPONENT_REF = 'COMPONENT_REF',
 }
 
-export const arrayItemOutputPathPart = 'array-item-5acf7fae';
-export const oneOfItemOutputPathPart = 'oneOf-item-5acf7fae';
-export const objectAdditionalPropOutputPathPart =
-  'object-additionalProp-5acf7fae';
+export const arraySchemaItemOutputPathPart = 'array-schema-item-5acf7fae';
+export const oneOfSchemaItemOutputPathPart = 'oneOf-schema-item-5acf7fae';
+export const objectSchemaAdditionalPropOutputPathPart =
+  'object-schema-additionalProp-5acf7fae';
 
 export type OutputPath = string[];
 
@@ -20,23 +31,37 @@ export function areOutputPathsEqual(a: OutputPath, b: OutputPath): boolean {
 
 export type CreateCodeFunc = (referencingPath: OutputPath) => string;
 
-type GenericOutput<T extends OutputType, P extends object = {}> = P & {
+type GenericOutput<T extends IndirectOutputType, P extends object = {}> = P & {
   type: T;
-  id: string;
   path: OutputPath;
   requiredOutputPaths: OutputPath[];
 };
 
-export type DirectOutput = GenericOutput<
-  OutputType.DIRECT,
-  {
-    createCode: CreateCodeFunc;
-    codeComment?: string;
-  }
->;
+export type DirectOutput = {
+  path: OutputPath;
+  requiredOutputPaths: OutputPath[];
+  createCode: CreateCodeFunc;
+  codeComment?: string;
+};
+
+export function createTypeDefinitionFromDirectOutput(
+  directOutput: DirectOutput,
+  createTypeName: (referencingPath: OutputPath) => string
+): TypeDefinitionOutput {
+  return {
+    type: IndirectOutputType.TYPE_DEFINITION,
+    path: directOutput.path,
+    requiredOutputPaths: directOutput.requiredOutputPaths,
+    createTypeName,
+    createCode: referencingPath => {
+      return directOutput.createCode(referencingPath);
+    },
+    codeComment: directOutput.codeComment,
+  };
+}
 
 export type TypeDefinitionOutput = GenericOutput<
-  OutputType.TYPE_DEFINITION,
+  IndirectOutputType.TYPE_DEFINITION,
   {
     createTypeName: (referencingPath: OutputPath) => string;
     createCode: CreateCodeFunc;
@@ -44,8 +69,17 @@ export type TypeDefinitionOutput = GenericOutput<
   }
 >;
 
+export type FunctionDefinitionOutput = GenericOutput<
+  IndirectOutputType.FUNCTION_DEFINITION,
+  {
+    createFunctionName: (referencingPath: OutputPath) => string;
+    createCode: CreateCodeFunc;
+    codeComment?: string;
+  }
+>;
+
 export type EnumDefinitionOutput = GenericOutput<
-  OutputType.ENUM_DEFINITION,
+  IndirectOutputType.ENUM_DEFINITION,
   {
     createTypeName: (referencingPath: OutputPath) => string;
     createCode: CreateCodeFunc;
@@ -61,7 +95,7 @@ export type ObjectDiscriminatorConfig = {
 };
 
 export type ComponentRefOutput = GenericOutput<
-  OutputType.COMPONENT_REF,
+  IndirectOutputType.COMPONENT_REF,
   {
     createTypeName: (referencingPath: OutputPath) => string;
     componentRef: string;
@@ -72,11 +106,11 @@ export type ComponentRefOutput = GenericOutput<
 export type IndirectOutput =
   | EnumDefinitionOutput
   | TypeDefinitionOutput
+  | FunctionDefinitionOutput
   | ComponentRefOutput;
 
 export type CodeGenerationSummary = {
   directOutput: DirectOutput;
-  indirectOutputs: IndirectOutput[];
 };
 
 export function mergeIndirectOutputs(
@@ -86,11 +120,11 @@ export function mergeIndirectOutputs(
   let nextOutputs = [...existingOutputs];
   additionalOutputs.forEach(outputToAdd => {
     switch (outputToAdd.type) {
-      case OutputType.COMPONENT_REF:
+      case IndirectOutputType.COMPONENT_REF:
         // eslint-disable-next-line no-case-declarations
         const foundComponentRefOutput = nextOutputs.find(
           o =>
-            o.type === OutputType.COMPONENT_REF &&
+            o.type === IndirectOutputType.COMPONENT_REF &&
             o.componentRef === outputToAdd.componentRef
         ) as undefined | ComponentRefOutput;
         if (foundComponentRefOutput && outputToAdd.objectDiscriminatorConfig) {
@@ -100,7 +134,7 @@ export function mergeIndirectOutputs(
           if (!foundComponentRefOutput.objectDiscriminatorConfig) {
             nextOutputs = nextOutputs.filter(
               o =>
-                o.type !== OutputType.COMPONENT_REF ||
+                o.type !== IndirectOutputType.COMPONENT_REF ||
                 o.componentRef !== outputToAdd.componentRef
             );
             nextOutputs.push(outputToAdd);
@@ -121,8 +155,9 @@ export function mergeIndirectOutputs(
         }
         nextOutputs.push(outputToAdd);
         return;
-      case OutputType.ENUM_DEFINITION:
-      case OutputType.TYPE_DEFINITION:
+      case IndirectOutputType.FUNCTION_DEFINITION:
+      case IndirectOutputType.ENUM_DEFINITION:
+      case IndirectOutputType.TYPE_DEFINITION:
         if (
           nextOutputs.find(o => areOutputPathsEqual(o.path, outputToAdd.path))
         ) {

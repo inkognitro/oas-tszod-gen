@@ -14,11 +14,6 @@ export const authenticateEndpointId: EndpointId = {
   path: '/v1/authenticate',
 };
 
-export type AuthenticateRequest = Request & {
-  username: string;
-  password: string;
-};
-
 type OkAuthenticateResponse = Response<StatusCode.OK, {accessToken: string}>;
 type BadRequestAuthenticateResponse = Response<StatusCode.BAD_REQUEST>;
 
@@ -27,7 +22,7 @@ export type AuthenticateResponse =
   | BadRequestAuthenticateResponse;
 
 export type AuthenticateRequestResult = RequestResult<
-  AuthenticateRequest,
+  Request,
   AuthenticateResponse
 >;
 

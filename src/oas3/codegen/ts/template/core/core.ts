@@ -37,14 +37,17 @@ export type EndpointId = {
   path: string;
 };
 
-export type Request = {
+export type Request<
+  QueryParams extends object = any,
+  Body extends object = any,
+> = {
   endpointId: EndpointId;
   url: string;
   supportedSecuritySchemes: string[];
   securityScheme: null | string;
   headers: object;
-  queryParams: object;
-  body: object;
+  queryParams: QueryParams;
+  body: Body;
 };
 
 type RequestCreationSettings = {

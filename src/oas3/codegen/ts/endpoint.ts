@@ -1,10 +1,20 @@
-import {CodeGenerationSummary} from '@oas3/codegen/ts/core';
+import {CodeGenerator, DirectOutput, IndirectOutputType} from './core';
 import {Endpoint} from '@oas3/specification';
-import {SchemaCodeGenerator} from '@oas3/codegen/ts/schema';
 
-type CodeGenerator = SchemaCodeGenerator; // todo: rename underlying or extend this one
-
-export function createEndpointCode(
-  schema: Endpoint,
-  codeGenerator: CodeGenerator
-): CodeGenerationSummary {}
+export function createEndpointSummary(
+  codeGenerator: CodeGenerator,
+  schema: Endpoint
+): DirectOutput {
+  const path = codeGenerator.createOutputPathByOperationId(schema.operationId);
+  /*
+  const responsesSummary = createResponsesSummary(schema.responses, [
+    ...path,
+    'response',
+  ]);
+  */
+  return {
+    createCode: referencingPath => '',
+    path,
+    requiredOutputPaths: [],
+  };
+}

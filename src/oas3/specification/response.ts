@@ -1,7 +1,7 @@
 import {isSchema, Schema} from './schema';
 import {ComponentRef, isComponentRef} from '@oas3/specification/componentRef';
 
-type ResponseBodyContent = {
+export type ResponseBodyContent = {
   schema: Schema;
 };
 
