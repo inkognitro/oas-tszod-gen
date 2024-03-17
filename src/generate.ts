@@ -1,4 +1,5 @@
 import {isSpecification} from '@oas3/specification';
+
 const fs = require('fs');
 
 export function generate() {
