@@ -1,7 +1,7 @@
 export interface CodeGenerator {
   createComponentTypeName(ref: string, referencingPath: OutputPath): string;
   createEnumName(path: OutputPath, referencingPath: OutputPath): string;
-  createResponseTypeName(path: OutputPath, referencingPath: OutputPath): string; // todo: might be unified in "createTypeName" method
+  createTypeName(path: OutputPath, referencingPath: OutputPath): string;
 
   createOutputPathByOperationId(operationId: string): OutputPath;
   createOutputPathByComponentRef(componentRef: string): OutputPath;
@@ -12,6 +12,7 @@ export interface CodeGenerator {
 export enum IndirectOutputType {
   ENUM_DEFINITION = 'ENUM_DEFINITION',
   TYPE_DEFINITION = 'TYPE_DEFINITION',
+  CONST_DEFINITION = 'CONST_DEFINITION',
   FUNCTION_DEFINITION = 'FUNCTION_DEFINITION',
   COMPONENT_REF = 'COMPONENT_REF',
 }
@@ -56,6 +57,15 @@ export type TypeDefinitionOutput = GenericIndirectOutput<
   }
 >;
 
+export type ConstDefinitionOutput = GenericIndirectOutput<
+  IndirectOutputType.CONST_DEFINITION,
+  {
+    createConstName: (referencingPath: OutputPath) => string;
+    createCode: CreateCodeFunc;
+    codeComment?: string;
+  }
+>;
+
 export type FunctionDefinitionOutput = GenericIndirectOutput<
   IndirectOutputType.FUNCTION_DEFINITION,
   {
@@ -93,6 +103,7 @@ export type ComponentRefOutput = GenericIndirectOutput<
 export type IndirectOutput =
   | EnumDefinitionOutput
   | TypeDefinitionOutput
+  | ConstDefinitionOutput
   | FunctionDefinitionOutput
   | ComponentRefOutput;
 

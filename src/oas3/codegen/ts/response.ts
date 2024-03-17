@@ -31,7 +31,7 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
     type: IndirectOutputType.TYPE_DEFINITION,
     path,
     createTypeName: referencingPath => {
-      return codeGenerator.createResponseTypeName(path, referencingPath);
+      return codeGenerator.createTypeName(path, referencingPath);
     },
     createCode: referencingPath => {
       const responseType = templateResponseType.createTypeName(path);
@@ -90,7 +90,7 @@ export function applyResponseByStatusCodeMap(
   const responseTypeDefinition: TypeDefinitionOutput = {
     type: IndirectOutputType.TYPE_DEFINITION,
     createTypeName: referencingPath => {
-      return codeGenerator.createResponseTypeName(path, referencingPath);
+      return codeGenerator.createTypeName(path, referencingPath);
     },
     path,
     createCode: () => {

@@ -1,6 +1,5 @@
 import {
   createRequest,
-  EndpointId,
   Request,
   RequestExecutionConfig,
   RequestHandler,
@@ -9,7 +8,7 @@ import {
   StatusCode,
 } from '../core';
 
-export const authenticateEndpointId: EndpointId = {
+export const authenticateEndpointId = {
   method: 'post',
   path: '/v1/authenticate',
 };

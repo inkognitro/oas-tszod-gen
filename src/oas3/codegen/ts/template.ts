@@ -6,14 +6,17 @@ import {
 
 const templateOutputPathPart = 'template-5acf7fae';
 
-export const templateRequestDefinition: TypeDefinitionOutput = {
+const createCodeErrorMessage =
+  'case not supported: code should be referenced from template folder instead';
+
+export const templateRequestType: TypeDefinitionOutput = {
   type: IndirectOutputType.TYPE_DEFINITION,
   path: [templateOutputPathPart, 'core', 'request'],
   createTypeName: () => {
     return 'Request';
   },
   createCode: () => {
-    throw new Error('case not supported');
+    throw new Error(createCodeErrorMessage);
   },
   requiredOutputPaths: [],
 };
@@ -25,7 +28,7 @@ export const templateResponseType: TypeDefinitionOutput = {
     return 'Response';
   },
   createCode: () => {
-    throw new Error('case not supported');
+    throw new Error(createCodeErrorMessage);
   },
   requiredOutputPaths: [],
 };
@@ -37,7 +40,7 @@ export const templateStatusCodeEnum: EnumDefinitionOutput = {
     return 'StatusCode';
   },
   createCode: () => {
-    throw new Error('case not supported');
+    throw new Error(createCodeErrorMessage);
   },
   requiredOutputPaths: [],
 };
@@ -62,3 +65,15 @@ export function getTemplateResponseStatusCodeEnumEntry(
       throw new Error(`status code ${statusCode} not supported`);
   }
 }
+
+export const templateRequestResultType: TypeDefinitionOutput = {
+  type: IndirectOutputType.TYPE_DEFINITION,
+  path: [templateOutputPathPart, 'core', 'requestResult'],
+  createTypeName: () => {
+    return 'RequestResult';
+  },
+  createCode: () => {
+    throw new Error(createCodeErrorMessage);
+  },
+  requiredOutputPaths: [],
+};
