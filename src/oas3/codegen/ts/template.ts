@@ -77,3 +77,15 @@ export const templateRequestResultType: TypeDefinitionOutput = {
   },
   requiredOutputPaths: [],
 };
+
+export const templateRequestHandlerType: TypeDefinitionOutput = {
+  type: IndirectOutputType.TYPE_DEFINITION,
+  path: [templateOutputPathPart, 'core', 'requestHandler'],
+  createTypeName: () => {
+    return 'RequestHandler';
+  },
+  createCode: () => {
+    throw new Error(createCodeErrorMessage);
+  },
+  requiredOutputPaths: [],
+};

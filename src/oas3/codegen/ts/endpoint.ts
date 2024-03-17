@@ -1,14 +1,18 @@
 import {
-  CodeGenerationOutput,
   CodeGenerator,
   ConstDefinitionOutput,
+  FunctionDefinitionOutput,
   IndirectOutputType,
   OutputPath,
   TypeDefinitionOutput,
 } from './core';
 import {Request} from '@oas3/specification';
 import {applyResponseByStatusCodeMap} from './response';
-import {templateRequestResultType, templateRequestType} from './template';
+import {
+  templateRequestHandlerType,
+  templateRequestResultType,
+  templateRequestType,
+} from './template';
 import {EndpointId} from './template/core';
 
 function applyRequestResultTypeDefinition(
@@ -48,7 +52,7 @@ function applyEndpointIdConstDefinition(
     type: IndirectOutputType.CONST_DEFINITION,
     path,
     createConstName: referencingPath => {
-      return codeGenerator.createTypeName(path, referencingPath);
+      return codeGenerator.createConstName(path, referencingPath);
     },
     createCode: () => {
       return `{method:'${endpointId.method}', path:'${endpointId.path}'}`;
@@ -61,7 +65,7 @@ export function applyEndpointCallerFunction(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
   schema: Request
-): CodeGenerationOutput {
+): FunctionDefinitionOutput {
   const path = codeGenerator.createOutputPathByOperationId(schema.operationId);
   const endpointIdConstDefinition = applyEndpointIdConstDefinition(
     codeGenerator,
@@ -73,14 +77,22 @@ export function applyEndpointCallerFunction(
     schema,
     [...path, 'requestResult']
   );
-  return {
-    createCode: referencingPath => {
-      return ''; // todo: implement
+  const funcDefinition: FunctionDefinitionOutput = {
+    type: IndirectOutputType.FUNCTION_DEFINITION,
+    createFunctionName: referencingPath => {
+      return codeGenerator.createFunctionName(path, referencingPath);
+    },
+    createCode: () => {
+      const requestResult = requestResultTypeDefinition.createTypeName(path);
+      return `(): Promise<${requestResult}> => { throw new Error('implement me!'); }`; // todo: implement
     },
     path,
     requiredOutputPaths: [
       endpointIdConstDefinition.path,
       requestResultTypeDefinition.path,
+      templateRequestHandlerType.path,
     ],
   };
+  codeGenerator.addIndirectOutput(funcDefinition);
+  return funcDefinition;
 }
