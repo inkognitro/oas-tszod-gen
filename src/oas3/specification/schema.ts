@@ -167,13 +167,9 @@ export function isOneOfSchema(anyValue: any): anyValue is OneOfSchema {
   if (!Array.isArray(value.oneOf)) {
     return false;
   }
-  let discriminatorPropName = undefined;
-  if (value.discriminator !== undefined) {
-    discriminatorPropName = value.discriminator;
-  }
   if (
-    discriminatorPropName !== undefined &&
-    typeof discriminatorPropName !== 'string'
+    value.discriminator !== undefined &&
+    typeof value.discriminator.propertyName !== 'string'
   ) {
     return false;
   }

@@ -59,5 +59,5 @@ export function isResponseByStatusCodeMap(
       return false;
     }
   }
-  return false;
+  return true;
 }

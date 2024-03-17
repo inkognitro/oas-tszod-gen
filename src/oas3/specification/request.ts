@@ -31,6 +31,9 @@ export function isPermissionsBySecurityNameArray(
   anyValue: any
 ): anyValue is PermissionsBySecurityNameArray {
   const value = anyValue as PermissionsBySecurityNameArray;
+  if (value === null) {
+    return true;
+  }
   if (!Array.isArray(value)) {
     return false;
   }
@@ -43,7 +46,7 @@ export function isPermissionsBySecurityNameArray(
 export type RequestParameter = {
   name: string;
   in: 'query' | 'path';
-  required: boolean;
+  required?: boolean;
   schema: Schema;
 };
 
@@ -54,13 +57,13 @@ export function isRequestParameter(
   if (typeof value !== 'object') {
     return false;
   }
-  if (!!value.name && typeof value.name !== 'string') {
+  if (typeof value.name !== 'string') {
     return false;
   }
   if (typeof value.in !== 'string' || !['query', 'path'].includes(value.in)) {
     return false;
   }
-  if (typeof value.required !== 'boolean') {
+  if (value.required !== undefined && typeof value.required !== 'boolean') {
     return false;
   }
   if (!isSchema(value.schema)) {
@@ -85,7 +88,7 @@ function isRequestBody(anyValue: any): anyValue is RequestBody {
 }
 
 export type RequestBodyByContentTypes = {
-  content: {
+  content?: {
     [contentType: 'application/json' | string]: RequestBody;
   };
 };
@@ -96,6 +99,9 @@ export function isRequestBodyByContentTypes(
   const value = anyValue as RequestBodyByContentTypes;
   if (typeof value !== 'object' || Array.isArray(value)) {
     return false;
+  }
+  if (value.content === undefined) {
+    return true;
   }
   if (typeof value.content !== 'object' || Array.isArray(value.content)) {
     return false;
@@ -112,16 +118,16 @@ export function isRequestBodyByContentTypes(
 export type Request = {
   operationId: string;
   tags: string[];
-  parameters: RequestParameter[];
-  requestBody: RequestBodyByContentTypes;
+  parameters?: RequestParameter[];
+  requestBody?: RequestBodyByContentTypes;
   summary?: string;
   responses: ResponseByStatusCodeMap;
-  security: null | PermissionsBySecurityNameArray;
+  security?: null | PermissionsBySecurityNameArray;
 };
 
 export function isRequest(anyValue: any): anyValue is Request {
   const value = anyValue as Request;
-  if (typeof value !== 'object' || !Array.isArray(value)) {
+  if (typeof value !== 'object' || Array.isArray(value)) {
     return false;
   }
   if (typeof value.operationId !== 'string') {
@@ -141,10 +147,13 @@ export function isRequest(anyValue: any): anyValue is Request {
   if (invalidParameter) {
     return false;
   }
-  if (!Array.isArray(value.parameters)) {
+  if (value.parameters !== undefined && !Array.isArray(value.parameters)) {
     return false;
   }
-  if (!isRequestBodyByContentTypes(value.requestBody)) {
+  if (
+    value.requestBody !== undefined &&
+    !isRequestBodyByContentTypes(value.requestBody)
+  ) {
     return false;
   }
   if (value.summary !== undefined && typeof value.summary !== 'string') {
@@ -153,7 +162,10 @@ export function isRequest(anyValue: any): anyValue is Request {
   if (!isResponseByStatusCodeMap(value.responses)) {
     return false;
   }
-  if (!!value.security && isPermissionsBySecurityNameArray(value.security)) {
+  if (
+    value.security !== undefined &&
+    !isPermissionsBySecurityNameArray(value.security)
+  ) {
     return false;
   }
   return true;

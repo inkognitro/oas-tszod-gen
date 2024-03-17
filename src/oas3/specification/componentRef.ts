@@ -7,7 +7,7 @@ export function isComponentRef(anyValue: any): anyValue is ComponentRef {
   if (typeof value !== 'object') {
     return false;
   }
-  if (value.$ref !== 'string') {
+  if (typeof value.$ref !== 'string') {
     return false;
   }
   return true;
