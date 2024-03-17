@@ -40,14 +40,8 @@ export function isResponse(anyValue: any): anyValue is Response {
   return true;
 }
 
-export type ResponseRef = ComponentRef;
-
-export function isResponseRef(anyValue: any): anyValue is ResponseRef {
-  return isComponentRef(anyValue);
-}
-
 export type ResponseByStatusCodeMap = {
-  [statusCode: string]: Response | ResponseRef;
+  [statusCode: string]: Response | ComponentRef;
 };
 
 export function isResponseByStatusCodeMap(
@@ -59,7 +53,7 @@ export function isResponseByStatusCodeMap(
   const value = anyValue as ResponseByStatusCodeMap;
   for (const statusCode in value) {
     const responseOrRef = value[statusCode];
-    if (!isResponseRef(responseOrRef) && !isResponse(responseOrRef)) {
+    if (!isComponentRef(responseOrRef) && !isResponse(responseOrRef)) {
       return false;
     }
   }

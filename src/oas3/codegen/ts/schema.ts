@@ -1,6 +1,6 @@
 import {
   CreateCodeFunc,
-  ApplySchemaOutput,
+  CodeGenerationOutput,
   ObjectDiscriminatorConfig,
   IndirectOutputType,
   EnumDefinitionOutput,
@@ -32,7 +32,7 @@ export function applySchema(
   codeGenerator: CodeGenerator,
   schema: Schema,
   path: OutputPath
-): ApplySchemaOutput {
+): CodeGenerationOutput {
   if (isComponentRef(schema)) {
     return applyComponentRefSchema(codeGenerator, schema, path);
   }
@@ -60,7 +60,7 @@ export function applySchema(
 export function applyBooleanSchema(
   schema: BooleanSchema,
   path: OutputPath
-): ApplySchemaOutput {
+): CodeGenerationOutput {
   let code = 'boolean';
   if (schema.nullable) {
     code = `null | ${code}`;
@@ -77,7 +77,7 @@ export function applyBooleanSchema(
 function applyStringSchema(
   schema: StringSchema,
   path: OutputPath
-): ApplySchemaOutput {
+): CodeGenerationOutput {
   let codeComment: undefined | string = undefined;
   let code = 'string';
   if (schema.enum && schema.enum.length > 0) {
@@ -103,7 +103,7 @@ export function applyArraySchema(
   codeGenerator: CodeGenerator,
   schema: ArraySchema,
   path: OutputPath
-): ApplySchemaOutput {
+): CodeGenerationOutput {
   const itemOutputPath = [...path, arraySchemaItemOutputPathPart];
   const itemSummary = applySchema(codeGenerator, schema.items, [
     ...path,
@@ -125,7 +125,7 @@ export function applyArraySchema(
 export function applyNumberSchema(
   schema: NumberSchema,
   path: OutputPath
-): ApplySchemaOutput {
+): CodeGenerationOutput {
   let codeComment: undefined | string = undefined;
   let code = 'number';
   if (schema.nullable) {
@@ -149,7 +149,7 @@ export function applyComponentRefSchema(
   schema: ComponentRef,
   path: OutputPath,
   objectDiscriminatorConfig?: ObjectDiscriminatorConfig
-): ApplySchemaOutput {
+): CodeGenerationOutput {
   codeGenerator.addIndirectOutput({
     type: IndirectOutputType.COMPONENT_REF,
     createTypeName: referencingPath => {
@@ -178,7 +178,7 @@ export function applyObjectSchema(
   schema: ObjectSchema,
   path: OutputPath,
   discriminatorConfig?: ObjectDiscriminatorConfig
-): ApplySchemaOutput {
+): CodeGenerationOutput {
   const directOutputByPropNameMap: {
     [propName: string]: {
       createCode: CreateCodeFunc;
@@ -198,7 +198,7 @@ export function applyObjectSchema(
     const propOutput = applySchema(codeGenerator, propSchema, subSchemaPath);
     directOutputByPropNameMap[propName] = propOutput;
   }
-  let additionalPropertiesDirectOutput: undefined | ApplySchemaOutput;
+  let additionalPropertiesDirectOutput: undefined | CodeGenerationOutput;
   if (schema.additionalProperties) {
     const propOutput = applySchema(codeGenerator, schema.additionalProperties, [
       ...path,
@@ -307,7 +307,7 @@ export function applyOneOfSchema(
   codeGenerator: CodeGenerator,
   schema: OneOfSchema,
   path: OutputPath
-): ApplySchemaOutput {
+): CodeGenerationOutput {
   const enumOutput = createNullableDiscriminatorEnumDefinitionOutput(
     schema,
     path,
@@ -316,10 +316,10 @@ export function applyOneOfSchema(
   if (enumOutput) {
     codeGenerator.addIndirectOutput(enumOutput);
   }
-  const oneOfItemDirectOutputs: ApplySchemaOutput[] = [];
+  const oneOfItemDirectOutputs: CodeGenerationOutput[] = [];
   const requiredOutputPaths: OutputPath[] = [];
   schema.oneOf.forEach((itemSchema, index) => {
-    let itemOutput: undefined | ApplySchemaOutput;
+    let itemOutput: undefined | CodeGenerationOutput;
     if (enumOutput) {
       const discriminatorPropName = schema.discriminator?.propertyName;
       if (!discriminatorPropName) {

@@ -31,7 +31,7 @@ export function areOutputPathsEqual(a: OutputPath, b: OutputPath): boolean {
 
 export type CreateCodeFunc = (referencingPath: OutputPath) => string;
 
-export type ApplySchemaOutput = {
+export type CodeGenerationOutput = {
   path: OutputPath;
   requiredOutputPaths: OutputPath[];
   createCode: CreateCodeFunc;
@@ -46,22 +46,6 @@ type GenericIndirectOutput<
   path: OutputPath;
   requiredOutputPaths: OutputPath[];
 };
-
-export function createTypeDefinitionFromDirectOutput(
-  directOutput: ApplySchemaOutput,
-  createTypeName: (referencingPath: OutputPath) => string
-): TypeDefinitionOutput {
-  return {
-    type: IndirectOutputType.TYPE_DEFINITION,
-    path: directOutput.path,
-    requiredOutputPaths: directOutput.requiredOutputPaths,
-    createTypeName,
-    createCode: referencingPath => {
-      return directOutput.createCode(referencingPath);
-    },
-    codeComment: directOutput.codeComment,
-  };
-}
 
 export type TypeDefinitionOutput = GenericIndirectOutput<
   IndirectOutputType.TYPE_DEFINITION,
@@ -111,10 +95,6 @@ export type IndirectOutput =
   | TypeDefinitionOutput
   | FunctionDefinitionOutput
   | ComponentRefOutput;
-
-export type CodeGenerationSummary = {
-  directOutput: ApplySchemaOutput;
-};
 
 export function mergeIndirectOutputs(
   existingOutputs: IndirectOutput[],

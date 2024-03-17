@@ -18,7 +18,7 @@ export const templateRequestDefinition: TypeDefinitionOutput = {
   requiredOutputPaths: [],
 };
 
-export const templateResponse: TypeDefinitionOutput = {
+export const templateResponseType: TypeDefinitionOutput = {
   type: IndirectOutputType.TYPE_DEFINITION,
   path: [templateOutputPathPart, 'core', 'response'],
   createTypeName: () => {
@@ -30,7 +30,7 @@ export const templateResponse: TypeDefinitionOutput = {
   requiredOutputPaths: [],
 };
 
-export const templateResponseStatusCodeEnum: EnumDefinitionOutput = {
+export const templateStatusCodeEnum: EnumDefinitionOutput = {
   type: IndirectOutputType.ENUM_DEFINITION,
   path: [templateOutputPathPart, 'core', 'statusCode'],
   createTypeName: () => {
