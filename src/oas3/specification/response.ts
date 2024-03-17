@@ -5,7 +5,9 @@ export type ResponseBodyContent = {
   schema: Schema;
 };
 
-function isResponseBodyContent(anyValue: any): anyValue is ResponseBodyContent {
+export function isResponseBodyContent(
+  anyValue: any
+): anyValue is ResponseBodyContent {
   const value = anyValue as ResponseBodyContent;
   if (typeof value !== 'object') {
     return false;
