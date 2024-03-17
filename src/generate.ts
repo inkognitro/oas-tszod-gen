@@ -10,7 +10,8 @@ export function generate() {
       return;
     }
     if (!isSpecification(data)) {
-      console.error('specs are invalid :(');
+      console.error('specs are invalid...');
+      return;
     }
     console.info('specs are valid :)');
     /*if (!isSpecification())
