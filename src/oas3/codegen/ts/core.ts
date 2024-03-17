@@ -4,10 +4,8 @@ export interface CodeGenerator {
   createTypeName(path: OutputPath, referencingPath: OutputPath): string;
   createConstName(path: OutputPath, referencingPath: OutputPath): string;
   createFunctionName(path: OutputPath, referencingPath: OutputPath): string;
-
   createOutputPathByOperationId(operationId: string): OutputPath;
   createOutputPathByComponentRef(componentRef: string): OutputPath;
-
   addIndirectOutput(output: IndirectOutput): void;
 }
 
