@@ -4,13 +4,13 @@ import {
   ResponseByStatusCodeMap,
 } from '@oas3/specification';
 import {
-  CodeGenerator,
   CodeGenerationOutput,
-  OutputPath,
+  CodeGenerator,
   IndirectOutputType,
+  OutputPath,
   TypeDefinitionOutput,
 } from './core';
-import {applySchema} from './schema';
+import {applyComponentRefSchema, applySchema} from './schema';
 import {
   getTemplateResponseStatusCodeEnumEntry,
   templateResponseType,
@@ -27,7 +27,7 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
     ...path,
     'body',
   ]);
-  return {
+  const typeDefinitionOutput: TypeDefinitionOutput = {
     type: IndirectOutputType.TYPE_DEFINITION,
     path,
     createTypeName: referencingPath => {
@@ -47,6 +47,8 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
       jsonResponseBodySummary.path,
     ],
   };
+  codeGenerator.addIndirectOutput(typeDefinitionOutput);
+  return typeDefinitionOutput;
 }
 
 export function applyResponseByStatusCodeMap(
@@ -54,32 +56,60 @@ export function applyResponseByStatusCodeMap(
   schema: ResponseByStatusCodeMap,
   path: OutputPath
 ): CodeGenerationOutput {
-  const responseTypeDefinitionOutputs: TypeDefinitionOutput[] = []; // todo: use
-  const requiredOutputPaths: OutputPath[] = [];
+  const responseOutputs: CodeGenerationOutput[] = [];
   for (const statusCode in schema) {
+    const responseOutputPath: OutputPath = [...path, statusCode];
     const responseOrRef = schema[statusCode];
     if (isComponentRef(responseOrRef)) {
-      console.error('ResponseRef case is not supported yet'); // todo: implement
+      const responseOutput = applyComponentRefSchema(
+        codeGenerator,
+        responseOrRef,
+        responseOutputPath
+      );
+      responseOutputs.push(responseOutput);
       continue;
     }
     const jsonResponseBody = responseOrRef.content['application/json'];
     if (!jsonResponseBody) {
       continue;
     }
-    const responseOutputPath: OutputPath = [...path, statusCode];
-    requiredOutputPaths.push(responseOutputPath);
-    const responseTypeDefinitionOutput =
-      applyStatusCodeResponseAndGetTypeDefinitionOutput(
-        codeGenerator,
-        responseOutputPath,
-        parseInt(statusCode),
-        jsonResponseBody
-      );
-    responseTypeDefinitionOutputs.push(responseTypeDefinitionOutput);
+    const responseOutput = applyStatusCodeResponseAndGetTypeDefinitionOutput(
+      codeGenerator,
+      responseOutputPath,
+      parseInt(statusCode),
+      jsonResponseBody
+    );
+    responseOutputs.push({
+      createCode: referencingPath => {
+        return responseTypeDefinition.createTypeName(referencingPath);
+      },
+      path: responseOutputPath,
+      requiredOutputPaths: [responseOutput.path],
+    });
   }
+  const responseTypeDefinition: TypeDefinitionOutput = {
+    type: IndirectOutputType.TYPE_DEFINITION,
+    createTypeName: referencingPath => {
+      return codeGenerator.createResponseTypeName(path, referencingPath);
+    },
+    path,
+    createCode: () => {
+      const codeParts: string[] = [];
+      responseOutputs.forEach(responseOutput => {
+        const codeComment = responseOutput.codeComment
+          ? ` // ${responseOutput.codeComment}`
+          : '';
+        codeParts.push(`| ${responseOutput.createCode(path)}${codeComment}`);
+      });
+      return `${codeParts.join('\n')}`;
+    },
+    requiredOutputPaths: responseOutputs.map(o => o.path),
+  };
   return {
-    path: path,
-    createCode: referencingPath => {},
-    requiredOutputPaths,
+    path,
+    requiredOutputPaths: [responseTypeDefinition.path],
+    createCode: referencingPath => {
+      return responseTypeDefinition.createTypeName(referencingPath);
+    },
   };
 }

@@ -1,7 +1,7 @@
 export interface CodeGenerator {
   createComponentTypeName(ref: string, referencingPath: OutputPath): string;
   createEnumName(path: OutputPath, referencingPath: OutputPath): string;
-  createResponseTypeName(path: OutputPath, referencingPath: OutputPath): string;
+  createResponseTypeName(path: OutputPath, referencingPath: OutputPath): string; // todo: might be unified in "createTypeName" method
 
   createOutputPathByOperationId(operationId: string): OutputPath;
   createOutputPathByComponentRef(componentRef: string): OutputPath;
