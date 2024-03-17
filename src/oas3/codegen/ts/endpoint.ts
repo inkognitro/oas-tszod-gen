@@ -6,14 +6,14 @@ import {
   OutputPath,
   TypeDefinitionOutput,
 } from './core';
-import {Endpoint} from '@oas3/specification';
+import {Request} from '@oas3/specification';
 import {applyResponseByStatusCodeMap} from './response';
 import {templateRequestResultType, templateRequestType} from './template';
 import {EndpointId} from '@oas3/codegen/ts/template/core';
 
 function applyRequestResultTypeDefinition(
   codeGenerator: CodeGenerator,
-  schema: Endpoint,
+  schema: Request,
   path: OutputPath
 ): TypeDefinitionOutput {
   const responseOutput = applyResponseByStatusCodeMap(
@@ -57,10 +57,10 @@ function applyEndpointId(
   };
 }
 
-export function applyEndpoint(
+export function applyEndpointCallerFunction(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
-  schema: Endpoint
+  schema: Request
 ): CodeGenerationOutput {
   const path = codeGenerator.createOutputPathByOperationId(schema.operationId);
   const endpointIdConstDefinition = applyEndpointId(codeGenerator, endpointId, [
