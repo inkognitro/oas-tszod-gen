@@ -9,10 +9,14 @@
     },
     "lib": [
       "ES2021.String"
+    ],
+    "plugins": [
+      { "transform": "typescript-transform-paths" },
+      { "transform": "typescript-transform-paths", "afterDeclarations": true }
     ]
   },
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
-  ]
+  ],
 }

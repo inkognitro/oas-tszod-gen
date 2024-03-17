@@ -4,9 +4,10 @@
   "description": "A tool to convert OpenApi specifications into callable endpoint functions in TS.",
   "main": "index.js",
   "scripts": {
-    "start": "npx tsc -w",
+    "start": "npx tspc -w",
+    "tempTest": "node build/src/generate.js",
     "test": "test",
-    "tsc": "tsc",
+    "tspc": "tspc",
     "lint": "gts lint",
     "clean": "gts clean",
     "compile": "tsc",
@@ -34,6 +35,8 @@
     "@types/node": "20.8.2",
     "@types/uuid": "^9.0.8",
     "gts": "^5.2.0",
-    "typescript": "~5.2.0"
+    "ts-patch": "^3.1.2",
+    "typescript": "~5.2.0",
+    "typescript-transform-paths": "^3.4.7"
   }
 }
