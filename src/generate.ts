@@ -1,4 +1,4 @@
-import {Specification} from './oas3/schema';
+import {isSpecification} from '@oas3/specification';
 const fs = require('fs');
 
 export function generate() {
@@ -8,13 +8,18 @@ export function generate() {
       console.error(`could not load file from filePath "${filePath}"`, error);
       return;
     }
-    const specs = new Specification(data);
-    specs.generateFiles({
-      createFile: (filePath, content) => {
-        console.log(`filePath: ${filePath}`);
-        console.log(content);
-      },
-    });
+    if (!isSpecification(data)) {
+      console.error('specs are invalid :(');
+    }
+    console.info('specs are valid :)');
+    /*if (!isSpecification())
+      specs.generateFiles({
+        createFile: (filePath, content) => {
+          console.log(`filePath: ${filePath}`);
+          console.log(content);
+        },
+      });
+      */
   });
 }
 
