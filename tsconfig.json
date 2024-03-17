@@ -4,7 +4,7 @@
     "rootDir": ".",
     "outDir": "build",
     "paths": {
-      "@oas3/*": ["src/oas3/*"]
+      "@oas3/*": ["./src/oas3/*"]
     },
     "lib": [
       "ES2021.String",
