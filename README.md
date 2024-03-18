@@ -1,3 +1,5 @@
+[JestCoverageBadge](./badges/coverage-jest coverage.svg)
+
 # oas2ts
 A tool to convert [OpenApi](https://swagger.io/specification/) specifications into callable endpoint functions in [TS](https://www.typescriptlang.org/).
 
