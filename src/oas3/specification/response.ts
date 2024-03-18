@@ -1,13 +1,11 @@
 import {isSchema, Schema} from './schema';
-import {ComponentRef, isComponentRef} from '@oas3/specification/componentRef';
+import {ComponentRef, isComponentRef} from './componentRef';
 
 export type ResponseBodyContent = {
   schema: Schema;
 };
 
-export function isResponseBodyContent(
-  anyValue: any
-): anyValue is ResponseBodyContent {
+function isResponseBodyContent(anyValue: any): anyValue is ResponseBodyContent {
   const value = anyValue as ResponseBodyContent;
   if (typeof value !== 'object') {
     return false;

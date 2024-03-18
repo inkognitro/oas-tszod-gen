@@ -1,4 +1,4 @@
-import {isResponseBodyContent, ResponseBodyContent} from './response';
+import {isResponse, Response} from './response';
 import {isSchema, Schema} from './schema';
 import {isSecurityScheme, SecurityScheme} from './security';
 import {isRequest, Request} from './request';
@@ -41,20 +41,18 @@ function isRequestDefinitionsByPathMap(
   return true;
 }
 
-type ResponseBodyContentByNameMap = {
-  [requestPath: string]: ResponseBodyContent;
+type ResponseByNameMap = {
+  [requestPath: string]: Response;
 };
 
-function isResponseBodyContentByNameMap(
-  anyValue: any
-): anyValue is ResponseBodyContentByNameMap {
-  const value = anyValue as ResponseBodyContentByNameMap;
+function isResponseByNameMap(anyValue: any): anyValue is ResponseByNameMap {
+  const value = anyValue as ResponseByNameMap;
   if (typeof value !== 'object' || Array.isArray(value)) {
     return false;
   }
   for (const name in value) {
-    const bodyContent = value[name];
-    if (!isResponseBodyContent(bodyContent)) {
+    const response = value[name];
+    if (!isResponse(response)) {
       return false;
     }
   }
@@ -100,7 +98,7 @@ function isSecuritySchemeByNameMap(
 }
 
 type ComponentDefinitions = {
-  responses: ResponseBodyContentByNameMap;
+  responses: ResponseByNameMap;
   schemas: SchemaByNameMap;
   securitySchemes: SecuritySchemeByNameMap;
 };
@@ -112,7 +110,7 @@ function isComponentDefinitions(
   if (typeof value !== 'object' || Array.isArray(value)) {
     return false;
   }
-  if (value.responses && !isResponseBodyContentByNameMap(value.responses)) {
+  if (value.responses && !isResponseByNameMap(value.responses)) {
     return false;
   }
   if (value.schemas && !isSchemaByNameMap(value.schemas)) {
@@ -145,8 +143,7 @@ export function isSpecification(anyValue: any): anyValue is Specification {
     return false;
   }
   if (!isComponentDefinitions(value.components)) {
-    console.log(value); // todo: fix
-    // return false;
+    return false;
   }
   return true;
 }

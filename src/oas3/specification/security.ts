@@ -5,7 +5,7 @@ export type SecurityScheme = {
 
 export function isSecurityScheme(anyValue: any): anyValue is SecurityScheme {
   const value = anyValue as SecurityScheme;
-  if (typeof value !== 'object' || !Array.isArray(value)) {
+  if (typeof value !== 'object' || Array.isArray(value)) {
     return false;
   }
   if (value.type !== 'http') {
