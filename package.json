@@ -4,17 +4,18 @@
   "description": "A tool to convert OpenApi specifications into callable endpoint functions in TS.",
   "main": "index.js",
   "scripts": {
-    "start": "npx tspc -w",
-    "prodTest": "node build/src/generate.js",
-    "test": "jest",
-    "tspc": "tspc",
     "lint": "gts lint",
     "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
+    "posttest": "npm.cmd run lint",
     "prepare": "npm.cmd run compile",
     "pretest": "npm.cmd run compile",
-    "posttest": "npm.cmd run lint"
+    "prodTest": "node build/src/generate.js",
+    "start": "npx tspc -w",
+    "test": "jest",
+    "test-ci": "jest --ci --coverage",
+    "tspc": "tspc"
   },
   "repository": {
     "type": "git",

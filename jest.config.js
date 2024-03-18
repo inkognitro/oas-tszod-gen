@@ -1,4 +1,5 @@
 module.exports = {
+  coverageReporters: ['json-summary'],
   roots: ['<rootDir>/src'],
   testMatch: [
     '**/__tests__/**/*.+(ts|js)',

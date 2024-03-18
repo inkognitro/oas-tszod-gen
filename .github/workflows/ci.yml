@@ -1,28 +1,16 @@
 name: CI Pipeline
-
-on:
-  push:
-    branches:
-      - '*'
-  pull_request:
-    branches:
-      - '*'
-
+on: [push]
 jobs:
-  test:
-    name: Test
+  bump:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Check out repository code
+        uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v1
+      - name: Test
+        run: npm run test-ci
+
+      - name: Generating coverage badges
+        uses: jpb06/jest-badges-action@latest
         with:
-          node-version: '20.x'
-
-      - name: Install node modules
-        run: npm install
-
-      - name: Run tests
-        run: npm run test
+          branches: main
