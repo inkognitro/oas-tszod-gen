@@ -1,19 +1,23 @@
 name: CI Pipeline
+
 on: [push]
+
 jobs:
-  bump:
+  testing:
+    name: Generate test coverage badges
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Install modules
         run: npm install
 
-      - name: Test
+      - name: Run tests
         run: npm run test-ci
 
       - name: Generating coverage badges
         uses: jpb06/jest-badges-action@latest
         with:
           branches: main
+          badges-icon: vitest
