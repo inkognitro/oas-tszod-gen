@@ -1,4 +1,3 @@
-![MIT License](./badges/license-mit.svg)
 ![Branches](./badges/jest/coverage-branches.svg)
 ![Functions](./badges/jest/coverage-functions.svg)
 ![Lines](./badges/jest/coverage-lines.svg)
