@@ -24,3 +24,4 @@ jobs:
         with:
           branches: main
           badges-icon: vitest
+          output-folder: ./badges/jest

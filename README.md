@@ -1,9 +1,9 @@
 ![MIT License](./badges/license-mit.svg)
-![Branches](./badges/coverage-branches.svg)
-![Functions](./badges/coverage-functions.svg)
-![Lines](./badges/coverage-lines.svg)
-![Statements](./badges/coverage-statements.svg)
-![Coverage total](./badges/coverage-total.svg)
+![Branches](./badges/jest/coverage-branches.svg)
+![Functions](./badges/jest/coverage-functions.svg)
+![Lines](./badges/jest/coverage-lines.svg)
+![Statements](./badges/jest/coverage-statements.svg)
+![Coverage total](./badges/jest/coverage-total.svg)
 
 # oas2ts
 A tool to convert [OpenApi](https://swagger.io/specification/) specifications into callable endpoint functions in [TS](https://www.typescriptlang.org/).
