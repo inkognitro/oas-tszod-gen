@@ -1,5 +1,5 @@
 {
-  "name": "oas2ts",
+  "name": "oas-to-code",
   "version": "0.0.1",
   "description": "A tool to convert OpenApi specifications into callable endpoint functions in TS.",
   "main": "index.js",
