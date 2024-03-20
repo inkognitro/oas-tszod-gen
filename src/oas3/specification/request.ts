@@ -1,5 +1,6 @@
 import {isSchema, Schema} from './schema';
 import {isResponseByStatusCodeMap, ResponseByStatusCodeMap} from './response';
+import {ComponentRef, isComponentRef} from './componentRef';
 
 type PermissionsBySecurityName = {
   [securityName: string]: string[];
@@ -118,7 +119,7 @@ export function isRequestBodyByContentTypes(
 export type Request = {
   operationId: string;
   tags: string[];
-  parameters?: RequestParameter[];
+  parameters?: (RequestParameter | ComponentRef)[];
   requestBody?: RequestBodyByContentTypes;
   summary?: string;
   responses: ResponseByStatusCodeMap;
@@ -140,10 +141,12 @@ export function isRequest(anyValue: any): anyValue is Request {
   if (invalidTag) {
     return false;
   }
-  if (!Array.isArray(value.parameters)) {
+  if (value.parameters !== undefined && !Array.isArray(value.parameters)) {
     return false;
   }
-  const invalidParameter = value.parameters.find(p => !isRequestParameter(p));
+  const invalidParameter = value.parameters?.find(
+    p => !isRequestParameter(p) && !isComponentRef(p)
+  );
   if (invalidParameter) {
     return false;
   }

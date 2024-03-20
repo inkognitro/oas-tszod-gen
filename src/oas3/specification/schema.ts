@@ -5,10 +5,13 @@ export function isSchema(anyValue: any): anyValue is Schema {
     isComponentRef(anyValue) ||
     isBooleanSchema(anyValue) ||
     isStringSchema(anyValue) ||
+    isIntegerSchema(anyValue) ||
     isNumberSchema(anyValue) ||
     isArraySchema(anyValue) ||
     isObjectSchema(anyValue) ||
-    isOneOfSchema(anyValue)
+    isOneOfSchema(anyValue) ||
+    isAnyOfSchema(anyValue) ||
+    isAllOfSchema(anyValue)
   );
 }
 
@@ -152,6 +155,53 @@ export function isStringSchema(anyValue: any): anyValue is StringSchema {
   return true;
 }
 
+export type AllOfMetaData = {
+  description?: string;
+};
+
+function isAllOfMetaData(anyValue: any): anyValue is AllOfMetaData {
+  const value = anyValue as AllOfMetaData;
+  if (typeof value !== 'object') {
+    return false;
+  }
+  if (
+    value.description !== undefined &&
+    typeof value.description !== 'string'
+  ) {
+    return false;
+  }
+  return true;
+}
+
+export type AllOfSchema = {
+  allOf: (Schema | AllOfMetaData)[]; // at least one element should be a complete schema
+};
+
+export function isAllOfSchema(anyValue: any): anyValue is AllOfSchema {
+  const value = anyValue as AllOfSchema;
+  if (typeof value !== 'object') {
+    return false;
+  }
+  if (!Array.isArray(value.allOf)) {
+    return false;
+  }
+  let hasAtLeastOneValidSchema = false;
+  for (const index in value.allOf) {
+    const item = value.allOf[index];
+    if (isSchema(item)) {
+      hasAtLeastOneValidSchema = true;
+      continue;
+    }
+    if (!isAllOfMetaData(item)) {
+      return false;
+    }
+  }
+  if (!hasAtLeastOneValidSchema) {
+    return false;
+  }
+  return true;
+}
+
 export type OneOfSchema = {
   oneOf: Schema[];
   discriminator?: {
@@ -185,6 +235,39 @@ export function isOneOfSchema(anyValue: any): anyValue is OneOfSchema {
   return true;
 }
 
+export type AnyOfSchema = {
+  anyOf: Schema[];
+  discriminator?: {
+    propertyName: string;
+  };
+};
+
+export function isAnyOfSchema(anyValue: any): anyValue is AnyOfSchema {
+  const value = anyValue as AnyOfSchema;
+  if (typeof value !== 'object') {
+    return false;
+  }
+  if (!Array.isArray(value.anyOf)) {
+    return false;
+  }
+  if (
+    value.discriminator !== undefined &&
+    typeof value.discriminator.propertyName !== 'string'
+  ) {
+    return false;
+  }
+  const invalidEntry = value.anyOf.find(e => {
+    if (!isSchema(e)) {
+      return true;
+    }
+    return false;
+  });
+  if (invalidEntry) {
+    return false;
+  }
+  return true;
+}
+
 export type NumberSchema = {
   type: 'number';
   format?: 'string';
@@ -204,6 +287,47 @@ export function isNumberSchema(anyValue: any): anyValue is NumberSchema {
     return false;
   }
   if (value.format !== undefined && typeof value.format !== 'string') {
+    return false;
+  }
+  if (value.nullable !== undefined && typeof value.nullable !== 'boolean') {
+    return false;
+  }
+  if (value.minimum !== undefined && typeof value.minimum !== 'number') {
+    return false;
+  }
+  if (
+    value.exclusiveMinimum !== undefined &&
+    typeof value.exclusiveMinimum !== 'number'
+  ) {
+    return false;
+  }
+  if (value.maximum !== undefined && typeof value.maximum !== 'number') {
+    return false;
+  }
+  if (
+    value.exclusiveMaximum !== undefined &&
+    typeof value.exclusiveMaximum !== 'number'
+  ) {
+    return false;
+  }
+  return true;
+}
+
+export type IntegerSchema = {
+  type: 'integer';
+  nullable?: boolean;
+  minimum?: number;
+  exclusiveMinimum?: number;
+  maximum?: number;
+  exclusiveMaximum?: number;
+};
+
+export function isIntegerSchema(anyValue: any): anyValue is IntegerSchema {
+  const value = anyValue as IntegerSchema;
+  if (typeof value !== 'object') {
+    return false;
+  }
+  if (value.type !== 'integer') {
     return false;
   }
   if (value.nullable !== undefined && typeof value.nullable !== 'boolean') {

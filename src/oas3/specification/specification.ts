@@ -1,7 +1,12 @@
 import {isResponse, Response} from './response';
 import {isSchema, Schema} from './schema';
 import {isSecurityScheme, SecurityScheme} from './security';
-import {isRequest, Request} from './request';
+import {
+  isRequest,
+  isRequestParameter,
+  Request,
+  RequestParameter,
+} from './request';
 
 export type RequestByMethodMap = {
   [requestMethod: string]: Request;
@@ -13,8 +18,8 @@ function isRequestByMethodMap(anyValue: any): anyValue is RequestByMethodMap {
     return false;
   }
   for (const requestMethod in value) {
-    const endpoint = value[requestMethod];
-    if (!isRequest(endpoint)) {
+    const request = value[requestMethod];
+    if (!isRequest(request)) {
       return false;
     }
   }
@@ -97,10 +102,31 @@ function isSecuritySchemeByNameMap(
   return true;
 }
 
+type RequestParameterByNameMap = {
+  [name: string]: RequestParameter;
+};
+
+function isRequestParameterByNameMap(
+  anyValue: any
+): anyValue is RequestParameterByNameMap {
+  const value = anyValue as RequestParameterByNameMap;
+  if (typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+  for (const name in value) {
+    const requestParameter = value[name];
+    if (!isRequestParameter(requestParameter)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 type ComponentDefinitions = {
-  responses: ResponseByNameMap;
-  schemas: SchemaByNameMap;
-  securitySchemes: SecuritySchemeByNameMap;
+  parameters?: RequestParameterByNameMap;
+  responses?: ResponseByNameMap;
+  schemas?: SchemaByNameMap;
+  securitySchemes?: SecuritySchemeByNameMap;
 };
 
 function isComponentDefinitions(
@@ -108,6 +134,9 @@ function isComponentDefinitions(
 ): anyValue is ComponentDefinitions {
   const value = anyValue as ComponentDefinitions;
   if (typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+  if (value.parameters && !isRequestParameterByNameMap(value.parameters)) {
     return false;
   }
   if (value.responses && !isResponseByNameMap(value.responses)) {
