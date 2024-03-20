@@ -5,10 +5,10 @@
 ![Statements](./badges/jest/coverage-statements.svg)
 ![Coverage total](./badges/jest/coverage-total.svg)
 
-# oas2ts
+# oas-to-code
 A tool to convert [OpenApi](https://swagger.io/specification/) specifications into callable endpoint functions in [TS](https://www.typescriptlang.org/).
 
-## Why should I use `oas2ts`?
+## Why should I use `oas-to-code`?
 Easy one to answer:
 - to have a single-source-of-truth for endpoint definitions
 - to have the possibility for an automatic compatibility check of your api endpoints with your TS frontends
