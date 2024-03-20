@@ -19,19 +19,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/inkognitro/oas2ts.git"
+    "url": "git+https://github.com/inkognitro/oas-to-code.git"
   },
   "keywords": [
-    "oas2ts",
+    "oas-to-code",
     "oas3",
-    "ts-api"
+    "oas3 code generator"
   ],
   "author": "Marcel Fischer",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/inkognitro/oas2ts/issues"
+    "url": "https://github.com/inkognitro/oas-to-code/issues"
   },
-  "homepage": "https://github.com/inkognitro/oas2ts#readme",
+  "homepage": "https://github.com/inkognitro/oas-to-code#readme",
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "20.8.2",
