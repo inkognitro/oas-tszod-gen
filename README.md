@@ -20,8 +20,7 @@ Easy one to answer:
 Good question. The aim of this library is not only to guarantee type-safety but also to generate
 endpoint caller functions with standalone types which then can be used in your code base.
 
-> **Worried?**
+> **Worried about different generated outputs after this library was updated?**
 > 
 > As long as the API contract on the backend site was not violated through breaking changes,
-> there is no need to worry about different code generation outputs,
-> generated from the same **major version** of this library.
+> there is no need to worry about different generated code outputs from the same **major version** of this library.
