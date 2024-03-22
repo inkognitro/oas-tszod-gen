@@ -1,8 +1,10 @@
 import {
   areOutputPathsEqual,
   CodeGenerator,
+  ComponentRefOutput,
   doesOutPathStartWithOtherOutputPath,
   IndirectOutput,
+  IndirectOutputType,
   OutputPath,
 } from './core';
 import {isSpecification} from '@oas3/specification';
@@ -36,7 +38,47 @@ export class FilesCodeGenerator implements CodeGenerator {
   }
 
   addIndirectOutput(output: IndirectOutput) {
-    this.indirectOutputs.push(output); // todo: add checks from core.ts
+    const outputWithSamePath = this.indirectOutputs.find(o =>
+      areOutputPathsEqual(o.path, output.path)
+    );
+    if (outputWithSamePath) {
+      throw new Error(
+        `ambiguous definitions for outputPath: ${JSON.stringify(output.path)}"`
+      );
+    }
+    if (output.type === IndirectOutputType.COMPONENT_REF) {
+      // @ts-ignore
+      const conflictingComponentRefOutput: ComponentRefOutput | undefined =
+        this.indirectOutputs.find(o => {
+          if (
+            o.type !== IndirectOutputType.COMPONENT_REF ||
+            o.componentRef !== output.componentRef
+          ) {
+            return false;
+          }
+          if (
+            !o.objectDiscriminatorConfig ||
+            !output.objectDiscriminatorConfig
+          ) {
+            return false;
+          }
+          return (
+            JSON.stringify(o.objectDiscriminatorConfig) !==
+            JSON.stringify(output.objectDiscriminatorConfig)
+          );
+        });
+      if (conflictingComponentRefOutput) {
+        throw new Error(
+          `conflicting "objectDiscriminatorConfig" property for type ComponentRefOutput with componentName "${output.componentRef}":` +
+            `${JSON.stringify(
+              output.objectDiscriminatorConfig
+            )} Vs. ${JSON.stringify(
+              conflictingComponentRefOutput.objectDiscriminatorConfig
+            )}`
+        );
+      }
+    }
+    this.indirectOutputs.push(output);
   }
 
   private getOutputPathWithoutOperationIdPathPart(
