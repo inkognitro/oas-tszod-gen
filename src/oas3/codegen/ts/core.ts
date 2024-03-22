@@ -1,10 +1,16 @@
 export interface CodeGenerator {
-  createComponentTypeName(ref: string, referencingPath: OutputPath): string;
-  createEnumName(path: OutputPath, referencingPath: OutputPath): string;
-  createTypeName(path: OutputPath, referencingPath: OutputPath): string;
-  createConstName(path: OutputPath, referencingPath: OutputPath): string;
-  createFunctionName(path: OutputPath, referencingPath: OutputPath): string;
-  createOutputPathByOperationId(operationId: string): OutputPath;
+  createComponentTypeName(
+    componentRef: string,
+    referencingPath: OutputPath
+  ): string;
+  createEnumName(outputPath: OutputPath, referencingPath: OutputPath): string;
+  createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string;
+  createConstName(outputPath: OutputPath, referencingPath: OutputPath): string;
+  createFunctionName(
+    outputPath: OutputPath,
+    referencingPath: OutputPath
+  ): string;
+  createOperationIdOutputPath(operationId: string): OutputPath;
   createOutputPathByComponentRef(componentRef: string): OutputPath;
   addIndirectOutput(output: IndirectOutput): void;
 }
@@ -28,6 +34,21 @@ export function areOutputPathsEqual(a: OutputPath, b: OutputPath): boolean {
   return (
     a.length === b.length && a.every((element, index) => element === b[index])
   );
+}
+
+export function doesOutPathStartWithOtherOutputPath(
+  outputPath: OutputPath,
+  otherOutputPath: OutputPath
+): boolean {
+  if (outputPath.length < otherOutputPath.length) {
+    return false;
+  }
+  for (const index in otherOutputPath) {
+    if (outputPath[index] !== otherOutputPath[index]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 export type CreateCodeFunc = (referencingPath: OutputPath) => string;
