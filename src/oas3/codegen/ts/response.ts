@@ -6,9 +6,9 @@ import {
 import {
   CodeGenerationOutput,
   CodeGenerator,
-  IndirectOutputType,
+  OutputType,
   OutputPath,
-  TypeDefinitionOutput,
+  DefinitionOutput,
 } from './core';
 import {applyComponentRefSchema, applySchema} from './schema';
 import {
@@ -22,20 +22,21 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
   path: OutputPath,
   statusCode: number,
   schema: ResponseBodyContent
-): TypeDefinitionOutput {
+): DefinitionOutput {
   const jsonResponseBodySummary = applySchema(codeGenerator, schema.schema, [
     ...path,
     'body',
   ]);
-  const typeDefinitionOutput: TypeDefinitionOutput = {
-    type: IndirectOutputType.TYPE_DEFINITION,
+  const typeDefinitionOutput: DefinitionOutput = {
+    type: OutputType.DEFINITION,
+    definitionType: 'type',
     path,
-    createTypeName: referencingPath => {
+    createName: referencingPath => {
       return codeGenerator.createTypeName(path, referencingPath);
     },
     createCode: referencingPath => {
-      const responseType = templateResponseType.createTypeName(path);
-      const statusCodeEnum = templateStatusCodeEnum.createTypeName(path);
+      const responseType = templateResponseType.createName(path);
+      const statusCodeEnum = templateStatusCodeEnum.createName(path);
       const statusCodeEnumEntry =
         getTemplateResponseStatusCodeEnumEntry(statusCode);
       const bodyCode = jsonResponseBodySummary.createCode(referencingPath);
@@ -81,15 +82,16 @@ export function applyResponseByStatusCodeMap(
     );
     responseOutputs.push({
       createCode: referencingPath => {
-        return responseTypeDefinition.createTypeName(referencingPath);
+        return responseTypeDefinition.createName(referencingPath);
       },
       path: responseOutputPath,
       requiredOutputPaths: [responseOutput.path],
     });
   }
-  const responseTypeDefinition: TypeDefinitionOutput = {
-    type: IndirectOutputType.TYPE_DEFINITION,
-    createTypeName: referencingPath => {
+  const responseTypeDefinition: DefinitionOutput = {
+    type: OutputType.DEFINITION,
+    definitionType: 'type',
+    createName: referencingPath => {
       return codeGenerator.createTypeName(path, referencingPath);
     },
     path,
@@ -109,7 +111,7 @@ export function applyResponseByStatusCodeMap(
     path,
     requiredOutputPaths: [responseTypeDefinition.path],
     createCode: referencingPath => {
-      return responseTypeDefinition.createTypeName(referencingPath);
+      return responseTypeDefinition.createName(referencingPath);
     },
   };
 }

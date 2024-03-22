@@ -1,11 +1,4 @@
-import {
-  CodeGenerator,
-  ConstDefinitionOutput,
-  FunctionDefinitionOutput,
-  IndirectOutputType,
-  OutputPath,
-  TypeDefinitionOutput,
-} from './core';
+import {CodeGenerator, OutputType, OutputPath, DefinitionOutput} from './core';
 import {Request} from '@oas3/specification';
 import {applyResponseByStatusCodeMap} from './response';
 import {
@@ -19,22 +12,23 @@ function applyRequestResultTypeDefinition(
   codeGenerator: CodeGenerator,
   schema: Request,
   path: OutputPath
-): TypeDefinitionOutput {
+): DefinitionOutput {
   const responseOutput = applyResponseByStatusCodeMap(
     codeGenerator,
     schema.responses,
     [...path, 'response']
   );
-  const typeDefinition: TypeDefinitionOutput = {
-    type: IndirectOutputType.TYPE_DEFINITION,
+  const typeDefinition: DefinitionOutput = {
+    type: OutputType.DEFINITION,
+    definitionType: 'type',
     path,
     createCode: () => {
-      const requestResultType = templateRequestResultType.createTypeName(path);
-      const requestType = templateRequestType.createTypeName(path);
+      const requestResultType = templateRequestResultType.createName(path);
+      const requestType = templateRequestType.createName(path);
       const responseType = responseOutput.createCode(path);
       return `${requestResultType}<${requestType}, ${responseType}>`;
     },
-    createTypeName: referencingPath => {
+    createName: referencingPath => {
       return codeGenerator.createTypeName(path, referencingPath);
     },
     requiredOutputPaths: [templateRequestResultType.path, responseOutput.path],
@@ -47,11 +41,12 @@ function applyEndpointIdConstDefinition(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
   path: OutputPath
-): ConstDefinitionOutput {
+): DefinitionOutput {
   return {
-    type: IndirectOutputType.CONST_DEFINITION,
+    type: OutputType.DEFINITION,
+    definitionType: 'const',
     path,
-    createConstName: referencingPath => {
+    createName: referencingPath => {
       return codeGenerator.createConstName(path, referencingPath);
     },
     createCode: () => {
@@ -65,7 +60,7 @@ export function applyEndpointCallerFunction(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
   schema: Request
-): FunctionDefinitionOutput {
+) {
   const path = codeGenerator.createOperationIdOutputPath(schema.operationId);
   const endpointIdConstDefinition = applyEndpointIdConstDefinition(
     codeGenerator,
@@ -77,13 +72,14 @@ export function applyEndpointCallerFunction(
     schema,
     [...path, 'requestResult']
   );
-  const funcDefinition: FunctionDefinitionOutput = {
-    type: IndirectOutputType.FUNCTION_DEFINITION,
-    createFunctionName: referencingPath => {
+  const funcDefinition: DefinitionOutput = {
+    type: OutputType.DEFINITION,
+    definitionType: 'function',
+    createName: referencingPath => {
       return codeGenerator.createFunctionName(path, referencingPath);
     },
     createCode: () => {
-      const requestResult = requestResultTypeDefinition.createTypeName(path);
+      const requestResult = requestResultTypeDefinition.createName(path);
       return `(): Promise<${requestResult}> => { throw new Error('implement me!'); }`; // todo: implement
     },
     path,
@@ -94,5 +90,4 @@ export function applyEndpointCallerFunction(
     ],
   };
   codeGenerator.addIndirectOutput(funcDefinition);
-  return funcDefinition;
 }

@@ -1,18 +1,15 @@
-import {
-  EnumDefinitionOutput,
-  IndirectOutputType,
-  TypeDefinitionOutput,
-} from '@oas3/codegen/ts/core';
+import {DefinitionOutput, OutputType} from '@oas3/codegen/ts/core';
 
 const templateOutputPathPart = 'template-5acf7fae';
 
 const createCodeErrorMessage =
   'case not supported: code should be referenced from template folder instead';
 
-export const templateRequestType: TypeDefinitionOutput = {
-  type: IndirectOutputType.TYPE_DEFINITION,
+export const templateRequestType: DefinitionOutput = {
+  type: OutputType.DEFINITION,
+  definitionType: 'type',
   path: [templateOutputPathPart, 'core', 'request'],
-  createTypeName: () => {
+  createName: () => {
     return 'Request';
   },
   createCode: () => {
@@ -21,10 +18,11 @@ export const templateRequestType: TypeDefinitionOutput = {
   requiredOutputPaths: [],
 };
 
-export const templateResponseType: TypeDefinitionOutput = {
-  type: IndirectOutputType.TYPE_DEFINITION,
+export const templateResponseType: DefinitionOutput = {
+  type: OutputType.DEFINITION,
+  definitionType: 'type',
   path: [templateOutputPathPart, 'core', 'response'],
-  createTypeName: () => {
+  createName: () => {
     return 'Response';
   },
   createCode: () => {
@@ -33,10 +31,11 @@ export const templateResponseType: TypeDefinitionOutput = {
   requiredOutputPaths: [],
 };
 
-export const templateStatusCodeEnum: EnumDefinitionOutput = {
-  type: IndirectOutputType.ENUM_DEFINITION,
+export const templateStatusCodeEnum: DefinitionOutput = {
+  type: OutputType.DEFINITION,
+  definitionType: 'enum',
   path: [templateOutputPathPart, 'core', 'statusCode'],
-  createTypeName: () => {
+  createName: () => {
     return 'StatusCode';
   },
   createCode: () => {
@@ -66,10 +65,11 @@ export function getTemplateResponseStatusCodeEnumEntry(
   }
 }
 
-export const templateRequestResultType: TypeDefinitionOutput = {
-  type: IndirectOutputType.TYPE_DEFINITION,
+export const templateRequestResultType: DefinitionOutput = {
+  type: OutputType.DEFINITION,
+  definitionType: 'type',
   path: [templateOutputPathPart, 'core', 'requestResult'],
-  createTypeName: () => {
+  createName: () => {
     return 'RequestResult';
   },
   createCode: () => {
@@ -78,10 +78,11 @@ export const templateRequestResultType: TypeDefinitionOutput = {
   requiredOutputPaths: [],
 };
 
-export const templateRequestHandlerType: TypeDefinitionOutput = {
-  type: IndirectOutputType.TYPE_DEFINITION,
+export const templateRequestHandlerType: DefinitionOutput = {
+  type: OutputType.DEFINITION,
+  definitionType: 'type',
   path: [templateOutputPathPart, 'core', 'requestHandler'],
-  createTypeName: () => {
+  createName: () => {
     return 'RequestHandler';
   },
   createCode: () => {

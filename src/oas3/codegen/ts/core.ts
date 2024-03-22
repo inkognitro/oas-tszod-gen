@@ -12,10 +12,11 @@ export interface CodeGenerator {
   ): string;
   createOperationIdOutputPath(operationId: string): OutputPath;
   createOutputPathByComponentRef(componentRef: string): OutputPath;
-  addIndirectOutput(output: IndirectOutput): void;
+  addIndirectOutput(output: Output): void;
 }
 
-export enum IndirectOutputType {
+export enum OutputType {
+  DEFINITION = 'DEFINITION',
   ENUM_DEFINITION = 'ENUM_DEFINITION',
   TYPE_DEFINITION = 'TYPE_DEFINITION',
   CONST_DEFINITION = 'CONST_DEFINITION',
@@ -60,46 +61,17 @@ export type CodeGenerationOutput = {
   codeComment?: string;
 };
 
-type GenericIndirectOutput<
-  T extends IndirectOutputType,
-  P extends object = {},
-> = P & {
+type GenericOutput<T extends OutputType, P extends object = {}> = P & {
   type: T;
   path: OutputPath;
+  createName: (referencingPath: OutputPath) => string;
   requiredOutputPaths: OutputPath[];
 };
 
-export type TypeDefinitionOutput = GenericIndirectOutput<
-  IndirectOutputType.TYPE_DEFINITION,
+export type DefinitionOutput = GenericOutput<
+  OutputType.DEFINITION,
   {
-    createTypeName: (referencingPath: OutputPath) => string;
-    createCode: CreateCodeFunc;
-    codeComment?: string;
-  }
->;
-
-export type ConstDefinitionOutput = GenericIndirectOutput<
-  IndirectOutputType.CONST_DEFINITION,
-  {
-    createConstName: (referencingPath: OutputPath) => string;
-    createCode: CreateCodeFunc;
-    codeComment?: string;
-  }
->;
-
-export type FunctionDefinitionOutput = GenericIndirectOutput<
-  IndirectOutputType.FUNCTION_DEFINITION,
-  {
-    createFunctionName: (referencingPath: OutputPath) => string;
-    createCode: CreateCodeFunc;
-    codeComment?: string;
-  }
->;
-
-export type EnumDefinitionOutput = GenericIndirectOutput<
-  IndirectOutputType.ENUM_DEFINITION,
-  {
-    createTypeName: (referencingPath: OutputPath) => string;
+    definitionType: 'enum' | 'const' | 'function' | 'type';
     createCode: CreateCodeFunc;
     codeComment?: string;
   }
@@ -112,18 +84,12 @@ export type ObjectDiscriminatorConfig = {
   codeComment?: string;
 };
 
-export type ComponentRefOutput = GenericIndirectOutput<
-  IndirectOutputType.COMPONENT_REF,
+export type ComponentRefOutput = GenericOutput<
+  OutputType.COMPONENT_REF,
   {
-    createTypeName: (referencingPath: OutputPath) => string;
     componentRef: string;
     objectDiscriminatorConfig?: ObjectDiscriminatorConfig;
   }
 >;
 
-export type IndirectOutput =
-  | EnumDefinitionOutput
-  | TypeDefinitionOutput
-  | ConstDefinitionOutput
-  | FunctionDefinitionOutput
-  | ComponentRefOutput;
+export type Output = DefinitionOutput | ComponentRefOutput;

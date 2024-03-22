@@ -2,13 +2,13 @@ import {
   CreateCodeFunc,
   CodeGenerationOutput,
   ObjectDiscriminatorConfig,
-  IndirectOutputType,
-  EnumDefinitionOutput,
+  OutputType,
   OutputPath,
   arraySchemaItemOutputPathPart,
   oneOfSchemaItemOutputPathPart,
   objectSchemaAdditionalPropOutputPathPart,
   CodeGenerator,
+  DefinitionOutput,
 } from './core';
 import {
   ArraySchema,
@@ -105,10 +105,7 @@ export function applyArraySchema(
   path: OutputPath
 ): CodeGenerationOutput {
   const itemOutputPath = [...path, arraySchemaItemOutputPathPart];
-  const itemSummary = applySchema(codeGenerator, schema.items, [
-    ...path,
-    arraySchemaItemOutputPathPart,
-  ]);
+  const itemSummary = applySchema(codeGenerator, schema.items, itemOutputPath);
   const codeComment = itemSummary.codeComment
     ? `item: ${itemSummary.codeComment}`
     : undefined;
@@ -151,8 +148,8 @@ export function applyComponentRefSchema(
   objectDiscriminatorConfig?: ObjectDiscriminatorConfig
 ): CodeGenerationOutput {
   codeGenerator.addIndirectOutput({
-    type: IndirectOutputType.COMPONENT_REF,
-    createTypeName: referencingPath => {
+    type: OutputType.COMPONENT_REF,
+    createName: referencingPath => {
       return codeGenerator.createComponentTypeName(
         schema.$ref,
         referencingPath
@@ -161,7 +158,9 @@ export function applyComponentRefSchema(
     componentRef: schema.$ref,
     objectDiscriminatorConfig,
     path,
-    requiredOutputPaths: [],
+    requiredOutputPaths: [
+      codeGenerator.createOutputPathByComponentRef(schema.$ref),
+    ],
   });
   return {
     createCode: referencingPath =>
@@ -276,7 +275,7 @@ function createNullableDiscriminatorEnumDefinitionOutput(
   oneOfSchema: OneOfSchema,
   path: OutputPath,
   codeGenerator: CodeGenerator
-): null | EnumDefinitionOutput {
+): null | DefinitionOutput {
   const discriminatorPropName = oneOfSchema.discriminator?.propertyName;
   if (!discriminatorPropName) {
     return null;
@@ -293,8 +292,9 @@ function createNullableDiscriminatorEnumDefinitionOutput(
   });
   const enumOutputPath = [...path, discriminatorPropName];
   return {
-    type: IndirectOutputType.ENUM_DEFINITION,
-    createTypeName: (referencingPath: OutputPath) => {
+    type: OutputType.DEFINITION,
+    definitionType: 'enum',
+    createName: (referencingPath: OutputPath) => {
       return codeGenerator.createEnumName(enumOutputPath, referencingPath);
     },
     createCode: () => `{\n${enumsCodeLines.join(',\n')}\n}`,
@@ -339,7 +339,7 @@ export function applyOneOfSchema(
         requiredOutputPaths: [enumOutput.path],
         propName: discriminatorPropName,
         createCode: referencingContext => {
-          const enumTypeName = enumOutput.createTypeName(referencingContext);
+          const enumTypeName = enumOutput.createName(referencingContext);
           return `${enumTypeName}.${enumValue}`;
         },
       };
