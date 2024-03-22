@@ -119,18 +119,18 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.operationIdPathParts = [];
   }
 
-  generate(): Output[] {
+  generate() {
     this.indirectOutputs = [];
     this.operationIdPathParts = [];
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
       this.generateRequestRequestByMethodMapOutputs(path, requestByMethodMap);
     }
-    // todo: implement other parts
-    return this.indirectOutputs;
+    const fileOutputByFilePath = this.createFileOutputByFilePath();
+    console.log(fileOutputByFilePath); // todo: use for file generation
   }
 
-  private createOutputsByFileName(): FileOutputByFilePath {
+  private createFileOutputByFilePath(): FileOutputByFilePath {
     const fileOutputByFilePath: FileOutputByFilePath = {};
     this.indirectOutputs.forEach(output => {
       const filePath = createFilePathFromOutputPath(output.path);
@@ -145,18 +145,18 @@ export class DefaultCodeGenerator implements CodeGenerator {
       );
       switch (output.type) {
         case OutputType.COMPONENT_REF:
-          return;
+          break;
         case OutputType.DEFINITION:
           fileOutput = {
             ...fileOutput,
             definitions: [...fileOutput.definitions, output],
           };
-          return;
+          break;
         default:
           // @ts-ignore
           throw new Error(`type "${output.type}" is not supported`);
       }
-      // todo: use fileOutput
+      fileOutputByFilePath[filePath] = fileOutput;
     });
     return fileOutputByFilePath;
   }
