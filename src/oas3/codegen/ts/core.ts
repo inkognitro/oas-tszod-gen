@@ -37,7 +37,7 @@ export function areOutputPathsEqual(a: OutputPath, b: OutputPath): boolean {
   );
 }
 
-export function doesOutPathStartWithOtherOutputPath(
+export function doesOutputPathStartWithOtherOutputPath(
   outputPath: OutputPath,
   otherOutputPath: OutputPath
 ): boolean {

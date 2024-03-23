@@ -5,7 +5,7 @@ import {
   Output,
   OutputType,
   DefinitionOutput,
-  doesOutPathStartWithOtherOutputPath,
+  doesOutputPathStartWithOtherOutputPath,
   OutputPath,
 } from './core';
 import {
@@ -15,6 +15,7 @@ import {
 } from '@oas3/specification';
 import {applyEndpointCallerFunction} from '@oas3/codegen/ts/endpoint';
 import {EndpointId} from '@oas3/codegen/ts/template/core';
+const fs = require('fs');
 
 function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -37,78 +38,26 @@ type FileOutputByFilePath = {
   [filePath: string]: FileOutput;
 };
 
-function createRelativeOutputFolderPathFromOutputPath(
-  outputPath: OutputPath
-): string {
-  if (outputPath.length < 1) {
-    throw new Error(`invalid outputPath: ${JSON.stringify(outputPath)}`);
-  }
-  return `./${outputPath.slice(0, 1)}`;
-}
-
-function createFilePathFromOutputPath(outputPath: OutputPath): string {
-  if (outputPath.length < 2) {
-    throw new Error(`invalid outputPath: ${JSON.stringify(outputPath)}`);
-  }
-  return `${createRelativeOutputFolderPathFromOutputPath(
-    outputPath
-  )}/${outputPath.slice(1, 2)}.ts`;
-}
-
-function createImportPath(
-  localOutputPath: OutputPath,
-  referencingOutputPath: OutputPath
-): string {
-  return 'foo'; // todo: implement
-}
-
-function isSameFileContext(
-  outputPath: OutputPath,
-  referencingPath: OutputPath
-) {
-  return areOutputPathsEqual(
-    outputPath.slice(0, 2),
-    referencingPath.slice(0, 2)
+function convertToKebabCase(str: string): string {
+  return str.replace(
+    /[A-Z]+(?![a-z])|[A-Z]/g,
+    (subStr, ofs) => (ofs ? '-' : '') + subStr.toLowerCase()
   );
 }
 
-function addImportsToFileOutputByFilePath(
-  availableOutputs: Output[],
-  fileOutput: FileOutput,
-  output: Output
-): FileOutput {
-  let nextFileOutput = fileOutput;
-  output.requiredOutputPaths.forEach(requiredOutputPath => {
-    const requiredOutput = availableOutputs.find(o =>
-      areOutputPathsEqual(o.path, requiredOutputPath)
-    );
-    if (!requiredOutput) {
-      return;
-    }
-    if (isSameFileContext(requiredOutput.path, output.path)) {
-      return;
-    }
-    const importName = requiredOutput.createName(requiredOutput.path);
-    const importPath = createImportPath(requiredOutput.path, output.path);
-    const importNames = nextFileOutput.importNamesByPath[importPath] ?? [];
-    if (importNames.includes(importName)) {
-      return;
-    }
-    nextFileOutput = {
-      ...nextFileOutput,
-      importNamesByPath: {
-        ...nextFileOutput.importNamesByPath,
-        [importPath]: [...importNames, importName],
-      },
-    };
-  });
-  return nextFileOutput;
+function cleanUpFolderPath(path: string): string {
+  return path
+    .split('\\')
+    .join('/')
+    .split('/')
+    .filter(p => p !== '/')
+    .join('/');
 }
 
 export class DefaultCodeGenerator implements CodeGenerator {
   private readonly oas3Specs: Specification;
   private indirectOutputs: Output[];
-  private operationIdPathParts: OutputPath[]; // todo: check if these are required
+  private operationIdOutputPaths: OutputPath[]; // todo: check if these are required
 
   constructor(oas3Specs: object) {
     if (!isSpecification(oas3Specs)) {
@@ -116,29 +65,134 @@ export class DefaultCodeGenerator implements CodeGenerator {
     }
     this.oas3Specs = oas3Specs;
     this.indirectOutputs = [];
-    this.operationIdPathParts = [];
+    this.operationIdOutputPaths = [];
   }
 
-  generate() {
+  generate(targetFolderPath: string) {
     this.indirectOutputs = [];
-    this.operationIdPathParts = [];
+    this.operationIdOutputPaths = [];
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
       this.generateRequestRequestByMethodMapOutputs(path, requestByMethodMap);
     }
     const fileOutputByFilePath = this.createFileOutputByFilePath();
-    console.log(fileOutputByFilePath); // todo: use for file generation
+    this.createFiles(fileOutputByFilePath, targetFolderPath);
+  }
+
+  private createFiles(
+    fileOutputByFilePath: FileOutputByFilePath,
+    targetFolderPath: string
+  ) {
+    const cleanTargetFolderPath = cleanUpFolderPath(targetFolderPath);
+    for (const filePath in fileOutputByFilePath) {
+      const fileOutput = fileOutputByFilePath[filePath];
+      const fsFilePath = `${cleanTargetFolderPath}${filePath}`;
+      fs.writeFile(fsFilePath, this.createFileContent(fileOutput), () => {
+        console.log(`file was created: ${fsFilePath}`);
+      });
+    }
+  }
+
+  private createFileContent(fileOutput: FileOutput): string {
+    return 'pseudo content...'; // todo: implement
+  }
+
+  private generateRequestRequestByMethodMapOutputs(
+    path: string,
+    requestByMethodMap: RequestByMethodMap
+  ) {
+    for (const method in requestByMethodMap) {
+      const requestSchema = requestByMethodMap[method];
+      const endpointId: EndpointId = {path, method};
+      applyEndpointCallerFunction(this, endpointId, requestSchema);
+      this.operationIdOutputPaths.push(
+        this.createOperationIdOutputPath(requestSchema.operationId)
+      );
+    }
+  }
+
+  private createFilePathFromOutputPath(outputPath: OutputPath): string {
+    if (outputPath.length < 2) {
+      throw new Error(`invalid outputPath: ${JSON.stringify(outputPath)}`);
+    }
+    const operationIdFilePath = this.operationIdOutputPaths.find(
+      operationIdFilePath =>
+        doesOutputPathStartWithOtherOutputPath(outputPath, operationIdFilePath)
+    );
+    if (operationIdFilePath) {
+      const folders = operationIdFilePath.slice(0, -1);
+      const fileName = lowerCaseFirstLetter(
+        operationIdFilePath[operationIdFilePath.length - 1]
+      );
+      return `/${convertToKebabCase(folders.join('/'))}/${fileName}.ts`;
+    }
+    const folders = outputPath.slice(0, -1);
+    const fileName = lowerCaseFirstLetter(outputPath[outputPath.length - 1]);
+    return `/${convertToKebabCase(folders.join('/'))}/${fileName}.ts`;
+  }
+
+  private createImportPath(
+    localOutputPath: OutputPath,
+    referencingOutputPath: OutputPath
+  ): string {
+    return this.createFilePathFromOutputPath(localOutputPath); // todo: reference relatively
+  }
+
+  private isSameFileContext(
+    outputPath: OutputPath,
+    referencingPath: OutputPath
+  ) {
+    return areOutputPathsEqual(
+      outputPath.slice(0, 2),
+      referencingPath.slice(0, 2)
+    );
+  }
+
+  private addImportsToFileOutputByFilePath(
+    availableOutputs: Output[],
+    fileOutput: FileOutput,
+    output: Output
+  ): FileOutput {
+    let nextFileOutput = fileOutput;
+    output.requiredOutputPaths.forEach(requiredOutputPath => {
+      const requiredOutput = availableOutputs.find(o =>
+        areOutputPathsEqual(o.path, requiredOutputPath)
+      );
+      if (!requiredOutput) {
+        return;
+      }
+      if (this.isSameFileContext(requiredOutput.path, output.path)) {
+        return;
+      }
+      const importName = requiredOutput.createName(requiredOutput.path);
+      const importPath = this.createImportPath(
+        requiredOutput.path,
+        output.path
+      );
+      const importNames = nextFileOutput.importNamesByPath[importPath] ?? [];
+      if (importNames.includes(importName)) {
+        return;
+      }
+      nextFileOutput = {
+        ...nextFileOutput,
+        importNamesByPath: {
+          ...nextFileOutput.importNamesByPath,
+          [importPath]: [...importNames, importName],
+        },
+      };
+    });
+    return nextFileOutput;
   }
 
   private createFileOutputByFilePath(): FileOutputByFilePath {
     const fileOutputByFilePath: FileOutputByFilePath = {};
     this.indirectOutputs.forEach(output => {
-      const filePath = createFilePathFromOutputPath(output.path);
+      const filePath = this.createFilePathFromOutputPath(output.path);
       let fileOutput: FileOutput = fileOutputByFilePath[filePath] ?? {
         importNamesByPath: {},
         definitions: [],
       };
-      fileOutput = addImportsToFileOutputByFilePath(
+      fileOutput = this.addImportsToFileOutputByFilePath(
         this.indirectOutputs,
         fileOutput,
         output
@@ -159,17 +213,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
       fileOutputByFilePath[filePath] = fileOutput;
     });
     return fileOutputByFilePath;
-  }
-
-  private generateRequestRequestByMethodMapOutputs(
-    path: string,
-    requestByMethodMap: RequestByMethodMap
-  ) {
-    for (const method in requestByMethodMap) {
-      const requestSchema = requestByMethodMap[method];
-      const endpointId: EndpointId = {path, method};
-      applyEndpointCallerFunction(this, endpointId, requestSchema);
-    }
   }
 
   addIndirectOutput(output: Output) {
@@ -220,10 +263,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
     outputPath: OutputPath
   ): OutputPath {
     // todo: check if required
-    for (const index in this.operationIdPathParts) {
-      const operationIdPathPart = this.operationIdPathParts[index];
+    for (const index in this.operationIdOutputPaths) {
+      const operationIdPathPart = this.operationIdOutputPaths[index];
       if (
-        doesOutPathStartWithOtherOutputPath(outputPath, operationIdPathPart)
+        doesOutputPathStartWithOtherOutputPath(outputPath, operationIdPathPart)
       ) {
         return outputPath.slice(operationIdPathPart.length - 1);
       }
@@ -235,10 +278,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
     outputPath: OutputPath
   ): null | OutputPath {
     // todo: check if required
-    for (const index in this.operationIdPathParts) {
-      const operationIdPathPart = this.operationIdPathParts[index];
+    for (const index in this.operationIdOutputPaths) {
+      const operationIdPathPart = this.operationIdOutputPaths[index];
       if (
-        doesOutPathStartWithOtherOutputPath(outputPath, operationIdPathPart)
+        doesOutputPathStartWithOtherOutputPath(outputPath, operationIdPathPart)
       ) {
         return operationIdPathPart;
       }
@@ -254,12 +297,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   createOperationIdOutputPath(operationId: string): OutputPath {
     const path = operationId.split('.').map(p => lowerCaseFirstLetter(p));
-    this.operationIdPathParts.push(path);
+    this.operationIdOutputPaths.push(path);
     return path;
   }
 
   createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    const parts = isSameFileContext(outputPath, referencingPath)
+    const parts = this.isSameFileContext(outputPath, referencingPath)
       ? this.getOutputPathWithoutDomainPathPart(outputPath)
       : outputPath;
     const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
@@ -267,7 +310,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   createEnumName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    const parts = isSameFileContext(outputPath, referencingPath)
+    const parts = this.isSameFileContext(outputPath, referencingPath)
       ? this.getOutputPathWithoutDomainPathPart(outputPath)
       : outputPath;
     const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
@@ -275,7 +318,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   createConstName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    const parts = isSameFileContext(outputPath, referencingPath)
+    const parts = this.isSameFileContext(outputPath, referencingPath)
       ? this.getOutputPathWithoutDomainPathPart(outputPath)
       : outputPath;
     const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
@@ -286,7 +329,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     outputPath: OutputPath,
     referencingPath: OutputPath
   ): string {
-    const parts = isSameFileContext(outputPath, referencingPath)
+    const parts = this.isSameFileContext(outputPath, referencingPath)
       ? this.getOutputPathWithoutDomainPathPart(outputPath)
       : outputPath;
     const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
