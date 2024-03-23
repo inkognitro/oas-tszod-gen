@@ -15,7 +15,14 @@ import {
 } from '@oas3/specification';
 import {applyEndpointCallerFunction} from '@oas3/codegen/ts/endpoint';
 import {EndpointId} from '@oas3/codegen/ts/template/core';
+import {mkdirp} from 'mkdirp';
 const fs = require('fs');
+
+async function writeFile(path: string, content: string) {
+  const dirPath = path.split('/').slice(0, -1).join('/');
+  await mkdirp(dirPath);
+  fs.writeFileSync(path, content);
+}
 
 function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -87,8 +94,8 @@ export class DefaultCodeGenerator implements CodeGenerator {
     for (const filePath in fileOutputByFilePath) {
       const fileOutput = fileOutputByFilePath[filePath];
       const fsFilePath = `${cleanTargetFolderPath}${filePath}`;
-      fs.writeFile(fsFilePath, this.createFileContent(fileOutput), () => {
-        console.log(`file was created: ${fsFilePath}`);
+      writeFile(fsFilePath, this.createFileContent(fileOutput)).then(() => {
+        console.log(`created file: ${fsFilePath}`);
       });
     }
   }
