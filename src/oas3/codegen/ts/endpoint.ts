@@ -84,7 +84,7 @@ export function applyEndpointCallerFunction(
     },
     createCode: () => {
       const requestResult = requestResultTypeDefinition.createName(path);
-      return `(): Promise<${requestResult}> => { throw new Error('implement me!'); }`; // todo: implement
+      return `(): Promise<${requestResult}> { throw new Error('implement me!'); }`; // todo: implement
     },
     path,
     requiredOutputPaths: [

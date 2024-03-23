@@ -1,6 +1,10 @@
-import {DefinitionOutput, OutputType} from '@oas3/codegen/ts/core';
-
-const templateOutputPathPart = 'template-5acf7fae';
+import {
+  areOutputPathsEqual,
+  DefinitionOutput,
+  Output,
+  OutputPath,
+  OutputType,
+} from '@oas3/codegen/ts/core';
 
 const createCodeErrorMessage =
   'case not supported: code should be referenced from template folder instead';
@@ -8,7 +12,7 @@ const createCodeErrorMessage =
 export const templateRequestType: DefinitionOutput = {
   type: OutputType.DEFINITION,
   definitionType: 'type',
-  path: [templateOutputPathPart, 'core', 'request'],
+  path: ['core', 'request'],
   createName: () => {
     return 'Request';
   },
@@ -21,7 +25,7 @@ export const templateRequestType: DefinitionOutput = {
 export const templateResponseType: DefinitionOutput = {
   type: OutputType.DEFINITION,
   definitionType: 'type',
-  path: [templateOutputPathPart, 'core', 'response'],
+  path: ['core', 'response'],
   createName: () => {
     return 'Response';
   },
@@ -34,7 +38,7 @@ export const templateResponseType: DefinitionOutput = {
 export const templateStatusCodeEnum: DefinitionOutput = {
   type: OutputType.DEFINITION,
   definitionType: 'enum',
-  path: [templateOutputPathPart, 'core', 'statusCode'],
+  path: ['core', 'statusCode'],
   createName: () => {
     return 'StatusCode';
   },
@@ -68,7 +72,7 @@ export function getTemplateResponseStatusCodeEnumEntry(
 export const templateRequestResultType: DefinitionOutput = {
   type: OutputType.DEFINITION,
   definitionType: 'type',
-  path: [templateOutputPathPart, 'core', 'requestResult'],
+  path: ['core', 'requestResult'],
   createName: () => {
     return 'RequestResult';
   },
@@ -81,7 +85,7 @@ export const templateRequestResultType: DefinitionOutput = {
 export const templateRequestHandlerType: DefinitionOutput = {
   type: OutputType.DEFINITION,
   definitionType: 'type',
-  path: [templateOutputPathPart, 'core', 'requestHandler'],
+  path: ['core', 'requestHandler'],
   createName: () => {
     return 'RequestHandler';
   },
@@ -90,3 +94,15 @@ export const templateRequestHandlerType: DefinitionOutput = {
   },
   requiredOutputPaths: [],
 };
+
+const templateOutputs: Output[] = [
+  templateRequestType,
+  templateResponseType,
+  templateStatusCodeEnum,
+  templateRequestResultType,
+  templateRequestHandlerType,
+];
+
+export function findTemplateOutput(outputPath: OutputPath): undefined | Output {
+  return templateOutputs.find(o => areOutputPathsEqual(o.path, outputPath));
+}

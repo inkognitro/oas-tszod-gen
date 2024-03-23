@@ -15,6 +15,7 @@ import {
 } from '@oas3/specification';
 import {applyEndpointCallerFunction} from '@oas3/codegen/ts/endpoint';
 import {mkdirp} from 'mkdirp';
+import {findTemplateOutput} from '@oas3/codegen/ts/template';
 const fs = require('fs');
 
 async function writeFile(path: string, content: string) {
@@ -118,7 +119,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       switch (o.definitionType) {
         case 'function':
           definitionContents.push(
-            `export function ${o.createName(o.path)} ${o.createCode(o.path)}`
+            `export function ${o.createName(o.path)}${o.createCode(o.path)}`
           );
           break;
         case 'const':
@@ -142,9 +143,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
     });
     let content = importContents.join('\n');
     if (importContents.length && definitionContents.length) {
-      content += '\n\n';
+      content += '\n\n\n';
     }
-    content += definitionContents.join('\n');
+    content += definitionContents.join('\n\n');
     return content;
   }
 
@@ -182,21 +183,17 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return `/${convertToKebabCase(folders.join('/'))}/${fileName}.ts`;
   }
 
-  private createImportPath(
+  private createRelativeImportPath(
     localOutputPath: OutputPath,
     referencingOutputPath: OutputPath
   ): string {
     return this.createFilePathFromOutputPath(localOutputPath); // todo: reference relatively
   }
 
-  private isSameFileContext(
-    outputPath: OutputPath,
-    referencingPath: OutputPath
-  ) {
-    return areOutputPathsEqual(
-      outputPath.slice(0, 2),
-      referencingPath.slice(0, 2)
-    );
+  private isSameOutputFile(outputPath1: OutputPath, outputPath2: OutputPath) {
+    const filePath1 = this.createFilePathFromOutputPath(outputPath1);
+    const filePath2 = this.createFilePathFromOutputPath(outputPath2);
+    return filePath1 === filePath2;
   }
 
   private addImportsToFileOutputByFilePath(
@@ -206,17 +203,23 @@ export class DefaultCodeGenerator implements CodeGenerator {
   ): FileOutput {
     let nextFileOutput = fileOutput;
     output.requiredOutputPaths.forEach(requiredOutputPath => {
-      const requiredOutput = availableOutputs.find(o =>
+      let requiredOutput = availableOutputs.find(o =>
         areOutputPathsEqual(o.path, requiredOutputPath)
       );
       if (!requiredOutput) {
+        requiredOutput = findTemplateOutput(requiredOutputPath);
+      }
+      if (!requiredOutput) {
+        console.log(
+          'could not find output by path: ' + requiredOutputPath.join('.')
+        );
         return;
       }
-      if (this.isSameFileContext(requiredOutput.path, output.path)) {
+      if (this.isSameOutputFile(requiredOutput.path, output.path)) {
         return;
       }
       const importName = requiredOutput.createName(requiredOutput.path);
-      const importPath = this.createImportPath(
+      const importPath = this.createRelativeImportPath(
         requiredOutput.path,
         output.path
       );
@@ -353,7 +356,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    const parts = this.isSameFileContext(outputPath, referencingPath)
+    const parts = this.isSameOutputFile(outputPath, referencingPath)
       ? this.getOutputPathWithoutDomainPathPart(outputPath)
       : outputPath;
     const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
@@ -361,7 +364,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   createEnumName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    const parts = this.isSameFileContext(outputPath, referencingPath)
+    const parts = this.isSameOutputFile(outputPath, referencingPath)
       ? this.getOutputPathWithoutDomainPathPart(outputPath)
       : outputPath;
     const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
@@ -369,7 +372,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   createConstName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    const parts = this.isSameFileContext(outputPath, referencingPath)
+    const parts = this.isSameOutputFile(outputPath, referencingPath)
       ? this.getOutputPathWithoutDomainPathPart(outputPath)
       : outputPath;
     const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
@@ -380,7 +383,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     outputPath: OutputPath,
     referencingPath: OutputPath
   ): string {
-    const parts = this.isSameFileContext(outputPath, referencingPath)
+    const parts = this.isSameOutputFile(outputPath, referencingPath)
       ? this.getOutputPathWithoutDomainPathPart(outputPath)
       : outputPath;
     const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
