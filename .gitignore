@@ -1,5 +1,5 @@
 .idea
 oasTestSpecs.json
-build
+dist
 node_modules
 generated-files

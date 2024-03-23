@@ -1,8 +1,8 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "build",
+    "rootDir": "./src",
+    "outDir": "dist",
     "baseUrl": "./src",
     "paths": {
       "@oas3/*": ["./oas3/*"]
@@ -22,6 +22,6 @@
   "exclude": [
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
-    "src/oas3/codegen/ts/template/**",
+    "src/codegen-template/**"
   ]
 }

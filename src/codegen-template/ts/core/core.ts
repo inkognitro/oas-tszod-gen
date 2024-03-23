@@ -27,7 +27,7 @@ function createRequestUrl(endpointPath: string, params: UrlParameters): string {
       );
       return;
     }
-    url = url.replaceAll(`{${urlVariableName}}`, `${paramValue}`);
+    url = url.split(`{${urlVariableName}}`).join(`${paramValue}`);
   });
   return url;
 }
