@@ -6,7 +6,11 @@ import {
   templateRequestResultType,
   templateRequestType,
 } from './template';
-import {EndpointId} from './template/core';
+
+type EndpointId = {
+  method: string;
+  path: string;
+};
 
 function applyRequestResultTypeDefinition(
   codeGenerator: CodeGenerator,

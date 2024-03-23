@@ -14,7 +14,6 @@ import {
   Specification,
 } from '@oas3/specification';
 import {applyEndpointCallerFunction} from '@oas3/codegen/ts/endpoint';
-import {EndpointId} from '@oas3/codegen/ts/template/core';
 import {mkdirp} from 'mkdirp';
 const fs = require('fs');
 
@@ -91,6 +90,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
     targetFolderPath: string
   ) {
     const cleanTargetFolderPath = cleanUpFolderPath(targetFolderPath);
+    fs.cpSync(__dirname + '/template', cleanTargetFolderPath, {
+      recursive: true,
+    });
     for (const filePath in fileOutputByFilePath) {
       const fileOutput = fileOutputByFilePath[filePath];
       const fsFilePath = `${cleanTargetFolderPath}${filePath}`;
@@ -101,7 +103,49 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   private createFileContent(fileOutput: FileOutput): string {
-    return 'pseudo content...'; // todo: implement
+    const importContents: string[] = [];
+    for (const importPath in fileOutput.importNamesByPath) {
+      const importNames = fileOutput.importNamesByPath[importPath];
+      if (!importNames.length) {
+        continue;
+      }
+      importContents.push(
+        `import {${importNames.join(', ')}} from '${importPath}';`
+      );
+    }
+    const definitionContents: string[] = [];
+    fileOutput.definitions.forEach(o => {
+      switch (o.definitionType) {
+        case 'function':
+          definitionContents.push(
+            `export function ${o.createName(o.path)} ${o.createCode(o.path)}`
+          );
+          break;
+        case 'const':
+          definitionContents.push(
+            `export const ${o.createName(o.path)} = ${o.createCode(o.path)}`
+          );
+          break;
+        case 'enum':
+          definitionContents.push(
+            `export enum ${o.createName(o.path)} ${o.createCode(o.path)}`
+          );
+          break;
+        case 'type':
+          definitionContents.push(
+            `export type ${o.createName(o.path)} = ${o.createCode(o.path)}`
+          );
+          break;
+        default:
+          throw new Error(`output type "${o.definitionType}" is not supported`);
+      }
+    });
+    let content = importContents.join('\n');
+    if (importContents.length && definitionContents.length) {
+      content += '\n\n';
+    }
+    content += definitionContents.join('\n');
+    return content;
   }
 
   private generateRequestRequestByMethodMapOutputs(
@@ -110,7 +154,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
   ) {
     for (const method in requestByMethodMap) {
       const requestSchema = requestByMethodMap[method];
-      const endpointId: EndpointId = {path, method};
+      const endpointId = {path, method};
       applyEndpointCallerFunction(this, endpointId, requestSchema);
       this.operationIdOutputPaths.push(
         this.createOperationIdOutputPath(requestSchema.operationId)

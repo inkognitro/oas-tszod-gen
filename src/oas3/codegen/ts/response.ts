@@ -15,7 +15,7 @@ import {
   getTemplateResponseStatusCodeEnumEntry,
   templateResponseType,
   templateStatusCodeEnum,
-} from '@oas3/codegen/ts/template';
+} from './template';
 
 function applyStatusCodeResponseAndGetTypeDefinitionOutput(
   codeGenerator: CodeGenerator,
