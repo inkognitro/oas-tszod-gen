@@ -90,7 +90,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     targetFolderPath: string
   ) {
     const cleanTargetFolderPath = cleanUpFolderPath(targetFolderPath);
-    fs.cpSync(__dirname + '/template', cleanTargetFolderPath, {
+    fs.cpSync(__dirname + '../../../../templates/ts', cleanTargetFolderPath, {
       recursive: true,
     });
     for (const filePath in fileOutputByFilePath) {
