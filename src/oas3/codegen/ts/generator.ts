@@ -10,7 +10,10 @@ import {
 } from './core';
 import {
   isSpecification,
+  parameterComponentRefPrefix,
   RequestByMethodMap,
+  responseComponentRefPrefix,
+  schemaComponentRefPrefix,
   Specification,
 } from '@oas3/specification';
 import {applyEndpointCallerFunction} from '@oas3/codegen/ts/endpoint';
@@ -88,6 +91,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
       const requestByMethodMap = this.oas3Specs.paths[path];
       this.generateRequestRequestByMethodMapOutputs(path, requestByMethodMap);
     }
+
+    // todo: add fileOutput generation for componentRefs
+
     const fileOutputByFilePath = this.createFileOutputByFilePath(config);
     this.createFiles(fileOutputByFilePath, config);
   }
@@ -184,7 +190,11 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   private createFilePathFromOutputPath(outputPath: OutputPath): string {
     if (outputPath.length < 2) {
-      throw new Error(`invalid outputPath: ${JSON.stringify(outputPath)}`);
+      throw new Error(
+        `output path should contain at least two output path parts: ${JSON.stringify(
+          outputPath
+        )}`
+      );
     }
     const operationIdFilePath = this.operationIdOutputPaths.find(
       operationIdFilePath =>
@@ -459,8 +469,28 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   createOutputPathByComponentRef(componentRef: string): OutputPath {
-    const pathStr = componentRef.replace('#/', '').split('/').join('.');
-    return pathStr.split('.').map(p => lowerCaseFirstLetter(p));
+    const outputPath = componentRef
+      .replace(parameterComponentRefPrefix, '')
+      .replace(responseComponentRefPrefix, '')
+      .replace(schemaComponentRefPrefix, '')
+      .split('/')
+      .join('.')
+      .split('.')
+      .map(p => lowerCaseFirstLetter(p));
+
+    if (componentRef.startsWith(parameterComponentRefPrefix)) {
+      outputPath.push('parameters');
+      return outputPath;
+    }
+    if (componentRef.startsWith(responseComponentRefPrefix)) {
+      outputPath.push('responses');
+      return outputPath;
+    }
+    if (componentRef.startsWith(schemaComponentRefPrefix)) {
+      outputPath.push('schemas');
+      return outputPath;
+    }
+    throw new Error(`componentRef "${componentRef}" is not supported`);
   }
 
   createComponentTypeName(
