@@ -39,6 +39,7 @@ type ImportNamesByPath = {
 type FileOutput = {
   importNamesByPath: ImportNamesByPath;
   definitions: DefinitionOutput[];
+  exportPaths: string[];
 };
 
 type FileOutputByFilePath = {
@@ -119,6 +120,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
         `import {${importNames.join(', ')}} from '${importPath}';`
       );
     }
+
     const definitionContents: string[] = [];
     fileOutput.definitions.forEach(o => {
       switch (o.definitionType) {
@@ -146,12 +148,24 @@ export class DefaultCodeGenerator implements CodeGenerator {
           throw new Error(`output type "${o.definitionType}" is not supported`);
       }
     });
-    let content = importContents.join('\n');
-    if (importContents.length && definitionContents.length) {
-      content += '\n\n\n';
+
+    const exportContents: string[] = [];
+    fileOutput.exportPaths.forEach(path => {
+      exportContents.push(`export * from '${path}';`);
+    });
+
+    const contentParts: string[] = [];
+    if (importContents.length) {
+      contentParts.push(importContents.join('\n'));
     }
-    content += definitionContents.join('\n\n');
-    return content;
+    if (definitionContents.length) {
+      contentParts.push(definitionContents.join('\n\n'));
+    }
+    if (exportContents.length) {
+      contentParts.push(exportContents.join('\n'));
+    }
+
+    return contentParts.join('\n\n');
   }
 
   private generateRequestRequestByMethodMapOutputs(
@@ -234,7 +248,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return filePath1 === filePath2;
   }
 
-  private addImportsToFileOutputByFilePath(
+  private addImportsToFileOutput(
     fileOutput: FileOutput,
     output: Output,
     config: GenerateConfig
@@ -287,12 +301,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
       let fileOutput: FileOutput = fileOutputByFilePath[filePath] ?? {
         importNamesByPath: {},
         definitions: [],
+        exportPaths: [],
       };
-      fileOutput = this.addImportsToFileOutputByFilePath(
-        fileOutput,
-        output,
-        config
-      );
+      fileOutput = this.addImportsToFileOutput(fileOutput, output, config);
       switch (output.type) {
         case OutputType.COMPONENT_REF:
           break;
@@ -308,7 +319,52 @@ export class DefaultCodeGenerator implements CodeGenerator {
       }
       fileOutputByFilePath[filePath] = fileOutput;
     });
-    return fileOutputByFilePath;
+    return this.getFileOutputByFilePathWithAddedIndexFiles(
+      fileOutputByFilePath
+    );
+  }
+
+  private getFileOutputByFilePathWithAddedIndexFiles(
+    fileOutputByFilePath: FileOutputByFilePath
+  ): FileOutputByFilePath {
+    let nextFileOutputByFilePath = fileOutputByFilePath;
+    for (const filePath in fileOutputByFilePath) {
+      const folderPath = filePath.split('/').slice(0, -1).join('/');
+      const indexFilePath = `${folderPath}/index.ts`;
+      if (!fileOutputByFilePath[indexFilePath]) {
+        nextFileOutputByFilePath = {
+          ...nextFileOutputByFilePath,
+          [indexFilePath]: this.createFileOutputForIndexTsFile(
+            folderPath,
+            fileOutputByFilePath
+          ),
+        };
+      }
+    }
+    return nextFileOutputByFilePath;
+  }
+
+  private createFileOutputForIndexTsFile(
+    folderPath: string,
+    fileOutputByFilePath: FileOutputByFilePath
+  ): FileOutput {
+    const exportPaths: string[] = [];
+    for (const filePath in fileOutputByFilePath) {
+      const fileFolderPath = filePath.split('/').slice(0, -1).join('/');
+      if (folderPath === fileFolderPath) {
+        const exportPath = filePath
+          .split('/')
+          .slice(-1)
+          .join('')
+          .split('.ts')[0];
+        exportPaths.push(`./${exportPath}`);
+      }
+    }
+    return {
+      importNamesByPath: {},
+      definitions: [],
+      exportPaths,
+    };
   }
 
   addIndirectOutput(output: Output) {
