@@ -13,13 +13,17 @@ export function isComponentRef(anyValue: any): anyValue is ComponentRef {
   return true;
 }
 
+export const schemaComponentRefPrefix = '#/components/schemas/';
+
 export function isSchemaComponentRef(anyValue: any): anyValue is ComponentRef {
   const value = anyValue as ComponentRef;
   if (!isComponentRef(value)) {
     return false;
   }
-  return value.$ref.startsWith('#/components/schemas/');
+  return value.$ref.startsWith(schemaComponentRefPrefix);
 }
+
+export const responseComponentRefPrefix = '#/components/responses/';
 
 export function isResponseComponentRef(
   anyValue: any
@@ -28,8 +32,10 @@ export function isResponseComponentRef(
   if (!isComponentRef(value)) {
     return false;
   }
-  return value.$ref.startsWith('#/components/responses/');
+  return value.$ref.startsWith(responseComponentRefPrefix);
 }
+
+export const parameterComponentRefPrefix = '#/components/parameters/';
 
 export function isParameterComponentRef(
   anyValue: any
@@ -38,8 +44,10 @@ export function isParameterComponentRef(
   if (!isComponentRef(value)) {
     return false;
   }
-  return value.$ref.startsWith('#/components/parameters/');
+  return value.$ref.startsWith(parameterComponentRefPrefix);
 }
+
+export const securitySchemeComponentRefPrefix = '#/components/securitySchemes/';
 
 export function isSecuritySchemesComponentRef(
   anyValue: any
@@ -48,5 +56,5 @@ export function isSecuritySchemesComponentRef(
   if (!isComponentRef(value)) {
     return false;
   }
-  return value.$ref.startsWith('#/components/securitySchemes/');
+  return value.$ref.startsWith(securitySchemeComponentRefPrefix);
 }
