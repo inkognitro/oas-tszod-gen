@@ -89,6 +89,7 @@ export function applyEndpointCallerFunction(
     path,
     requiredOutputPaths: [
       endpointIdConstDefinition.path,
+      templateRequestType.path,
       requestResultTypeDefinition.path,
       templateRequestHandlerType.path,
     ],

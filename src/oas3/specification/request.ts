@@ -1,6 +1,6 @@
 import {isSchema, Schema} from './schema';
 import {isResponseByStatusCodeMap, ResponseByStatusCodeMap} from './response';
-import {ComponentRef, isComponentRef} from './componentRef';
+import {ComponentRef, isParameterComponentRef} from './componentRef';
 
 type PermissionsBySecurityName = {
   [securityName: string]: string[];
@@ -145,7 +145,7 @@ export function isRequest(anyValue: any): anyValue is Request {
     return false;
   }
   const invalidParameter = value.parameters?.find(
-    p => !isRequestParameter(p) && !isComponentRef(p)
+    p => !isRequestParameter(p) && !isParameterComponentRef(p)
   );
   if (invalidParameter) {
     return false;

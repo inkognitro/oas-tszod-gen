@@ -1,5 +1,5 @@
 import {
-  isComponentRef,
+  isResponseComponentRef,
   ResponseBodyContent,
   ResponseByStatusCodeMap,
 } from '@oas3/specification';
@@ -61,7 +61,7 @@ export function applyResponseByStatusCodeMap(
   for (const statusCode in schema) {
     const responseOutputPath: OutputPath = [...path, statusCode];
     const responseOrRef = schema[statusCode];
-    if (isComponentRef(responseOrRef)) {
+    if (isResponseComponentRef(responseOrRef)) {
       const responseOutput = applyComponentRefSchema(
         codeGenerator,
         responseOrRef,
@@ -107,6 +107,7 @@ export function applyResponseByStatusCodeMap(
     },
     requiredOutputPaths: responseOutputs.map(o => o.path),
   };
+  codeGenerator.addIndirectOutput(responseTypeDefinition);
   return {
     path,
     requiredOutputPaths: [responseTypeDefinition.path],

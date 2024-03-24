@@ -1,5 +1,5 @@
 import {isSchema, Schema} from './schema';
-import {ComponentRef, isComponentRef} from './componentRef';
+import {ComponentRef, isResponseComponentRef} from './componentRef';
 
 export type ResponseBodyContent = {
   schema: Schema;
@@ -53,7 +53,7 @@ export function isResponseByStatusCodeMap(
   const value = anyValue as ResponseByStatusCodeMap;
   for (const statusCode in value) {
     const responseOrRef = value[statusCode];
-    if (!isComponentRef(responseOrRef) && !isResponse(responseOrRef)) {
+    if (!isResponseComponentRef(responseOrRef) && !isResponse(responseOrRef)) {
       return false;
     }
   }

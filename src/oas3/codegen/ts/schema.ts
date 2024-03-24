@@ -16,10 +16,10 @@ import {
   ComponentRef,
   isArraySchema,
   isBooleanSchema,
-  isComponentRef,
   isNumberSchema,
   isObjectSchema,
   isOneOfSchema,
+  isSchemaComponentRef,
   isStringSchema,
   NumberSchema,
   ObjectSchema,
@@ -33,7 +33,7 @@ export function applySchema(
   schema: Schema,
   path: OutputPath
 ): CodeGenerationOutput {
-  if (isComponentRef(schema)) {
+  if (isSchemaComponentRef(schema)) {
     return applyComponentRefSchema(codeGenerator, schema, path);
   }
   if (isBooleanSchema(schema)) {
@@ -350,7 +350,7 @@ export function applyOneOfSchema(
           itemPath,
           objectDiscriminatorConfig
         );
-      } else if (isComponentRef(itemSchema)) {
+      } else if (isSchemaComponentRef(itemSchema)) {
         itemOutput = applyComponentRefSchema(
           codeGenerator,
           itemSchema,
