@@ -70,7 +70,7 @@ type GenerateConfig = {
 export class DefaultCodeGenerator implements CodeGenerator {
   private readonly oas3Specs: Specification;
   private indirectOutputs: Output[];
-  private operationIdOutputPaths: OutputPath[]; // todo: check if these are required
+  private operationIdOutputPaths: OutputPath[];
 
   constructor(oas3Specs: object) {
     if (!isSpecification(oas3Specs)) {
