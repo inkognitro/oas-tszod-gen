@@ -6,7 +6,9 @@ export function generate() {
   const dataStr = fs.readFileSync(filePath, 'utf-8').toString();
   const data = JSON.parse(dataStr);
   const codeGenerator = new DefaultCodeGenerator(data);
-  codeGenerator.generate('./generated-files');
+  codeGenerator.generate({
+    targetFolderPath: './generated-files',
+  });
 }
 
 generate();

@@ -61,6 +61,11 @@ function cleanUpFolderPath(path: string): string {
     .join('/');
 }
 
+type GenerateConfig = {
+  targetFolderPath: string;
+  importRootAlias?: string;
+};
+
 export class DefaultCodeGenerator implements CodeGenerator {
   private readonly oas3Specs: Specification;
   private indirectOutputs: Output[];
@@ -75,22 +80,22 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.operationIdOutputPaths = [];
   }
 
-  generate(targetFolderPath: string) {
+  generate(config: GenerateConfig) {
     this.indirectOutputs = [];
     this.operationIdOutputPaths = [];
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
       this.generateRequestRequestByMethodMapOutputs(path, requestByMethodMap);
     }
-    const fileOutputByFilePath = this.createFileOutputByFilePath();
-    this.createFiles(fileOutputByFilePath, targetFolderPath);
+    const fileOutputByFilePath = this.createFileOutputByFilePath(config);
+    this.createFiles(fileOutputByFilePath, config);
   }
 
   private createFiles(
     fileOutputByFilePath: FileOutputByFilePath,
-    targetFolderPath: string
+    config: GenerateConfig
   ) {
-    const cleanTargetFolderPath = cleanUpFolderPath(targetFolderPath);
+    const cleanTargetFolderPath = cleanUpFolderPath(config.targetFolderPath);
     fs.cpSync(__dirname + '../../../../templates/ts', cleanTargetFolderPath, {
       recursive: true,
     });
@@ -183,11 +188,16 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return `/${convertToKebabCase(folders.join('/'))}/${fileName}.ts`;
   }
 
-  private createRelativeImportPath(
+  private createImportPath(
     localOutputPath: OutputPath,
-    refOutputPath: OutputPath
+    refOutputPath: OutputPath,
+    config: GenerateConfig
   ): string {
     const targetFilePath = this.createFilePathFromOutputPath(localOutputPath);
+    const targetFolderPathParts = targetFilePath.split('/').slice(0, -1);
+    if (config.importRootAlias) {
+      return `${config.importRootAlias}${targetFolderPathParts.join('/')}`;
+    }
     const refFilePath = this.createFilePathFromOutputPath(refOutputPath);
     if (targetFilePath === refFilePath) {
       throw new Error(
@@ -195,7 +205,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
       );
     }
     const targetFileName = targetFilePath.split('/').slice(-1).join('');
-    const targetFolderPathParts = targetFilePath.split('/').slice(0, -1);
     const targetFolderPath = targetFolderPathParts.join('/');
     const refFolderPathParts = refFilePath.split('/').slice(0, -1);
     const refFolderPath = refFolderPathParts.join('/');
@@ -226,10 +235,11 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   private addImportsToFileOutputByFilePath(
-    availableOutputs: Output[],
     fileOutput: FileOutput,
-    output: Output
+    output: Output,
+    config: GenerateConfig
   ): FileOutput {
+    const availableOutputs = this.indirectOutputs;
     let nextFileOutput = fileOutput;
     output.requiredOutputPaths.forEach(requiredOutputPath => {
       let requiredOutput = availableOutputs.find(o =>
@@ -248,9 +258,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
         return;
       }
       const importName = requiredOutput.createName(requiredOutput.path);
-      const importPath = this.createRelativeImportPath(
+      const importPath = this.createImportPath(
         requiredOutput.path,
-        output.path
+        output.path,
+        config
       );
       const importNames = nextFileOutput.importNamesByPath[importPath] ?? [];
       if (importNames.includes(importName)) {
@@ -267,7 +278,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return nextFileOutput;
   }
 
-  private createFileOutputByFilePath(): FileOutputByFilePath {
+  private createFileOutputByFilePath(
+    config: GenerateConfig
+  ): FileOutputByFilePath {
     const fileOutputByFilePath: FileOutputByFilePath = {};
     this.indirectOutputs.forEach(output => {
       const filePath = this.createFilePathFromOutputPath(output.path);
@@ -276,9 +289,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
         definitions: [],
       };
       fileOutput = this.addImportsToFileOutputByFilePath(
-        this.indirectOutputs,
         fileOutput,
-        output
+        output,
+        config
       );
       switch (output.type) {
         case OutputType.COMPONENT_REF:
@@ -340,36 +353,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
       }
     }
     this.indirectOutputs.push(output);
-  }
-
-  private getOutputPathWithoutOperationIdPathPart(
-    outputPath: OutputPath
-  ): OutputPath {
-    // todo: check if required
-    for (const index in this.operationIdOutputPaths) {
-      const operationIdPathPart = this.operationIdOutputPaths[index];
-      if (
-        doesOutputPathStartWithOtherOutputPath(outputPath, operationIdPathPart)
-      ) {
-        return outputPath.slice(operationIdPathPart.length - 1);
-      }
-    }
-    return outputPath;
-  }
-
-  private findOperationIdOutputPathFromOutputPath(
-    outputPath: OutputPath
-  ): null | OutputPath {
-    // todo: check if required
-    for (const index in this.operationIdOutputPaths) {
-      const operationIdPathPart = this.operationIdOutputPaths[index];
-      if (
-        doesOutputPathStartWithOtherOutputPath(outputPath, operationIdPathPart)
-      ) {
-        return operationIdPathPart;
-      }
-    }
-    return null;
   }
 
   private getOutputPathWithoutDomainPathPart(
