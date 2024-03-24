@@ -185,9 +185,38 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   private createRelativeImportPath(
     localOutputPath: OutputPath,
-    referencingOutputPath: OutputPath
+    refOutputPath: OutputPath
   ): string {
-    return this.createFilePathFromOutputPath(localOutputPath); // todo: reference relatively
+    const targetFilePath = this.createFilePathFromOutputPath(localOutputPath);
+    const refFilePath = this.createFilePathFromOutputPath(refOutputPath);
+    if (targetFilePath === refFilePath) {
+      throw new Error(
+        'same filePath cases should have been handled before calling this function'
+      );
+    }
+    const targetFileName = targetFilePath.split('/').slice(-1).join('');
+    const targetFolderPathParts = targetFilePath.split('/').slice(0, -1);
+    const targetFolderPath = targetFolderPathParts.join('/');
+    const refFolderPathParts = refFilePath.split('/').slice(0, -1);
+    const refFolderPath = refFolderPathParts.join('/');
+    if (targetFolderPath === refFolderPath) {
+      const targetFileNameParts = targetFileName.split('.ts');
+      return `./${targetFileNameParts[0]}`;
+    }
+    let relativePath = '../';
+    let commonIndex = refFolderPathParts.length - 1;
+    for (let index = refFolderPathParts.length - 1; index >= 0; index--) {
+      const refPathPrefixParts = refFolderPathParts.slice(0, index);
+      const targetPathPrefixParts = targetFolderPathParts.slice(0, index);
+      if (!areOutputPathsEqual(targetPathPrefixParts, refPathPrefixParts)) {
+        relativePath += '../';
+        continue;
+      }
+      commonIndex = index;
+      break;
+    }
+    const relativePathPartsToTarget = targetFolderPathParts.slice(commonIndex);
+    return `${relativePath}${relativePathPartsToTarget.join('/')}`;
   }
 
   private isSameOutputFile(outputPath1: OutputPath, outputPath2: OutputPath) {
