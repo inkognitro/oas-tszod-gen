@@ -5,8 +5,8 @@ export function isSchema(anyValue: any): anyValue is Schema {
     isComponentRef(anyValue) ||
     isBooleanSchema(anyValue) ||
     isStringSchema(anyValue) ||
-    isIntegerSchema(anyValue) ||
     isNumberSchema(anyValue) ||
+    isIntegerSchema(anyValue) ||
     isArraySchema(anyValue) ||
     isObjectSchema(anyValue) ||
     isOneOfSchema(anyValue) ||
@@ -20,6 +20,7 @@ export type Schema =
   | BooleanSchema
   | StringSchema
   | NumberSchema
+  | IntegerSchema
   | ArraySchema
   | ObjectSchema
   | OneOfSchema;
