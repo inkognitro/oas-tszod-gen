@@ -45,7 +45,7 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
     requiredOutputPaths: [
       templateResponseType.path,
       templateStatusCodeEnum.path,
-      jsonResponseBodySummary.path,
+      ...jsonResponseBodySummary.requiredOutputPaths,
     ],
   };
   codeGenerator.addIndirectOutput(typeDefinitionOutput);

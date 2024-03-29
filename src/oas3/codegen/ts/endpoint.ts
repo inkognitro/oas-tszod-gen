@@ -71,6 +71,7 @@ export function applyEndpointCallerFunction(
     endpointId,
     [...path, 'endpointId']
   );
+  codeGenerator.addIndirectOutput(endpointIdConstDefinition);
   const requestResultTypeDefinition = applyRequestResultTypeDefinition(
     codeGenerator,
     schema,

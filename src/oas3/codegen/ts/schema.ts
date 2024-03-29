@@ -16,6 +16,7 @@ import {
   ComponentRef,
   isArraySchema,
   isBooleanSchema,
+  isComponentRef,
   isNumberSchema,
   isObjectSchema,
   isOneOfSchema,
@@ -187,14 +188,14 @@ export function applyObjectSchema(
   const requiredOutputPaths: OutputPath[] = [];
   for (const propName in schema.properties) {
     const propSchema = schema.properties[propName];
-    const subSchemaPath = [...path, propName];
-    requiredOutputPaths.push(subSchemaPath);
+    const propSchemaPath = [...path, propName];
+    requiredOutputPaths.push(propSchemaPath);
     if (discriminatorConfig && propName === discriminatorConfig.propName) {
-      applySchema(codeGenerator, propSchema, subSchemaPath);
+      applySchema(codeGenerator, propSchema, propSchemaPath);
       directOutputByPropNameMap[propName] = discriminatorConfig;
       continue;
     }
-    const propOutput = applySchema(codeGenerator, propSchema, subSchemaPath);
+    const propOutput = applySchema(codeGenerator, propSchema, propSchemaPath);
     directOutputByPropNameMap[propName] = propOutput;
   }
   let additionalPropertiesDirectOutput: undefined | CodeGenerationOutput;
@@ -246,8 +247,13 @@ export function applyObjectSchema(
 
 function getEnumValueFromItemSchema(
   itemSchema: Schema,
-  discriminatorPropName: string
+  discriminatorPropName: string,
+  codeGenerator: CodeGenerator // todo: check if still required
 ): string {
+  if (isComponentRef(itemSchema)) {
+    return 'IMPLEMENT_ME'; // todo: implement
+  }
+
   if (!isObjectSchema(itemSchema)) {
     throw new Error(
       `every item of oneOfSchema must have the discriminator property "${discriminatorPropName}", but no ObjectSchema was given: ${JSON.stringify(
@@ -283,7 +289,11 @@ function createNullableDiscriminatorEnumDefinitionOutput(
   const enumParts: string[] = [];
   oneOfSchema.oneOf.forEach(itemSchema => {
     enumParts.push(
-      getEnumValueFromItemSchema(itemSchema, discriminatorPropName)
+      getEnumValueFromItemSchema(
+        itemSchema,
+        discriminatorPropName,
+        codeGenerator
+      )
     );
   });
   const enumsCodeLines: string[] = [];
@@ -327,7 +337,8 @@ export function applyOneOfSchema(
       }
       const enumValue = getEnumValueFromItemSchema(
         itemSchema,
-        discriminatorPropName
+        discriminatorPropName,
+        codeGenerator
       );
       const itemPath: OutputPath = [
         ...path,

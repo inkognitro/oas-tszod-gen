@@ -2,11 +2,11 @@ import {
   areOutputPathsEqual,
   CodeGenerator,
   ComponentRefOutput,
-  Output,
-  OutputType,
   DefinitionOutput,
   doesOutputPathStartWithOtherOutputPath,
+  Output,
   OutputPath,
+  OutputType,
 } from './core';
 import {
   isSpecification,
@@ -19,6 +19,8 @@ import {
 import {applyEndpointCallerFunction} from '@oas3/codegen/ts/endpoint';
 import {mkdirp} from 'mkdirp';
 import {findTemplateOutput} from '@oas3/codegen/ts/template';
+import {applySchema} from '@oas3/codegen/ts/schema';
+
 const fs = require('fs');
 
 async function writeFile(path: string, content: string) {
@@ -89,11 +91,18 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.operationIdOutputPaths = [];
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
-      this.generateRequestRequestByMethodMapOutputs(path, requestByMethodMap);
+      for (const method in requestByMethodMap) {
+        const request = requestByMethodMap[method];
+        this.operationIdOutputPaths.push(
+          this.createOperationIdOutputPath(request.operationId)
+        );
+      }
     }
-
-    // todo: add fileOutput generation for componentRefs
-
+    for (const path in this.oas3Specs.paths) {
+      const requestByMethodMap = this.oas3Specs.paths[path];
+      this.generateRequestByMethodMapOutputs(path, requestByMethodMap);
+    }
+    this.generateComponentOutputs();
     const fileOutputByFilePath = this.createFileOutputByFilePath(config);
     this.createFiles(fileOutputByFilePath, config);
   }
@@ -110,7 +119,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       const fileOutput = fileOutputByFilePath[filePath];
       const fsFilePath = `${cleanTargetFolderPath}${filePath}`;
       writeFile(fsFilePath, this.createFileContent(fileOutput)).then(() => {
-        console.log(`created file: ${fsFilePath}`);
+        // console.log(`created file: ${fsFilePath}`); // todo: reimplement
       });
     }
   }
@@ -174,7 +183,92 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return contentParts.join('\n\n');
   }
 
-  private generateRequestRequestByMethodMapOutputs(
+  private generateComponentOutputs() {
+    const outputPathsToConsider = this.indirectOutputs.reduce<OutputPath[]>(
+      (allOutputPaths, output) => {
+        const outputPathsToAdd = output.requiredOutputPaths.filter(p => {
+          return !allOutputPaths.find(sp => areOutputPathsEqual(sp, p));
+        });
+        return [...allOutputPaths, ...outputPathsToAdd];
+      },
+      []
+    );
+    const components = this.oas3Specs.components;
+    for (const schemaName in components.schemas) {
+      const refStr = `${schemaComponentRefPrefix}${schemaName}`;
+      const schema = components.schemas[schemaName];
+      const outputPath = this.createOutputPathByComponentRef(refStr);
+      const shouldOutputBeAdded = !!outputPathsToConsider.find(op =>
+        areOutputPathsEqual(op, outputPath)
+      );
+      if (!shouldOutputBeAdded) {
+        continue;
+      }
+      const generationSummary = applySchema(this, schema, outputPath);
+      const typeDefinition: DefinitionOutput = {
+        type: OutputType.DEFINITION,
+        ...generationSummary,
+        definitionType: 'type',
+        createName: referencingPath =>
+          this.createComponentTypeName(refStr, referencingPath),
+      };
+      this.addIndirectOutput(typeDefinition);
+    }
+    for (const parameterName in components.parameters) {
+      const refStr = `${parameterComponentRefPrefix}${parameterName}`;
+      const requestParameter = components.parameters[parameterName];
+      const outputPath = this.createOutputPathByComponentRef(refStr);
+      const shouldOutputBeAdded = !!outputPathsToConsider.find(op =>
+        areOutputPathsEqual(op, outputPath)
+      );
+      if (!shouldOutputBeAdded) {
+        continue;
+      }
+      const generationSummary = applySchema(
+        this,
+        requestParameter.schema,
+        outputPath
+      );
+      const typeDefinition: DefinitionOutput = {
+        type: OutputType.DEFINITION,
+        ...generationSummary,
+        definitionType: 'type',
+        createName: referencingPath =>
+          this.createComponentTypeName(refStr, referencingPath),
+      };
+      this.addIndirectOutput(typeDefinition);
+    }
+    for (const responseName in components.responses) {
+      const refStr = `${responseComponentRefPrefix}${responseName}`;
+      const response = components.responses[responseName];
+      const jsonResponse = response.content['application/json'];
+      if (!jsonResponse) {
+        continue;
+      }
+      const outputPath = this.createOutputPathByComponentRef(refStr);
+      const shouldOutputBeAdded = !!outputPathsToConsider.find(op =>
+        areOutputPathsEqual(op, outputPath)
+      );
+      if (!shouldOutputBeAdded) {
+        continue;
+      }
+      const generationSummary = applySchema(
+        this,
+        jsonResponse.schema,
+        outputPath
+      );
+      const typeDefinition: DefinitionOutput = {
+        type: OutputType.DEFINITION,
+        ...generationSummary,
+        definitionType: 'type',
+        createName: referencingPath =>
+          this.createComponentTypeName(refStr, referencingPath),
+      };
+      this.addIndirectOutput(typeDefinition);
+    }
+  }
+
+  private generateRequestByMethodMapOutputs(
     path: string,
     requestByMethodMap: RequestByMethodMap
   ) {
@@ -182,9 +276,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
       const requestSchema = requestByMethodMap[method];
       const endpointId = {path, method};
       applyEndpointCallerFunction(this, endpointId, requestSchema);
-      this.operationIdOutputPaths.push(
-        this.createOperationIdOutputPath(requestSchema.operationId)
-      );
     }
   }
 
@@ -196,17 +287,20 @@ export class DefaultCodeGenerator implements CodeGenerator {
         )}`
       );
     }
-    const operationIdFilePath = this.operationIdOutputPaths.find(
+    const operationIdOutputPath = this.operationIdOutputPaths.find(
       operationIdFilePath =>
         doesOutputPathStartWithOtherOutputPath(outputPath, operationIdFilePath)
     );
-    if (operationIdFilePath) {
-      const folders = operationIdFilePath.slice(0, -1);
+    if (operationIdOutputPath) {
+      const folders = operationIdOutputPath.slice(0, -1);
       const fileName = lowerCaseFirstLetter(
-        operationIdFilePath[operationIdFilePath.length - 1]
+        operationIdOutputPath[operationIdOutputPath.length - 1]
       );
       return `/${convertToKebabCase(folders.join('/'))}/${fileName}.ts`;
     }
+
+    // todo: implement case for components!
+
     const folders = outputPath.slice(0, -1);
     const fileName = lowerCaseFirstLetter(outputPath[outputPath.length - 1]);
     return `/${convertToKebabCase(folders.join('/'))}/${fileName}.ts`;
@@ -274,7 +368,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
       }
       if (!requiredOutput) {
         console.log(
-          'could not find output by path: ' + requiredOutputPath.join('.')
+          `could not find output by path "${requiredOutputPath.join(
+            '.'
+          )}", referenced by path "${output.path.join('.')}"`
         );
         return;
       }
@@ -378,47 +474,60 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   addIndirectOutput(output: Output) {
-    const outputWithSamePath = this.indirectOutputs.find(o =>
-      areOutputPathsEqual(o.path, output.path)
-    );
-    if (outputWithSamePath) {
-      throw new Error(
-        `ambiguous definitions for outputPath: ${JSON.stringify(output.path)}"`
-      );
-    }
-    if (output.type === OutputType.COMPONENT_REF) {
-      // @ts-ignore
-      const conflictingComponentRefOutput: ComponentRefOutput | undefined =
-        this.indirectOutputs.find(o => {
-          if (
-            o.type !== OutputType.COMPONENT_REF ||
-            o.componentRef !== output.componentRef
-          ) {
-            return false;
-          }
-          if (
-            !o.objectDiscriminatorConfig ||
-            !output.objectDiscriminatorConfig
-          ) {
-            return false;
-          }
-          return (
-            JSON.stringify(o.objectDiscriminatorConfig) !==
-            JSON.stringify(output.objectDiscriminatorConfig)
+    switch (output.type) {
+      case OutputType.COMPONENT_REF:
+        // eslint-disable-next-line no-case-declarations
+        const conflictingOutput: ComponentRefOutput | undefined =
+          this.indirectOutputs.find(o => {
+            if (
+              o.type !== OutputType.COMPONENT_REF ||
+              o.componentRef !== output.componentRef
+            ) {
+              return false;
+            }
+            if (
+              !o.objectDiscriminatorConfig ||
+              !output.objectDiscriminatorConfig
+            ) {
+              return false;
+            }
+            return (
+              JSON.stringify(o.objectDiscriminatorConfig) !==
+              JSON.stringify(output.objectDiscriminatorConfig)
+            );
+          }) as undefined | ComponentRefOutput;
+        if (conflictingOutput) {
+          throw new Error(
+            `conflicting "objectDiscriminatorConfig" property for type ComponentRefOutput with componentName "${output.componentRef}":` +
+              `${JSON.stringify(
+                output.objectDiscriminatorConfig
+              )} Vs. ${JSON.stringify(
+                conflictingOutput.objectDiscriminatorConfig
+              )}`
           );
-        });
-      if (conflictingComponentRefOutput) {
-        throw new Error(
-          `conflicting "objectDiscriminatorConfig" property for type ComponentRefOutput with componentName "${output.componentRef}":` +
-            `${JSON.stringify(
-              output.objectDiscriminatorConfig
-            )} Vs. ${JSON.stringify(
-              conflictingComponentRefOutput.objectDiscriminatorConfig
-            )}`
+        }
+        this.indirectOutputs.push(output);
+        break;
+      case OutputType.DEFINITION:
+        // eslint-disable-next-line no-case-declarations
+        const outputWithSamePath = this.indirectOutputs.find(
+          o =>
+            o.type !== OutputType.COMPONENT_REF &&
+            areOutputPathsEqual(o.path, output.path)
         );
-      }
+        if (outputWithSamePath) {
+          throw new Error(
+            `ambiguous definitions for outputPath: ${JSON.stringify(
+              output.path
+            )}"`
+          );
+        }
+        this.indirectOutputs.push(output);
+        break;
+      default:
+        // @ts-ignore
+        throw new Error(`output.type "${output.type}" is not supported`);
     }
-    this.indirectOutputs.push(output);
   }
 
   private getOutputPathWithoutDomainPathPart(
@@ -428,9 +537,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   createOperationIdOutputPath(operationId: string): OutputPath {
-    const path = operationId.split('.').map(p => lowerCaseFirstLetter(p));
-    this.operationIdOutputPaths.push(path);
-    return path;
+    return operationId.split('.').map(p => lowerCaseFirstLetter(p));
   }
 
   createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string {
@@ -468,8 +575,41 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return lowerCaseFirstLetter(pascalCaseParts.join(''));
   }
 
+  // todo: finalize
+  private findOperationIdForComponentRef(
+    componentRef: string,
+    componentType: 'schema' | 'response' | 'parameter'
+  ): null | string {
+    const componentName = componentRef
+      .replace(parameterComponentRefPrefix, '')
+      .replace(responseComponentRefPrefix, '')
+      .replace(schemaComponentRefPrefix, '');
+    const outputPath = componentName
+      .split('.')
+      .map(p => lowerCaseFirstLetter(p));
+    let componentFolderOutputPathPart: null | OutputPath = null;
+    this.operationIdOutputPaths.forEach(p => {
+      const operationIdFolderOutputPathPart = p.slice(0, -1);
+      if (
+        !doesOutputPathStartWithOtherOutputPath(
+          outputPath,
+          operationIdFolderOutputPathPart
+        )
+      ) {
+        return;
+      }
+      if (
+        componentFolderOutputPathPart !== null &&
+        componentFolderOutputPathPart.length <
+          operationIdFolderOutputPathPart.length
+      ) {
+        componentFolderOutputPathPart = operationIdFolderOutputPathPart;
+      }
+    });
+  }
+
   createOutputPathByComponentRef(componentRef: string): OutputPath {
-    const outputPath = componentRef
+    const parts = componentRef
       .replace(parameterComponentRefPrefix, '')
       .replace(responseComponentRefPrefix, '')
       .replace(schemaComponentRefPrefix, '')
@@ -477,18 +617,21 @@ export class DefaultCodeGenerator implements CodeGenerator {
       .join('.')
       .split('.')
       .map(p => lowerCaseFirstLetter(p));
-
+    if (parts.length < 2) {
+      throw new Error(
+        `componentRef "${componentRef}" should at least be divided into three parts (by a dot).`
+      );
+    }
+    const folderPathParts = parts.slice(0, 1);
+    const typeNamePathParts = parts.slice(1);
     if (componentRef.startsWith(parameterComponentRefPrefix)) {
-      outputPath.push('parameters');
-      return outputPath;
+      return [...folderPathParts, 'parameters', ...typeNamePathParts];
     }
     if (componentRef.startsWith(responseComponentRefPrefix)) {
-      outputPath.push('responses');
-      return outputPath;
+      return [...folderPathParts, 'responses', ...typeNamePathParts];
     }
     if (componentRef.startsWith(schemaComponentRefPrefix)) {
-      outputPath.push('schemas');
-      return outputPath;
+      return [...folderPathParts, 'schemas', ...typeNamePathParts];
     }
     throw new Error(`componentRef "${componentRef}" is not supported`);
   }
