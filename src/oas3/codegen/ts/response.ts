@@ -56,36 +56,38 @@ export function applyResponseByStatusCodeMap(
   codeGenerator: CodeGenerator,
   schema: ResponseByStatusCodeMap,
   path: OutputPath
-): CodeGenerationOutput {
-  const responseOutputs: CodeGenerationOutput[] = [];
+): DefinitionOutput {
+  const statusCodeResponseOutputs: CodeGenerationOutput[] = [];
   for (const statusCode in schema) {
     const responseOutputPath: OutputPath = [...path, statusCode];
     const responseOrRef = schema[statusCode];
     if (isResponseComponentRef(responseOrRef)) {
+      // todo: fix this one, because it is more a "responseBodyContentRef" than a "responseComponentRef"
       const responseOutput = applyComponentRefSchema(
         codeGenerator,
         responseOrRef,
         responseOutputPath
       );
-      responseOutputs.push(responseOutput);
+      statusCodeResponseOutputs.push(responseOutput);
       continue;
     }
     const jsonResponseBody = responseOrRef.content['application/json'];
     if (!jsonResponseBody) {
       continue;
     }
-    const responseOutput = applyStatusCodeResponseAndGetTypeDefinitionOutput(
-      codeGenerator,
-      responseOutputPath,
-      parseInt(statusCode),
-      jsonResponseBody
-    );
-    responseOutputs.push({
+    const statusCodeResponseType =
+      applyStatusCodeResponseAndGetTypeDefinitionOutput(
+        codeGenerator,
+        responseOutputPath,
+        parseInt(statusCode),
+        jsonResponseBody
+      );
+    statusCodeResponseOutputs.push({
       createCode: referencingPath => {
-        return responseTypeDefinition.createName(referencingPath);
+        return statusCodeResponseType.createName(referencingPath);
       },
       path: responseOutputPath,
-      requiredOutputPaths: [responseOutput.path],
+      requiredOutputPaths: [statusCodeResponseType.path],
     });
   }
   const responseTypeDefinition: DefinitionOutput = {
@@ -97,7 +99,7 @@ export function applyResponseByStatusCodeMap(
     path,
     createCode: () => {
       const codeParts: string[] = [];
-      responseOutputs.forEach(responseOutput => {
+      statusCodeResponseOutputs.forEach(responseOutput => {
         const codeComment = responseOutput.codeComment
           ? ` // ${responseOutput.codeComment}`
           : '';
@@ -105,14 +107,8 @@ export function applyResponseByStatusCodeMap(
       });
       return `${codeParts.join('\n')}`;
     },
-    requiredOutputPaths: responseOutputs.map(o => o.path),
+    requiredOutputPaths: statusCodeResponseOutputs.map(o => o.path),
   };
   codeGenerator.addOutput(responseTypeDefinition);
-  return {
-    path,
-    requiredOutputPaths: [responseTypeDefinition.path],
-    createCode: referencingPath => {
-      return responseTypeDefinition.createName(referencingPath);
-    },
-  };
+  return responseTypeDefinition;
 }

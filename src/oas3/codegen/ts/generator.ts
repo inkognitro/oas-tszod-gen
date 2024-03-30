@@ -16,7 +16,11 @@ import {
   schemaComponentRefPrefix,
   Specification,
 } from '@oas3/specification';
-import {applyEndpointCallerFunction} from '@oas3/codegen/ts/endpoint';
+import {
+  applyEndpointCallerFunction,
+  requestResultOutputPathPart,
+  responseOutputPathPart,
+} from '@oas3/codegen/ts/endpoint';
 import {mkdirp} from 'mkdirp';
 import {findTemplateOutput, templateFilePaths} from '@oas3/codegen/ts/template';
 import {applySchema} from '@oas3/codegen/ts/schema';
@@ -651,6 +655,46 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return operationId.split('.').map(p => lowerCaseFirstLetter(p));
   }
 
+  private isStatusCodeResponseOutputPath(outputPath: OutputPath): boolean {
+    const statusCodeStr = outputPath[outputPath.length - 1];
+    const statusCode = parseInt(statusCodeStr);
+    if (isNaN(statusCode)) {
+      return false;
+    }
+    if (`${statusCode}` !== statusCodeStr) {
+      return false;
+    }
+    if (outputPath[outputPath.length - 2] !== responseOutputPathPart) {
+      return false;
+    }
+    return outputPath.includes(requestResultOutputPathPart);
+  }
+
+  private isUnionResponseOutputPath(outputPath: OutputPath): boolean {
+    return outputPath[outputPath.length - 1] === responseOutputPathPart;
+  }
+
+  private isRequestResultOutputPath(outputPath: OutputPath): boolean {
+    return outputPath[outputPath.length - 1] === requestResultOutputPathPart;
+  }
+
+  private createResponseStatusCodeName(statusCode: number): string {
+    switch (statusCode) {
+      case 200:
+        return 'Ok';
+      case 201:
+        return 'Created';
+      case 400:
+        return 'BadRequest';
+      case 401:
+        return 'Unauthorized';
+      case 403:
+        return 'Forbidden';
+      default:
+        throw new Error(`case for statusCode ${statusCode} is not supported`);
+    }
+  }
+
   createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string {
     let parts = this.isSameOutputFolder(outputPath, referencingPath)
       ? this.getOutputPathWithoutFolderOutputPathParts(outputPath)
@@ -661,6 +705,24 @@ export class DefaultCodeGenerator implements CodeGenerator {
         p !== componentParametersFileNameOutputPathPart &&
         p !== componentResponsesFileNameOutputPathPart
     );
+    if (this.isUnionResponseOutputPath(parts)) {
+      parts = parts.filter(p => p !== requestResultOutputPathPart);
+      parts = [...parts.slice(0, -1), 'response'];
+      return parts.map(p => capitalizeFirstLetter(p)).join('');
+    }
+    if (this.isStatusCodeResponseOutputPath(parts)) {
+      const statusCode = parseInt(parts[parts.length - 1]);
+      parts = [
+        ...parts.slice(0, -3),
+        ...this.createResponseStatusCodeName(statusCode),
+        'response',
+      ];
+      return parts.map(p => capitalizeFirstLetter(p)).join('');
+    }
+    if (this.isRequestResultOutputPath(parts)) {
+      parts = [...parts.slice(0, -1), 'requestResult'];
+      return parts.map(p => capitalizeFirstLetter(p)).join('');
+    }
     const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
     return pascalCaseParts.join('');
   }

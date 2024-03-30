@@ -7,6 +7,9 @@ import {
   templateRequestType,
 } from './template';
 
+export const responseOutputPathPart = 'response6b3a7814';
+export const requestResultOutputPathPart = 'requestResult6b3a7814';
+
 type EndpointId = {
   method: string;
   path: string;
@@ -17,25 +20,25 @@ function applyRequestResultTypeDefinition(
   schema: Request,
   path: OutputPath
 ): DefinitionOutput {
-  const responseOutput = applyResponseByStatusCodeMap(
+  const responseType = applyResponseByStatusCodeMap(
     codeGenerator,
     schema.responses,
-    [...path, 'response']
+    [...path, responseOutputPathPart]
   );
   const typeDefinition: DefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'type',
     path,
     createCode: () => {
-      const requestResultType = templateRequestResultType.createName(path);
-      const requestType = templateRequestType.createName(path);
-      const responseType = responseOutput.createCode(path);
-      return `${requestResultType}<${requestType}, ${responseType}>`;
+      const requestResultTypeName = templateRequestResultType.createName(path);
+      const requestTypeName = templateRequestType.createName(path);
+      const responseTypeName = responseType.createName(path);
+      return `${requestResultTypeName}<${requestTypeName}, ${responseTypeName}>`;
     },
     createName: referencingPath => {
       return codeGenerator.createTypeName(path, referencingPath);
     },
-    requiredOutputPaths: [templateRequestResultType.path, responseOutput.path],
+    requiredOutputPaths: [templateRequestResultType.path, responseType.path],
   };
   codeGenerator.addOutput(typeDefinition);
   return typeDefinition;
@@ -75,7 +78,7 @@ export function applyEndpointCallerFunction(
   const requestResultTypeDefinition = applyRequestResultTypeDefinition(
     codeGenerator,
     schema,
-    [...path, 'requestResult']
+    [...path, requestResultOutputPathPart]
   );
   const funcDefinition: DefinitionOutput = {
     type: OutputType.DEFINITION,
