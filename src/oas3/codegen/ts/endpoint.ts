@@ -65,7 +65,7 @@ export function applyEndpointCallerFunction(
   endpointId: EndpointId,
   schema: Request
 ) {
-  const path = codeGenerator.createOperationIdOutputPath(schema.operationId);
+  const path = codeGenerator.createOperationOutputPath(schema.operationId);
   const endpointIdConstDefinition = applyEndpointIdConstDefinition(
     codeGenerator,
     endpointId,

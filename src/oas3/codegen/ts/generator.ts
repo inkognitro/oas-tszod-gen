@@ -37,12 +37,17 @@ function lowerCaseFirstLetter(str: string): string {
   return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
-type ImportNamesByPath = {
-  [path: string]: string[];
+type ImportAsset = {
+  name: string;
+  importAsName: string;
+};
+
+type ImportAssetsByPath = {
+  [path: string]: ImportAsset[];
 };
 
 type FileOutput = {
-  importNamesByPath: ImportNamesByPath;
+  importAssetsByPath: ImportAssetsByPath;
   definitions: DefinitionOutput[];
   exportPaths: string[];
 };
@@ -67,6 +72,10 @@ function cleanUpFolderPath(path: string): string {
     .join('/');
 }
 
+const componentParametersFileNameOutputPathPart = 'parameters6b3a7814';
+const componentResponsesFileNameOutputPathPart = 'responses6b3a7814';
+const componentSchemasFileNameOutputPathPart = 'schemas6b3a7814';
+
 type GenerateConfig = {
   targetFolderPath: string;
   importRootAlias?: string;
@@ -75,7 +84,7 @@ type GenerateConfig = {
 export class DefaultCodeGenerator implements CodeGenerator {
   private readonly oas3Specs: Specification;
   private indirectOutputs: Output[];
-  private operationIdOutputPaths: OutputPath[];
+  private operationOutputPaths: OutputPath[];
 
   constructor(oas3Specs: object) {
     if (!isSpecification(oas3Specs)) {
@@ -83,21 +92,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
     }
     this.oas3Specs = oas3Specs;
     this.indirectOutputs = [];
-    this.operationIdOutputPaths = [];
+    this.operationOutputPaths = [];
   }
 
   generate(config: GenerateConfig) {
     this.indirectOutputs = [];
-    this.operationIdOutputPaths = [];
-    for (const path in this.oas3Specs.paths) {
-      const requestByMethodMap = this.oas3Specs.paths[path];
-      for (const method in requestByMethodMap) {
-        const request = requestByMethodMap[method];
-        this.operationIdOutputPaths.push(
-          this.createOperationIdOutputPath(request.operationId)
-        );
-      }
-    }
+    this.initializeOperationOutputPaths();
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
       this.generateRequestByMethodMapOutputs(path, requestByMethodMap);
@@ -105,6 +105,18 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.generateComponentOutputs();
     const fileOutputByFilePath = this.createFileOutputByFilePath(config);
     this.createFiles(fileOutputByFilePath, config);
+  }
+
+  private initializeOperationOutputPaths() {
+    this.operationOutputPaths = [];
+    for (const path in this.oas3Specs.paths) {
+      const requestByMethodMap = this.oas3Specs.paths[path];
+      for (const method in requestByMethodMap) {
+        const request = requestByMethodMap[method];
+        const outputPath = this.createOperationOutputPath(request.operationId);
+        this.operationOutputPaths.push(outputPath);
+      }
+    }
   }
 
   private createFiles(
@@ -126,13 +138,19 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   private createFileContent(fileOutput: FileOutput): string {
     const importContents: string[] = [];
-    for (const importPath in fileOutput.importNamesByPath) {
-      const importNames = fileOutput.importNamesByPath[importPath];
-      if (!importNames.length) {
+    for (const importPath in fileOutput.importAssetsByPath) {
+      const importAssets = fileOutput.importAssetsByPath[importPath];
+      if (!importAssets.length) {
         continue;
       }
+      const importStatements = importAssets.map(a => {
+        if (a.importAsName === a.name) {
+          return a.name;
+        }
+        return `${a.name} as ${a.importAsName}`;
+      });
       importContents.push(
-        `import {${importNames.join(', ')}} from '${importPath}';`
+        `import {${importStatements.join(', ')}} from '${importPath}';`
       );
     }
 
@@ -279,7 +297,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
     }
   }
 
-  private createFilePathFromOutputPath(outputPath: OutputPath): string {
+  private createFolderOutputPathFromOutputPath(
+    outputPath: OutputPath
+  ): OutputPath {
     if (outputPath.length < 2) {
       throw new Error(
         `output path should contain at least two output path parts: ${JSON.stringify(
@@ -287,23 +307,27 @@ export class DefaultCodeGenerator implements CodeGenerator {
         )}`
       );
     }
-    const operationIdOutputPath = this.operationIdOutputPaths.find(
-      operationIdFilePath =>
-        doesOutputPathStartWithOtherOutputPath(outputPath, operationIdFilePath)
-    );
-    if (operationIdOutputPath) {
-      const folders = operationIdOutputPath.slice(0, -1);
-      const fileName = lowerCaseFirstLetter(
-        operationIdOutputPath[operationIdOutputPath.length - 1]
-      );
-      return `/${convertToKebabCase(folders.join('/'))}/${fileName}.ts`;
+    const folderOutputPath =
+      this.findMostAccurateOperationFolderOutputPath(outputPath);
+    if (!folderOutputPath) {
+      return outputPath.slice(0, 1);
     }
+    return folderOutputPath;
+  }
 
-    // todo: implement case for components!
-
-    const folders = outputPath.slice(0, -1);
-    const fileName = lowerCaseFirstLetter(outputPath[outputPath.length - 1]);
-    return `/${convertToKebabCase(folders.join('/'))}/${fileName}.ts`;
+  private createFilePathFromOutputPath(outputPath: OutputPath): string {
+    const folderOutputPath =
+      this.createFolderOutputPathFromOutputPath(outputPath);
+    const folders = folderOutputPath.map(p => convertToKebabCase(p));
+    let fileName = lowerCaseFirstLetter(outputPath[folders.length]);
+    if (fileName === componentParametersFileNameOutputPathPart) {
+      fileName = 'parameters';
+    } else if (fileName === componentResponsesFileNameOutputPathPart) {
+      fileName = 'responses';
+    } else if (fileName === componentSchemasFileNameOutputPathPart) {
+      fileName = 'schemas';
+    }
+    return `/${folders.join('/')}/${fileName}.ts`;
   }
 
   private createImportPath(
@@ -352,6 +376,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return filePath1 === filePath2;
   }
 
+  private isSameOutputFolder(outputPath1: OutputPath, outputPath2: OutputPath) {
+    const folderPath1 = this.createFolderOutputPathFromOutputPath(outputPath1);
+    const folderPath2 = this.createFolderOutputPathFromOutputPath(outputPath2);
+    return areOutputPathsEqual(folderPath1, folderPath2);
+  }
+
   private addImportsToFileOutput(
     fileOutput: FileOutput,
     output: Output,
@@ -377,21 +407,27 @@ export class DefaultCodeGenerator implements CodeGenerator {
       if (this.isSameOutputFile(requiredOutput.path, output.path)) {
         return;
       }
-      const importName = requiredOutput.createName(requiredOutput.path);
+      const importAsset: ImportAsset = {
+        name: requiredOutput.createName(requiredOutput.path),
+        importAsName: requiredOutput.createName(output.path),
+      };
       const importPath = this.createImportPath(
         requiredOutput.path,
         output.path,
         config
       );
-      const importNames = nextFileOutput.importNamesByPath[importPath] ?? [];
-      if (importNames.includes(importName)) {
+      const importAssets = nextFileOutput.importAssetsByPath[importPath] ?? [];
+      const isAssetAlreadyConsidered = !!importAssets.find(
+        a => a.importAsName === importAsset.importAsName
+      );
+      if (isAssetAlreadyConsidered) {
         return;
       }
       nextFileOutput = {
         ...nextFileOutput,
-        importNamesByPath: {
-          ...nextFileOutput.importNamesByPath,
-          [importPath]: [...importNames, importName],
+        importAssetsByPath: {
+          ...nextFileOutput.importAssetsByPath,
+          [importPath]: [...importAssets, importAsset],
         },
       };
     });
@@ -405,7 +441,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.indirectOutputs.forEach(output => {
       const filePath = this.createFilePathFromOutputPath(output.path);
       let fileOutput: FileOutput = fileOutputByFilePath[filePath] ?? {
-        importNamesByPath: {},
+        importAssetsByPath: {},
         definitions: [],
         exportPaths: [],
       };
@@ -467,7 +503,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       }
     }
     return {
-      importNamesByPath: {},
+      importAssetsByPath: {},
       definitions: [],
       exportPaths,
     };
@@ -530,35 +566,43 @@ export class DefaultCodeGenerator implements CodeGenerator {
     }
   }
 
-  private getOutputPathWithoutDomainPathPart(
+  private getOutputPathWithoutFolderOutputPathParts(
     outputPath: OutputPath
   ): OutputPath {
-    return outputPath.slice(1);
+    const folderOutputPath =
+      this.createFolderOutputPathFromOutputPath(outputPath);
+    return outputPath.slice(folderOutputPath.length);
   }
 
-  createOperationIdOutputPath(operationId: string): OutputPath {
+  createOperationOutputPath(operationId: string): OutputPath {
     return operationId.split('.').map(p => lowerCaseFirstLetter(p));
   }
 
   createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    const parts = this.isSameOutputFile(outputPath, referencingPath)
-      ? this.getOutputPathWithoutDomainPathPart(outputPath)
+    let parts = this.isSameOutputFolder(outputPath, referencingPath)
+      ? this.getOutputPathWithoutFolderOutputPathParts(outputPath)
       : outputPath;
+    parts = parts.filter(
+      p =>
+        p !== componentSchemasFileNameOutputPathPart &&
+        p !== componentParametersFileNameOutputPathPart &&
+        p !== componentResponsesFileNameOutputPathPart
+    );
     const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
     return pascalCaseParts.join('');
   }
 
   createEnumName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    const parts = this.isSameOutputFile(outputPath, referencingPath)
-      ? this.getOutputPathWithoutDomainPathPart(outputPath)
+    const parts = this.isSameOutputFolder(outputPath, referencingPath)
+      ? this.getOutputPathWithoutFolderOutputPathParts(outputPath)
       : outputPath;
     const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
     return pascalCaseParts.join('');
   }
 
   createConstName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    const parts = this.isSameOutputFile(outputPath, referencingPath)
-      ? this.getOutputPathWithoutDomainPathPart(outputPath)
+    const parts = this.isSameOutputFolder(outputPath, referencingPath)
+      ? this.getOutputPathWithoutFolderOutputPathParts(outputPath)
       : outputPath;
     const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
     return lowerCaseFirstLetter(pascalCaseParts.join(''));
@@ -568,72 +612,71 @@ export class DefaultCodeGenerator implements CodeGenerator {
     outputPath: OutputPath,
     referencingPath: OutputPath
   ): string {
-    const parts = this.isSameOutputFile(outputPath, referencingPath)
-      ? this.getOutputPathWithoutDomainPathPart(outputPath)
+    const parts = this.isSameOutputFolder(outputPath, referencingPath)
+      ? this.getOutputPathWithoutFolderOutputPathParts(outputPath)
       : outputPath;
     const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
     return lowerCaseFirstLetter(pascalCaseParts.join(''));
   }
 
-  // todo: finalize
-  private findOperationIdForComponentRef(
-    componentRef: string,
-    componentType: 'schema' | 'response' | 'parameter'
-  ): null | string {
-    const componentName = componentRef
-      .replace(parameterComponentRefPrefix, '')
-      .replace(responseComponentRefPrefix, '')
-      .replace(schemaComponentRefPrefix, '');
-    const outputPath = componentName
-      .split('.')
-      .map(p => lowerCaseFirstLetter(p));
-    let componentFolderOutputPathPart: null | OutputPath = null;
-    this.operationIdOutputPaths.forEach(p => {
-      const operationIdFolderOutputPathPart = p.slice(0, -1);
+  private findMostAccurateOperationFolderOutputPath(
+    outputPath: OutputPath
+  ): null | OutputPath {
+    let mostAccurateFolderOutputPath: null | OutputPath = null;
+    this.operationOutputPaths.forEach(p => {
+      const folderOutputPath = p.slice(0, -1);
       if (
-        !doesOutputPathStartWithOtherOutputPath(
-          outputPath,
-          operationIdFolderOutputPathPart
-        )
+        !doesOutputPathStartWithOtherOutputPath(outputPath, folderOutputPath)
       ) {
         return;
       }
-      if (
-        componentFolderOutputPathPart !== null &&
-        componentFolderOutputPathPart.length <
-          operationIdFolderOutputPathPart.length
-      ) {
-        componentFolderOutputPathPart = operationIdFolderOutputPathPart;
+      if (mostAccurateFolderOutputPath === null) {
+        mostAccurateFolderOutputPath = folderOutputPath;
+        return;
+      }
+      if (mostAccurateFolderOutputPath.length < folderOutputPath.length) {
+        mostAccurateFolderOutputPath = folderOutputPath;
       }
     });
+    return mostAccurateFolderOutputPath;
   }
 
   createOutputPathByComponentRef(componentRef: string): OutputPath {
-    const parts = componentRef
+    const outputPathParts: OutputPath = componentRef
       .replace(parameterComponentRefPrefix, '')
       .replace(responseComponentRefPrefix, '')
       .replace(schemaComponentRefPrefix, '')
-      .split('/')
-      .join('.')
       .split('.')
       .map(p => lowerCaseFirstLetter(p));
-    if (parts.length < 2) {
+    if (outputPathParts.length < 2) {
       throw new Error(
-        `componentRef "${componentRef}" should at least be divided into three parts (by a dot).`
+        `componentRef "${componentRef}" should at least be divided into two parts (by a dot).`
       );
     }
-    const folderPathParts = parts.slice(0, 1);
-    const typeNamePathParts = parts.slice(1);
+    let folderOutputPathParts =
+      this.findMostAccurateOperationFolderOutputPath(outputPathParts);
+    if (!folderOutputPathParts) {
+      folderOutputPathParts = outputPathParts.slice(0, 1);
+    }
+    const typeNamePathParts = outputPathParts.slice(
+      folderOutputPathParts.length
+    );
+    let fileNameOutputPathPart: string | null = null;
     if (componentRef.startsWith(parameterComponentRefPrefix)) {
-      return [...folderPathParts, 'parameters', ...typeNamePathParts];
+      fileNameOutputPathPart = componentParametersFileNameOutputPathPart;
+    } else if (componentRef.startsWith(responseComponentRefPrefix)) {
+      fileNameOutputPathPart = componentResponsesFileNameOutputPathPart;
+    } else if (componentRef.startsWith(schemaComponentRefPrefix)) {
+      fileNameOutputPathPart = componentSchemasFileNameOutputPathPart;
     }
-    if (componentRef.startsWith(responseComponentRefPrefix)) {
-      return [...folderPathParts, 'responses', ...typeNamePathParts];
+    if (!fileNameOutputPathPart) {
+      throw new Error(`componentRef "${componentRef}" is not supported`);
     }
-    if (componentRef.startsWith(schemaComponentRefPrefix)) {
-      return [...folderPathParts, 'schemas', ...typeNamePathParts];
-    }
-    throw new Error(`componentRef "${componentRef}" is not supported`);
+    return [
+      ...folderOutputPathParts,
+      fileNameOutputPathPart,
+      ...typeNamePathParts,
+    ];
   }
 
   createComponentTypeName(

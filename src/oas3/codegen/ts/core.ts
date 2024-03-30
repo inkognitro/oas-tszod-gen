@@ -10,7 +10,7 @@ export interface CodeGenerator {
     outputPath: OutputPath,
     referencingPath: OutputPath
   ): string;
-  createOperationIdOutputPath(operationId: string): OutputPath;
+  createOperationOutputPath(operationId: string): OutputPath;
   createOutputPathByComponentRef(componentRef: string): OutputPath;
   addIndirectOutput(output: Output): void;
 }
