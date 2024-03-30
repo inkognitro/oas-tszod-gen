@@ -145,7 +145,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
             console.log(`extended file: ${fsFilePath}`);
           }
         );
-        return;
+        continue;
       }
       writeFile(fsFilePath, this.createFileContent(fileOutput)).then(() => {
         console.log(`created file: ${fsFilePath}`);
