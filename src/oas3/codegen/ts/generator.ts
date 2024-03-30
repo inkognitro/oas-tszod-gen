@@ -216,88 +216,148 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   private generateComponentOutputs() {
-    const outputPathsToConsider = this.indirectOutputs.reduce<OutputPath[]>(
-      (allOutputPaths, output) => {
-        const outputPathsToAdd = output.requiredOutputPaths.filter(p => {
-          return !allOutputPaths.find(sp => areOutputPathsEqual(sp, p));
-        });
-        return [...allOutputPaths, ...outputPathsToAdd];
-      },
-      []
+    const allComponentOutputs: Output[] = [];
+    for (const schemaName in this.oas3Specs.components.schemas) {
+      const componentRef = `${schemaComponentRefPrefix}${schemaName}`;
+      allComponentOutputs.push(this.createComponentOutput(componentRef));
+    }
+    for (const parameterName in this.oas3Specs.components.parameters) {
+      const componentRef = `${parameterComponentRefPrefix}${parameterName}`;
+      allComponentOutputs.push(this.createComponentOutput(componentRef));
+    }
+    for (const responseName in this.oas3Specs.components.responses) {
+      const componentRef = `${responseComponentRefPrefix}${responseName}`;
+      allComponentOutputs.push(this.createComponentOutput(componentRef));
+    }
+    const directlyRequiredOutputPaths = this.indirectOutputs.reduce<
+      OutputPath[]
+    >((allOutputPaths, output) => {
+      const outputPathsToAdd = output.requiredOutputPaths.filter(p => {
+        return !allOutputPaths.find(sp => areOutputPathsEqual(sp, p));
+      });
+      return [...allOutputPaths, ...outputPathsToAdd];
+    }, []);
+    this.recursivelyAddRequiredComponentOutputs(
+      allComponentOutputs,
+      directlyRequiredOutputPaths
     );
-    const components = this.oas3Specs.components;
-    for (const schemaName in components.schemas) {
-      const refStr = `${schemaComponentRefPrefix}${schemaName}`;
-      const schema = components.schemas[schemaName];
-      const outputPath = this.createOutputPathByComponentRef(refStr);
-      const shouldOutputBeAdded = !!outputPathsToConsider.find(op =>
-        areOutputPathsEqual(op, outputPath)
+  }
+
+  private recursivelyAddRequiredComponentOutputs(
+    componentOutputs: Output[],
+    requiredOutputPaths: OutputPath[],
+    outputPathsToIgnore: OutputPath[] = []
+  ) {
+    requiredOutputPaths.forEach(outputPath => {
+      const componentOutput = componentOutputs.find(o =>
+        areOutputPathsEqual(o.path, outputPath)
       );
-      if (!shouldOutputBeAdded) {
-        continue;
+      if (!componentOutput) {
+        return;
+      }
+      const existingOutput = this.indirectOutputs.find(o =>
+        areOutputPathsEqual(o.path, outputPath)
+      );
+      if (existingOutput) {
+        return;
+      }
+      const outputShouldBeIgnored = outputPathsToIgnore.find(p =>
+        areOutputPathsEqual(p, outputPath)
+      );
+      if (outputShouldBeIgnored) {
+        return; // this is to prevent from infinite recursion
+      }
+      this.recursivelyAddRequiredComponentOutputs(
+        componentOutputs,
+        componentOutput.requiredOutputPaths,
+        [...outputPathsToIgnore, componentOutput.path]
+      );
+      this.indirectOutputs.push(componentOutput);
+    });
+  }
+
+  private createComponentOutput(componentRef: string): Output {
+    const components = this.oas3Specs.components;
+    const outputPath = this.createOutputPathByComponentRef(componentRef);
+    if (
+      componentRef.startsWith(schemaComponentRefPrefix) &&
+      components.schemas
+    ) {
+      const schemaName = componentRef.replace(schemaComponentRefPrefix, '');
+      const schema = components.schemas[schemaName];
+      if (!schema) {
+        throw new Error(
+          `could not find schema for componentRef "${componentRef}"`
+        );
       }
       const generationSummary = applySchema(this, schema, outputPath);
-      const typeDefinition: DefinitionOutput = {
+      return {
         type: OutputType.DEFINITION,
         ...generationSummary,
         definitionType: 'type',
         createName: referencingPath =>
-          this.createComponentTypeName(refStr, referencingPath),
+          this.createComponentTypeName(componentRef, referencingPath),
       };
-      this.addIndirectOutput(typeDefinition);
-    }
-    for (const parameterName in components.parameters) {
-      const refStr = `${parameterComponentRefPrefix}${parameterName}`;
-      const requestParameter = components.parameters[parameterName];
-      const outputPath = this.createOutputPathByComponentRef(refStr);
-      const shouldOutputBeAdded = !!outputPathsToConsider.find(op =>
-        areOutputPathsEqual(op, outputPath)
+    } else if (
+      componentRef.startsWith(parameterComponentRefPrefix) &&
+      components.parameters
+    ) {
+      const parameterName = componentRef.replace(
+        parameterComponentRefPrefix,
+        ''
       );
-      if (!shouldOutputBeAdded) {
-        continue;
+      const requestParameter = components.parameters[parameterName];
+      if (!requestParameter) {
+        throw new Error(
+          `could not find requestParameter for componentRef "${componentRef}"`
+        );
       }
       const generationSummary = applySchema(
         this,
         requestParameter.schema,
         outputPath
       );
-      const typeDefinition: DefinitionOutput = {
+      return {
         type: OutputType.DEFINITION,
         ...generationSummary,
         definitionType: 'type',
         createName: referencingPath =>
-          this.createComponentTypeName(refStr, referencingPath),
+          this.createComponentTypeName(componentRef, referencingPath),
       };
-      this.addIndirectOutput(typeDefinition);
     }
-    for (const responseName in components.responses) {
-      const refStr = `${responseComponentRefPrefix}${responseName}`;
+    if (
+      componentRef.startsWith(responseComponentRefPrefix) &&
+      components.responses
+    ) {
+      const responseName = componentRef.replace(responseComponentRefPrefix, '');
       const response = components.responses[responseName];
+      if (!response) {
+        throw new Error(
+          `could not find definition for componentRef "${componentRef}"`
+        );
+      }
       const jsonResponse = response.content['application/json'];
       if (!jsonResponse) {
-        continue;
-      }
-      const outputPath = this.createOutputPathByComponentRef(refStr);
-      const shouldOutputBeAdded = !!outputPathsToConsider.find(op =>
-        areOutputPathsEqual(op, outputPath)
-      );
-      if (!shouldOutputBeAdded) {
-        continue;
+        throw new Error(
+          `could not find jsonResponse for componentRef "${componentRef}"`
+        );
       }
       const generationSummary = applySchema(
         this,
         jsonResponse.schema,
         outputPath
       );
-      const typeDefinition: DefinitionOutput = {
+      return {
         type: OutputType.DEFINITION,
         ...generationSummary,
         definitionType: 'type',
         createName: referencingPath =>
-          this.createComponentTypeName(refStr, referencingPath),
+          this.createComponentTypeName(componentRef, referencingPath),
       };
-      this.addIndirectOutput(typeDefinition);
     }
+    throw new Error(
+      `could not find any definition for componentRef "${componentRef}"`
+    );
   }
 
   private generateRequestByMethodMapOutputs(
