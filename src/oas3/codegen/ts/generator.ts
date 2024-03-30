@@ -18,7 +18,7 @@ import {
 } from '@oas3/specification';
 import {applyEndpointCallerFunction} from '@oas3/codegen/ts/endpoint';
 import {mkdirp} from 'mkdirp';
-import {findTemplateOutput} from '@oas3/codegen/ts/template';
+import {findTemplateOutput, templateFilePaths} from '@oas3/codegen/ts/template';
 import {applySchema} from '@oas3/codegen/ts/schema';
 
 const fs = require('fs');
@@ -27,6 +27,12 @@ async function writeFile(path: string, content: string) {
   const dirPath = path.split('/').slice(0, -1).join('/');
   await mkdirp(dirPath);
   fs.writeFileSync(path, content);
+}
+
+async function appendToFile(path: string, content: string) {
+  const dirPath = path.split('/').slice(0, -1).join('/');
+  await mkdirp(dirPath);
+  fs.appendFileSync(path, content);
 }
 
 function capitalizeFirstLetter(str: string): string {
@@ -130,8 +136,16 @@ export class DefaultCodeGenerator implements CodeGenerator {
     for (const filePath in fileOutputByFilePath) {
       const fileOutput = fileOutputByFilePath[filePath];
       const fsFilePath = `${cleanTargetFolderPath}${filePath}`;
+      if (templateFilePaths.includes(filePath)) {
+        appendToFile(fsFilePath, this.createFileContent(fileOutput)).then(
+          () => {
+            console.log(`extended file: ${fsFilePath}`);
+          }
+        );
+        return;
+      }
       writeFile(fsFilePath, this.createFileContent(fileOutput)).then(() => {
-        // console.log(`created file: ${fsFilePath}`); // todo: reimplement
+        console.log(`created file: ${fsFilePath}`);
       });
     }
   }
@@ -397,11 +411,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
         requiredOutput = findTemplateOutput(requiredOutputPath);
       }
       if (!requiredOutput) {
-        console.log(
-          `could not find output by path "${requiredOutputPath.join(
-            '.'
-          )}", referenced by path "${output.path.join('.')}"`
-        );
         return;
       }
       if (this.isSameOutputFile(requiredOutput.path, output.path)) {

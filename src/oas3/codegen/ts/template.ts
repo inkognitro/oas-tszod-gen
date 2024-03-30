@@ -95,6 +95,12 @@ export const templateRequestHandlerType: DefinitionOutput = {
   requiredOutputPaths: [],
 };
 
+export const templateFilePaths = [
+  '/core/core.ts',
+  '/core/index.ts',
+  '/core/security.ts',
+];
+
 const templateOutputs: Output[] = [
   templateRequestType,
   templateResponseType,
