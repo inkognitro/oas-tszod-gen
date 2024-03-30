@@ -37,7 +37,7 @@ function applyRequestResultTypeDefinition(
     },
     requiredOutputPaths: [templateRequestResultType.path, responseOutput.path],
   };
-  codeGenerator.addIndirectOutput(typeDefinition);
+  codeGenerator.addOutput(typeDefinition);
   return typeDefinition;
 }
 
@@ -71,7 +71,7 @@ export function applyEndpointCallerFunction(
     endpointId,
     [...path, 'endpointId']
   );
-  codeGenerator.addIndirectOutput(endpointIdConstDefinition);
+  codeGenerator.addOutput(endpointIdConstDefinition);
   const requestResultTypeDefinition = applyRequestResultTypeDefinition(
     codeGenerator,
     schema,
@@ -95,5 +95,5 @@ export function applyEndpointCallerFunction(
       templateRequestHandlerType.path,
     ],
   };
-  codeGenerator.addIndirectOutput(funcDefinition);
+  codeGenerator.addOutput(funcDefinition);
 }

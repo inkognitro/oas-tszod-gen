@@ -48,7 +48,7 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
       ...jsonResponseBodySummary.requiredOutputPaths,
     ],
   };
-  codeGenerator.addIndirectOutput(typeDefinitionOutput);
+  codeGenerator.addOutput(typeDefinitionOutput);
   return typeDefinitionOutput;
 }
 
@@ -107,7 +107,7 @@ export function applyResponseByStatusCodeMap(
     },
     requiredOutputPaths: responseOutputs.map(o => o.path),
   };
-  codeGenerator.addIndirectOutput(responseTypeDefinition);
+  codeGenerator.addOutput(responseTypeDefinition);
   return {
     path,
     requiredOutputPaths: [responseTypeDefinition.path],

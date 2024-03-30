@@ -8,6 +8,7 @@ export function generate() {
   const codeGenerator = new DefaultCodeGenerator(data);
   codeGenerator.generate({
     targetFolderPath: './generated-files',
+    predefinedFolderPaths: [['booking', 'core']],
   });
 }
 

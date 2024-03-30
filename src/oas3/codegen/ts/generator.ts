@@ -85,25 +85,26 @@ const componentSchemasFileNameOutputPathPart = 'schemas6b3a7814';
 type GenerateConfig = {
   targetFolderPath: string;
   importRootAlias?: string;
+  predefinedFolderPaths?: OutputPath[];
 };
 
 export class DefaultCodeGenerator implements CodeGenerator {
   private readonly oas3Specs: Specification;
-  private indirectOutputs: Output[];
-  private operationOutputPaths: OutputPath[];
+  private outputs: Output[];
+  private operationFolderOutputPaths: OutputPath[];
 
   constructor(oas3Specs: object) {
     if (!isSpecification(oas3Specs)) {
       throw new Error('invalid oas3 specification given');
     }
     this.oas3Specs = oas3Specs;
-    this.indirectOutputs = [];
-    this.operationOutputPaths = [];
+    this.outputs = [];
+    this.operationFolderOutputPaths = [];
   }
 
   generate(config: GenerateConfig) {
-    this.indirectOutputs = [];
-    this.initializeOperationOutputPaths();
+    this.outputs = [];
+    this.initializeOperationFolderOutputPaths(config);
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
       this.generateRequestByMethodMapOutputs(path, requestByMethodMap);
@@ -113,14 +114,16 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.createFiles(fileOutputByFilePath, config);
   }
 
-  private initializeOperationOutputPaths() {
-    this.operationOutputPaths = [];
+  private initializeOperationFolderOutputPaths(config: GenerateConfig) {
+    this.operationFolderOutputPaths = config.predefinedFolderPaths ?? [];
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
       for (const method in requestByMethodMap) {
         const request = requestByMethodMap[method];
-        const outputPath = this.createOperationOutputPath(request.operationId);
-        this.operationOutputPaths.push(outputPath);
+        const folderOutputPath = this.createOperationOutputPath(
+          request.operationId
+        ).slice(0, -1);
+        this.operationFolderOutputPaths.push(folderOutputPath);
       }
     }
   }
@@ -229,14 +232,15 @@ export class DefaultCodeGenerator implements CodeGenerator {
       const componentRef = `${responseComponentRefPrefix}${responseName}`;
       allComponentOutputs.push(this.createComponentOutput(componentRef));
     }
-    const directlyRequiredOutputPaths = this.indirectOutputs.reduce<
-      OutputPath[]
-    >((allOutputPaths, output) => {
-      const outputPathsToAdd = output.requiredOutputPaths.filter(p => {
-        return !allOutputPaths.find(sp => areOutputPathsEqual(sp, p));
-      });
-      return [...allOutputPaths, ...outputPathsToAdd];
-    }, []);
+    const directlyRequiredOutputPaths = this.outputs.reduce<OutputPath[]>(
+      (allOutputPaths, output) => {
+        const outputPathsToAdd = output.requiredOutputPaths.filter(p => {
+          return !allOutputPaths.find(sp => areOutputPathsEqual(sp, p));
+        });
+        return [...allOutputPaths, ...outputPathsToAdd];
+      },
+      []
+    );
     this.recursivelyAddRequiredComponentOutputs(
       allComponentOutputs,
       directlyRequiredOutputPaths
@@ -255,7 +259,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       if (!componentOutput) {
         return;
       }
-      const existingOutput = this.indirectOutputs.find(o =>
+      const existingOutput = this.outputs.find(o =>
         areOutputPathsEqual(o.path, outputPath)
       );
       if (existingOutput) {
@@ -272,7 +276,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
         componentOutput.requiredOutputPaths,
         [...outputPathsToIgnore, componentOutput.path]
       );
-      this.indirectOutputs.push(componentOutput);
+      this.outputs.push(componentOutput);
     });
   }
 
@@ -461,7 +465,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     output: Output,
     config: GenerateConfig
   ): FileOutput {
-    const availableOutputs = this.indirectOutputs;
+    const availableOutputs = this.outputs;
     let nextFileOutput = fileOutput;
     output.requiredOutputPaths.forEach(requiredOutputPath => {
       let requiredOutput = availableOutputs.find(o =>
@@ -507,7 +511,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     config: GenerateConfig
   ): FileOutputByFilePath {
     const fileOutputByFilePath: FileOutputByFilePath = {};
-    this.indirectOutputs.forEach(output => {
+    this.outputs.forEach(output => {
       const filePath = this.createFilePathFromOutputPath(output.path);
       let fileOutput: FileOutput = fileOutputByFilePath[filePath] ?? {
         importAssetsByPath: {},
@@ -578,12 +582,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
     };
   }
 
-  addIndirectOutput(output: Output) {
+  addOutput(output: Output) {
     switch (output.type) {
       case OutputType.COMPONENT_REF:
         // eslint-disable-next-line no-case-declarations
         const conflictingOutput: ComponentRefOutput | undefined =
-          this.indirectOutputs.find(o => {
+          this.outputs.find(o => {
             if (
               o.type !== OutputType.COMPONENT_REF ||
               o.componentRef !== output.componentRef
@@ -611,11 +615,11 @@ export class DefaultCodeGenerator implements CodeGenerator {
               )}`
           );
         }
-        this.indirectOutputs.push(output);
+        this.outputs.push(output);
         break;
       case OutputType.DEFINITION:
         // eslint-disable-next-line no-case-declarations
-        const outputWithSamePath = this.indirectOutputs.find(
+        const outputWithSamePath = this.outputs.find(
           o =>
             o.type !== OutputType.COMPONENT_REF &&
             areOutputPathsEqual(o.path, output.path)
@@ -627,7 +631,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
             )}"`
           );
         }
-        this.indirectOutputs.push(output);
+        this.outputs.push(output);
         break;
       default:
         // @ts-ignore
@@ -692,8 +696,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     outputPath: OutputPath
   ): null | OutputPath {
     let mostAccurateFolderOutputPath: null | OutputPath = null;
-    this.operationOutputPaths.forEach(p => {
-      const folderOutputPath = p.slice(0, -1);
+    this.operationFolderOutputPaths.forEach(folderOutputPath => {
       if (
         !doesOutputPathStartWithOtherOutputPath(outputPath, folderOutputPath)
       ) {

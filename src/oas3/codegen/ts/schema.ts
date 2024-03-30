@@ -148,7 +148,7 @@ export function applyComponentRefSchema(
   path: OutputPath,
   objectDiscriminatorConfig?: ObjectDiscriminatorConfig
 ): CodeGenerationOutput {
-  codeGenerator.addIndirectOutput({
+  codeGenerator.addOutput({
     type: OutputType.COMPONENT_REF,
     createName: referencingPath => {
       return codeGenerator.createComponentTypeName(
@@ -324,7 +324,7 @@ export function applyOneOfSchema(
     codeGenerator
   );
   if (enumOutput) {
-    codeGenerator.addIndirectOutput(enumOutput);
+    codeGenerator.addOutput(enumOutput);
   }
   const oneOfItemDirectOutputs: CodeGenerationOutput[] = [];
   const requiredOutputPaths: OutputPath[] = [];

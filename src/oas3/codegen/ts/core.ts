@@ -12,7 +12,7 @@ export interface CodeGenerator {
   ): string;
   createOperationOutputPath(operationId: string): OutputPath;
   createOutputPathByComponentRef(componentRef: string): OutputPath;
-  addIndirectOutput(output: Output): void;
+  addOutput(output: Output): void;
 }
 
 export enum OutputType {
