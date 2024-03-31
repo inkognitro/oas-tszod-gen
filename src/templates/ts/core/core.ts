@@ -72,10 +72,13 @@ export function createRequest(settings: RequestCreationSettings): Request {
 }
 
 export enum StatusCode {
-  OK = 200,
-  CREATED = 201,
-  BAD_REQUEST = 400,
-  SERVER_ERROR = 500,
+  Ok = 200,
+  Created = 201,
+  BadRequest = 400,
+  Unauthorized = 401,
+  Forbidden = 403,
+  NotFound = 404,
+  InternalServerError = 500,
 }
 
 export type Response<S extends StatusCode = any, Body extends object = {}> = {

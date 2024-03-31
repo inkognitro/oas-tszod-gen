@@ -113,7 +113,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
       const requestByMethodMap = this.oas3Specs.paths[path];
       this.generateRequestByMethodMapOutputs(path, requestByMethodMap);
     }
-    this.generateComponentOutputs();
     const fileOutputByFilePath = this.createFileOutputByFilePath(config);
     this.createFiles(fileOutputByFilePath, config);
   }
@@ -222,71 +221,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return contentParts.join('\n\n');
   }
 
-  private generateComponentOutputs() {
-    const allComponentOutputs: Output[] = [];
-    for (const schemaName in this.oas3Specs.components.schemas) {
-      const componentRef = `${schemaComponentRefPrefix}${schemaName}`;
-      allComponentOutputs.push(this.createComponentOutput(componentRef));
-    }
-    for (const parameterName in this.oas3Specs.components.parameters) {
-      const componentRef = `${parameterComponentRefPrefix}${parameterName}`;
-      allComponentOutputs.push(this.createComponentOutput(componentRef));
-    }
-    for (const responseName in this.oas3Specs.components.responses) {
-      const componentRef = `${responseComponentRefPrefix}${responseName}`;
-      allComponentOutputs.push(this.createComponentOutput(componentRef));
-    }
-    const directlyRequiredOutputPaths = this.outputs.reduce<OutputPath[]>(
-      (allOutputPaths, output) => {
-        const outputPathsToAdd = output.requiredOutputPaths.filter(p => {
-          return !allOutputPaths.find(sp => areOutputPathsEqual(sp, p));
-        });
-        return [...allOutputPaths, ...outputPathsToAdd];
-      },
-      []
-    );
-    this.recursivelyAddRequiredComponentOutputs(
-      allComponentOutputs,
-      directlyRequiredOutputPaths
-    );
-  }
-
-  private recursivelyAddRequiredComponentOutputs(
-    componentOutputs: Output[],
-    requiredOutputPaths: OutputPath[],
-    outputPathsToIgnore: OutputPath[] = []
-  ) {
-    requiredOutputPaths.forEach(outputPath => {
-      const componentOutput = componentOutputs.find(o =>
-        areOutputPathsEqual(o.path, outputPath)
-      );
-      if (!componentOutput) {
-        return;
-      }
-      const existingOutput = this.outputs.find(o =>
-        areOutputPathsEqual(o.path, outputPath)
-      );
-      if (existingOutput) {
-        return;
-      }
-      const outputShouldBeIgnored = outputPathsToIgnore.find(p =>
-        areOutputPathsEqual(p, outputPath)
-      );
-      if (outputShouldBeIgnored) {
-        return; // this is to prevent from infinite recursion
-      }
-      this.recursivelyAddRequiredComponentOutputs(
-        componentOutputs,
-        componentOutput.requiredOutputPaths,
-        [...outputPathsToIgnore, componentOutput.path]
-      );
-      this.outputs.push(componentOutput);
-    });
-  }
-
-  private createComponentOutput(componentRef: string): Output {
+  addComponentOutputByComponentRef(componentRef: string) {
     const components = this.oas3Specs.components;
     const outputPath = this.createOutputPathByComponentRef(componentRef);
+    if (this.outputs.find(o => areOutputPathsEqual(o.path, outputPath))) {
+      return;
+    }
     if (
       componentRef.startsWith(schemaComponentRefPrefix) &&
       components.schemas
@@ -299,14 +239,17 @@ export class DefaultCodeGenerator implements CodeGenerator {
         );
       }
       const generationSummary = applySchema(this, schema, outputPath);
-      return {
+      this.addOutput({
         type: OutputType.DEFINITION,
         ...generationSummary,
         definitionType: 'type',
         createName: referencingPath =>
           this.createComponentTypeName(componentRef, referencingPath),
-      };
-    } else if (
+      });
+      return;
+    }
+
+    if (
       componentRef.startsWith(parameterComponentRefPrefix) &&
       components.parameters
     ) {
@@ -325,13 +268,14 @@ export class DefaultCodeGenerator implements CodeGenerator {
         requestParameter.schema,
         outputPath
       );
-      return {
+      this.addOutput({
         type: OutputType.DEFINITION,
         ...generationSummary,
         definitionType: 'type',
         createName: referencingPath =>
           this.createComponentTypeName(componentRef, referencingPath),
-      };
+      });
+      return;
     }
     if (
       componentRef.startsWith(responseComponentRefPrefix) &&
@@ -355,17 +299,16 @@ export class DefaultCodeGenerator implements CodeGenerator {
         jsonResponse.schema,
         outputPath
       );
-      return {
+      this.addOutput({
         type: OutputType.DEFINITION,
         ...generationSummary,
         definitionType: 'type',
         createName: referencingPath =>
           this.createComponentTypeName(componentRef, referencingPath),
-      };
+      });
+      return;
     }
-    throw new Error(
-      `could not find any definition for componentRef "${componentRef}"`
-    );
+    throw new Error(`componentRef "${componentRef}" is not supported`);
   }
 
   private generateRequestByMethodMapOutputs(
@@ -695,7 +638,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
     }
   }
 
-  createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string {
+  private createPascalCaseNamedTypeName(
+    outputPath: OutputPath,
+    referencingPath: OutputPath
+  ): string {
     let parts = this.isSameOutputFolder(outputPath, referencingPath)
       ? this.getOutputPathWithoutFolderOutputPathParts(outputPath)
       : outputPath;
@@ -723,35 +669,30 @@ export class DefaultCodeGenerator implements CodeGenerator {
       parts = [...parts.slice(0, -1), 'requestResult'];
       return parts.map(p => capitalizeFirstLetter(p)).join('');
     }
-    const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
-    return pascalCaseParts.join('');
+    return parts.map(p => capitalizeFirstLetter(p)).join('');
+  }
+
+  createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string {
+    return this.createPascalCaseNamedTypeName(outputPath, referencingPath);
   }
 
   createEnumName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    const parts = this.isSameOutputFolder(outputPath, referencingPath)
-      ? this.getOutputPathWithoutFolderOutputPathParts(outputPath)
-      : outputPath;
-    const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
-    return pascalCaseParts.join('');
+    return this.createPascalCaseNamedTypeName(outputPath, referencingPath);
   }
 
   createConstName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    const parts = this.isSameOutputFolder(outputPath, referencingPath)
-      ? this.getOutputPathWithoutFolderOutputPathParts(outputPath)
-      : outputPath;
-    const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
-    return lowerCaseFirstLetter(pascalCaseParts.join(''));
+    return lowerCaseFirstLetter(
+      this.createPascalCaseNamedTypeName(outputPath, referencingPath)
+    );
   }
 
   createFunctionName(
     outputPath: OutputPath,
     referencingPath: OutputPath
   ): string {
-    const parts = this.isSameOutputFolder(outputPath, referencingPath)
-      ? this.getOutputPathWithoutFolderOutputPathParts(outputPath)
-      : outputPath;
-    const pascalCaseParts = parts.map(p => capitalizeFirstLetter(p));
-    return lowerCaseFirstLetter(pascalCaseParts.join(''));
+    return lowerCaseFirstLetter(
+      this.createPascalCaseNamedTypeName(outputPath, referencingPath)
+    );
   }
 
   private findMostAccurateOperationFolderOutputPath(
@@ -800,6 +741,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       fileNameOutputPathPart = componentParametersFileNameOutputPathPart;
     } else if (componentRef.startsWith(responseComponentRefPrefix)) {
       fileNameOutputPathPart = componentResponsesFileNameOutputPathPart;
+      typeNamePathParts.push('responseBody');
     } else if (componentRef.startsWith(schemaComponentRefPrefix)) {
       fileNameOutputPathPart = componentSchemasFileNameOutputPathPart;
     }

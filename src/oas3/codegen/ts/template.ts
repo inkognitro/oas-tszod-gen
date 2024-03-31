@@ -53,17 +53,19 @@ export function getTemplateResponseStatusCodeEnumEntry(
 ): string {
   switch (statusCode) {
     case 200:
-      return 'OK';
+      return 'Ok';
     case 201:
-      return 'CREATED';
+      return 'Created';
     case 400:
-      return 'BAD_REQUEST';
+      return 'BadRequest';
     case 401:
-      return 'UNAUTHORIZED';
+      return 'Unauthorized';
     case 403:
-      return 'FORBIDDEN';
+      return 'Forbidden';
+    case 404:
+      return 'NotFound';
     case 500:
-      return 'SERVER_ERROR';
+      return 'InternalServerError';
     default:
       throw new Error(`status code ${statusCode} not supported`);
   }

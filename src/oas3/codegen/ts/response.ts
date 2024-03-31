@@ -62,12 +62,28 @@ export function applyResponseByStatusCodeMap(
     const responseOutputPath: OutputPath = [...path, statusCode];
     const responseOrRef = schema[statusCode];
     if (isResponseComponentRef(responseOrRef)) {
-      // todo: fix this one, because it is more a "responseBodyContentRef" than a "responseComponentRef"
-      const responseOutput = applyComponentRefSchema(
+      const responseBodyOutput = applyComponentRefSchema(
         codeGenerator,
         responseOrRef,
-        responseOutputPath
+        [...responseOutputPath, 'body']
       );
+      const responseOutput: CodeGenerationOutput = {
+        createCode: referencingPath => {
+          const responseType = templateResponseType.createName(path);
+          const statusCodeEnum = templateStatusCodeEnum.createName(path);
+          const statusCodeEnumEntry = getTemplateResponseStatusCodeEnumEntry(
+            parseInt(statusCode)
+          );
+          const bodyCode = responseBodyOutput.createCode(referencingPath);
+          return `${responseType}<${statusCodeEnum}.${statusCodeEnumEntry}, ${bodyCode}>`;
+        },
+        path: responseOutputPath,
+        requiredOutputPaths: [
+          templateResponseType.path,
+          templateStatusCodeEnum.path,
+          responseBodyOutput.path,
+        ],
+      };
       statusCodeResponseOutputs.push(responseOutput);
       continue;
     }
