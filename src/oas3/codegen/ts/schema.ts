@@ -163,7 +163,6 @@ export function applyComponentRefSchema(
       codeGenerator.createOutputPathByComponentRef(schema.$ref),
     ],
   });
-  codeGenerator.addComponentOutputByComponentRef(schema.$ref);
   return {
     createCode: referencingPath =>
       codeGenerator.createComponentTypeName(schema.$ref, referencingPath),

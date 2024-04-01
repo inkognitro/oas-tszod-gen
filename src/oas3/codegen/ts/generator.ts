@@ -221,10 +221,16 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return contentParts.join('\n\n');
   }
 
-  addComponentOutputByComponentRef(componentRef: string) {
+  private addComponentOutputByComponentRef(componentRef: string) {
     const components = this.oas3Specs.components;
     const outputPath = this.createOutputPathByComponentRef(componentRef);
-    if (this.outputs.find(o => areOutputPathsEqual(o.path, outputPath))) {
+    if (
+      this.outputs.find(
+        o =>
+          o.type !== OutputType.COMPONENT_REF &&
+          areOutputPathsEqual(o.path, outputPath)
+      )
+    ) {
       return;
     }
     if (
@@ -563,6 +569,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
           );
         }
         this.outputs.push(output);
+        this.addComponentOutputByComponentRef(output.componentRef);
         break;
       case OutputType.DEFINITION:
         // eslint-disable-next-line no-case-declarations
