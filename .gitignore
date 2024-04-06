@@ -1,5 +1,6 @@
 .idea
 oasTestSpecs.json
+oasTestSpecsDeprecated.json
 dist
 node_modules
 generated-files
