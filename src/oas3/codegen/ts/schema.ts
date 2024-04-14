@@ -6,11 +6,13 @@ import {
   OutputPath,
   arraySchemaItemOutputPathPart,
   oneOfSchemaItemOutputPathPart,
-  objectSchemaAdditionalPropOutputPathPart,
+  objectSchemaAdditionalPropsOutputPathPart,
   CodeGenerator,
   DefinitionOutput,
+  Output,
 } from './core';
 import {
+  AnyOfSchema,
   ArraySchema,
   BooleanSchema,
   ComponentRef,
@@ -202,7 +204,7 @@ export function applyObjectSchema(
   if (schema.additionalProperties) {
     const propOutput = applySchema(codeGenerator, schema.additionalProperties, [
       ...path,
-      objectSchemaAdditionalPropOutputPathPart,
+      objectSchemaAdditionalPropsOutputPathPart,
     ]);
     additionalPropertiesDirectOutput = propOutput;
   }
@@ -245,36 +247,75 @@ export function applyObjectSchema(
   };
 }
 
+function getConcreteSchema(
+  schema: Schema,
+  codeGenerator: CodeGenerator
+): Schema {
+  if (!isComponentRef(schema)) {
+    return schema;
+  }
+  const componentSchema = codeGenerator.findComponentSchemaByRef(schema.$ref);
+  if (!componentSchema) {
+    throw new Error(
+      `could not find schema for component with ref "${schema.$ref}"`
+    );
+  }
+  return componentSchema;
+}
+
 function getEnumValueFromItemSchema(
   itemSchema: Schema,
   discriminatorPropName: string,
-  codeGenerator: CodeGenerator // todo: check if still required
+  codeGenerator: CodeGenerator
 ): string {
-  if (isComponentRef(itemSchema)) {
-    return 'IMPLEMENT_ME'; // todo: implement
-  }
-
-  if (!isObjectSchema(itemSchema)) {
+  const concreteItemSchema = getConcreteSchema(itemSchema, codeGenerator);
+  if (!isObjectSchema(concreteItemSchema)) {
     throw new Error(
-      `every item of oneOfSchema must have the discriminator property "${discriminatorPropName}", but no ObjectSchema was given: ${JSON.stringify(
-        itemSchema
+      `every underlying itemSchema of a oneOfSchema with discriminator, must be a ObjectSchema, but following was given: ${JSON.stringify(
+        concreteItemSchema
       )}`
     );
   }
-
-  const discriminatorSchema = itemSchema.properties[discriminatorPropName];
+  const discriminatorSchema =
+    concreteItemSchema.properties[discriminatorPropName];
+  const concreteDiscriminatorSchema = getConcreteSchema(
+    discriminatorSchema,
+    codeGenerator
+  );
   if (
-    !isStringSchema(discriminatorSchema) ||
-    discriminatorSchema.enum?.length !== 1
+    !isStringSchema(concreteDiscriminatorSchema) ||
+    concreteDiscriminatorSchema.enum?.length !== 1
   ) {
     throw new Error(
       `only StringSchema with one specific enum value is supported for discriminators, but following schema was given for property "${discriminatorPropName}": ${JSON.stringify(
-        itemSchema
+        concreteItemSchema
       )}`
     );
   }
+  return concreteDiscriminatorSchema.enum[0];
+}
 
-  return discriminatorSchema.enum[0];
+function isEveryItemSchemaDiscriminatorPropertyAStringSchemaWithOnlyOneValue(
+  schemas: Schema[],
+  discriminatorPropName: string,
+  codeGenerator: CodeGenerator
+): boolean {
+  for (const index in schemas) {
+    const schema = schemas[index];
+    const concreteSchema = getConcreteSchema(schema, codeGenerator);
+    if (!isObjectSchema(concreteSchema)) {
+      return false;
+    }
+    const discriminatorPropSchema =
+      concreteSchema.properties[discriminatorPropName];
+    if (!isStringSchema(discriminatorPropSchema)) {
+      return false;
+    }
+    if (discriminatorPropSchema.enum?.length !== 1) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function createNullableDiscriminatorEnumDefinitionOutput(
@@ -284,6 +325,25 @@ function createNullableDiscriminatorEnumDefinitionOutput(
 ): null | DefinitionOutput {
   const discriminatorPropName = oneOfSchema.discriminator?.propertyName;
   if (!discriminatorPropName) {
+    return null;
+  }
+  if (
+    !isEveryItemSchemaDiscriminatorPropertyAStringSchemaWithOnlyOneValue(
+      oneOfSchema.oneOf,
+      discriminatorPropName,
+      codeGenerator
+    )
+  ) {
+    return null;
+  }
+  if (
+    doesEveryItemSchemaDiscriminatorPropertyLiveInTheSameFileContext(
+      oneOfSchema.oneOf,
+      path,
+      codeGenerator,
+      discriminatorPropName
+    )
+  ) {
     return null;
   }
   const enumParts: string[] = [];
@@ -311,6 +371,36 @@ function createNullableDiscriminatorEnumDefinitionOutput(
     path: enumOutputPath,
     requiredOutputPaths: [],
   };
+}
+
+function doesEveryItemSchemaDiscriminatorPropertyLiveInTheSameFileContext(
+  itemSchemas: Schema[],
+  path: OutputPath,
+  codeGenerator: CodeGenerator,
+  discriminatorPropName: string
+): boolean {
+  let previousSchemaOutputPath: OutputPath | null = null;
+  for (const index in itemSchemas) {
+    const schema = itemSchemas[index];
+    const itemSchemaOutputPath: OutputPath = [
+      ...path,
+      oneOfSchemaItemOutputPathPart,
+      getEnumValueFromItemSchema(schema, discriminatorPropName, codeGenerator),
+    ];
+    if (!previousSchemaOutputPath) {
+      previousSchemaOutputPath = itemSchemaOutputPath;
+      continue;
+    }
+    if (
+      !codeGenerator.hasSameFileContext(
+        previousSchemaOutputPath,
+        itemSchemaOutputPath
+      )
+    ) {
+      return false;
+    }
+  }
+  return true;
 }
 
 export function applyOneOfSchema(

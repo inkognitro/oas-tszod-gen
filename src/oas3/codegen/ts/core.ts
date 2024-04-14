@@ -1,3 +1,5 @@
+import {Schema} from '@oas3/specification';
+
 export interface CodeGenerator {
   createComponentTypeName(
     componentRef: string,
@@ -13,6 +15,8 @@ export interface CodeGenerator {
   createOperationOutputPath(operationId: string): OutputPath;
   createOutputPathByComponentRef(componentRef: string): OutputPath;
   addOutput(output: Output): void;
+  findComponentSchemaByRef(componentRef: string): null | Schema;
+  hasSameFileContext(outputPath1: OutputPath, outputPath2: OutputPath): boolean;
 }
 
 export enum OutputType {
@@ -22,8 +26,8 @@ export enum OutputType {
 
 export const arraySchemaItemOutputPathPart = 'array-schema-item-5acf7fae';
 export const oneOfSchemaItemOutputPathPart = 'oneOf-schema-item-5acf7fae';
-export const objectSchemaAdditionalPropOutputPathPart =
-  'object-schema-additionalProp-5acf7fae';
+export const objectSchemaAdditionalPropsOutputPathPart =
+  'object-schema-additionalProps-5acf7fae';
 
 export type OutputPath = string[];
 

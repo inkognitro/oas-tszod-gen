@@ -1,9 +1,12 @@
 import {
   areOutputPathsEqual,
+  arraySchemaItemOutputPathPart,
   CodeGenerator,
   ComponentRefOutput,
   DefinitionOutput,
   doesOutputPathStartWithOtherOutputPath,
+  objectSchemaAdditionalPropsOutputPathPart,
+  oneOfSchemaItemOutputPathPart,
   Output,
   OutputPath,
   OutputType,
@@ -13,6 +16,7 @@ import {
   parameterComponentRefPrefix,
   RequestByMethodMap,
   responseComponentRefPrefix,
+  Schema,
   schemaComponentRefPrefix,
   Specification,
 } from '@oas3/specification';
@@ -315,6 +319,44 @@ export class DefaultCodeGenerator implements CodeGenerator {
       return;
     }
     throw new Error(`componentRef "${componentRef}" is not supported`);
+  }
+
+  hasSameFileContext(
+    outputPath1: OutputPath,
+    outputPath2: OutputPath
+  ): boolean {
+    const filePath1 = this.createFilePathFromOutputPath(outputPath1);
+    const filePath2 = this.createFilePathFromOutputPath(outputPath2);
+    return filePath1 === filePath2;
+  }
+
+  findComponentSchemaByRef(componentRef: string): null | Schema {
+    const components = this.oas3Specs.components;
+    if (
+      componentRef.startsWith(schemaComponentRefPrefix) &&
+      components.schemas
+    ) {
+      const name = componentRef.replace(schemaComponentRefPrefix, '');
+      const schema = components.schemas[name];
+      return schema ?? null;
+    }
+    if (
+      componentRef.startsWith(parameterComponentRefPrefix) &&
+      components.parameters
+    ) {
+      const name = componentRef.replace(parameterComponentRefPrefix, '');
+      const requestParameter = components.parameters[name];
+      return requestParameter.schema ?? null;
+    }
+    if (
+      componentRef.startsWith(responseComponentRefPrefix) &&
+      components.parameters
+    ) {
+      const name = componentRef.replace(responseComponentRefPrefix, '');
+      const response = components.parameters[name];
+      return response.schema ?? null;
+    }
+    return null;
   }
 
   private generateRequestByMethodMapOutputs(
@@ -656,8 +698,18 @@ export class DefaultCodeGenerator implements CodeGenerator {
       p =>
         p !== componentSchemasFileNameOutputPathPart &&
         p !== componentParametersFileNameOutputPathPart &&
-        p !== componentResponsesFileNameOutputPathPart
+        p !== componentResponsesFileNameOutputPathPart &&
+        p !== oneOfSchemaItemOutputPathPart
     );
+    parts = parts.map(p => {
+      if (p === arraySchemaItemOutputPathPart) {
+        return 'item';
+      }
+      if (p === objectSchemaAdditionalPropsOutputPathPart) {
+        return 'additionalProps';
+      }
+      return p;
+    });
     if (this.isUnionResponseOutputPath(parts)) {
       parts = parts.filter(p => p !== requestResultOutputPathPart);
       parts = [...parts.slice(0, -1), 'response'];
