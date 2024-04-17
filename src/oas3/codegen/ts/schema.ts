@@ -9,10 +9,8 @@ import {
   objectSchemaAdditionalPropsOutputPathPart,
   CodeGenerator,
   DefinitionOutput,
-  Output,
 } from './core';
 import {
-  AnyOfSchema,
   ArraySchema,
   BooleanSchema,
   ComponentRef,
@@ -187,45 +185,48 @@ export function applyObjectSchema(
       codeComment?: string;
     };
   } = {};
-  const requiredOutputPaths: OutputPath[] = [];
+  const requiredOutputPaths: OutputPath[] = discriminatorConfig
+    ? [...discriminatorConfig.requiredOutputPaths]
+    : [];
   for (const propName in schema.properties) {
     const propSchema = schema.properties[propName];
     const propSchemaPath = [...path, propName];
     requiredOutputPaths.push(propSchemaPath);
     if (discriminatorConfig && propName === discriminatorConfig.propName) {
-      applySchema(codeGenerator, propSchema, propSchemaPath);
       directOutputByPropNameMap[propName] = discriminatorConfig;
       continue;
     }
-    const propOutput = applySchema(codeGenerator, propSchema, propSchemaPath);
-    directOutputByPropNameMap[propName] = propOutput;
+    directOutputByPropNameMap[propName] = applySchema(
+      codeGenerator,
+      propSchema,
+      propSchemaPath
+    );
   }
   let additionalPropertiesDirectOutput: undefined | CodeGenerationOutput;
   if (schema.additionalProperties) {
-    const propOutput = applySchema(codeGenerator, schema.additionalProperties, [
-      ...path,
-      objectSchemaAdditionalPropsOutputPathPart,
-    ]);
-    additionalPropertiesDirectOutput = propOutput;
+    additionalPropertiesDirectOutput = applySchema(
+      codeGenerator,
+      schema.additionalProperties,
+      [...path, objectSchemaAdditionalPropsOutputPathPart]
+    );
   }
   return {
     createCode: referencingContext => {
       const codeRows: string[] = [];
-      for (const propName in schema.properties) {
+      for (const propName in directOutputByPropNameMap) {
         const directOutput = directOutputByPropNameMap[propName];
-        if (discriminatorConfig && propName === discriminatorConfig.propName) {
-          codeRows.push(
-            `${propName}: ${directOutput.createCode(referencingContext)}`
-          );
-          continue;
-        }
-        const undefinableMark = !schema.required?.includes(propName) ? '?' : '';
+        const isDiscriminatorProp =
+          discriminatorConfig && propName === discriminatorConfig.propName;
+        const questionMark =
+          !schema.required?.includes(propName) && !isDiscriminatorProp
+            ? '?'
+            : '';
         const propComment = directOutput.codeComment
           ? ` // ${directOutput.codeComment}`
           : '';
         codeRows.push(
-          `${propName}${undefinableMark}: ${directOutput.createCode(
-            referencingContext
+          `${propName}${questionMark}: ${directOutput.createCode(
+            path
           )};${propComment}`
         );
       }
@@ -235,7 +236,7 @@ export function applyObjectSchema(
           : '';
         codeRows.push(
           `[key: string]: ${additionalPropertiesDirectOutput.createCode(
-            referencingContext
+            path
           )};${propComment}`
         );
       }
@@ -337,7 +338,7 @@ function createNullableDiscriminatorEnumDefinitionOutput(
     return null;
   }
   if (
-    doesEveryItemSchemaDiscriminatorPropertyLiveInTheSameFileContext(
+    !doesEveryItemSchemaDiscriminatorPropertyLiveInTheSameFileContext(
       oneOfSchema.oneOf,
       path,
       codeGenerator,

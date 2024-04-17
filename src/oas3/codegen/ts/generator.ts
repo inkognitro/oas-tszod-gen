@@ -5,6 +5,7 @@ import {
   ComponentRefOutput,
   DefinitionOutput,
   doesOutputPathStartWithOtherOutputPath,
+  ObjectDiscriminatorConfig,
   objectSchemaAdditionalPropsOutputPathPart,
   oneOfSchemaItemOutputPathPart,
   Output,
@@ -12,6 +13,7 @@ import {
   OutputType,
 } from './core';
 import {
+  isObjectSchema,
   isSpecification,
   parameterComponentRefPrefix,
   RequestByMethodMap,
@@ -27,7 +29,7 @@ import {
 } from '@oas3/codegen/ts/endpoint';
 import {mkdirp} from 'mkdirp';
 import {findTemplateOutput, templateFilePaths} from '@oas3/codegen/ts/template';
-import {applySchema} from '@oas3/codegen/ts/schema';
+import {applyObjectSchema, applySchema} from '@oas3/codegen/ts/schema';
 
 const fs = require('fs');
 
@@ -225,7 +227,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return contentParts.join('\n\n');
   }
 
-  private addComponentOutputByComponentRef(componentRef: string) {
+  private addComponentOutputByComponentRef(
+    componentRef: string,
+    objectDiscriminatorConfig?: ObjectDiscriminatorConfig
+  ) {
     const components = this.oas3Specs.components;
     const outputPath = this.createOutputPathByComponentRef(componentRef);
     if (
@@ -248,7 +253,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
           `could not find schema for componentRef "${componentRef}"`
         );
       }
-      const generationSummary = applySchema(this, schema, outputPath);
+      const generationSummary = isObjectSchema(schema)
+        ? applyObjectSchema(this, schema, outputPath, objectDiscriminatorConfig)
+        : applySchema(this, schema, outputPath);
       this.addOutput({
         type: OutputType.DEFINITION,
         ...generationSummary,
@@ -273,11 +280,14 @@ export class DefaultCodeGenerator implements CodeGenerator {
           `could not find requestParameter for componentRef "${componentRef}"`
         );
       }
-      const generationSummary = applySchema(
-        this,
-        requestParameter.schema,
-        outputPath
-      );
+      const generationSummary = isObjectSchema(requestParameter.schema)
+        ? applyObjectSchema(
+            this,
+            requestParameter.schema,
+            outputPath,
+            objectDiscriminatorConfig
+          )
+        : applySchema(this, requestParameter.schema, outputPath);
       this.addOutput({
         type: OutputType.DEFINITION,
         ...generationSummary,
@@ -304,11 +314,14 @@ export class DefaultCodeGenerator implements CodeGenerator {
           `could not find jsonResponse for componentRef "${componentRef}"`
         );
       }
-      const generationSummary = applySchema(
-        this,
-        jsonResponse.schema,
-        outputPath
-      );
+      const generationSummary = isObjectSchema(jsonResponse.schema)
+        ? applyObjectSchema(
+            this,
+            jsonResponse.schema,
+            outputPath,
+            objectDiscriminatorConfig
+          )
+        : applySchema(this, jsonResponse.schema, outputPath);
       this.addOutput({
         type: OutputType.DEFINITION,
         ...generationSummary,
@@ -611,7 +624,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
           );
         }
         this.outputs.push(output);
-        this.addComponentOutputByComponentRef(output.componentRef);
+        this.addComponentOutputByComponentRef(
+          output.componentRef,
+          output.objectDiscriminatorConfig
+        );
         break;
       case OutputType.DEFINITION:
         // eslint-disable-next-line no-case-declarations
