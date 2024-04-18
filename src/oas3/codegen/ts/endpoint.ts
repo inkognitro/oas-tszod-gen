@@ -1,11 +1,7 @@
 import {CodeGenerator, OutputType, OutputPath, DefinitionOutput} from './core';
 import {Request} from '@oas3/specification';
 import {applyResponseByStatusCodeMap} from './response';
-import {
-  templateRequestHandlerType,
-  templateRequestResultType,
-  templateRequestType,
-} from './template';
+import {templateRequestResultType, templateRequestType} from './template';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -95,7 +91,6 @@ export function applyEndpointCallerFunction(
       endpointIdConstDefinition.path,
       templateRequestType.path,
       requestResultTypeDefinition.path,
-      templateRequestHandlerType.path,
     ],
   };
   codeGenerator.addOutput(funcDefinition);

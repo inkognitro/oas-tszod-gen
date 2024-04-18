@@ -37,6 +37,13 @@ export function areOutputPathsEqual(a: OutputPath, b: OutputPath): boolean {
   );
 }
 
+export function containsOutputPath(
+  outputPaths: OutputPath[],
+  outputPath: OutputPath
+): boolean {
+  return !!outputPaths.find(p => areOutputPathsEqual(p, outputPath));
+}
+
 export function doesOutputPathStartWithOtherOutputPath(
   outputPath: OutputPath,
   otherOutputPath: OutputPath

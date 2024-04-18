@@ -93,9 +93,9 @@ const componentResponsesFileNameOutputPathPart = 'responses6b3a7814';
 const componentSchemasFileNameOutputPathPart = 'schemas6b3a7814';
 
 type GenerateConfig = {
-  targetFolderPath: string;
+  outputFolderPath: string;
   importRootAlias?: string;
-  predefinedFolderPaths?: OutputPath[];
+  predefinedFolderOutputPaths?: OutputPath[];
 };
 
 export class DefaultCodeGenerator implements CodeGenerator {
@@ -124,7 +124,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   private initializeOperationFolderOutputPaths(config: GenerateConfig) {
-    this.operationFolderOutputPaths = config.predefinedFolderPaths ?? [];
+    this.operationFolderOutputPaths = config.predefinedFolderOutputPaths ?? [];
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
       for (const method in requestByMethodMap) {
@@ -141,7 +141,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     fileOutputByFilePath: FileOutputByFilePath,
     config: GenerateConfig
   ) {
-    const cleanTargetFolderPath = cleanUpFolderPath(config.targetFolderPath);
+    const cleanTargetFolderPath = cleanUpFolderPath(config.outputFolderPath);
     fs.cpSync(__dirname + '../../../../templates/ts', cleanTargetFolderPath, {
       recursive: true,
     });
