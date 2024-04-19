@@ -2,7 +2,6 @@ import {isSpecification} from './specification';
 const petStoreSpecification = require('./specification.test.petstore.json');
 
 test('isSpecification validates pet store specification as correctly input', () => {
-  expect(true).toBe(true);
   expect(isSpecification(petStoreSpecification)).toBe(true);
 });
 
