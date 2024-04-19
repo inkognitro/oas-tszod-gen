@@ -1,8 +1,17 @@
 {
   "name": "@inkognitro/oas-to-code",
-  "version": "0.0.3",
-  "description": "A tool to convert OpenApi specifications into callable endpoint functions in TS.",
+  "version": "0.0.6",
+  "files": [
+    "./LICENSE",
+    "./README.md",
+    "./package.json"
+  ],
+  "directories": {
+    "dist:": "./dist",
+    "coverage:": "./coverage"
+  },
   "main": "dist/index.js",
+  "description": "A tool to convert OpenApi specifications into callable endpoint functions in TS.",
   "scripts": {
     "lint": "gts lint",
     "clean": "gts clean",
@@ -47,5 +56,8 @@
   },
   "dependencies": {
     "mkdirp": "^3.0.1"
+  },
+  "paths": {
+    "@oas3/*": ["dist/oas3/*"]
   }
 }
