@@ -8,4 +8,7 @@ module.exports = {
   transform: {
     '^.+\\.(ts)$': 'ts-jest',
   },
+  moduleNameMapper: {
+    '@oas3/(.*)': '<rootDir>/src/oas3/$1',
+  },
 };
