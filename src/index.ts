@@ -1,2 +1,3 @@
-export * from './oas3/specification';
-export * from './oas3/codegen/ts';
+import * as TsCodeGen from './oas3/codegen/ts';
+
+export = TsCodeGen;
