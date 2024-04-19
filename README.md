@@ -1,9 +1,12 @@
-![MIT License](./badges/license-mit.svg)
-![Branches](./badges/jest/coverage-branches.svg)
-![Functions](./badges/jest/coverage-functions.svg)
-![Lines](./badges/jest/coverage-lines.svg)
-![Statements](./badges/jest/coverage-statements.svg)
-![Coverage total](./badges/jest/coverage-total.svg)
+[![CI](https://github.com/inkognitro/oas-to-code/actions/workflows/ci.yml/badge.svg)](https://github.com/inkognitro/oas-to-code/actions?query=workflow%3Aci)
+![License](https://github.com/inkognitro/oas-to-code/badges/license-mit.svg)]
+
+
+Current development test coverage:
+
+[![Functions](https://github.com/inkognitro/oas-to-code/badges/jest/coverage-functions.svg)]
+[![Lines](https://github.com/inkognitro/oas-to-code/badges/jest/coverage-lines.svg)]
+[![Coverage total](https://github.com/inkognitro/oas-to-code/badges/jest/coverage-total.svg)]
 
 # oas-to-code
 A tool to convert [OpenApi](https://swagger.io/specification/) specifications into callable endpoint functions in [TS](https://www.typescriptlang.org/).
