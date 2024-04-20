@@ -2,7 +2,6 @@
   "name": "@inkognitro/oas-to-code",
   "version": "0.0.11",
   "files": [
-    "./badges",
     "./dist",
     "./LICENSE",
     "./package.json",
