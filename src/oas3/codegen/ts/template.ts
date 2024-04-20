@@ -56,6 +56,12 @@ export function getTemplateResponseStatusCodeEnumEntry(
       return 'Ok';
     case 201:
       return 'Created';
+    case 202:
+      return 'Accepted';
+    case 203:
+      return 'NonAuthoritativeInformation';
+    case 204:
+      return 'NoContent';
     case 400:
       return 'BadRequest';
     case 401:
@@ -64,6 +70,10 @@ export function getTemplateResponseStatusCodeEnumEntry(
       return 'Forbidden';
     case 404:
       return 'NotFound';
+    case 405:
+      return 'MethodNotAllowed';
+    case 413:
+      return 'ContentTooLarge';
     case 500:
       return 'InternalServerError';
     default:

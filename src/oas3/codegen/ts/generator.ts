@@ -129,9 +129,11 @@ export class DefaultCodeGenerator implements CodeGenerator {
       const requestByMethodMap = this.oas3Specs.paths[path];
       for (const method in requestByMethodMap) {
         const request = requestByMethodMap[method];
-        const folderOutputPath = this.createOperationOutputPath(
-          request.operationId
-        ).slice(0, -1);
+        const outputPath = this.createOperationOutputPath(request.operationId);
+        if (outputPath.length < 2) {
+          continue;
+        }
+        const folderOutputPath = outputPath.slice(0, -1);
         this.operationFolderOutputPaths.push(folderOutputPath);
       }
     }
@@ -231,6 +233,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     componentRef: string,
     objectDiscriminatorConfig?: ObjectDiscriminatorConfig
   ) {
+    const preventFromAddingTypesForComponentRefs = [componentRef];
     const components = this.oas3Specs.components;
     const outputPath = this.createOutputPathByComponentRef(componentRef);
     if (
@@ -254,8 +257,19 @@ export class DefaultCodeGenerator implements CodeGenerator {
         );
       }
       const generationSummary = isObjectSchema(schema)
-        ? applyObjectSchema(this, schema, outputPath, objectDiscriminatorConfig)
-        : applySchema(this, schema, outputPath);
+        ? applyObjectSchema(
+            this,
+            schema,
+            outputPath,
+            objectDiscriminatorConfig,
+            preventFromAddingTypesForComponentRefs
+          )
+        : applySchema(
+            this,
+            schema,
+            outputPath,
+            preventFromAddingTypesForComponentRefs
+          );
       this.addOutput({
         type: OutputType.DEFINITION,
         ...generationSummary,
@@ -285,9 +299,15 @@ export class DefaultCodeGenerator implements CodeGenerator {
             this,
             requestParameter.schema,
             outputPath,
-            objectDiscriminatorConfig
+            objectDiscriminatorConfig,
+            preventFromAddingTypesForComponentRefs
           )
-        : applySchema(this, requestParameter.schema, outputPath);
+        : applySchema(
+            this,
+            requestParameter.schema,
+            outputPath,
+            preventFromAddingTypesForComponentRefs
+          );
       this.addOutput({
         type: OutputType.DEFINITION,
         ...generationSummary,
@@ -302,26 +322,36 @@ export class DefaultCodeGenerator implements CodeGenerator {
       components.responses
     ) {
       const responseName = componentRef.replace(responseComponentRefPrefix, '');
-      const response = components.responses[responseName];
-      if (!response) {
-        throw new Error(
-          `could not find definition for componentRef "${componentRef}"`
-        );
-      }
-      const jsonResponse = response.content['application/json'];
+      const jsonResponse =
+        components.responses?.[responseName]?.content?.['application/json'];
       if (!jsonResponse) {
-        throw new Error(
-          `could not find jsonResponse for componentRef "${componentRef}"`
-        );
+        this.addOutput({
+          type: OutputType.DEFINITION,
+          definitionType: 'type',
+          path: outputPath,
+          createName: referencingPath =>
+            this.createComponentTypeName(componentRef, referencingPath),
+          createCode: () => {
+            return 'any';
+          },
+          requiredOutputPaths: [],
+        });
+        return;
       }
       const generationSummary = isObjectSchema(jsonResponse.schema)
         ? applyObjectSchema(
             this,
             jsonResponse.schema,
             outputPath,
-            objectDiscriminatorConfig
+            objectDiscriminatorConfig,
+            preventFromAddingTypesForComponentRefs
           )
-        : applySchema(this, jsonResponse.schema, outputPath);
+        : applySchema(
+            this,
+            jsonResponse.schema,
+            outputPath,
+            preventFromAddingTypesForComponentRefs
+          );
       this.addOutput({
         type: OutputType.DEFINITION,
         ...generationSummary,
@@ -387,11 +417,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     outputPath: OutputPath
   ): OutputPath {
     if (outputPath.length < 2) {
-      throw new Error(
-        `output path should contain at least two output path parts: ${JSON.stringify(
-          outputPath
-        )}`
-      );
+      return [];
     }
     const folderOutputPath =
       this.findMostAccurateOperationFolderOutputPath(outputPath);
@@ -660,7 +686,11 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   createOperationOutputPath(operationId: string): OutputPath {
-    return operationId.split('.').map(p => lowerCaseFirstLetter(p));
+    return operationId
+      .split('/')
+      .join('.')
+      .split('.')
+      .map(p => lowerCaseFirstLetter(p));
   }
 
   private isStatusCodeResponseOutputPath(outputPath: OutputPath): boolean {
@@ -796,17 +826,16 @@ export class DefaultCodeGenerator implements CodeGenerator {
       .replace(parameterComponentRefPrefix, '')
       .replace(responseComponentRefPrefix, '')
       .replace(schemaComponentRefPrefix, '')
+      .split('/')
+      .join('.')
       .split('.')
       .map(p => lowerCaseFirstLetter(p));
-    if (outputPathParts.length < 2) {
-      throw new Error(
-        `componentRef "${componentRef}" should at least be divided into two parts (by a dot).`
-      );
-    }
-    let folderOutputPathParts =
-      this.findMostAccurateOperationFolderOutputPath(outputPathParts);
-    if (!folderOutputPathParts) {
-      folderOutputPathParts = outputPathParts.slice(0, 1);
+    let folderOutputPathParts: OutputPath = [];
+    if (outputPathParts.length >= 2) {
+      const mostAccurateOperationFolderOutputPath =
+        this.findMostAccurateOperationFolderOutputPath(outputPathParts);
+      folderOutputPathParts =
+        mostAccurateOperationFolderOutputPath ?? outputPathParts.slice(0, 1);
     }
     const typeNamePathParts = outputPathParts.slice(
       folderOutputPathParts.length

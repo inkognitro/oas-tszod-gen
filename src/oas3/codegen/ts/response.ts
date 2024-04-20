@@ -102,7 +102,7 @@ export function applyResponseByStatusCodeMap(
       statusCodeResponseOutputs.push(responseOutput);
       continue;
     }
-    const jsonResponseBody = responseOrRef.content['application/json'];
+    const jsonResponseBody = responseOrRef.content?.['application/json'];
     if (!jsonResponseBody) {
       continue;
     }

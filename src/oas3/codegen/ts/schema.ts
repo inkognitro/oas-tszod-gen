@@ -11,12 +11,16 @@ import {
   DefinitionOutput,
 } from './core';
 import {
+  AllOfSchema,
   ArraySchema,
   BooleanSchema,
   ComponentRef,
+  IntegerSchema,
+  isAllOfSchema,
   isArraySchema,
   isBooleanSchema,
   isComponentRef,
+  isIntegerSchema,
   isNumberSchema,
   isObjectSchema,
   isOneOfSchema,
@@ -32,10 +36,17 @@ import {
 export function applySchema(
   codeGenerator: CodeGenerator,
   schema: Schema,
-  path: OutputPath
+  path: OutputPath,
+  preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
   if (isSchemaComponentRef(schema)) {
-    return applyComponentRefSchema(codeGenerator, schema, path);
+    return applyComponentRefSchema(
+      codeGenerator,
+      schema,
+      path,
+      undefined,
+      preventFromAddingTypesForComponentRefs
+    );
   }
   if (isBooleanSchema(schema)) {
     return applyBooleanSchema(schema, path);
@@ -46,14 +57,41 @@ export function applySchema(
   if (isNumberSchema(schema)) {
     return applyNumberSchema(schema, path);
   }
+  if (isIntegerSchema(schema)) {
+    return applyIntegerSchema(schema, path);
+  }
   if (isArraySchema(schema)) {
-    return applyArraySchema(codeGenerator, schema, path);
+    return applyArraySchema(
+      codeGenerator,
+      schema,
+      path,
+      preventFromAddingTypesForComponentRefs
+    );
   }
   if (isObjectSchema(schema)) {
-    return applyObjectSchema(codeGenerator, schema, path);
+    return applyObjectSchema(
+      codeGenerator,
+      schema,
+      path,
+      undefined,
+      preventFromAddingTypesForComponentRefs
+    );
   }
   if (isOneOfSchema(schema)) {
-    return applyOneOfSchema(codeGenerator, schema, path);
+    return applyOneOfSchema(
+      codeGenerator,
+      schema,
+      path,
+      preventFromAddingTypesForComponentRefs
+    );
+  }
+  if (isAllOfSchema(schema)) {
+    return applyAllOfSchema(
+      codeGenerator,
+      schema,
+      path,
+      preventFromAddingTypesForComponentRefs
+    );
   }
   throw new Error(`schema not supported: ${JSON.stringify(schema)}`);
 }
@@ -103,10 +141,16 @@ function applyStringSchema(
 export function applyArraySchema(
   codeGenerator: CodeGenerator,
   schema: ArraySchema,
-  path: OutputPath
+  path: OutputPath,
+  preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const itemOutputPath = [...path, arraySchemaItemOutputPathPart];
-  const itemSummary = applySchema(codeGenerator, schema.items, itemOutputPath);
+  const itemSummary = applySchema(
+    codeGenerator,
+    schema.items,
+    itemOutputPath,
+    preventFromAddingTypesForComponentRefs
+  );
   const codeComment = itemSummary.codeComment
     ? `item: ${itemSummary.codeComment}`
     : undefined;
@@ -142,27 +186,48 @@ export function applyNumberSchema(
   };
 }
 
+export function applyIntegerSchema(
+  schema: IntegerSchema,
+  path: OutputPath
+): CodeGenerationOutput {
+  let code = 'number';
+  if (schema.nullable) {
+    code = `null | ${code}`;
+  }
+  return {
+    createCode: () => {
+      return code;
+    },
+    codeComment: 'int',
+    path,
+    requiredOutputPaths: [],
+  };
+}
+
 export function applyComponentRefSchema(
   codeGenerator: CodeGenerator,
   schema: ComponentRef,
   path: OutputPath,
-  objectDiscriminatorConfig?: ObjectDiscriminatorConfig
+  objectDiscriminatorConfig?: ObjectDiscriminatorConfig,
+  preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  codeGenerator.addOutput({
-    type: OutputType.COMPONENT_REF,
-    createName: referencingPath => {
-      return codeGenerator.createComponentTypeName(
-        schema.$ref,
-        referencingPath
-      );
-    },
-    componentRef: schema.$ref,
-    objectDiscriminatorConfig,
-    path,
-    requiredOutputPaths: [
-      codeGenerator.createOutputPathByComponentRef(schema.$ref),
-    ],
-  });
+  if (!preventFromAddingTypesForComponentRefs.includes(schema.$ref)) {
+    codeGenerator.addOutput({
+      type: OutputType.COMPONENT_REF,
+      createName: referencingPath => {
+        return codeGenerator.createComponentTypeName(
+          schema.$ref,
+          referencingPath
+        );
+      },
+      componentRef: schema.$ref,
+      objectDiscriminatorConfig,
+      path,
+      requiredOutputPaths: [
+        codeGenerator.createOutputPathByComponentRef(schema.$ref),
+      ],
+    });
+  }
   return {
     createCode: referencingPath =>
       codeGenerator.createComponentTypeName(schema.$ref, referencingPath),
@@ -177,7 +242,8 @@ export function applyObjectSchema(
   codeGenerator: CodeGenerator,
   schema: ObjectSchema,
   path: OutputPath,
-  discriminatorConfig?: ObjectDiscriminatorConfig
+  discriminatorConfig?: ObjectDiscriminatorConfig,
+  preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const directOutputByPropNameMap: {
     [propName: string]: {
@@ -199,7 +265,8 @@ export function applyObjectSchema(
     directOutputByPropNameMap[propName] = applySchema(
       codeGenerator,
       propSchema,
-      propSchemaPath
+      propSchemaPath,
+      preventFromAddingTypesForComponentRefs
     );
   }
   let additionalPropertiesDirectOutput: undefined | CodeGenerationOutput;
@@ -207,7 +274,8 @@ export function applyObjectSchema(
     additionalPropertiesDirectOutput = applySchema(
       codeGenerator,
       schema.additionalProperties,
-      [...path, objectSchemaAdditionalPropsOutputPathPart]
+      [...path, objectSchemaAdditionalPropsOutputPathPart],
+      preventFromAddingTypesForComponentRefs
     );
   }
   return {
@@ -407,7 +475,8 @@ function doesEveryItemSchemaDiscriminatorPropertyLiveInTheSameFileContext(
 export function applyOneOfSchema(
   codeGenerator: CodeGenerator,
   schema: OneOfSchema,
-  path: OutputPath
+  path: OutputPath,
+  preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const enumOutput = createNullableDiscriminatorEnumDefinitionOutput(
     schema,
@@ -450,14 +519,16 @@ export function applyOneOfSchema(
           codeGenerator,
           itemSchema,
           itemPath,
-          objectDiscriminatorConfig
+          objectDiscriminatorConfig,
+          preventFromAddingTypesForComponentRefs
         );
       } else if (isSchemaComponentRef(itemSchema)) {
         itemOutput = applyComponentRefSchema(
           codeGenerator,
           itemSchema,
           itemPath,
-          objectDiscriminatorConfig
+          objectDiscriminatorConfig,
+          preventFromAddingTypesForComponentRefs
         );
       } else {
         throw new Error(
@@ -475,7 +546,12 @@ export function applyOneOfSchema(
         `${index}`,
       ];
       requiredOutputPaths.push(itemPath);
-      itemOutput = applySchema(codeGenerator, itemSchema, itemPath);
+      itemOutput = applySchema(
+        codeGenerator,
+        itemSchema,
+        itemPath,
+        preventFromAddingTypesForComponentRefs
+      );
       oneOfItemDirectOutputs.push(itemOutput);
     }
   });
@@ -494,5 +570,21 @@ export function applyOneOfSchema(
     },
     path,
     requiredOutputPaths,
+  };
+}
+
+export function applyAllOfSchema(
+  _codeGenerator: CodeGenerator,
+  _schema: AllOfSchema,
+  path: OutputPath,
+  _preventFromAddingTypesForComponentRefs: string[] = []
+): CodeGenerationOutput {
+  // todo: implement
+  return {
+    createCode: () => {
+      return 'any';
+    },
+    path,
+    requiredOutputPaths: [],
   };
 }

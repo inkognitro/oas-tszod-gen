@@ -18,7 +18,7 @@ function isResponseBodyContent(anyValue: any): anyValue is ResponseBodyContent {
 
 export type Response = {
   description?: string;
-  content: {
+  content?: {
     [contentType: 'application/json' | string]: ResponseBodyContent;
   };
 };
@@ -31,10 +31,12 @@ export function isResponse(anyValue: any): anyValue is Response {
   if (!!value.description && typeof value.description !== 'string') {
     return false;
   }
-  for (const contentType in value.content) {
-    const responseBodyContent = value.content[contentType];
-    if (!isResponseBodyContent(responseBodyContent)) {
-      return false;
+  if (value.content) {
+    for (const contentType in value.content) {
+      const responseBodyContent = value.content[contentType];
+      if (!isResponseBodyContent(responseBodyContent)) {
+        return false;
+      }
     }
   }
   return true;
