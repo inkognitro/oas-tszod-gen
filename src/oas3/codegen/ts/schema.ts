@@ -211,8 +211,8 @@ export function applyComponentRefSchema(
   objectDiscriminatorConfig?: ObjectDiscriminatorConfig,
   preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  if (!preventFromAddingTypesForComponentRefs.includes(schema.$ref)) {
-    codeGenerator.addOutput({
+  codeGenerator.addOutput(
+    {
       type: OutputType.COMPONENT_REF,
       createName: referencingPath => {
         return codeGenerator.createComponentTypeName(
@@ -226,8 +226,9 @@ export function applyComponentRefSchema(
       requiredOutputPaths: [
         codeGenerator.createOutputPathByComponentRef(schema.$ref),
       ],
-    });
-  }
+    },
+    preventFromAddingTypesForComponentRefs
+  );
   return {
     createCode: referencingPath =>
       codeGenerator.createComponentTypeName(schema.$ref, referencingPath),

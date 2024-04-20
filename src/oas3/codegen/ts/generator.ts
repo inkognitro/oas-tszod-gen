@@ -617,7 +617,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
     };
   }
 
-  addOutput(output: Output) {
+  addOutput(
+    output: Output,
+    preventFromAddingTypesForComponentRefs: string[] = []
+  ) {
     switch (output.type) {
       case OutputType.COMPONENT_REF:
         // eslint-disable-next-line no-case-declarations
@@ -651,10 +654,14 @@ export class DefaultCodeGenerator implements CodeGenerator {
           );
         }
         this.outputs.push(output);
-        this.addComponentOutputByComponentRef(
-          output.componentRef,
-          output.objectDiscriminatorConfig
-        );
+        if (
+          !preventFromAddingTypesForComponentRefs.includes(output.componentRef)
+        ) {
+          this.addComponentOutputByComponentRef(
+            output.componentRef,
+            output.objectDiscriminatorConfig
+          );
+        }
         break;
       case OutputType.DEFINITION:
         // eslint-disable-next-line no-case-declarations

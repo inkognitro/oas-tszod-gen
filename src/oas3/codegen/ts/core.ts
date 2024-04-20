@@ -14,7 +14,10 @@ export interface CodeGenerator {
   ): string;
   createOperationOutputPath(operationId: string): OutputPath;
   createOutputPathByComponentRef(componentRef: string): OutputPath;
-  addOutput(output: Output): void;
+  addOutput(
+    output: Output,
+    preventFromAddingTypesForComponentRefs?: string[]
+  ): void;
   findComponentSchemaByRef(componentRef: string): null | Schema;
   hasSameFileContext(outputPath1: OutputPath, outputPath2: OutputPath): boolean;
 }

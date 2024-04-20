@@ -46,7 +46,6 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
     requiredOutputPaths: [
       templateResponseType.path,
       templateStatusCodeEnum.path,
-      ...jsonResponseBodySummary.requiredOutputPaths,
     ],
   };
   codeGenerator.addOutput(typeDefinitionOutput);
@@ -64,10 +63,15 @@ export function applyResponseByStatusCodeMap(
     const responseOutputPath: OutputPath = [...path, statusCode];
     const responseOrRef = schema[statusCode];
     if (isResponseComponentRef(responseOrRef)) {
+      const responseBodyOutputPath = [...responseOutputPath, 'body'];
+      if (containsOutputPath(requiredOutputPaths, responseBodyOutputPath)) {
+        continue;
+      }
+      requiredOutputPaths.push(responseBodyOutputPath);
       const jsonResponseBody = applyComponentRefSchema(
         codeGenerator,
         responseOrRef,
-        [...responseOutputPath, 'body']
+        responseBodyOutputPath
       );
       if (!containsOutputPath(requiredOutputPaths, templateResponseType.path)) {
         requiredOutputPaths.push(templateResponseType.path);
@@ -76,11 +80,6 @@ export function applyResponseByStatusCodeMap(
         !containsOutputPath(requiredOutputPaths, templateStatusCodeEnum.path)
       ) {
         requiredOutputPaths.push(templateStatusCodeEnum.path);
-      }
-      if (
-        !containsOutputPath(requiredOutputPaths, templateStatusCodeEnum.path)
-      ) {
-        requiredOutputPaths.push(jsonResponseBody.path);
       }
       const responseOutput: CodeGenerationOutput = {
         createCode: referencingPath => {
