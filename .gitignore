@@ -2,3 +2,5 @@
 dist
 node_modules
 generated-files
+src/oas3/codegen/ts/generate.test.other.json
+src/oas3/codegen/ts/generate.test.other.ts
