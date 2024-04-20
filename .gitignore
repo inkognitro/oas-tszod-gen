@@ -3,5 +3,5 @@ dist
 node_modules
 generated-files-petstore
 generated-files-other
-src/oas3/codegen/ts/generate.other.test.json
+src/oas3/codegen/ts/generate.other.test.specs.json
 src/oas3/codegen/ts/generate.other.test.ts
