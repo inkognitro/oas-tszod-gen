@@ -12,7 +12,7 @@ const createCodeErrorMessage =
 export const templateRequestType: DefinitionOutput = {
   type: OutputType.DEFINITION,
   definitionType: 'type',
-  path: ['core', 'request'],
+  path: ['core', 'core', 'request'],
   createName: () => {
     return 'Request';
   },
@@ -25,7 +25,7 @@ export const templateRequestType: DefinitionOutput = {
 export const templateResponseType: DefinitionOutput = {
   type: OutputType.DEFINITION,
   definitionType: 'type',
-  path: ['core', 'response'],
+  path: ['core', 'core', 'response'],
   createName: () => {
     return 'Response';
   },
@@ -38,7 +38,7 @@ export const templateResponseType: DefinitionOutput = {
 export const templateStatusCodeEnum: DefinitionOutput = {
   type: OutputType.DEFINITION,
   definitionType: 'enum',
-  path: ['core', 'statusCode'],
+  path: ['core', 'core', 'statusCode'],
   createName: () => {
     return 'StatusCode';
   },
@@ -84,7 +84,7 @@ export function getTemplateResponseStatusCodeEnumEntry(
 export const templateRequestResultType: DefinitionOutput = {
   type: OutputType.DEFINITION,
   definitionType: 'type',
-  path: ['core', 'requestResult'],
+  path: ['core', 'core', 'requestResult'],
   createName: () => {
     return 'RequestResult';
   },
@@ -97,7 +97,7 @@ export const templateRequestResultType: DefinitionOutput = {
 export const templateRequestHandlerType: DefinitionOutput = {
   type: OutputType.DEFINITION,
   definitionType: 'type',
-  path: ['core', 'requestHandler'],
+  path: ['core', 'core', 'requestHandler'],
   createName: () => {
     return 'RequestHandler';
   },

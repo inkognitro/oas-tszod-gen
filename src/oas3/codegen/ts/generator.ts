@@ -422,7 +422,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     const folderOutputPath =
       this.findMostAccurateOperationFolderOutputPath(outputPath);
     if (!folderOutputPath) {
-      return outputPath.slice(0, 1);
+      return [];
     }
     return folderOutputPath;
   }
@@ -439,7 +439,8 @@ export class DefaultCodeGenerator implements CodeGenerator {
     } else if (fileName === componentSchemasFileNameOutputPathPart) {
       fileName = 'schemas';
     }
-    return `/${folders.join('/')}/${fileName}.ts`;
+    const prefix = folders.length > 0 ? '/' : '';
+    return `${prefix}${folders.join('/')}/${fileName}.ts`;
   }
 
   private createImportPath(
@@ -722,12 +723,26 @@ export class DefaultCodeGenerator implements CodeGenerator {
         return 'Ok';
       case 201:
         return 'Created';
+      case 202:
+        return 'Accepted';
+      case 203:
+        return 'NonAuthoritativeInformation';
+      case 204:
+        return 'NoContent';
       case 400:
         return 'BadRequest';
       case 401:
         return 'Unauthorized';
       case 403:
         return 'Forbidden';
+      case 404:
+        return 'NotFound';
+      case 405:
+        return 'MethodNotAllowed';
+      case 413:
+        return 'ContentTooLarge';
+      case 500:
+        return 'InternalServerError';
       default:
         throw new Error(`case for statusCode ${statusCode} is not supported`);
     }
@@ -757,17 +772,31 @@ export class DefaultCodeGenerator implements CodeGenerator {
       return p;
     });
     if (this.isUnionResponseOutputPath(parts)) {
-      parts = parts.filter(p => p !== requestResultOutputPathPart);
-      parts = [...parts.slice(0, -1), 'response'];
+      parts = parts.filter(
+        p => p !== requestResultOutputPathPart && p !== responseOutputPathPart
+      );
+      parts = [...parts, 'response'];
       return parts.map(p => capitalizeFirstLetter(p)).join('');
     }
     if (this.isStatusCodeResponseOutputPath(parts)) {
-      const statusCode = parseInt(parts[parts.length - 1]);
+      const responseOutputPathPartIndex = parts.findIndex(
+        p => p === responseOutputPathPart
+      );
+      if (responseOutputPathPartIndex === -1) {
+        throw new Error(
+          'this case should have been caught by the parent if condition'
+        );
+      }
+      const statusCodeIndex = responseOutputPathPartIndex + 1;
+      const statusCode = parseInt(parts[statusCodeIndex]);
       parts = [
-        ...parts.slice(0, -3),
-        ...this.createResponseStatusCodeName(statusCode),
+        ...parts.slice(0, statusCodeIndex),
+        this.createResponseStatusCodeName(statusCode),
         'response',
       ];
+      parts = parts.filter(
+        p => p !== requestResultOutputPathPart && p !== responseOutputPathPart
+      );
       return parts.map(p => capitalizeFirstLetter(p)).join('');
     }
     if (this.isRequestResultOutputPath(parts)) {
@@ -778,26 +807,30 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    return this.createPascalCaseNamedTypeName(outputPath, referencingPath);
+    const n = this.createPascalCaseNamedTypeName(outputPath, referencingPath);
+    return n.match(/^\d/) ? `$${n}` : n;
   }
 
   createEnumName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    return this.createPascalCaseNamedTypeName(outputPath, referencingPath);
+    const n = this.createPascalCaseNamedTypeName(outputPath, referencingPath);
+    return n.match(/^\d/) ? `$${n}` : n;
   }
 
   createConstName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    return lowerCaseFirstLetter(
+    const n = lowerCaseFirstLetter(
       this.createPascalCaseNamedTypeName(outputPath, referencingPath)
     );
+    return n.match(/^\d/) ? `$${n}` : n;
   }
 
   createFunctionName(
     outputPath: OutputPath,
     referencingPath: OutputPath
   ): string {
-    return lowerCaseFirstLetter(
+    const n = lowerCaseFirstLetter(
       this.createPascalCaseNamedTypeName(outputPath, referencingPath)
     );
+    return n.match(/^\d/) ? `$${n}` : n;
   }
 
   private findMostAccurateOperationFolderOutputPath(
