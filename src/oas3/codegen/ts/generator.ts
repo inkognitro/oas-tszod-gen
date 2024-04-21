@@ -512,13 +512,40 @@ export class DefaultCodeGenerator implements CodeGenerator {
       if (!requiredOutput) {
         return;
       }
-      if (this.isSameOutputFile(requiredOutput.path, output.path)) {
+
+      if (
+        output.type !== OutputType.COMPONENT_REF &&
+        this.isSameOutputFile(requiredOutput.path, output.path)
+      ) {
         return;
       }
-      const importAsset: ImportAsset = {
-        name: requiredOutput.createName(requiredOutput.path),
-        importAsName: requiredOutput.createName(output.path),
-      };
+
+      if (output.type === OutputType.COMPONENT_REF) {
+        const componentOutputPath = this.createOutputPathByComponentRef(
+          output.componentRef
+        );
+        requiredOutput = availableOutputs.find(o =>
+          areOutputPathsEqual(o.path, componentOutputPath)
+        );
+        if (!requiredOutput) {
+          return;
+        }
+        if (this.isSameOutputFile(requiredOutput.path, output.path)) {
+          return;
+        }
+      }
+
+      const importAsset: ImportAsset =
+        output.type === OutputType.COMPONENT_REF
+          ? {
+              name: output.createName(requiredOutput.path),
+              importAsName: output.createName(output.path),
+            }
+          : {
+              name: requiredOutput.createName(requiredOutput.path),
+              importAsName: requiredOutput.createName(output.path),
+            };
+
       const importPath = this.createImportPath(
         requiredOutput.path,
         output.path,
