@@ -10,11 +10,11 @@ import {
 
 export const authenticateEndpointId = {
   method: 'post',
-  path: '/v1/authenticate',
+  path: '/v1/auth/authenticate',
 };
 
-type OkAuthenticateResponse = Response<StatusCode.OK, {accessToken: string}>;
-type BadRequestAuthenticateResponse = Response<StatusCode.BAD_REQUEST>;
+type OkAuthenticateResponse = Response<StatusCode.Ok, {accessToken: string}>;
+type BadRequestAuthenticateResponse = Response<StatusCode.BadRequest>;
 
 export type AuthenticateResponse =
   | OkAuthenticateResponse
@@ -25,21 +25,22 @@ export type AuthenticateRequestResult = RequestResult<
   AuthenticateResponse
 >;
 
-export type AuthenticateParams = {
+export type AuthenticatePayload = {
   emailOrUsername: string;
   password: string;
 };
 
 export function authenticate(
   requestHandler: RequestHandler,
-  params: AuthenticateParams,
+  payload: AuthenticatePayload,
   config?: RequestExecutionConfig
 ): Promise<AuthenticateRequestResult> {
   const request = createRequest({
     endpointId: authenticateEndpointId,
+    contentType: 'application/json',
     body: {
-      emailOrUsername: params.emailOrUsername,
-      password: params.password,
+      emailOrUsername: payload.emailOrUsername,
+      password: payload.password,
     },
   });
   return requestHandler.execute(request, config);
