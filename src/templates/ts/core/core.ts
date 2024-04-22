@@ -37,26 +37,29 @@ export type EndpointId = {
   path: string;
 };
 
+type RequestHeaders = {
+  contentType: string;
+  [key: string]: string;
+};
+
 export type Request<
   QueryParams extends object = any,
   Body extends object = any,
 > = {
   endpointId: EndpointId;
-  contentType: string;
   url: string;
   supportedSecuritySchemes: string[];
-  securityScheme: null | string;
-  headers: object;
+  appliedSecurityScheme: null | string;
+  headers: RequestHeaders;
   queryParams: QueryParams;
   body: Body;
 };
 
 type RequestCreationSettings = {
   endpointId: EndpointId;
-  contentType: string;
   supportedSecuritySchemes?: [];
   urlParams?: UrlParameters;
-  headers?: {};
+  headers: RequestHeaders;
   queryParams?: object;
   body?: object;
 };
@@ -64,9 +67,8 @@ type RequestCreationSettings = {
 export function createRequest(settings: RequestCreationSettings): Request {
   return {
     endpointId: settings.endpointId,
-    contentType: settings.contentType,
     supportedSecuritySchemes: settings.supportedSecuritySchemes ?? [],
-    securityScheme: null,
+    appliedSecurityScheme: null,
     url: createRequestUrl(settings.endpointId.path, settings.urlParams ?? {}),
     headers: settings.headers ?? {},
     queryParams: settings.queryParams ?? {},
@@ -103,9 +105,10 @@ export type RequestResult<
   hasRequestBeenCancelled: boolean;
 };
 
-export type RequestExecutionConfig = {
+export interface RequestExecutionConfig {
   onUploadProgress?: () => void;
-};
+  doNotApplyAuthCredentials?: boolean;
+}
 
 export interface RequestHandler {
   execute(

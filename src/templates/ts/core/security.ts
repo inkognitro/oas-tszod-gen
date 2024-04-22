@@ -1,4 +1,9 @@
-import {Request} from './core';
+import {
+  Request,
+  RequestExecutionConfig,
+  RequestHandler,
+  RequestResult,
+} from './core';
 
 export enum SecuritySchemeType {
   httpBearer = 'httpBearer',
@@ -40,23 +45,38 @@ export type SecurityScheme =
   | HttpBearerSecurityScheme
   | CustomSecurityScheme;
 
-export class SecuritySchemesRequestModifier {
-  private readonly securitySchemes: SecurityScheme[];
+export class AuthRequestHandler implements RequestHandler {
+  private readonly supportedSecuritySchemes: SecurityScheme[];
+  private readonly nextRequestHandler: RequestHandler;
 
-  constructor(securitySchemes: SecurityScheme[]) {
-    this.securitySchemes = securitySchemes;
+  constructor(
+    supportedSecuritySchemes: SecurityScheme[],
+    nextRequestHandler: RequestHandler
+  ) {
+    this.supportedSecuritySchemes = supportedSecuritySchemes;
+    this.nextRequestHandler = nextRequestHandler;
   }
 
-  private getWithSecurityExtendedRequest(request: Request): Request {
+  execute(
+    request: Request,
+    config?: RequestExecutionConfig
+  ): Promise<RequestResult> {
+    if (config?.doNotApplyAuthCredentials) {
+      return this.nextRequestHandler.execute(request, config);
+    }
+    return this.nextRequestHandler.execute(
+      this.createRequestWithAuthCredentials(request),
+      config
+    );
+  }
+
+  private createRequestWithAuthCredentials(request: Request): Request {
     for (const index in request.supportedSecuritySchemes) {
       const securitySchemeName = request.supportedSecuritySchemes[index];
-      const securityScheme = this.securitySchemes.find(
+      const securityScheme = this.supportedSecuritySchemes.find(
         s => s.name === securitySchemeName
       );
       if (!securityScheme) {
-        console.warn(
-          `security scheme with name "${securitySchemeName}" is ignored because it was not found`
-        );
         continue;
       }
       switch (securityScheme.type) {
@@ -97,7 +117,7 @@ export class SecuritySchemesRequestModifier {
           if (result.securityWasAppliedToRequest) {
             return {
               ...result.request,
-              securityScheme: securitySchemeName,
+              appliedSecurityScheme: securitySchemeName,
             };
           }
           break;
