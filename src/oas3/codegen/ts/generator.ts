@@ -32,6 +32,7 @@ import {findTemplateOutput, templateFilePaths} from '@oas3/codegen/ts/template';
 import {applyObjectSchema, applySchema} from '@oas3/codegen/ts/schema';
 
 const fs = require('fs');
+const path = require('path');
 
 async function writeFile(path: string, content: string) {
   const dirPath = path.split('/').slice(0, -1).join('/');
@@ -144,9 +145,13 @@ export class DefaultCodeGenerator implements CodeGenerator {
     config: GenerateConfig
   ) {
     const cleanTargetFolderPath = cleanUpFolderPath(config.outputFolderPath);
-    fs.cpSync(__dirname + '../../../../templates/ts', cleanTargetFolderPath, {
-      recursive: true,
-    });
+    fs.cpSync(
+      path.resolve(__dirname, '../../../templates/ts'),
+      cleanTargetFolderPath,
+      {
+        recursive: true,
+      }
+    );
     for (const filePath in fileOutputByFilePath) {
       const fileOutput = fileOutputByFilePath[filePath];
       const fsFilePath = `${cleanTargetFolderPath}${filePath}`;
