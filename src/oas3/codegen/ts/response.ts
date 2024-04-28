@@ -73,6 +73,7 @@ export function applyResponseByStatusCodeMap(
   const statusCodeResponseOutputs: CodeGenerationOutput[] = [];
   const requiredOutputPaths: OutputPath[] = [];
   for (const statusCode in schema) {
+    // todo: support statusCode "default"
     const responseOutputPath: OutputPath = [...path, statusCode];
     const responseOrRef = schema[statusCode];
     if (isResponseComponentRef(responseOrRef)) {

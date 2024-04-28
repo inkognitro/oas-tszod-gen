@@ -349,7 +349,14 @@ function getEnumValueFromItemSchema(
     );
   }
   const discriminatorSchema =
-    concreteItemSchema.properties[discriminatorPropName];
+    concreteItemSchema.properties?.[discriminatorPropName];
+  if (!discriminatorSchema) {
+    throw new Error(
+      `discriminator property "${discriminatorPropName}" could not be found: ${JSON.stringify(
+        concreteItemSchema
+      )}`
+    );
+  }
   const concreteDiscriminatorSchema = getConcreteSchema(
     discriminatorSchema,
     codeGenerator
@@ -379,7 +386,7 @@ function isEveryItemSchemaDiscriminatorPropertyAStringSchemaWithOnlyOneValue(
       return false;
     }
     const discriminatorPropSchema =
-      concreteSchema.properties[discriminatorPropName];
+      concreteSchema.properties?.[discriminatorPropName];
     if (!isStringSchema(discriminatorPropSchema)) {
       return false;
     }
