@@ -70,7 +70,7 @@ export function isBooleanSchema(anyValue: any): anyValue is BooleanSchema {
 export type ObjectSchema = {
   type: 'object';
   required?: string[];
-  properties: {[propName: string]: Schema};
+  properties?: {[propName: string]: Schema};
   additionalProperties?: Schema;
 };
 
@@ -92,9 +92,8 @@ export function isObjectSchema(anyValue: any): anyValue is ObjectSchema {
     }
   }
   if (
-    !value.properties ||
-    typeof value.properties !== 'object' ||
-    Array.isArray(value.properties)
+    value.properties &&
+    (typeof value.properties !== 'object' || Array.isArray(value.properties))
   ) {
     return false;
   }

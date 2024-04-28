@@ -44,9 +44,17 @@ export function isPermissionsBySecurityNameArray(
   return true;
 }
 
+type RequestParameterLocation = 'query' | 'path' | 'header' | 'cookie';
+const requestParameterLocations: RequestParameterLocation[] = [
+  'query',
+  'path',
+  'header',
+  'cookie',
+];
+
 export type RequestParameter = {
   name: string;
-  in: 'query' | 'path';
+  in: RequestParameterLocation;
   required?: boolean;
   schema: Schema;
 };
@@ -61,7 +69,10 @@ export function isRequestParameter(
   if (typeof value.name !== 'string') {
     return false;
   }
-  if (typeof value.in !== 'string' || !['query', 'path'].includes(value.in)) {
+  if (
+    typeof value.in !== 'string' ||
+    !requestParameterLocations.includes(value.in)
+  ) {
     return false;
   }
   if (value.required !== undefined && typeof value.required !== 'boolean') {
