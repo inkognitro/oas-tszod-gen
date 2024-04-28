@@ -1,6 +1,7 @@
 import {
   isResponseComponentRef,
   ResponseBodyContent,
+  ResponseBodyContentByContentTypeMap,
   ResponseByStatusCodeMap,
 } from '@oas3/specification';
 import {
@@ -52,6 +53,18 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
   return typeDefinitionOutput;
 }
 
+function findPreferredResponseBodyContent(
+  contentByContentType: ResponseBodyContentByContentTypeMap
+): null | ResponseBodyContent {
+  const jsonResponseBody = contentByContentType['application/json'];
+  if (jsonResponseBody) {
+    return jsonResponseBody;
+  }
+  console.log(contentByContentType);
+  console.log(contentByContentType[Object.keys(contentByContentType)[0]]);
+  return contentByContentType[Object.keys(contentByContentType)[0]] ?? null;
+}
+
 export function applyResponseByStatusCodeMap(
   codeGenerator: CodeGenerator,
   schema: ResponseByStatusCodeMap,
@@ -101,8 +114,10 @@ export function applyResponseByStatusCodeMap(
       statusCodeResponseOutputs.push(responseOutput);
       continue;
     }
-    const jsonResponseBody = responseOrRef.content?.['application/json'];
-    if (!jsonResponseBody) {
+    const responseBodyContent = responseOrRef.content
+      ? findPreferredResponseBodyContent(responseOrRef.content)
+      : null;
+    if (!responseBodyContent) {
       continue;
     }
     const statusCodeResponseType =
@@ -110,7 +125,7 @@ export function applyResponseByStatusCodeMap(
         codeGenerator,
         responseOutputPath,
         parseInt(statusCode),
-        jsonResponseBody
+        responseBodyContent
       );
     if (!containsOutputPath(requiredOutputPaths, statusCodeResponseType.path)) {
       requiredOutputPaths.push(statusCodeResponseType.path);

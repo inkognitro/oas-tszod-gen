@@ -16,11 +16,13 @@ function isResponseBodyContent(anyValue: any): anyValue is ResponseBodyContent {
   return true;
 }
 
+export type ResponseBodyContentByContentTypeMap = {
+  [contentType: 'application/json' | string]: ResponseBodyContent;
+};
+
 export type Response = {
   description?: string;
-  content?: {
-    [contentType: 'application/json' | string]: ResponseBodyContent;
-  };
+  content?: ResponseBodyContentByContentTypeMap;
 };
 
 export function isResponse(anyValue: any): anyValue is Response {
