@@ -48,10 +48,14 @@ export const templateStatusCodeEnum: DefinitionOutput = {
   requiredOutputPaths: [],
 };
 
-export function getTemplateResponseStatusCodeEnumEntry(
-  statusCode: number
-): string {
-  switch (statusCode) {
+export function findTemplateResponseStatusCodeEnumEntry(
+  statusCode: string
+): string | null {
+  const numericStatusCode = parseInt(statusCode);
+  if (isNaN(numericStatusCode)) {
+    return null;
+  }
+  switch (numericStatusCode) {
     case 200:
       return 'Ok';
     case 201:

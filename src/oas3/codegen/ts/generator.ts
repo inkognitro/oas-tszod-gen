@@ -733,15 +733,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       .map(p => lowerCaseFirstLetter(p));
   }
 
-  private isStatusCodeResponseOutputPath(outputPath: OutputPath): boolean {
-    const statusCodeStr = outputPath[outputPath.length - 1];
-    const statusCode = parseInt(statusCodeStr);
-    if (isNaN(statusCode)) {
-      return false;
-    }
-    if (`${statusCode}` !== statusCodeStr) {
-      return false;
-    }
+  private isResponseOutputPath(outputPath: OutputPath): boolean {
     if (outputPath[outputPath.length - 2] !== responseOutputPathPart) {
       return false;
     }
@@ -817,7 +809,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       parts = [...parts, 'response'];
       return parts.map(p => capitalizeFirstLetter(p)).join('');
     }
-    if (this.isStatusCodeResponseOutputPath(parts)) {
+    if (this.isResponseOutputPath(parts)) {
       const responseOutputPathPartIndex = parts.findIndex(
         p => p === responseOutputPathPart
       );
@@ -828,9 +820,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
       }
       const statusCodeIndex = responseOutputPathPartIndex + 1;
       const statusCode = parseInt(parts[statusCodeIndex]);
+      const statusCodeOutputPathPart = isNaN(statusCode)
+        ? 'any'
+        : this.createResponseStatusCodeName(statusCode);
       parts = [
         ...parts.slice(0, statusCodeIndex),
-        this.createResponseStatusCodeName(statusCode),
+        statusCodeOutputPathPart,
         'response',
       ];
       parts = parts.filter(

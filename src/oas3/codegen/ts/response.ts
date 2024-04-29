@@ -14,7 +14,7 @@ import {
 } from './core';
 import {applyComponentRefSchema, applySchema} from './schema';
 import {
-  getTemplateResponseStatusCodeEnumEntry,
+  findTemplateResponseStatusCodeEnumEntry,
   templateResponseType,
   templateStatusCodeEnum,
 } from './template';
@@ -22,10 +22,19 @@ import {
 function applyStatusCodeResponseAndGetTypeDefinitionOutput(
   codeGenerator: CodeGenerator,
   path: OutputPath,
-  statusCode: number,
+  statusCode: string,
   schema: ResponseBodyContent
 ): DefinitionOutput {
-  const jsonResponseBodySummary = applySchema(codeGenerator, schema.schema, [
+  const requiredOutputPaths: OutputPath[] = [templateResponseType.path];
+  const statusCodeEnumEntry =
+    findTemplateResponseStatusCodeEnumEntry(statusCode);
+  const statusCodeType = statusCodeEnumEntry
+    ? `${templateStatusCodeEnum.createName(path)}.${statusCodeEnumEntry}`
+    : 'any';
+  if (statusCodeType !== 'any') {
+    requiredOutputPaths.push(templateStatusCodeEnum.path);
+  }
+  const responseBodySummary = applySchema(codeGenerator, schema.schema, [
     ...path,
     'body',
   ]);
@@ -38,16 +47,10 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
     },
     createCode: referencingPath => {
       const responseType = templateResponseType.createName(path);
-      const statusCodeEnum = templateStatusCodeEnum.createName(path);
-      const statusCodeEnumEntry =
-        getTemplateResponseStatusCodeEnumEntry(statusCode);
-      const bodyCode = jsonResponseBodySummary.createCode(referencingPath);
-      return `${responseType}<${statusCodeEnum}.${statusCodeEnumEntry},${bodyCode}>`;
+      const bodyCode = responseBodySummary.createCode(referencingPath);
+      return `${responseType}<${statusCodeType}, ${bodyCode}>`;
     },
-    requiredOutputPaths: [
-      templateResponseType.path,
-      templateStatusCodeEnum.path,
-    ],
+    requiredOutputPaths,
   };
   codeGenerator.addOutput(typeDefinitionOutput);
   return typeDefinitionOutput;
@@ -60,8 +63,6 @@ function findPreferredResponseBodyContent(
   if (jsonResponseBody) {
     return jsonResponseBody;
   }
-  console.log(contentByContentType);
-  console.log(contentByContentType[Object.keys(contentByContentType)[0]]);
   return contentByContentType[Object.keys(contentByContentType)[0]] ?? null;
 }
 
@@ -73,7 +74,6 @@ export function applyResponseByStatusCodeMap(
   const statusCodeResponseOutputs: CodeGenerationOutput[] = [];
   const requiredOutputPaths: OutputPath[] = [];
   for (const statusCode in schema) {
-    // todo: support statusCode "default"
     const responseOutputPath: OutputPath = [...path, statusCode];
     const responseOrRef = schema[statusCode];
     if (isResponseComponentRef(responseOrRef)) {
@@ -82,7 +82,7 @@ export function applyResponseByStatusCodeMap(
         continue;
       }
       requiredOutputPaths.push(responseBodyOutputPath);
-      const jsonResponseBody = applyComponentRefSchema(
+      const responseBodyContent = applyComponentRefSchema(
         codeGenerator,
         responseOrRef,
         responseBodyOutputPath
@@ -90,7 +90,13 @@ export function applyResponseByStatusCodeMap(
       if (!containsOutputPath(requiredOutputPaths, templateResponseType.path)) {
         requiredOutputPaths.push(templateResponseType.path);
       }
+      const statusCodeEnumEntry =
+        findTemplateResponseStatusCodeEnumEntry(statusCode);
+      const statusCodeType = statusCodeEnumEntry
+        ? `${templateStatusCodeEnum.createName(path)}.${statusCodeEnumEntry}`
+        : 'any';
       if (
+        statusCodeType !== 'any' &&
         !containsOutputPath(requiredOutputPaths, templateStatusCodeEnum.path)
       ) {
         requiredOutputPaths.push(templateStatusCodeEnum.path);
@@ -98,19 +104,11 @@ export function applyResponseByStatusCodeMap(
       const responseOutput: CodeGenerationOutput = {
         createCode: referencingPath => {
           const responseType = templateResponseType.createName(path);
-          const statusCodeEnum = templateStatusCodeEnum.createName(path);
-          const statusCodeEnumEntry = getTemplateResponseStatusCodeEnumEntry(
-            parseInt(statusCode)
-          );
-          const bodyCode = jsonResponseBody.createCode(referencingPath);
-          return `${responseType}<${statusCodeEnum}.${statusCodeEnumEntry}, ${bodyCode}>`;
+          const bodyCode = responseBodyContent.createCode(referencingPath);
+          return `${responseType}<${statusCodeType}, ${bodyCode}>`;
         },
         path: responseOutputPath,
-        requiredOutputPaths: [
-          templateResponseType.path,
-          templateStatusCodeEnum.path,
-          jsonResponseBody.path,
-        ],
+        requiredOutputPaths: [],
       };
       statusCodeResponseOutputs.push(responseOutput);
       continue;
@@ -125,7 +123,7 @@ export function applyResponseByStatusCodeMap(
       applyStatusCodeResponseAndGetTypeDefinitionOutput(
         codeGenerator,
         responseOutputPath,
-        parseInt(statusCode),
+        statusCode,
         responseBodyContent
       );
     if (!containsOutputPath(requiredOutputPaths, statusCodeResponseType.path)) {
@@ -154,6 +152,9 @@ export function applyResponseByStatusCodeMap(
           : '';
         codeParts.push(`| ${responseOutput.createCode(path)}${codeComment}`);
       });
+      if (!codeParts.length) {
+        return 'any';
+      }
       return `${codeParts.join('\n')}`;
     },
     requiredOutputPaths,
