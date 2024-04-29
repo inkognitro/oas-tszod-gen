@@ -2,7 +2,7 @@ import {generateOas3ToTs} from './generate';
 const petStore1Specification = require('./generate.petstore1.test.specs.json');
 const petStore2Specification = require('./generate.petstore2.test.specs.json');
 
-test('can generate files from pet store one specification', async () => {
+test('can generate files from pet store one specification', () => {
   expect(() => {
     generateOas3ToTs({
       getSpecification: () => {
@@ -11,11 +11,14 @@ test('can generate files from pet store one specification', async () => {
         });
       },
       outputFolderPath: './generated-files-petstore1',
+      logger: {
+        log: () => {},
+      },
     });
   }).not.toThrow();
 });
 
-test('can generate files from pet store two specification', async () => {
+test('can generate files from pet store two specification', () => {
   expect(() => {
     generateOas3ToTs({
       getSpecification: () => {
@@ -24,6 +27,9 @@ test('can generate files from pet store two specification', async () => {
         });
       },
       outputFolderPath: './generated-files-petstore2',
+      logger: {
+        log: () => {},
+      },
     });
   }).not.toThrow();
 });

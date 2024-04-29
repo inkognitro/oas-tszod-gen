@@ -93,7 +93,11 @@ const componentParametersFileNameOutputPathPart = 'parameters6b3a7814';
 const componentResponsesFileNameOutputPathPart = 'responses6b3a7814';
 const componentSchemasFileNameOutputPathPart = 'schemas6b3a7814';
 
-type GenerateConfig = {
+export interface Logger {
+  log(...data: any[]): void;
+}
+
+export type GenerateConfig = {
   outputFolderPath: string;
   importRootAlias?: string;
   predefinedFolderOutputPaths?: OutputPath[];
@@ -101,14 +105,16 @@ type GenerateConfig = {
 
 export class DefaultCodeGenerator implements CodeGenerator {
   private readonly oas3Specs: Specification;
+  private readonly logger: Logger;
   private outputs: Output[];
   private operationFolderOutputPaths: OutputPath[];
 
-  constructor(oas3Specs: object) {
+  constructor(oas3Specs: object, logger: Logger) {
     if (!isSpecification(oas3Specs)) {
       throw new Error('invalid oas3 specification given');
     }
     this.oas3Specs = oas3Specs;
+    this.logger = logger;
     this.outputs = [];
     this.operationFolderOutputPaths = [];
   }
@@ -158,13 +164,13 @@ export class DefaultCodeGenerator implements CodeGenerator {
       if (templateFilePaths.includes(filePath)) {
         appendToFile(fsFilePath, this.createFileContent(fileOutput)).then(
           () => {
-            console.log(`extended file: ${fsFilePath}`);
+            this.logger.log(`extended file: ${fsFilePath}`);
           }
         );
         continue;
       }
       writeFile(fsFilePath, this.createFileContent(fileOutput)).then(() => {
-        console.log(`created file: ${fsFilePath}`);
+        this.logger.log(`created file: ${fsFilePath}`);
       });
     }
   }
