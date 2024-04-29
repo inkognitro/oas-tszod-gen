@@ -1,7 +1,12 @@
 import {CodeGenerator, OutputType, OutputPath, DefinitionOutput} from './core';
 import {Request} from '@oas3/specification';
 import {applyResponseByStatusCodeMap} from './response';
-import {templateRequestResultType, templateRequestType} from './template';
+import {
+  templateRequestExecutionConfigType,
+  templateRequestHandlerType,
+  templateRequestResultType,
+  templateRequestType,
+} from './template';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -62,9 +67,9 @@ function applyEndpointIdConstDefinition(
 export function applyEndpointCallerFunction(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
-  schema: Request
+  request: Request
 ) {
-  const path = codeGenerator.createOperationOutputPath(schema.operationId);
+  const path = codeGenerator.createOperationOutputPath(request.operationId);
   const endpointIdConstDefinition = applyEndpointIdConstDefinition(
     codeGenerator,
     endpointId,
@@ -73,25 +78,32 @@ export function applyEndpointCallerFunction(
   codeGenerator.addOutput(endpointIdConstDefinition);
   const requestResultTypeDefinition = applyRequestResultTypeDefinition(
     codeGenerator,
-    schema,
+    request,
     [...path, requestResultOutputPathPart]
   );
-  const funcDefinition: DefinitionOutput = {
+  codeGenerator.addOutput({
     type: OutputType.DEFINITION,
     definitionType: 'function',
     createName: referencingPath => {
       return codeGenerator.createFunctionName(path, referencingPath);
     },
     createCode: () => {
-      const requestResult = requestResultTypeDefinition.createName(path);
-      return `(): Promise<${requestResult}> { throw new Error('implement me!'); }`; // todo: implement
+      const rrTn = requestResultTypeDefinition.createName(path);
+      const cfgTn = templateRequestExecutionConfigType.createName(path);
+      const rhTn = templateRequestHandlerType.createName(path);
+      const bodyParts: string[] = [];
+      bodyParts.push('throw new Error("implement me!");'); // todo: implement parts and remove this line
+      return `(requestHandler: ${rhTn}, config?: ${cfgTn}): Promise<${rrTn}> {${bodyParts.join(
+        '\n'
+      )}}`;
     },
     path,
     requiredOutputPaths: [
       endpointIdConstDefinition.path,
       templateRequestType.path,
       requestResultTypeDefinition.path,
+      templateRequestHandlerType.path,
+      templateRequestExecutionConfigType.path,
     ],
-  };
-  codeGenerator.addOutput(funcDefinition);
+  });
 }

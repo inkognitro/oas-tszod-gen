@@ -111,6 +111,19 @@ export const templateRequestHandlerType: DefinitionOutput = {
   requiredOutputPaths: [],
 };
 
+export const templateRequestExecutionConfigType: DefinitionOutput = {
+  type: OutputType.DEFINITION,
+  definitionType: 'type',
+  path: ['core', 'core', 'requestExecutionConfig'],
+  createName: () => {
+    return 'RequestExecutionConfig';
+  },
+  createCode: () => {
+    throw new Error(createCodeErrorMessage);
+  },
+  requiredOutputPaths: [],
+};
+
 export const templateFilePaths = [
   '/core/core.ts',
   '/core/index.ts',
@@ -123,6 +136,7 @@ const templateOutputs: Output[] = [
   templateStatusCodeEnum,
   templateRequestResultType,
   templateRequestHandlerType,
+  templateRequestExecutionConfigType,
 ];
 
 export function findTemplateOutput(outputPath: OutputPath): undefined | Output {
