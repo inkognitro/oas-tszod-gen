@@ -21,7 +21,8 @@
     "lint:fix": "tsc && gts fix",
     "start": "npm run copyTemplateFiles && tspc -w",
     "test": "jest",
-    "test-ci": "gts lint && jest --ci --coverage"
+    "test-ci": "gts lint && jest --ci --coverage",
+    "tsc": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
