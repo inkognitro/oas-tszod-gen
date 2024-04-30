@@ -1,12 +1,7 @@
 import {isResponse, Response} from './response';
 import {isSchema, Schema} from './schema';
 import {isSecurityScheme, SecurityScheme} from './security';
-import {
-  isRequest,
-  isRequestParameter,
-  Request,
-  RequestParameter,
-} from './request';
+import {isParameter, isRequest, Parameter, Request} from './request';
 
 export type RequestByMethodMap = {
   [requestMethod: string]: Request;
@@ -103,7 +98,7 @@ function isSecuritySchemeByNameMap(
 }
 
 type RequestParameterByNameMap = {
-  [name: string]: RequestParameter;
+  [name: string]: Parameter;
 };
 
 function isRequestParameterByNameMap(
@@ -114,8 +109,8 @@ function isRequestParameterByNameMap(
     return false;
   }
   for (const name in value) {
-    const requestParameter = value[name];
-    if (!isRequestParameter(requestParameter)) {
+    const parameter = value[name];
+    if (!isParameter(parameter)) {
       return false;
     }
   }

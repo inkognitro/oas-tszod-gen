@@ -1,8 +1,16 @@
 import {ComponentRef, isComponentRef} from './componentRef';
 
-export function isSchema(anyValue: any): anyValue is Schema {
+export type ConcreteSchema =
+  | BooleanSchema
+  | StringSchema
+  | NumberSchema
+  | IntegerSchema
+  | ArraySchema
+  | ObjectSchema
+  | OneOfSchema;
+
+export function isConcreteSchema(anyValue: any): anyValue is ConcreteSchema {
   return (
-    isComponentRef(anyValue) ||
     isBooleanSchema(anyValue) ||
     isStringSchema(anyValue) ||
     isNumberSchema(anyValue) ||
@@ -15,15 +23,11 @@ export function isSchema(anyValue: any): anyValue is Schema {
   );
 }
 
-export type Schema =
-  | ComponentRef
-  | BooleanSchema
-  | StringSchema
-  | NumberSchema
-  | IntegerSchema
-  | ArraySchema
-  | ObjectSchema
-  | OneOfSchema;
+export type Schema = ConcreteSchema | ComponentRef;
+
+export function isSchema(anyValue: any): anyValue is Schema {
+  return isComponentRef(anyValue) || isConcreteSchema(anyValue);
+}
 
 export type ArraySchema = {
   type: 'array';
