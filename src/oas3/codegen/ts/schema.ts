@@ -332,6 +332,9 @@ function getConcreteSchema(
       `could not find schema for component with ref "${schema.$ref}"`
     );
   }
+  if (isComponentRef(componentSchema)) {
+    return getConcreteSchema(componentSchema, codeGenerator);
+  }
   return componentSchema;
 }
 

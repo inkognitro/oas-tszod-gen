@@ -1,4 +1,10 @@
-import {Schema} from '@oas3/specification';
+import {
+  ConcreteParameter,
+  isParameterComponentRef,
+  Parameter,
+  Response,
+  Schema,
+} from '@oas3/specification';
 
 export interface CodeGenerator {
   createComponentTypeName(
@@ -19,6 +25,7 @@ export interface CodeGenerator {
     preventFromAddingTypesForComponentRefs?: string[]
   ): void;
   findComponentSchemaByRef(componentRef: string): null | Schema;
+  findComponentParameterByRef(componentRef: string): null | Parameter;
   hasSameFileContext(outputPath1: OutputPath, outputPath2: OutputPath): boolean;
 }
 
@@ -103,3 +110,24 @@ export type ComponentRefOutput = GenericOutput<
 >;
 
 export type Output = DefinitionOutput | ComponentRefOutput;
+
+export function getConcreteParameter(
+  parameterOrComponentRef: Parameter,
+  codeGenerator: CodeGenerator
+): ConcreteParameter {
+  if (!isParameterComponentRef(parameterOrComponentRef)) {
+    return parameterOrComponentRef;
+  }
+  const componentParameter = codeGenerator.findComponentParameterByRef(
+    parameterOrComponentRef.$ref
+  );
+  if (!componentParameter) {
+    throw new Error(
+      `could not find schema for component with ref "${parameterOrComponentRef.$ref}"`
+    );
+  }
+  if (isParameterComponentRef(componentParameter)) {
+    return getConcreteParameter(componentParameter, codeGenerator);
+  }
+  return componentParameter;
+}

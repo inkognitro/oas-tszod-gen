@@ -13,10 +13,13 @@ import {
   OutputType,
 } from './core';
 import {
+  isConcreteParameter,
   isObjectSchema,
   isSpecification,
+  Parameter,
   parameterComponentRefPrefix,
   RequestByMethodMap,
+  Response,
   responseComponentRefPrefix,
   Schema,
   schemaComponentRefPrefix,
@@ -240,7 +243,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return contentParts.join('\n\n');
   }
 
-  private addComponentOutputByComponentRef(
+  private addOutputByComponentRef(
     componentRef: string,
     objectDiscriminatorConfig?: ObjectDiscriminatorConfig
   ) {
@@ -299,23 +302,26 @@ export class DefaultCodeGenerator implements CodeGenerator {
         parameterComponentRefPrefix,
         ''
       );
-      const requestParameter = components.parameters[parameterName];
-      if (!requestParameter) {
+      const parameter = components.parameters[parameterName];
+      if (!parameter) {
         throw new Error(
-          `could not find requestParameter for componentRef "${componentRef}"`
+          `could not find parameter for componentRef "${componentRef}"`
         );
       }
-      const generationSummary = isObjectSchema(requestParameter.schema)
+      if (!isConcreteParameter(parameter)) {
+        throw new Error('currently only concreteParameters are supported.');
+      }
+      const generationSummary = isObjectSchema(parameter.schema)
         ? applyObjectSchema(
             this,
-            requestParameter.schema,
+            parameter.schema,
             outputPath,
             objectDiscriminatorConfig,
             preventFromAddingTypesForComponentRefs
           )
         : applySchema(
             this,
-            requestParameter.schema,
+            parameter.schema,
             outputPath,
             preventFromAddingTypesForComponentRefs
           );
@@ -394,21 +400,18 @@ export class DefaultCodeGenerator implements CodeGenerator {
       const schema = components.schemas[name];
       return schema ?? null;
     }
+    return null;
+  }
+
+  findComponentParameterByRef(componentRef: string): null | Parameter {
+    const components = this.oas3Specs.components;
     if (
       componentRef.startsWith(parameterComponentRefPrefix) &&
       components.parameters
     ) {
       const name = componentRef.replace(parameterComponentRefPrefix, '');
-      const requestParameter = components.parameters[name];
-      return requestParameter.schema ?? null;
-    }
-    if (
-      componentRef.startsWith(responseComponentRefPrefix) &&
-      components.parameters
-    ) {
-      const name = componentRef.replace(responseComponentRefPrefix, '');
-      const response = components.parameters[name];
-      return response.schema ?? null;
+      const parameter = components.parameters[name];
+      return parameter ?? null;
     }
     return null;
   }
@@ -695,7 +698,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
         if (
           !preventFromAddingTypesForComponentRefs.includes(output.componentRef)
         ) {
-          this.addComponentOutputByComponentRef(
+          this.addOutputByComponentRef(
             output.componentRef,
             output.objectDiscriminatorConfig
           );

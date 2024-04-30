@@ -1,5 +1,17 @@
-import {CodeGenerator, OutputType, OutputPath, DefinitionOutput} from './core';
-import {Request} from '@oas3/specification';
+import {
+  CodeGenerator,
+  OutputType,
+  OutputPath,
+  DefinitionOutput,
+  getConcreteParameter,
+} from './core';
+import {
+  ConcreteParameter,
+  Request,
+  RequestBodyContentByTypeMap,
+  ResponseBodyContent,
+  Schema,
+} from '@oas3/specification';
 import {applyResponseByStatusCodeMap} from './response';
 import {
   templateRequestExecutionConfigType,
@@ -45,12 +57,65 @@ function applyRequestResultTypeDefinition(
   return typeDefinition;
 }
 
+function findPreferredRequestBodyContentType(
+  contentByContentType?: RequestBodyContentByTypeMap
+): string | null {
+  if (!contentByContentType) {
+    return null;
+  }
+  if (contentByContentType['application/json']) {
+    return 'application/json';
+  }
+  return Object.keys(contentByContentType)[0] ?? null;
+}
+
+type TypeDefinitionWithCreateRequest = {
+  createRequestCreationCode: () => string;
+  payloadTypeDefinition: DefinitionOutput;
+};
+
+function applyPayloadTypeDefinitionWithCreateRequestCreationCode(
+  codeGenerator: CodeGenerator,
+  endpointId: EndpointId,
+  request: Request,
+  path: OutputPath
+): TypeDefinitionWithCreateRequest {
+  const concreteRequestParameters: ConcreteParameter[] =
+    (request.parameters?.filter(p =>
+      getConcreteParameter(p, codeGenerator)
+    ) as ConcreteParameter[]) ?? [];
+  const contentType = findPreferredRequestBodyContentType(
+    request.requestBody?.content
+  );
+  const requestBodyContent = contentType
+    ? request.requestBody?.content?.[contentType] ?? null
+    : null;
+  const requestBodyContentSchema = requestBodyContent?.schema ?? null;
+  if (endpointId.method.toLowerCase() === 'get') {
+    // todo: implement
+  }
+  const payloadTypeDefinition: DefinitionOutput = {
+    type: OutputType.DEFINITION,
+    definitionType: 'type',
+    path,
+    createName: referencingPath => {
+      return codeGenerator.createTypeName(path, referencingPath);
+    },
+    createCode: () => {
+      return '';
+    },
+    requiredOutputPaths: [],
+  };
+  codeGenerator.addOutput(payloadTypeDefinition);
+  return {payloadTypeDefinition, createRequestCreationCode: () => 'foo;'};
+}
+
 function applyEndpointIdConstDefinition(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
   path: OutputPath
 ): DefinitionOutput {
-  return {
+  const definition: DefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'const',
     path,
@@ -62,6 +127,8 @@ function applyEndpointIdConstDefinition(
     },
     requiredOutputPaths: [],
   };
+  codeGenerator.addOutput(definition);
+  return definition;
 }
 
 export function applyEndpointCallerFunction(
@@ -75,7 +142,13 @@ export function applyEndpointCallerFunction(
     endpointId,
     [...path, 'endpointId']
   );
-  codeGenerator.addOutput(endpointIdConstDefinition);
+  const {payloadTypeDefinition, createRequestCreationCode} =
+    applyPayloadTypeDefinitionWithCreateRequestCreationCode(
+      codeGenerator,
+      endpointId,
+      request,
+      [...path, 'payload']
+    );
   const requestResultTypeDefinition = applyRequestResultTypeDefinition(
     codeGenerator,
     request,
@@ -91,15 +164,17 @@ export function applyEndpointCallerFunction(
       const rrTn = requestResultTypeDefinition.createName(path);
       const cfgTn = templateRequestExecutionConfigType.createName(path);
       const rhTn = templateRequestHandlerType.createName(path);
-      const bodyParts: string[] = [];
-      bodyParts.push('throw new Error("implement me!");'); // todo: implement parts and remove this line
-      return `(requestHandler: ${rhTn}, config?: ${cfgTn}): Promise<${rrTn}> {${bodyParts.join(
-        '\n'
-      )}}`;
+      const bodyParts: string[] = [
+        `const request = ${createRequestCreationCode()}`,
+        'return requestHandler.execute(request, config);',
+      ];
+      const funcBody = bodyParts.join('\n');
+      return `(requestHandler: ${rhTn}, config?: ${cfgTn}): Promise<${rrTn}> {${funcBody}}`;
     },
     path,
     requiredOutputPaths: [
       endpointIdConstDefinition.path,
+      payloadTypeDefinition.path,
       templateRequestType.path,
       requestResultTypeDefinition.path,
       templateRequestHandlerType.path,
