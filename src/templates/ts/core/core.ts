@@ -37,8 +37,15 @@ export type EndpointId = {
   path: string;
 };
 
-type RequestHeaders = {
-  contentType: string;
+type RequestHeaders = {contentType?: string} & {
+  [key: string]: string;
+};
+
+type Cookies = {
+  [key: string]: string;
+};
+
+type PathParams = {
   [key: string]: string;
 };
 
@@ -51,6 +58,8 @@ export type Request<
   supportedSecuritySchemes: string[];
   appliedSecurityScheme: null | string;
   headers: RequestHeaders;
+  cookies: Cookies;
+  pathParams: UrlParameters;
   queryParams: QueryParams;
   body: Body;
 };
@@ -58,9 +67,11 @@ export type Request<
 type RequestCreationSettings = {
   endpointId: EndpointId;
   supportedSecuritySchemes?: [];
-  urlParams?: UrlParameters;
-  headers: RequestHeaders;
-  queryParams?: object;
+  appliedSecurityScheme?: string;
+  headers?: RequestHeaders;
+  cookies?: Cookies;
+  pathParams?: UrlParameters;
+  queryParams?: PathParams;
   body?: object;
 };
 
@@ -68,9 +79,11 @@ export function createRequest(settings: RequestCreationSettings): Request {
   return {
     endpointId: settings.endpointId,
     supportedSecuritySchemes: settings.supportedSecuritySchemes ?? [],
-    appliedSecurityScheme: null,
-    url: createRequestUrl(settings.endpointId.path, settings.urlParams ?? {}),
+    appliedSecurityScheme: settings.appliedSecurityScheme ?? null,
+    url: createRequestUrl(settings.endpointId.path, settings.pathParams ?? {}),
     headers: settings.headers ?? {},
+    cookies: settings.cookies ?? {},
+    pathParams: settings.pathParams ?? {},
     queryParams: settings.queryParams ?? {},
     body: settings.body ?? {},
   };
