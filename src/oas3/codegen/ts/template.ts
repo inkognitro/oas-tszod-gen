@@ -124,6 +124,19 @@ export const templateRequestExecutionConfigType: DefinitionOutput = {
   requiredOutputPaths: [],
 };
 
+export const templateCreateRequestFunction: DefinitionOutput = {
+  type: OutputType.DEFINITION,
+  definitionType: 'type',
+  path: ['core', 'core', 'createRequest'],
+  createName: () => {
+    return 'createRequest';
+  },
+  createCode: () => {
+    throw new Error(createCodeErrorMessage);
+  },
+  requiredOutputPaths: [],
+};
+
 export const templateFilePaths = [
   '/core/core.ts',
   '/core/index.ts',
@@ -137,6 +150,7 @@ const templateOutputs: Output[] = [
   templateRequestResultType,
   templateRequestHandlerType,
   templateRequestExecutionConfigType,
+  templateCreateRequestFunction,
 ];
 
 export function findTemplateOutput(outputPath: OutputPath): undefined | Output {

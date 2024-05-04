@@ -98,8 +98,8 @@ export function isRequestBody(anyValue: any): anyValue is RequestBody {
   return true;
 }
 
-type ConcreteParameterLocation = 'query' | 'path' | 'header' | 'cookie';
-const concreteParameterLocations: ConcreteParameterLocation[] = [
+export type ConcreteParameterLocation = 'query' | 'path' | 'header' | 'cookie';
+export const concreteParameterLocations: ConcreteParameterLocation[] = [
   'query',
   'path',
   'header',

@@ -4,21 +4,23 @@ import {
   OutputPath,
   DefinitionOutput,
   getConcreteParameter,
+  CodeGenerationOutput,
+  capitalizeFirstLetter,
 } from './core';
 import {
-  ConcreteParameter,
+  ConcreteParameterLocation,
   Request,
   RequestBodyContentByTypeMap,
-  ResponseBodyContent,
-  Schema,
 } from '@oas3/specification';
 import {applyResponseByStatusCodeMap} from './response';
 import {
+  templateCreateRequestFunction,
   templateRequestExecutionConfigType,
   templateRequestHandlerType,
   templateRequestResultType,
   templateRequestType,
 } from './template';
+import {applySchema} from '@oas3/codegen/ts/schema';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -57,6 +59,52 @@ function applyRequestResultTypeDefinition(
   return typeDefinition;
 }
 
+type PayloadParameterCodeGenerationOutput = CodeGenerationOutput & {
+  createRequestCreationCode: () => string;
+  payloadParameterName: string;
+};
+
+function applyPayloadParameterCodeGenerationOutputs(
+  request: Request,
+  path: OutputPath,
+  codeGenerator: CodeGenerator,
+  parameterLocation: ConcreteParameterLocation,
+  payloadParameterNamePrefix?: string
+): PayloadParameterCodeGenerationOutput[] {
+  const outputs: PayloadParameterCodeGenerationOutput[] = [];
+  request.parameters?.forEach(paramOrRef => {
+    const p = getConcreteParameter(paramOrRef, codeGenerator);
+    if (p.in !== parameterLocation) {
+      return;
+    }
+    const payloadParameterName = `${payloadParameterNamePrefix}${capitalizeFirstLetter(
+      p.name
+    )}`;
+    const parameterSchemaPath = [...path, payloadParameterName];
+    const parameterSchemaOutput = applySchema(
+      codeGenerator,
+      p.schema,
+      parameterSchemaPath
+    );
+    outputs.push({
+      createCode: () => {
+        const questionMark = !p.required ? '?' : '';
+        return `${payloadParameterName}${questionMark}: ${parameterSchemaOutput.createCode(
+          path
+        )}`;
+      },
+      createRequestCreationCode: () => {
+        return `${p.name}: payload.${payloadParameterName}`;
+      },
+      requiredOutputPaths: parameterSchemaOutput.requiredOutputPaths,
+      path,
+      codeComment: parameterSchemaOutput.codeComment,
+      payloadParameterName: payloadParameterName,
+    });
+  });
+  return outputs;
+}
+
 function findPreferredRequestBodyContentType(
   contentByContentType?: RequestBodyContentByTypeMap
 ): string | null {
@@ -69,32 +117,51 @@ function findPreferredRequestBodyContentType(
   return Object.keys(contentByContentType)[0] ?? null;
 }
 
-type TypeDefinitionWithCreateRequest = {
-  createRequestCreationCode: () => string;
-  payloadTypeDefinition: DefinitionOutput;
+type PayloadDefinitionOutput = DefinitionOutput & {
+  createRequestCreationCode: (endpointIdDefinition: DefinitionOutput) => string;
 };
 
-function applyPayloadTypeDefinitionWithCreateRequestCreationCode(
+function applyPayloadTypeDefinition(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
   request: Request,
   path: OutputPath
-): TypeDefinitionWithCreateRequest {
-  const concreteRequestParameters: ConcreteParameter[] =
-    (request.parameters?.filter(p =>
-      getConcreteParameter(p, codeGenerator)
-    ) as ConcreteParameter[]) ?? [];
+): PayloadDefinitionOutput {
+  const isGetEndpoint = endpointId.method.toLowerCase() !== 'get';
+  const headerParameterOutputs = applyPayloadParameterCodeGenerationOutputs(
+    request,
+    path,
+    codeGenerator,
+    'header',
+    'header'
+  );
+  const cookieParameterOutputs = applyPayloadParameterCodeGenerationOutputs(
+    request,
+    path,
+    codeGenerator,
+    'cookie',
+    'cookie'
+  );
+  const queryParameterOutputs = applyPayloadParameterCodeGenerationOutputs(
+    request,
+    path,
+    codeGenerator,
+    'query',
+    isGetEndpoint ? 'query' : undefined
+  );
+  const pathParameterOutputs = applyPayloadParameterCodeGenerationOutputs(
+    request,
+    path,
+    codeGenerator,
+    'path'
+  );
   const contentType = findPreferredRequestBodyContentType(
     request.requestBody?.content
   );
   const requestBodyContent = contentType
     ? request.requestBody?.content?.[contentType] ?? null
-    : null;
-  const requestBodyContentSchema = requestBodyContent?.schema ?? null;
-  if (endpointId.method.toLowerCase() === 'get') {
-    // todo: implement
-  }
-  const payloadTypeDefinition: DefinitionOutput = {
+    : null; // todo: implement
+  const payloadDefinition: PayloadDefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'type',
     path,
@@ -102,12 +169,62 @@ function applyPayloadTypeDefinitionWithCreateRequestCreationCode(
       return codeGenerator.createTypeName(path, referencingPath);
     },
     createCode: () => {
-      return '';
+      const parts: string[] = [];
+      const allParameters: PayloadParameterCodeGenerationOutput[] = [
+        ...pathParameterOutputs,
+        ...queryParameterOutputs,
+        ...headerParameterOutputs,
+        ...cookieParameterOutputs,
+      ];
+      allParameters.forEach(o => {
+        parts.push(o.createCode(path));
+      });
+      return `{\n${parts.join('\n')}\n}`;
+    },
+    createRequestCreationCode: (endpointIdDefinition: DefinitionOutput) => {
+      const parts: string[] = [];
+      parts.push(`endpointId: ${endpointIdDefinition.createName(path)}`);
+      // todo: fix
+      const supportedSecuritySchemes = request.security
+        ? Object.values(request.security)
+        : [];
+      if (supportedSecuritySchemes.length) {
+        parts.push(
+          `supportedSecuritySchemes: ['${supportedSecuritySchemes.join(
+            "', '"
+          )}']`
+        );
+      }
+      const headerCodeLines = headerParameterOutputs.map(o =>
+        o.createRequestCreationCode()
+      );
+      if (headerCodeLines.length) {
+        parts.push(`headers: {${headerCodeLines.join(',\n')}}`);
+      }
+      const cookieCodeLines = cookieParameterOutputs.map(o =>
+        o.createRequestCreationCode()
+      );
+      if (cookieCodeLines.length) {
+        parts.push(`cookies: {${cookieCodeLines.join(',\n')}}`);
+      }
+      const pathParamCodeLines = pathParameterOutputs.map(o =>
+        o.createRequestCreationCode()
+      );
+      if (pathParamCodeLines.length) {
+        parts.push(`cookies: {${pathParamCodeLines.join(',\n')}}`);
+      }
+      const queryParamCodeLines = queryParameterOutputs.map(o =>
+        o.createRequestCreationCode()
+      );
+      if (queryParamCodeLines.length) {
+        parts.push(`queryParams: {${queryParamCodeLines.join(',\n')}}`);
+      }
+      return `{\n${parts.join(',\n')}\n}`;
     },
     requiredOutputPaths: [],
   };
-  codeGenerator.addOutput(payloadTypeDefinition);
-  return {payloadTypeDefinition, createRequestCreationCode: () => 'foo;'};
+  codeGenerator.addOutput(payloadDefinition);
+  return payloadDefinition;
 }
 
 function applyEndpointIdConstDefinition(
@@ -142,13 +259,12 @@ export function applyEndpointCallerFunction(
     endpointId,
     [...path, 'endpointId']
   );
-  const {payloadTypeDefinition, createRequestCreationCode} =
-    applyPayloadTypeDefinitionWithCreateRequestCreationCode(
-      codeGenerator,
-      endpointId,
-      request,
-      [...path, 'payload']
-    );
+  const payloadDefinition = applyPayloadTypeDefinition(
+    codeGenerator,
+    endpointId,
+    request,
+    [...path, 'payload']
+  );
   const requestResultTypeDefinition = applyRequestResultTypeDefinition(
     codeGenerator,
     request,
@@ -165,7 +281,9 @@ export function applyEndpointCallerFunction(
       const cfgTn = templateRequestExecutionConfigType.createName(path);
       const rhTn = templateRequestHandlerType.createName(path);
       const bodyParts: string[] = [
-        `const request = ${createRequestCreationCode()}`,
+        `const request = createRequest(${payloadDefinition.createRequestCreationCode(
+          endpointIdConstDefinition
+        )});`,
         'return requestHandler.execute(request, config);',
       ];
       const funcBody = bodyParts.join('\n');
@@ -174,10 +292,11 @@ export function applyEndpointCallerFunction(
     path,
     requiredOutputPaths: [
       endpointIdConstDefinition.path,
-      payloadTypeDefinition.path,
+      payloadDefinition.path,
       templateRequestType.path,
       requestResultTypeDefinition.path,
       templateRequestHandlerType.path,
+      templateCreateRequestFunction.path,
       templateRequestExecutionConfigType.path,
     ],
   });

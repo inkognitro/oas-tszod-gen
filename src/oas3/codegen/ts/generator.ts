@@ -1,10 +1,12 @@
 import {
   areOutputPathsEqual,
   arraySchemaItemOutputPathPart,
+  capitalizeFirstLetter,
   CodeGenerator,
   ComponentRefOutput,
   DefinitionOutput,
   doesOutputPathStartWithOtherOutputPath,
+  lowerCaseFirstLetter,
   ObjectDiscriminatorConfig,
   objectSchemaAdditionalPropsOutputPathPart,
   oneOfSchemaItemOutputPathPart,
@@ -47,14 +49,6 @@ async function appendToFile(path: string, content: string) {
   const dirPath = path.split('/').slice(0, -1).join('/');
   await mkdirp(dirPath);
   fs.appendFileSync(path, content);
-}
-
-function capitalizeFirstLetter(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function lowerCaseFirstLetter(str: string): string {
-  return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
 type ImportAsset = {
