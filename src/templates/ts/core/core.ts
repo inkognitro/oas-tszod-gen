@@ -4,11 +4,11 @@ function getUrlVariableNames(endpointPath: string): string[] {
   return urlVariableNames ?? [];
 }
 
-type UrlParameters = {
+type PathParams = {
   [paramName: string]: number | string;
 };
 
-function createRequestUrl(endpointPath: string, params: UrlParameters): string {
+function createRequestUrl(endpointPath: string, params: PathParams): string {
   const urlVariableNames = getUrlVariableNames(endpointPath);
   let url = endpointPath;
   urlVariableNames.forEach(urlVariableName => {
@@ -45,10 +45,6 @@ type Cookies = {
   [key: string]: string;
 };
 
-type PathParams = {
-  [key: string]: string;
-};
-
 export type Request<
   QueryParams extends object = any,
   Body extends object = any,
@@ -59,19 +55,19 @@ export type Request<
   appliedSecurityScheme: null | string;
   headers: RequestHeaders;
   cookies: Cookies;
-  pathParams: UrlParameters;
+  pathParams: PathParams;
   queryParams: QueryParams;
   body: Body;
 };
 
 type RequestCreationSettings = {
   endpointId: EndpointId;
-  supportedSecuritySchemes?: [];
+  supportedSecuritySchemes?: string[];
   appliedSecurityScheme?: string;
   headers?: RequestHeaders;
   cookies?: Cookies;
-  pathParams?: UrlParameters;
-  queryParams?: PathParams;
+  pathParams?: PathParams;
+  queryParams?: object;
   body?: object;
 };
 
