@@ -9,6 +9,7 @@ import {
 } from './core';
 import {
   ConcreteParameterLocation,
+  isObjectSchema,
   Request,
   RequestBodyContentByTypeMap,
 } from '@oas3/specification';
@@ -59,19 +60,19 @@ function applyRequestResultTypeDefinition(
   return typeDefinition;
 }
 
-type PayloadParameterCodeGenerationOutput = CodeGenerationOutput & {
+type PayloadRequestParameterCodeGenerationOutput = CodeGenerationOutput & {
   createRequestCreationCode: () => string;
   payloadParameterName: string;
 };
 
-function applyPayloadParameterCodeGenerationOutputs(
+function applyPayloadRequestParameterCodeGenerationOutputs(
   request: Request,
   path: OutputPath,
   codeGenerator: CodeGenerator,
   parameterLocation: ConcreteParameterLocation,
   payloadParameterNamePrefix?: string
-): PayloadParameterCodeGenerationOutput[] {
-  const outputs: PayloadParameterCodeGenerationOutput[] = [];
+): PayloadRequestParameterCodeGenerationOutput[] {
+  const outputs: PayloadRequestParameterCodeGenerationOutput[] = [];
   request.parameters?.forEach(paramOrRef => {
     const p = getConcreteParameter(paramOrRef, codeGenerator);
     if (p.in !== parameterLocation) {
@@ -80,7 +81,11 @@ function applyPayloadParameterCodeGenerationOutputs(
     const payloadParameterName = payloadParameterNamePrefix
       ? `${payloadParameterNamePrefix}${capitalizeFirstLetter(p.name)}`
       : p.name;
-    const parameterSchemaPath = [...path, payloadParameterName];
+    const parameterSchemaPath = [
+      ...path,
+      parameterLocation,
+      payloadParameterName,
+    ];
     const parameterSchemaOutput = applySchema(
       codeGenerator,
       p.schema,
@@ -103,6 +108,45 @@ function applyPayloadParameterCodeGenerationOutputs(
     });
   });
   return outputs;
+}
+
+type PayloadRequestBodyCodeGenerationOutput = CodeGenerationOutput & {
+  createRequestCreationCode: () => string;
+  contentType: null | string;
+  bodyParameterName: null | string;
+};
+
+function applyPayloadRequestBodyCodeGenerationOutput(
+  request: Request,
+  path: OutputPath,
+  codeGenerator: CodeGenerator
+): null | PayloadRequestBodyCodeGenerationOutput {
+  const contentType = findPreferredRequestBodyContentType(
+    request.requestBody?.content
+  );
+  const requestBodyContent = contentType
+    ? request.requestBody?.content?.[contentType] ?? null
+    : null;
+  const requestBodySchema = requestBodyContent?.schema;
+  if (!requestBodySchema) {
+    return null;
+  }
+  const bodyOutput = applySchema(codeGenerator, requestBodySchema, [
+    ...path,
+    'body',
+  ]);
+  const bodyParameterName: null | string = null;
+  if (!isObjectSchema(requestBodySchema)) {
+    throw new Error('only objectSchema is supported for requestBody'); // todo: might not be a good choice?
+  }
+  return {
+    ...bodyOutput,
+    contentType,
+    createRequestCreationCode: () => {
+      return ''; // todo: implement
+    },
+    bodyParameterName,
+  };
 }
 
 function findPreferredRequestBodyContentType(
@@ -128,39 +172,43 @@ function applyPayloadTypeDefinition(
   path: OutputPath
 ): PayloadDefinitionOutput {
   const isGetEndpoint = endpointId.method.toLowerCase() !== 'get';
-  const headerParameterOutputs = applyPayloadParameterCodeGenerationOutputs(
-    request,
-    path,
-    codeGenerator,
-    'header',
-    'header'
-  );
-  const cookieParameterOutputs = applyPayloadParameterCodeGenerationOutputs(
-    request,
-    path,
-    codeGenerator,
-    'cookie',
-    'cookie'
-  );
-  const queryParameterOutputs = applyPayloadParameterCodeGenerationOutputs(
-    request,
-    path,
-    codeGenerator,
-    'query',
-    isGetEndpoint ? 'query' : undefined
-  );
-  const pathParameterOutputs = applyPayloadParameterCodeGenerationOutputs(
-    request,
-    path,
-    codeGenerator,
-    'path'
-  );
+  const headerParameterOutputs =
+    applyPayloadRequestParameterCodeGenerationOutputs(
+      request,
+      path,
+      codeGenerator,
+      'header',
+      'header'
+    );
+  const cookieParameterOutputs =
+    applyPayloadRequestParameterCodeGenerationOutputs(
+      request,
+      path,
+      codeGenerator,
+      'cookie',
+      'cookie'
+    );
+  const queryParameterOutputs =
+    applyPayloadRequestParameterCodeGenerationOutputs(
+      request,
+      path,
+      codeGenerator,
+      'query',
+      isGetEndpoint ? 'query' : undefined
+    );
+  const pathParameterOutputs =
+    applyPayloadRequestParameterCodeGenerationOutputs(
+      request,
+      path,
+      codeGenerator,
+      'path'
+    );
   const contentType = findPreferredRequestBodyContentType(
     request.requestBody?.content
   );
   const requestBodyContent = contentType
     ? request.requestBody?.content?.[contentType] ?? null
-    : null; // todo: implement
+    : null;
   const payloadDefinition: PayloadDefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'type',
@@ -170,7 +218,7 @@ function applyPayloadTypeDefinition(
     },
     createCode: () => {
       const parts: string[] = [];
-      const allParameters: PayloadParameterCodeGenerationOutput[] = [
+      const allParameters: PayloadRequestParameterCodeGenerationOutput[] = [
         ...pathParameterOutputs,
         ...queryParameterOutputs,
         ...headerParameterOutputs,
@@ -206,10 +254,16 @@ function applyPayloadTypeDefinition(
           )}']`
         );
       }
-
       const headerCodeLines = headerParameterOutputs.map(o =>
         o.createRequestCreationCode()
       );
+      if (
+        !headerParameterOutputs.find(
+          p => p.payloadParameterName.toLowerCase() === 'content-type'
+        )
+      ) {
+        headerCodeLines.push(`Content-Type: '${contentType}'`);
+      }
       if (headerCodeLines.length) {
         parts.push(`headers: {${headerCodeLines.join(',\n')}}`);
       }

@@ -38,7 +38,7 @@ export function authenticate(
   const request = createRequest({
     endpointId: authenticateEndpointId,
     headers: {
-      contentType: 'application/json',
+      'Content-Type': 'application/json',
     },
     body: {
       emailOrUsername: payload.emailOrUsername,

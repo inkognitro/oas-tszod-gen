@@ -37,7 +37,7 @@ export type EndpointId = {
   path: string;
 };
 
-type RequestHeaders = {contentType?: string} & {
+type RequestHeaders = {['Content-Type']?: string} & {
   [key: string]: string;
 };
 
