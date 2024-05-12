@@ -118,6 +118,7 @@ type PayloadRequestBodyCodeGenerationOutput = CodeGenerationOutput & {
 
 function applyPayloadRequestBodyCodeGenerationOutput(
   request: Request,
+  endpointId: EndpointId,
   path: OutputPath,
   codeGenerator: CodeGenerator
 ): null | PayloadRequestBodyCodeGenerationOutput {
@@ -135,17 +136,18 @@ function applyPayloadRequestBodyCodeGenerationOutput(
     ...path,
     'body',
   ]);
-  const bodyParameterName: null | string = null;
-  if (!isObjectSchema(requestBodySchema)) {
-    throw new Error('only objectSchema is supported for requestBody'); // todo: might not be a good choice?
-  }
+  const bodyParameterName = !isObjectSchema(requestBodySchema) ? 'body' : null;
   return {
     ...bodyOutput,
     contentType,
     createRequestCreationCode: () => {
+      if (bodyParameterName) {
+        return `payload.${bodyParameterName}`;
+      }
       return ''; // todo: implement
     },
-    bodyParameterName,
+    bodyParameterName:
+      endpointId.method.toLowerCase() === 'get' ? 'body' : null,
   };
 }
 
@@ -262,7 +264,7 @@ function applyPayloadTypeDefinition(
           p => p.payloadParameterName.toLowerCase() === 'content-type'
         )
       ) {
-        headerCodeLines.push(`Content-Type: '${contentType}'`);
+        headerCodeLines.push(`'Content-Type': '${contentType}'`);
       }
       if (headerCodeLines.length) {
         parts.push(`headers: {${headerCodeLines.join(',\n')}}`);
