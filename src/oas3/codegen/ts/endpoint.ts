@@ -5,11 +5,9 @@ import {
   DefinitionOutput,
   getConcreteParameter,
   CodeGenerationOutput,
-  capitalizeFirstLetter,
 } from './core';
 import {
   ConcreteParameterLocation,
-  isObjectSchema,
   Request,
   RequestBodyContentByTypeMap,
 } from '@oas3/specification';
@@ -69,8 +67,7 @@ function applyPayloadRequestParameterCodeGenerationOutputs(
   request: Request,
   path: OutputPath,
   codeGenerator: CodeGenerator,
-  parameterLocation: ConcreteParameterLocation,
-  payloadParameterNamePrefix?: string
+  parameterLocation: ConcreteParameterLocation
 ): PayloadRequestParameterCodeGenerationOutput[] {
   const outputs: PayloadRequestParameterCodeGenerationOutput[] = [];
   request.parameters?.forEach(paramOrRef => {
@@ -78,14 +75,7 @@ function applyPayloadRequestParameterCodeGenerationOutputs(
     if (p.in !== parameterLocation) {
       return;
     }
-    const payloadParameterName = payloadParameterNamePrefix
-      ? `${payloadParameterNamePrefix}${capitalizeFirstLetter(p.name)}`
-      : p.name;
-    const parameterSchemaPath = [
-      ...path,
-      parameterLocation,
-      payloadParameterName,
-    ];
+    const parameterSchemaPath = [...path, parameterLocation, p.name];
     const parameterSchemaOutput = applySchema(
       codeGenerator,
       p.schema,
@@ -94,31 +84,28 @@ function applyPayloadRequestParameterCodeGenerationOutputs(
     outputs.push({
       createCode: () => {
         const questionMark = !p.required ? '?' : '';
-        return `${payloadParameterName}${questionMark}: ${parameterSchemaOutput.createCode(
+        return `${p.name}${questionMark}: ${parameterSchemaOutput.createCode(
           path
         )}`;
       },
       createRequestCreationCode: () => {
-        return `${p.name}: payload.${payloadParameterName}`;
+        return `${p.name}: payload.${p.name}`;
       },
       requiredOutputPaths: parameterSchemaOutput.requiredOutputPaths,
       path,
       codeComment: parameterSchemaOutput.codeComment,
-      payloadParameterName: payloadParameterName,
+      payloadParameterName: p.name,
     });
   });
   return outputs;
 }
 
 type PayloadRequestBodyCodeGenerationOutput = CodeGenerationOutput & {
-  createRequestCreationCode: () => string;
   contentType: null | string;
-  bodyParameterName: null | string;
 };
 
 function applyPayloadRequestBodyCodeGenerationOutput(
   request: Request,
-  endpointId: EndpointId,
   path: OutputPath,
   codeGenerator: CodeGenerator
 ): null | PayloadRequestBodyCodeGenerationOutput {
@@ -136,19 +123,7 @@ function applyPayloadRequestBodyCodeGenerationOutput(
     ...path,
     'body',
   ]);
-  const bodyParameterName = !isObjectSchema(requestBodySchema) ? 'body' : null;
-  return {
-    ...bodyOutput,
-    contentType,
-    createRequestCreationCode: () => {
-      if (bodyParameterName) {
-        return `payload.${bodyParameterName}`;
-      }
-      return ''; // todo: implement
-    },
-    bodyParameterName:
-      endpointId.method.toLowerCase() === 'get' ? 'body' : null,
-  };
+  return {...bodyOutput, contentType};
 }
 
 function findPreferredRequestBodyContentType(
@@ -169,25 +144,20 @@ type PayloadDefinitionOutput = DefinitionOutput & {
 
 function applyPayloadTypeDefinition(
   codeGenerator: CodeGenerator,
-  endpointId: EndpointId,
   request: Request,
   path: OutputPath
 ): PayloadDefinitionOutput {
-  const isGetEndpoint = endpointId.method.toLowerCase() !== 'get';
-  const headerParameterOutputs =
-    applyPayloadRequestParameterCodeGenerationOutputs(
-      request,
-      path,
-      codeGenerator,
-      'header',
-      'header'
-    );
+  const headerParamOutputs = applyPayloadRequestParameterCodeGenerationOutputs(
+    request,
+    path,
+    codeGenerator,
+    'header'
+  );
   const cookieParameterOutputs =
     applyPayloadRequestParameterCodeGenerationOutputs(
       request,
       path,
       codeGenerator,
-      'cookie',
       'cookie'
     );
   const queryParameterOutputs =
@@ -195,8 +165,7 @@ function applyPayloadTypeDefinition(
       request,
       path,
       codeGenerator,
-      'query',
-      isGetEndpoint ? 'query' : undefined
+      'query'
     );
   const pathParameterOutputs =
     applyPayloadRequestParameterCodeGenerationOutputs(
@@ -205,12 +174,12 @@ function applyPayloadTypeDefinition(
       codeGenerator,
       'path'
     );
-  const contentType = findPreferredRequestBodyContentType(
-    request.requestBody?.content
+  const bodyOutput = applyPayloadRequestBodyCodeGenerationOutput(
+    request,
+    [...path, 'body'],
+    codeGenerator
   );
-  const requestBodyContent = contentType
-    ? request.requestBody?.content?.[contentType] ?? null
-    : null;
+  const bodyContentType = bodyOutput?.contentType;
   const payloadDefinition: PayloadDefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'type',
@@ -220,21 +189,42 @@ function applyPayloadTypeDefinition(
     },
     createCode: () => {
       const parts: string[] = [];
-      const allParameters: PayloadRequestParameterCodeGenerationOutput[] = [
-        ...pathParameterOutputs,
-        ...queryParameterOutputs,
-        ...headerParameterOutputs,
-        ...cookieParameterOutputs,
-      ];
-      allParameters.forEach(o => {
-        parts.push(o.createCode(path));
-      });
-      return `{\n${parts.join('\n')}\n}`;
+
+      if (pathParameterOutputs.length) {
+        const codeParts: string[] = pathParameterOutputs.map(o =>
+          o.createCode(path)
+        );
+        parts.push(`pathParams: {${codeParts.join(';\n')}}`);
+      }
+
+      if (queryParameterOutputs.length) {
+        const codeParts: string[] = queryParameterOutputs.map(o =>
+          o.createCode(path)
+        );
+        parts.push(`queryParams: {${codeParts.join(';\n')}}`);
+      }
+
+      if (headerParamOutputs.length) {
+        const codeParts: string[] = headerParamOutputs.map(o =>
+          o.createCode(path)
+        );
+        parts.push(`headers: {${codeParts.join(';\n')}}`);
+      }
+
+      if (cookieParameterOutputs.length) {
+        const codeParts: string[] = cookieParameterOutputs.map(o =>
+          o.createCode(path)
+        );
+        parts.push(`cookies: {${codeParts.join(';\n')}}`);
+      }
+      if (bodyOutput) {
+        parts.push(`body: ${bodyOutput.createCode(path)}`);
+      }
+      return `{\n${parts.join(';\n')}\n}`;
     },
     createRequestCreationCode: (endpointIdDefinition: DefinitionOutput) => {
       const parts: string[] = [];
       parts.push(`endpointId: ${endpointIdDefinition.createName(path)}`);
-
       const supportedSecuritySchemes =
         request.security?.reduce<string[]>(
           (allSecuritySchemes, permissionsBySecurityName) => {
@@ -256,36 +246,32 @@ function applyPayloadTypeDefinition(
           )}']`
         );
       }
-      const headerCodeLines = headerParameterOutputs.map(o =>
-        o.createRequestCreationCode()
-      );
-      if (
-        !headerParameterOutputs.find(
+      const shouldDefineContentTypeHeader =
+        bodyContentType &&
+        !headerParamOutputs.find(
           p => p.payloadParameterName.toLowerCase() === 'content-type'
-        )
-      ) {
-        headerCodeLines.push(`'Content-Type': '${contentType}'`);
+        );
+      const contentTypeHeaderPart = shouldDefineContentTypeHeader
+        ? `'Content-Type': '${bodyContentType}'`
+        : null;
+      if (contentTypeHeaderPart && !headerParamOutputs.length) {
+        parts.push(`headers: { ${contentTypeHeaderPart} }`);
+      } else if (contentTypeHeaderPart && headerParamOutputs.length) {
+        parts.push(`headers: {...payload.headers, ${contentTypeHeaderPart}}`);
+      } else if (!contentTypeHeaderPart && headerParamOutputs.length) {
+        parts.push('headers: payload.headers');
       }
-      if (headerCodeLines.length) {
-        parts.push(`headers: {${headerCodeLines.join(',\n')}}`);
+      if (cookieParameterOutputs.length) {
+        parts.push('cookies: payload.cookies');
       }
-      const cookieCodeLines = cookieParameterOutputs.map(o =>
-        o.createRequestCreationCode()
-      );
-      if (cookieCodeLines.length) {
-        parts.push(`cookies: {${cookieCodeLines.join(',\n')}}`);
+      if (pathParameterOutputs.length) {
+        parts.push('pathParams: payload.pathParams');
       }
-      const pathParamCodeLines = pathParameterOutputs.map(o =>
-        o.createRequestCreationCode()
-      );
-      if (pathParamCodeLines.length) {
-        parts.push(`pathParams: {${pathParamCodeLines.join(',\n')}}`);
+      if (queryParameterOutputs.length) {
+        parts.push('queryParams: payload.queryParams');
       }
-      const queryParamCodeLines = queryParameterOutputs.map(o =>
-        o.createRequestCreationCode()
-      );
-      if (queryParamCodeLines.length) {
-        parts.push(`queryParams: {${queryParamCodeLines.join(',\n')}}`);
+      if (bodyOutput) {
+        parts.push('body: payload.body');
       }
       return `{\n${parts.join(',\n')}\n}`;
     },
@@ -327,12 +313,10 @@ export function applyEndpointCallerFunction(
     endpointId,
     [...path, 'endpointId']
   );
-  const payloadDefinition = applyPayloadTypeDefinition(
-    codeGenerator,
-    endpointId,
-    request,
-    [...path, 'payload']
-  );
+  const payloadDefinition = applyPayloadTypeDefinition(codeGenerator, request, [
+    ...path,
+    'payload',
+  ]);
   const requestResultTypeDefinition = applyRequestResultTypeDefinition(
     codeGenerator,
     request,
@@ -370,3 +354,5 @@ export function applyEndpointCallerFunction(
     ],
   });
 }
+
+// todo: in case of empty payload type, no "payload" parameter should be required
