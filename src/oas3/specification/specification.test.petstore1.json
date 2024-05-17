@@ -332,7 +332,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "../components/parameters/BulkObjectIdNoPassport.yaml"
+                "$ref": "#/components/schemas/BulkObjectId"
               }
             }
           }

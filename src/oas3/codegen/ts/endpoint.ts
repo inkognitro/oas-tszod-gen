@@ -138,15 +138,16 @@ function findPreferredRequestBodyContentType(
   return Object.keys(contentByContentType)[0] ?? null;
 }
 
-type PayloadDefinitionOutput = DefinitionOutput & {
+type PayloadUtils = {
+  payloadDefinition: null | DefinitionOutput;
   createRequestCreationCode: (endpointIdDefinition: DefinitionOutput) => string;
 };
 
-function applyPayloadTypeDefinition(
+function applyPayloadUtils(
   codeGenerator: CodeGenerator,
   request: Request,
   path: OutputPath
-): PayloadDefinitionOutput {
+): PayloadUtils {
   const headerParamOutputs = applyPayloadRequestParameterCodeGenerationOutputs(
     request,
     path,
@@ -179,49 +180,63 @@ function applyPayloadTypeDefinition(
     [...path, 'body'],
     codeGenerator
   );
-  const bodyContentType = bodyOutput?.contentType;
-  const payloadDefinition: PayloadDefinitionOutput = {
-    type: OutputType.DEFINITION,
-    definitionType: 'type',
-    path,
-    createName: referencingPath => {
-      return codeGenerator.createTypeName(path, referencingPath);
-    },
-    createCode: () => {
-      const parts: string[] = [];
+  const shouldAddPayload =
+    headerParamOutputs.length ||
+    cookieParameterOutputs.length ||
+    queryParameterOutputs.length ||
+    pathParameterOutputs.length ||
+    bodyOutput;
+  const payloadDefinition: null | DefinitionOutput = shouldAddPayload
+    ? {
+        type: OutputType.DEFINITION,
+        definitionType: 'type',
+        path,
+        createName: referencingPath => {
+          return codeGenerator.createTypeName(path, referencingPath);
+        },
+        createCode: () => {
+          const parts: string[] = [];
 
-      if (pathParameterOutputs.length) {
-        const codeParts: string[] = pathParameterOutputs.map(o =>
-          o.createCode(path)
-        );
-        parts.push(`pathParams: {${codeParts.join(';\n')}}`);
-      }
+          if (pathParameterOutputs.length) {
+            const codeParts: string[] = pathParameterOutputs.map(o =>
+              o.createCode(path)
+            );
+            parts.push(`pathParams: {${codeParts.join(';\n')}}`);
+          }
 
-      if (queryParameterOutputs.length) {
-        const codeParts: string[] = queryParameterOutputs.map(o =>
-          o.createCode(path)
-        );
-        parts.push(`queryParams: {${codeParts.join(';\n')}}`);
-      }
+          if (queryParameterOutputs.length) {
+            const codeParts: string[] = queryParameterOutputs.map(o =>
+              o.createCode(path)
+            );
+            parts.push(`queryParams: {${codeParts.join(';\n')}}`);
+          }
 
-      if (headerParamOutputs.length) {
-        const codeParts: string[] = headerParamOutputs.map(o =>
-          o.createCode(path)
-        );
-        parts.push(`headers: {${codeParts.join(';\n')}}`);
-      }
+          if (headerParamOutputs.length) {
+            const codeParts: string[] = headerParamOutputs.map(o =>
+              o.createCode(path)
+            );
+            parts.push(`headers: {${codeParts.join(';\n')}}`);
+          }
 
-      if (cookieParameterOutputs.length) {
-        const codeParts: string[] = cookieParameterOutputs.map(o =>
-          o.createCode(path)
-        );
-        parts.push(`cookies: {${codeParts.join(';\n')}}`);
+          if (cookieParameterOutputs.length) {
+            const codeParts: string[] = cookieParameterOutputs.map(o =>
+              o.createCode(path)
+            );
+            parts.push(`cookies: {${codeParts.join(';\n')}}`);
+          }
+          if (bodyOutput) {
+            parts.push(`body: ${bodyOutput.createCode(path)}`);
+          }
+          return `{\n${parts.join(';\n')}\n}`;
+        },
+        requiredOutputPaths: [],
       }
-      if (bodyOutput) {
-        parts.push(`body: ${bodyOutput.createCode(path)}`);
-      }
-      return `{\n${parts.join(';\n')}\n}`;
-    },
+    : null;
+  if (payloadDefinition) {
+    codeGenerator.addOutput(payloadDefinition);
+  }
+  return {
+    payloadDefinition,
     createRequestCreationCode: (endpointIdDefinition: DefinitionOutput) => {
       const parts: string[] = [];
       parts.push(`endpointId: ${endpointIdDefinition.createName(path)}`);
@@ -246,6 +261,7 @@ function applyPayloadTypeDefinition(
           )}']`
         );
       }
+      const bodyContentType = bodyOutput?.contentType;
       const shouldDefineContentTypeHeader =
         bodyContentType &&
         !headerParamOutputs.find(
@@ -275,10 +291,7 @@ function applyPayloadTypeDefinition(
       }
       return `{\n${parts.join(',\n')}\n}`;
     },
-    requiredOutputPaths: [],
   };
-  codeGenerator.addOutput(payloadDefinition);
-  return payloadDefinition;
 }
 
 function applyEndpointIdConstDefinition(
@@ -313,7 +326,7 @@ export function applyEndpointCallerFunction(
     endpointId,
     [...path, 'endpointId']
   );
-  const payloadDefinition = applyPayloadTypeDefinition(codeGenerator, request, [
+  const payloadUtils = applyPayloadUtils(codeGenerator, request, [
     ...path,
     'payload',
   ]);
@@ -322,6 +335,17 @@ export function applyEndpointCallerFunction(
     request,
     [...path, requestResultOutputPathPart]
   );
+  const requiredOutputPaths: OutputPath[] = [
+    endpointIdConstDefinition.path,
+    templateRequestType.path,
+    requestResultTypeDefinition.path,
+    templateRequestHandlerType.path,
+    templateCreateRequestFunction.path,
+    templateRequestExecutionConfigType.path,
+  ];
+  if (payloadUtils.payloadDefinition) {
+    requiredOutputPaths.push(payloadUtils.payloadDefinition.path);
+  }
   codeGenerator.addOutput({
     type: OutputType.DEFINITION,
     definitionType: 'function',
@@ -330,29 +354,20 @@ export function applyEndpointCallerFunction(
     },
     createCode: () => {
       const rhTn = templateRequestHandlerType.createName(path);
-      const pTn = payloadDefinition.createName(path);
+      const pTn = payloadUtils.payloadDefinition?.createName(path);
+      const payloadParamCode = pTn ? `, payload: ${pTn}` : '';
       const rrTn = requestResultTypeDefinition.createName(path);
       const cfgTn = templateRequestExecutionConfigType.createName(path);
       const bodyParts: string[] = [
-        `const request = createRequest(${payloadDefinition.createRequestCreationCode(
+        `const request = createRequest(${payloadUtils.createRequestCreationCode(
           endpointIdConstDefinition
         )});`,
         'return requestHandler.execute(request, config);',
       ];
       const funcBody = bodyParts.join('\n');
-      return `(requestHandler: ${rhTn}, payload: ${pTn}, config?: ${cfgTn}): Promise<${rrTn}> {${funcBody}}`;
+      return `(requestHandler: ${rhTn}${payloadParamCode}, config?: ${cfgTn}): Promise<${rrTn}> {${funcBody}}`;
     },
     path,
-    requiredOutputPaths: [
-      endpointIdConstDefinition.path,
-      payloadDefinition.path,
-      templateRequestType.path,
-      requestResultTypeDefinition.path,
-      templateRequestHandlerType.path,
-      templateCreateRequestFunction.path,
-      templateRequestExecutionConfigType.path,
-    ],
+    requiredOutputPaths,
   });
 }
-
-// todo: in case of empty payload type, no "payload" parameter should be required
