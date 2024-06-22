@@ -4,7 +4,7 @@ export type HttpSecurityScheme = {
 };
 
 export function isHttpSecurityScheme(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is HttpSecurityScheme {
   const value = anyValue as HttpSecurityScheme;
   if (typeof value !== 'object' || Array.isArray(value)) {
@@ -28,7 +28,7 @@ export type ApiKeySecurityScheme = {
 const apiKeySecuritySchemeLocations = ['header', 'query', 'cookie'];
 
 export function isApiKeySecurityScheme(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is ApiKeySecurityScheme {
   const value = anyValue as ApiKeySecurityScheme;
   if (typeof value !== 'object' || Array.isArray(value)) {
@@ -58,7 +58,7 @@ type OAuth2SecuritySchemeFlows = {
 };
 
 function isOAuth2SecuritySchemeFlows(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is OAuth2SecuritySchemeFlows {
   const value = anyValue as OAuth2SecuritySchemeFlows;
   if (typeof value !== 'object' || Array.isArray(value)) {
@@ -92,7 +92,7 @@ export type OAuth2SecurityScheme = {
 };
 
 export function isOAuth2SecurityScheme(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is OAuth2SecurityScheme {
   const value = anyValue as OAuth2SecurityScheme;
   if (typeof value !== 'object' || Array.isArray(value)) {
@@ -109,7 +109,9 @@ export function isOAuth2SecurityScheme(
 
 export type SecurityScheme = HttpSecurityScheme | OAuth2SecurityScheme;
 
-export function isSecurityScheme(anyValue: any): anyValue is SecurityScheme {
+export function isSecurityScheme(
+  anyValue: unknown
+): anyValue is SecurityScheme {
   return (
     isHttpSecurityScheme(anyValue) ||
     isApiKeySecurityScheme(anyValue) ||

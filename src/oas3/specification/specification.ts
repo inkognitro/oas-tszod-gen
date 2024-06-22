@@ -7,7 +7,9 @@ export type RequestByMethodMap = {
   [requestMethod: string]: Request;
 };
 
-function isRequestByMethodMap(anyValue: any): anyValue is RequestByMethodMap {
+function isRequestByMethodMap(
+  anyValue: unknown
+): anyValue is RequestByMethodMap {
   const value = anyValue as RequestByMethodMap;
   if (typeof value !== 'object' || Array.isArray(value)) {
     return false;
@@ -26,7 +28,7 @@ export type RequestDefinitionsByPathMap = {
 };
 
 function isRequestDefinitionsByPathMap(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is RequestDefinitionsByPathMap {
   const value = anyValue as RequestDefinitionsByPathMap;
   if (typeof value !== 'object' || Array.isArray(value)) {
@@ -45,7 +47,7 @@ type ResponseByNameMap = {
   [requestPath: string]: Response;
 };
 
-function isResponseByNameMap(anyValue: any): anyValue is ResponseByNameMap {
+function isResponseByNameMap(anyValue: unknown): anyValue is ResponseByNameMap {
   const value = anyValue as ResponseByNameMap;
   if (typeof value !== 'object' || Array.isArray(value)) {
     return false;
@@ -63,7 +65,7 @@ type SchemaByNameMap = {
   [requestPath: string]: Schema;
 };
 
-function isSchemaByNameMap(anyValue: any): anyValue is SchemaByNameMap {
+function isSchemaByNameMap(anyValue: unknown): anyValue is SchemaByNameMap {
   const value = anyValue as SchemaByNameMap;
   if (typeof value !== 'object' || Array.isArray(value)) {
     return false;
@@ -82,7 +84,7 @@ type SecuritySchemeByNameMap = {
 };
 
 function isSecuritySchemeByNameMap(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is SecuritySchemeByNameMap {
   const value = anyValue as SecuritySchemeByNameMap;
   if (typeof value !== 'object' || Array.isArray(value)) {
@@ -102,7 +104,7 @@ type RequestParameterByNameMap = {
 };
 
 function isRequestParameterByNameMap(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is RequestParameterByNameMap {
   const value = anyValue as RequestParameterByNameMap;
   if (typeof value !== 'object' || Array.isArray(value)) {
@@ -125,7 +127,7 @@ type ComponentDefinitions = {
 };
 
 function isComponentDefinitions(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is ComponentDefinitions {
   const value = anyValue as ComponentDefinitions;
   if (typeof value !== 'object' || Array.isArray(value)) {
@@ -155,7 +157,7 @@ export type Specification = {
   components: ComponentDefinitions;
 };
 
-export function isSpecification(anyValue: any): anyValue is Specification {
+export function isSpecification(anyValue: unknown): anyValue is Specification {
   const value = anyValue as Specification;
   if (typeof value !== 'object') {
     return false;

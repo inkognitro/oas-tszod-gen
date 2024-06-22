@@ -2,7 +2,7 @@ export type ComponentRef = {
   $ref: 'string';
 };
 
-export function isComponentRef(anyValue: any): anyValue is ComponentRef {
+export function isComponentRef(anyValue: unknown): anyValue is ComponentRef {
   const value = anyValue as ComponentRef;
   if (typeof value !== 'object') {
     return false;
@@ -15,7 +15,9 @@ export function isComponentRef(anyValue: any): anyValue is ComponentRef {
 
 export const schemaComponentRefPrefix = '#/components/schemas/';
 
-export function isSchemaComponentRef(anyValue: any): anyValue is ComponentRef {
+export function isSchemaComponentRef(
+  anyValue: unknown
+): anyValue is ComponentRef {
   const value = anyValue as ComponentRef;
   if (!isComponentRef(value)) {
     return false;
@@ -26,7 +28,7 @@ export function isSchemaComponentRef(anyValue: any): anyValue is ComponentRef {
 export const responseComponentRefPrefix = '#/components/responses/';
 
 export function isResponseComponentRef(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is ComponentRef {
   const value = anyValue as ComponentRef;
   if (!isComponentRef(value)) {
@@ -38,7 +40,7 @@ export function isResponseComponentRef(
 export const parameterComponentRefPrefix = '#/components/parameters/';
 
 export function isParameterComponentRef(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is ComponentRef {
   const value = anyValue as ComponentRef;
   if (!isComponentRef(value)) {
@@ -50,7 +52,7 @@ export function isParameterComponentRef(
 export const securitySchemeComponentRefPrefix = '#/components/securitySchemes/';
 
 export function isSecuritySchemesComponentRef(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is ComponentRef {
   const value = anyValue as ComponentRef;
   if (!isComponentRef(value)) {

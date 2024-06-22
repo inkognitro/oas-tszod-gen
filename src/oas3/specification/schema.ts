@@ -9,7 +9,9 @@ export type ConcreteSchema =
   | ObjectSchema
   | OneOfSchema;
 
-export function isConcreteSchema(anyValue: any): anyValue is ConcreteSchema {
+export function isConcreteSchema(
+  anyValue: unknown
+): anyValue is ConcreteSchema {
   return (
     isBooleanSchema(anyValue) ||
     isStringSchema(anyValue) ||
@@ -25,7 +27,7 @@ export function isConcreteSchema(anyValue: any): anyValue is ConcreteSchema {
 
 export type Schema = ConcreteSchema | ComponentRef;
 
-export function isSchema(anyValue: any): anyValue is Schema {
+export function isSchema(anyValue: unknown): anyValue is Schema {
   return isComponentRef(anyValue) || isConcreteSchema(anyValue);
 }
 
@@ -35,7 +37,7 @@ export type ArraySchema = {
   items: Schema;
 };
 
-export function isArraySchema(anyValue: any): anyValue is ArraySchema {
+export function isArraySchema(anyValue: unknown): anyValue is ArraySchema {
   const value = anyValue as ArraySchema;
   if (typeof value !== 'object') {
     return false;
@@ -57,7 +59,7 @@ export type BooleanSchema = {
   nullable?: boolean;
 };
 
-export function isBooleanSchema(anyValue: any): anyValue is BooleanSchema {
+export function isBooleanSchema(anyValue: unknown): anyValue is BooleanSchema {
   const value = anyValue as BooleanSchema;
   if (typeof value !== 'object') {
     return false;
@@ -78,7 +80,7 @@ export type ObjectSchema = {
   additionalProperties?: Schema;
 };
 
-export function isObjectSchema(anyValue: any): anyValue is ObjectSchema {
+export function isObjectSchema(anyValue: unknown): anyValue is ObjectSchema {
   const value = anyValue as ObjectSchema;
   if (typeof value !== 'object') {
     return false;
@@ -127,7 +129,7 @@ export type StringSchema = {
   maxLength?: number;
 };
 
-export function isStringSchema(anyValue: any): anyValue is StringSchema {
+export function isStringSchema(anyValue: unknown): anyValue is StringSchema {
   const value = anyValue as StringSchema;
   if (typeof value !== 'object') {
     return false;
@@ -163,7 +165,7 @@ export type AllOfMetaData = {
   description?: string;
 };
 
-function isAllOfMetaData(anyValue: any): anyValue is AllOfMetaData {
+function isAllOfMetaData(anyValue: unknown): anyValue is AllOfMetaData {
   const value = anyValue as AllOfMetaData;
   if (typeof value !== 'object') {
     return false;
@@ -181,7 +183,7 @@ export type AllOfSchema = {
   allOf: (Schema | AllOfMetaData)[]; // at least one element should be a complete schema
 };
 
-export function isAllOfSchema(anyValue: any): anyValue is AllOfSchema {
+export function isAllOfSchema(anyValue: unknown): anyValue is AllOfSchema {
   const value = anyValue as AllOfSchema;
   if (typeof value !== 'object') {
     return false;
@@ -213,7 +215,7 @@ export type OneOfSchema = {
   };
 };
 
-export function isOneOfSchema(anyValue: any): anyValue is OneOfSchema {
+export function isOneOfSchema(anyValue: unknown): anyValue is OneOfSchema {
   const value = anyValue as OneOfSchema;
   if (typeof value !== 'object') {
     return false;
@@ -246,7 +248,7 @@ export type AnyOfSchema = {
   };
 };
 
-export function isAnyOfSchema(anyValue: any): anyValue is AnyOfSchema {
+export function isAnyOfSchema(anyValue: unknown): anyValue is AnyOfSchema {
   const value = anyValue as AnyOfSchema;
   if (typeof value !== 'object') {
     return false;
@@ -282,7 +284,7 @@ export type NumberSchema = {
   exclusiveMaximum?: number;
 };
 
-export function isNumberSchema(anyValue: any): anyValue is NumberSchema {
+export function isNumberSchema(anyValue: unknown): anyValue is NumberSchema {
   const value = anyValue as NumberSchema;
   if (typeof value !== 'object') {
     return false;
@@ -326,7 +328,7 @@ export type IntegerSchema = {
   exclusiveMaximum?: number;
 };
 
-export function isIntegerSchema(anyValue: any): anyValue is IntegerSchema {
+export function isIntegerSchema(anyValue: unknown): anyValue is IntegerSchema {
   const value = anyValue as IntegerSchema;
   if (typeof value !== 'object') {
     return false;

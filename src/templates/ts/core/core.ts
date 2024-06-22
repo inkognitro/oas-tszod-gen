@@ -19,7 +19,6 @@ function createRequestUrl(endpointPath: string, params: PathParams): string {
       );
       return;
     }
-    // @ts-ignore
     const paramValue = params[urlVariableName];
     if (typeof paramValue !== 'string' && typeof paramValue !== 'number') {
       console.error(
@@ -37,7 +36,7 @@ export type EndpointId = {
   path: string;
 };
 
-type RequestHeaders = {['Content-Type']?: string} & {
+type Headers = {['Content-Type']?: string} & {
   [key: string]: string;
 };
 
@@ -53,7 +52,7 @@ export type Request<
   url: string;
   supportedSecuritySchemes: string[];
   appliedSecurityScheme: null | string;
-  headers: RequestHeaders;
+  headers: Headers;
   cookies: Cookies;
   pathParams: PathParams;
   queryParams: QueryParams;
@@ -64,7 +63,7 @@ type RequestCreationSettings = {
   endpointId: EndpointId;
   supportedSecuritySchemes?: string[];
   appliedSecurityScheme?: string;
-  headers?: RequestHeaders;
+  headers?: Headers;
   cookies?: Cookies;
   pathParams?: PathParams;
   queryParams?: object;
@@ -100,8 +99,15 @@ export enum StatusCode {
   InternalServerError = 500,
 }
 
-export type Response<S extends StatusCode = any, Body extends object = {}> = {
+export type Response<
+  S extends StatusCode = any,
+  Body = any,
+  H extends Headers = {},
+  C extends Cookies = {},
+> = {
   statusCode: S;
+  headers: H;
+  cookies: C;
   body: Body;
 };
 

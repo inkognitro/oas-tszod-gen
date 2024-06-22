@@ -5,7 +5,9 @@ export type ResponseBodyContent = {
   schema: Schema;
 };
 
-function isResponseBodyContent(anyValue: any): anyValue is ResponseBodyContent {
+function isResponseBodyContent(
+  anyValue: unknown
+): anyValue is ResponseBodyContent {
   const value = anyValue as ResponseBodyContent;
   if (typeof value !== 'object') {
     return false;
@@ -25,7 +27,7 @@ export type Response = {
   content?: ResponseBodyContentByContentTypeMap;
 };
 
-export function isResponse(anyValue: any): anyValue is Response {
+export function isResponse(anyValue: unknown): anyValue is Response {
   const value = anyValue as Response;
   if (typeof value !== 'object') {
     return false;
@@ -49,7 +51,7 @@ export type ResponseByStatusCodeMap = {
 };
 
 export function isResponseByStatusCodeMap(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is ResponseByStatusCodeMap {
   if (typeof anyValue !== 'object' || Array.isArray(anyValue)) {
     return false;

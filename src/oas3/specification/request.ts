@@ -7,7 +7,7 @@ type PermissionsBySecurityName = {
 };
 
 function isPermissionsBySecurityName(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is PermissionsBySecurityName {
   const value = anyValue as PermissionsBySecurityName;
   if (typeof value !== 'object' || Array.isArray(value)) {
@@ -29,7 +29,7 @@ function isPermissionsBySecurityName(
 export type PermissionsBySecurityNameArray = PermissionsBySecurityName[];
 
 export function isPermissionsBySecurityNameArray(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is PermissionsBySecurityNameArray {
   const value = anyValue as PermissionsBySecurityNameArray;
   if (value === null) {
@@ -49,7 +49,7 @@ export type RequestBodyContent = {
 };
 
 export function isRequestBodyContent(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is RequestBodyContent {
   const value = anyValue as RequestBodyContent;
   if (typeof value !== 'object') {
@@ -66,7 +66,7 @@ export type RequestBodyContentByTypeMap = {
 };
 
 export function isRequestBodyContentByTypeMap(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is RequestBodyContentByTypeMap {
   const value = anyValue as RequestBodyContentByTypeMap;
   if (typeof value !== 'object' || Array.isArray(value.content)) {
@@ -87,7 +87,7 @@ export type RequestBody = {
   };
 };
 
-export function isRequestBody(anyValue: any): anyValue is RequestBody {
+export function isRequestBody(anyValue: unknown): anyValue is RequestBody {
   const value = anyValue as RequestBody;
   if (typeof value !== 'object' || Array.isArray(value)) {
     return false;
@@ -114,7 +114,7 @@ export type ConcreteParameter = {
 };
 
 export function isConcreteParameter(
-  anyValue: any
+  anyValue: unknown
 ): anyValue is ConcreteParameter {
   const value = anyValue as ConcreteParameter;
   if (typeof value !== 'object') {
@@ -140,7 +140,7 @@ export function isConcreteParameter(
 
 export type Parameter = ConcreteParameter | ComponentRef;
 
-export function isParameter(anyValue: any): anyValue is Parameter {
+export function isParameter(anyValue: unknown): anyValue is Parameter {
   return isConcreteParameter(anyValue) || isParameterComponentRef(anyValue);
 }
 
@@ -154,7 +154,7 @@ export type Request = {
   security?: null | PermissionsBySecurityNameArray;
 };
 
-export function isRequest(anyValue: any): anyValue is Request {
+export function isRequest(anyValue: unknown): anyValue is Request {
   const value = anyValue as Request;
   if (typeof value !== 'object' || Array.isArray(value)) {
     return false;
