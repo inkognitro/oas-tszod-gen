@@ -1,13 +1,12 @@
 import {
-  CreateCodeFunc,
-  CodeGenerationOutput,
-  ObjectDiscriminatorConfig,
-  OutputType,
-  OutputPath,
   arraySchemaItemOutputPathPart,
-  oneOfSchemaItemOutputPathPart,
-  objectSchemaAdditionalPropsOutputPathPart,
+  CodeGenerationOutput,
   CodeGenerator,
+  CreateCodeFunc,
+  objectSchemaAdditionalPropsOutputPathPart,
+  oneOfSchemaItemOutputPathPart,
+  OutputPath,
+  OutputType,
 } from './core';
 import {
   AllOfSchema,
@@ -42,7 +41,6 @@ export function applySchema(
       codeGenerator,
       schema,
       path,
-      undefined,
       preventFromAddingTypesForComponentRefs
     );
   }
@@ -71,7 +69,6 @@ export function applySchema(
       codeGenerator,
       schema,
       path,
-      undefined,
       preventFromAddingTypesForComponentRefs
     );
   }
@@ -98,12 +95,19 @@ export function applyBooleanSchema(
   schema: BooleanSchema,
   path: OutputPath
 ): CodeGenerationOutput {
-  let code = 'boolean';
-  if (schema.nullable) {
-    code = `null | ${code}`;
-  }
   return {
+    createZodCode: () => {
+      let code = 'z.boolean()';
+      if (schema.nullable) {
+        code += '.nullable()';
+      }
+      return code;
+    },
     createCode: () => {
+      let code = 'boolean';
+      if (schema.nullable) {
+        code = `null | ${code}`;
+      }
       return code;
     },
     path,
@@ -116,20 +120,36 @@ function applyStringSchema(
   path: OutputPath
 ): CodeGenerationOutput {
   let codeComment: undefined | string = undefined;
-  let code = 'string';
-  if (schema.enum && schema.enum.length > 0) {
-    code = `'${schema.enum.join("' | '")}'`;
-  } else if (schema.format === 'binary') {
-    code = 'any';
-  }
-  if (schema.nullable) {
-    code = `null | ${code}`;
-  }
   if (schema.format) {
     codeComment = schema.format;
   }
   return {
+    createZodCode: () => {
+      if (schema.enum && schema.enum.length === 1) {
+        return `z.literal('${schema.enum[0].replaceAll("'", "\\'")}')`;
+      } else if (schema.enum && schema.enum.length > 1) {
+        return `z.union([${schema.enum
+          .map(v => `z.literal('${v.replaceAll("'", "\\'")}')`)
+          .join(',')}])`;
+      } else if (schema.format === 'binary') {
+        return 'z.any()';
+      }
+      let code = 'z.string()';
+      if (schema.nullable) {
+        code += '.nullable()';
+      }
+      return code;
+    },
     createCode: () => {
+      let code = 'string';
+      if (schema.enum && schema.enum.length > 0) {
+        code = `'${schema.enum.join("' | '")}'`;
+      } else if (schema.format === 'binary') {
+        code = 'any';
+      }
+      if (schema.nullable) {
+        code = `null | ${code}`;
+      }
       return code;
     },
     path,
@@ -169,15 +189,32 @@ export function applyNumberSchema(
   path: OutputPath
 ): CodeGenerationOutput {
   let codeComment: undefined | string = undefined;
-  let code = 'number';
-  if (schema.nullable) {
-    code = `null | ${code}`;
-  }
   if (schema.format) {
     codeComment = schema.format;
   }
   return {
     createCode: () => {
+      let code = 'number';
+      if (schema.nullable) {
+        code = `null | ${code}`;
+      }
+      return code;
+    },
+    createZodCode: () => {
+      let code = 'z.number().safe().finite()';
+      if (schema.minimum) {
+        code += `.gte(${schema.minimum})`;
+      } else if (schema.exclusiveMinimum) {
+        code += `.gt(${schema.exclusiveMinimum})`;
+      }
+      if (schema.maximum) {
+        code += `.lte(${schema.maximum})`;
+      } else if (schema.exclusiveMinimum) {
+        code += `.lt(${schema.exclusiveMinimum})`;
+      }
+      if (schema.nullable) {
+        code += '.nullable()';
+      }
       return code;
     },
     codeComment,
@@ -190,12 +227,29 @@ export function applyIntegerSchema(
   schema: IntegerSchema,
   path: OutputPath
 ): CodeGenerationOutput {
-  let code = 'number';
-  if (schema.nullable) {
-    code = `null | ${code}`;
-  }
   return {
     createCode: () => {
+      let code = 'number';
+      if (schema.nullable) {
+        code = `null | ${code}`;
+      }
+      return code;
+    },
+    createZodCode: () => {
+      let code = 'z.number().safe().finite().int()';
+      if (schema.minimum) {
+        code += `.gte(${schema.minimum})`;
+      } else if (schema.exclusiveMinimum) {
+        code += `.gt(${schema.exclusiveMinimum})`;
+      }
+      if (schema.maximum) {
+        code += `.lte(${schema.maximum})`;
+      } else if (schema.exclusiveMinimum) {
+        code += `.lt(${schema.exclusiveMinimum})`;
+      }
+      if (schema.nullable) {
+        code += '.nullable()';
+      }
       return code;
     },
     codeComment: 'int',
@@ -208,7 +262,6 @@ export function applyComponentRefSchema(
   codeGenerator: CodeGenerator,
   schema: ComponentRef,
   path: OutputPath,
-  objectDiscriminatorConfig?: ObjectDiscriminatorConfig,
   preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
   codeGenerator.addOutput(
@@ -221,7 +274,6 @@ export function applyComponentRefSchema(
         );
       },
       componentRef: schema.$ref,
-      objectDiscriminatorConfig,
       path,
       requiredOutputPaths: [
         codeGenerator.createOutputPathByComponentRef(schema.$ref),
@@ -243,7 +295,6 @@ export function applyObjectSchema(
   codeGenerator: CodeGenerator,
   schema: ObjectSchema,
   path: OutputPath,
-  discriminatorConfig?: ObjectDiscriminatorConfig,
   preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const directOutputByPropNameMap: {
@@ -252,17 +303,11 @@ export function applyObjectSchema(
       codeComment?: string;
     };
   } = {};
-  const requiredOutputPaths: OutputPath[] = discriminatorConfig
-    ? [...discriminatorConfig.requiredOutputPaths]
-    : [];
+  const requiredOutputPaths: OutputPath[] = [];
   for (const propName in schema.properties) {
     const propSchema = schema.properties[propName];
     const propSchemaPath = [...path, propName];
     requiredOutputPaths.push(propSchemaPath);
-    if (discriminatorConfig && propName === discriminatorConfig.propName) {
-      directOutputByPropNameMap[propName] = discriminatorConfig;
-      continue;
-    }
     directOutputByPropNameMap[propName] = applySchema(
       codeGenerator,
       propSchema,
@@ -280,16 +325,11 @@ export function applyObjectSchema(
     );
   }
   return {
-    createCode: referencingContext => {
+    createCode: () => {
       const codeRows: string[] = [];
       for (const propName in directOutputByPropNameMap) {
         const directOutput = directOutputByPropNameMap[propName];
-        const isDiscriminatorProp =
-          discriminatorConfig && propName === discriminatorConfig.propName;
-        const questionMark =
-          !schema.required?.includes(propName) && !isDiscriminatorProp
-            ? '?'
-            : '';
+        const questionMark = !schema.required?.includes(propName) ? '?' : '';
         const propComment = directOutput.codeComment
           ? ` // ${directOutput.codeComment}`
           : '';

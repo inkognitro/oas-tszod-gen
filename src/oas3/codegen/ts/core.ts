@@ -2,7 +2,6 @@ import {
   ConcreteParameter,
   isParameterComponentRef,
   Parameter,
-  Response,
   Schema,
 } from '@oas3/specification';
 
@@ -75,6 +74,7 @@ export type CodeGenerationOutput = {
   path: OutputPath;
   requiredOutputPaths: OutputPath[];
   createCode: CreateCodeFunc;
+  createZodCode: CreateCodeFunc;
   codeComment?: string;
 };
 
@@ -94,18 +94,10 @@ export type DefinitionOutput = GenericOutput<
   }
 >;
 
-export type ObjectDiscriminatorConfig = {
-  propName: string;
-  requiredOutputPaths: OutputPath[];
-  createCode: CreateCodeFunc;
-  codeComment?: string;
-};
-
 export type ComponentRefOutput = GenericOutput<
   OutputType.COMPONENT_REF,
   {
     componentRef: string;
-    objectDiscriminatorConfig?: ObjectDiscriminatorConfig;
   }
 >;
 

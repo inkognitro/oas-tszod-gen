@@ -1,3 +1,5 @@
+import {Schema as ZodSchema} from 'zod'; // todo: somehow optionally import Zod according to GenerateConfig
+
 function getUrlVariableNames(endpointPath: string): string[] {
   const urlVariableNameRegex = /[^{}]+(?=})/g;
   const urlVariableNames = endpointPath.match(urlVariableNameRegex);
@@ -44,19 +46,37 @@ type Cookies = {
   [key: string]: string;
 };
 
+type ZodResponseSchema = {
+  headers?: ZodSchema;
+  cookies?: ZodSchema;
+  body?: ZodSchema;
+};
+
+type ZodRequestSchema = {
+  pathParams?: ZodSchema;
+  queryParams?: ZodSchema;
+  headers?: ZodSchema;
+  cookies?: ZodSchema;
+  body?: ZodSchema;
+  responseByStatusCode: {
+    [statusCode: string]: ZodResponseSchema;
+  };
+};
+
 export type Request<
-  QueryParams extends object = any,
-  Body extends object = any,
+  QueryParams extends object | undefined = any,
+  Body extends object | undefined = any,
 > = {
   endpointId: EndpointId;
   url: string;
   supportedSecuritySchemes: string[];
   appliedSecurityScheme: null | string;
-  headers: Headers;
-  cookies: Cookies;
-  pathParams: PathParams;
-  queryParams: QueryParams;
-  body: Body;
+  headers?: Headers;
+  cookies?: Cookies;
+  pathParams?: PathParams;
+  queryParams?: QueryParams;
+  body?: Body;
+  zodSchema?: ZodRequestSchema;
 };
 
 type RequestCreationSettings = {
@@ -68,6 +88,7 @@ type RequestCreationSettings = {
   pathParams?: PathParams;
   queryParams?: object;
   body?: object;
+  zodSchema?: ZodRequestSchema;
 };
 
 export function createRequest(settings: RequestCreationSettings): Request {
@@ -76,11 +97,12 @@ export function createRequest(settings: RequestCreationSettings): Request {
     supportedSecuritySchemes: settings.supportedSecuritySchemes ?? [],
     appliedSecurityScheme: settings.appliedSecurityScheme ?? null,
     url: createRequestUrl(settings.endpointId.path, settings.pathParams ?? {}),
-    headers: settings.headers ?? {},
-    cookies: settings.cookies ?? {},
-    pathParams: settings.pathParams ?? {},
-    queryParams: settings.queryParams ?? {},
-    body: settings.body ?? {},
+    headers: settings.headers,
+    cookies: settings.cookies,
+    pathParams: settings.pathParams,
+    queryParams: settings.queryParams,
+    body: settings.body,
+    zodSchema: settings.zodSchema,
   };
 }
 

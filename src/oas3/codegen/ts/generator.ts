@@ -3,11 +3,9 @@ import {
   arraySchemaItemOutputPathPart,
   capitalizeFirstLetter,
   CodeGenerator,
-  ComponentRefOutput,
   DefinitionOutput,
   doesOutputPathStartWithOtherOutputPath,
   lowerCaseFirstLetter,
-  ObjectDiscriminatorConfig,
   objectSchemaAdditionalPropsOutputPathPart,
   oneOfSchemaItemOutputPathPart,
   Output,
@@ -21,7 +19,6 @@ import {
   Parameter,
   parameterComponentRefPrefix,
   RequestByMethodMap,
-  Response,
   responseComponentRefPrefix,
   Schema,
   schemaComponentRefPrefix,
@@ -98,6 +95,7 @@ export type GenerateConfig = {
   outputFolderPath: string;
   importRootAlias?: string;
   predefinedFolderOutputPaths?: OutputPath[];
+  shouldGenerateWithZod?: boolean;
 };
 
 export class DefaultCodeGenerator implements CodeGenerator {
@@ -121,7 +119,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.initializeOperationFolderOutputPaths(config);
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
-      this.generateRequestByMethodMapOutputs(path, requestByMethodMap);
+      this.generateRequestByMethodMapOutputs(path, requestByMethodMap, config);
     }
     const fileOutputByFilePath = this.createFileOutputByFilePath(config);
     this.createFiles(fileOutputByFilePath, config);
@@ -232,10 +230,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return contentParts.join('\n\n');
   }
 
-  private addOutputByComponentRef(
-    componentRef: string,
-    objectDiscriminatorConfig?: ObjectDiscriminatorConfig
-  ) {
+  private addOutputByComponentRef(componentRef: string) {
     const preventFromAddingTypesForComponentRefs = [componentRef];
     const components = this.oas3Specs.components;
     const outputPath = this.createOutputPathByComponentRef(componentRef);
@@ -264,7 +259,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
             this,
             schema,
             outputPath,
-            objectDiscriminatorConfig,
             preventFromAddingTypesForComponentRefs
           )
         : applySchema(
@@ -305,7 +299,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
             this,
             parameter.schema,
             outputPath,
-            objectDiscriminatorConfig,
             preventFromAddingTypesForComponentRefs
           )
         : applySchema(
@@ -349,7 +342,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
             this,
             jsonResponse.schema,
             outputPath,
-            objectDiscriminatorConfig,
             preventFromAddingTypesForComponentRefs
           )
         : applySchema(
@@ -407,12 +399,13 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   private generateRequestByMethodMapOutputs(
     path: string,
-    requestByMethodMap: RequestByMethodMap
+    requestByMethodMap: RequestByMethodMap,
+    config: GenerateConfig
   ) {
     for (const method in requestByMethodMap) {
       const requestSchema = requestByMethodMap[method];
       const endpointId = {path, method};
-      applyEndpointCallerFunction(this, endpointId, requestSchema);
+      applyEndpointCallerFunction(this, endpointId, requestSchema, config);
     }
   }
 
@@ -653,44 +646,11 @@ export class DefaultCodeGenerator implements CodeGenerator {
   ) {
     switch (output.type) {
       case OutputType.COMPONENT_REF:
-        // eslint-disable-next-line no-case-declarations
-        const conflictingOutput: ComponentRefOutput | undefined =
-          this.outputs.find(o => {
-            if (
-              o.type !== OutputType.COMPONENT_REF ||
-              o.componentRef !== output.componentRef
-            ) {
-              return false;
-            }
-            if (
-              !o.objectDiscriminatorConfig ||
-              !output.objectDiscriminatorConfig
-            ) {
-              return false;
-            }
-            return (
-              JSON.stringify(o.objectDiscriminatorConfig) !==
-              JSON.stringify(output.objectDiscriminatorConfig)
-            );
-          }) as undefined | ComponentRefOutput;
-        if (conflictingOutput) {
-          throw new Error(
-            `conflicting "objectDiscriminatorConfig" property for type ComponentRefOutput with componentName "${output.componentRef}":` +
-              `${JSON.stringify(
-                output.objectDiscriminatorConfig
-              )} Vs. ${JSON.stringify(
-                conflictingOutput.objectDiscriminatorConfig
-              )}`
-          );
-        }
         this.outputs.push(output);
         if (
           !preventFromAddingTypesForComponentRefs.includes(output.componentRef)
         ) {
-          this.addOutputByComponentRef(
-            output.componentRef,
-            output.objectDiscriminatorConfig
-          );
+          this.addOutputByComponentRef(output.componentRef);
         }
         break;
       case OutputType.DEFINITION:

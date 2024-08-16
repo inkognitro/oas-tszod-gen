@@ -20,6 +20,7 @@ import {
   templateRequestType,
 } from './template';
 import {applySchema} from '@oas3/codegen/ts/schema';
+import {GenerateConfig} from '@oas3/codegen/ts/generator';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -87,6 +88,9 @@ function applyPayloadRequestParameterCodeGenerationOutputs(
         return `${p.name}${questionMark}: ${parameterSchemaOutput.createCode(
           path
         )}`;
+      },
+      createZodCode: () => {
+        throw new Error('Zod code generation not supported here');
       },
       createRequestCreationCode: () => {
         return `${p.name}: payload.${p.name}`;
@@ -318,7 +322,8 @@ function applyEndpointIdConstDefinition(
 export function applyEndpointCallerFunction(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
-  request: Request
+  request: Request,
+  config: GenerateConfig
 ) {
   const path = codeGenerator.createOperationOutputPath(request.operationId);
   const endpointIdConstDefinition = applyEndpointIdConstDefinition(
