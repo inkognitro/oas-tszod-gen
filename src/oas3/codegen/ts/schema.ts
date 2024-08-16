@@ -188,10 +188,7 @@ export function applyNumberSchema(
   schema: NumberSchema,
   path: OutputPath
 ): CodeGenerationOutput {
-  let codeComment: undefined | string = undefined;
-  if (schema.format) {
-    codeComment = schema.format;
-  }
+  const codeComment: undefined | string = undefined;
   return {
     createCode: () => {
       let code = 'number';
@@ -236,7 +233,7 @@ export function applyIntegerSchema(
       return code;
     },
     createZodCode: () => {
-      let code = 'z.number().safe().finite().int()';
+      let code = 'z.number().int().safe().finite()';
       if (schema.minimum) {
         code += `.gte(${schema.minimum})`;
       } else if (schema.exclusiveMinimum) {

@@ -276,7 +276,6 @@ export function isAnyOfSchema(anyValue: unknown): anyValue is AnyOfSchema {
 
 export type NumberSchema = {
   type: 'number';
-  format?: 'string';
   nullable?: boolean;
   minimum?: number;
   exclusiveMinimum?: number;
@@ -290,9 +289,6 @@ export function isNumberSchema(anyValue: unknown): anyValue is NumberSchema {
     return false;
   }
   if (value.type !== 'number') {
-    return false;
-  }
-  if (value.format !== undefined && typeof value.format !== 'string') {
     return false;
   }
   if (value.nullable !== undefined && typeof value.nullable !== 'boolean') {
