@@ -13,11 +13,15 @@ import {
   containsOutputPath,
 } from './core';
 import {applyComponentRefSchema, applySchema} from './schema';
-import {
-  findTemplateResponseStatusCodeEnumEntry,
-  templateResponseType,
-  templateStatusCodeEnum,
-} from './template';
+import {templateResponseType} from './template';
+
+function findNumericStatusCode(statusCode: string): number | null {
+  const numericStatusCode = parseInt(statusCode);
+  if (isNaN(numericStatusCode)) {
+    return null;
+  }
+  return numericStatusCode;
+}
 
 function applyStatusCodeResponseAndGetTypeDefinitionOutput(
   codeGenerator: CodeGenerator,
@@ -26,14 +30,8 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
   schema: ResponseBodyContent
 ): DefinitionOutput {
   const requiredOutputPaths: OutputPath[] = [templateResponseType.path];
-  const statusCodeEnumEntry =
-    findTemplateResponseStatusCodeEnumEntry(statusCode);
-  const statusCodeType = statusCodeEnumEntry
-    ? `${templateStatusCodeEnum.createName(path)}.${statusCodeEnumEntry}`
-    : 'any';
-  if (statusCodeType !== 'any') {
-    requiredOutputPaths.push(templateStatusCodeEnum.path);
-  }
+  const statusCodeDiscriminatorValue =
+    findNumericStatusCode(statusCode) ?? 'any';
   const responseBodySummary = applySchema(codeGenerator, schema.schema, [
     ...path,
     'body',
@@ -46,9 +44,9 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
       return codeGenerator.createTypeName(path, referencingPath);
     },
     createCode: referencingPath => {
-      const responseType = templateResponseType.createName(path);
+      const responseTypeName = templateResponseType.createName(path);
       const bodyCode = responseBodySummary.createCode(referencingPath);
-      return `${responseType}<${statusCodeType}, ${bodyCode}>`;
+      return `${responseTypeName}<${statusCodeDiscriminatorValue}, ${bodyCode}>`;
     },
     requiredOutputPaths,
   };
@@ -90,22 +88,13 @@ export function applyResponseByStatusCodeMap(
       if (!containsOutputPath(requiredOutputPaths, templateResponseType.path)) {
         requiredOutputPaths.push(templateResponseType.path);
       }
-      const statusCodeEnumEntry =
-        findTemplateResponseStatusCodeEnumEntry(statusCode);
-      const statusCodeType = statusCodeEnumEntry
-        ? `${templateStatusCodeEnum.createName(path)}.${statusCodeEnumEntry}`
-        : 'any';
-      if (
-        statusCodeType !== 'any' &&
-        !containsOutputPath(requiredOutputPaths, templateStatusCodeEnum.path)
-      ) {
-        requiredOutputPaths.push(templateStatusCodeEnum.path);
-      }
+      const statusCodeDiscriminatorValue =
+        findNumericStatusCode(statusCode) ?? 'any';
       const responseOutput: CodeGenerationOutput = {
         createCode: referencingPath => {
           const responseType = templateResponseType.createName(path);
           const bodyCode = responseBodyContent.createCode(referencingPath);
-          return `${responseType}<${statusCodeType}, ${bodyCode}>`;
+          return `${responseType}<${statusCodeDiscriminatorValue}, ${bodyCode}>`;
         },
         path: responseOutputPath,
         requiredOutputPaths: [],

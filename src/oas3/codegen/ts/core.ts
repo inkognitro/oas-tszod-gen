@@ -88,7 +88,7 @@ type GenericOutput<T extends OutputType, P extends object = {}> = P & {
 export type DefinitionOutput = GenericOutput<
   OutputType.DEFINITION,
   {
-    definitionType: 'enum' | 'const' | 'function' | 'type';
+    definitionType: 'const' | 'function' | 'type';
     createCode: CreateCodeFunc;
     codeComment?: string;
   }

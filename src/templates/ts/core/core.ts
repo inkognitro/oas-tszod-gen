@@ -84,41 +84,28 @@ export function createRequest(settings: RequestCreationSettings): Request {
   };
 }
 
-export enum StatusCode {
-  Ok = 200,
-  Created = 201,
-  Accepted = 202,
-  NonAuthoritativeInformation = 203,
-  NoContent = 204,
-  BadRequest = 400,
-  Unauthorized = 401,
-  Forbidden = 403,
-  NotFound = 404,
-  MethodNotAllowed = 405,
-  ContentTooLarge = 413,
-  InternalServerError = 500,
-}
+type StatusCode = number | 'any'; // this is not "any" of TypeScript, it's a string placeholder for unspecified status codes
 
-export type Response<
+export interface Response<
   S extends StatusCode = any,
   Body = any,
   H extends Headers = {},
   C extends Cookies = {},
-> = {
+> {
   statusCode: S;
   headers: H;
   cookies: C;
   body: Body;
-};
+}
 
-export type RequestResult<
+export interface RequestResult<
   Req extends Request = any,
   Res extends Response = any,
-> = {
+> {
   request: Req;
   response: null | Res;
   hasRequestBeenCancelled: boolean;
-};
+}
 
 export interface RequestExecutionConfig {
   onUploadProgress?: () => void;

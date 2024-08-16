@@ -35,56 +35,6 @@ export const templateResponseType: DefinitionOutput = {
   requiredOutputPaths: [],
 };
 
-export const templateStatusCodeEnum: DefinitionOutput = {
-  type: OutputType.DEFINITION,
-  definitionType: 'enum',
-  path: ['core', 'core', 'statusCode'],
-  createName: () => {
-    return 'StatusCode';
-  },
-  createCode: () => {
-    throw new Error(createCodeErrorMessage);
-  },
-  requiredOutputPaths: [],
-};
-
-export function findTemplateResponseStatusCodeEnumEntry(
-  statusCode: string
-): string | null {
-  const numericStatusCode = parseInt(statusCode);
-  if (isNaN(numericStatusCode)) {
-    return null;
-  }
-  switch (numericStatusCode) {
-    case 200:
-      return 'Ok';
-    case 201:
-      return 'Created';
-    case 202:
-      return 'Accepted';
-    case 203:
-      return 'NonAuthoritativeInformation';
-    case 204:
-      return 'NoContent';
-    case 400:
-      return 'BadRequest';
-    case 401:
-      return 'Unauthorized';
-    case 403:
-      return 'Forbidden';
-    case 404:
-      return 'NotFound';
-    case 405:
-      return 'MethodNotAllowed';
-    case 413:
-      return 'ContentTooLarge';
-    case 500:
-      return 'InternalServerError';
-    default:
-      throw new Error(`status code ${statusCode} not supported`);
-  }
-}
-
 export const templateRequestResultType: DefinitionOutput = {
   type: OutputType.DEFINITION,
   definitionType: 'type',
@@ -146,7 +96,6 @@ export const templateFilePaths = [
 const templateOutputs: Output[] = [
   templateRequestType,
   templateResponseType,
-  templateStatusCodeEnum,
   templateRequestResultType,
   templateRequestHandlerType,
   templateRequestExecutionConfigType,

@@ -203,11 +203,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
             `export const ${o.createName(o.path)} = ${o.createCode(o.path)}`
           );
           break;
-        case 'enum':
-          definitionContents.push(
-            `export enum ${o.createName(o.path)} ${o.createCode(o.path)}`
-          );
-          break;
         case 'type':
           definitionContents.push(
             `export type ${o.createName(o.path)} = ${o.createCode(o.path)}`

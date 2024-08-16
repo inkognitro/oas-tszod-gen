@@ -5,7 +5,6 @@ import {
   RequestHandler,
   RequestResult,
   Response,
-  StatusCode,
 } from '../core';
 
 export const uploadFileEndpointId = {
@@ -13,8 +12,8 @@ export const uploadFileEndpointId = {
   path: '/v1/auth/upload-file',
 };
 
-type OkUploadFileResponse = Response<StatusCode.Ok, {accessToken: string}>;
-type BadRequestUploadFileResponse = Response<StatusCode.BadRequest>;
+type OkUploadFileResponse = Response<200, {accessToken: string}>;
+type BadRequestUploadFileResponse = Response<400>;
 
 export type UploadFileResponse =
   | OkUploadFileResponse

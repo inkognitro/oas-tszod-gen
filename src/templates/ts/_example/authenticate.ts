@@ -5,7 +5,6 @@ import {
   RequestHandler,
   RequestResult,
   Response,
-  StatusCode,
 } from '../core';
 
 export const authenticateEndpointId = {
@@ -13,8 +12,8 @@ export const authenticateEndpointId = {
   path: '/v1/auth/authenticate',
 };
 
-type OkAuthenticateResponse = Response<StatusCode.Ok, {accessToken: string}>;
-type BadRequestAuthenticateResponse = Response<StatusCode.BadRequest>;
+type OkAuthenticateResponse = Response<200, {accessToken: string}>;
+type BadRequestAuthenticateResponse = Response<400>;
 
 export type AuthenticateResponse =
   | OkAuthenticateResponse
