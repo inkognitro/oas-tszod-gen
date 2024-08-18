@@ -19,7 +19,7 @@ and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
 I coded my own solution because I wanted to
 - have fine-grained and separated functions and type definitions for each API endpoint
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
-- have automatically generated [Zod](https://zod.dev) schemas for every endpoint to use for future form validations
+- have automatically generated [Zod](https://zod.dev) request schemas for form validations
 
 ## Semantic versioning
 **Worried about different code generation outputs after updating this library?**
