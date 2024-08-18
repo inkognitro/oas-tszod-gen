@@ -17,7 +17,7 @@ A tool to convert [OpenApi](https://swagger.io/specification/) specifications in
 Good question. The aim of this library is not only to guarantee type-safety but also to generate
 endpoint caller functions with standalone types which then can be used in your code base.
 
-## SEMVER
+## Semantic versioning
 **Worried about different code generation outputs after updating this library?**
 
 As long as the API contract on the backend side was not violated through breaking changes,
