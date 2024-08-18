@@ -5,7 +5,7 @@
 ![Total](./badges/jest/coverage-total.svg)
 
 # oas-to-code
-A tool to convert [OpenApi](https://swagger.io/specification/) specifications into callable endpoint functions in [TS](https://www.typescriptlang.org/).
+A tool to convert [OpenApiV3](https://swagger.io/specification/) specifications into callable endpoint functions in [TS](https://www.typescriptlang.org/) and [Zod](https://zod.dev).
 
 ## Why should I use `oas-to-code`?
 - to use your [OAS3](https://swagger.io/specification/) specification as a single-source-of-truth for your endpoint definitions
