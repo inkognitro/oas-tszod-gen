@@ -14,6 +14,7 @@ import {
 } from './core';
 import {applyComponentRefSchema, applySchema} from './schema';
 import {templateResponseType} from './template';
+import {GenerateConfig} from './generator';
 
 function findNumericStatusCode(statusCode: string): number | null {
   const numericStatusCode = parseInt(statusCode);
@@ -67,7 +68,8 @@ function findPreferredResponseBodyContent(
 export function applyResponseByStatusCodeMap(
   codeGenerator: CodeGenerator,
   schema: ResponseByStatusCodeMap,
-  path: OutputPath
+  path: OutputPath,
+  config: GenerateConfig
 ): DefinitionOutput {
   const statusCodeResponseOutputs: CodeGenerationOutput[] = [];
   const requiredOutputPaths: OutputPath[] = [];

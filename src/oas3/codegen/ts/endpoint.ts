@@ -19,8 +19,8 @@ import {
   templateRequestResultType,
   templateRequestType,
 } from './template';
-import {applySchema} from '@oas3/codegen/ts/schema';
-import {GenerateConfig} from '@oas3/codegen/ts/generator';
+import {applySchema} from './schema';
+import {GenerateConfig} from './generator';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -33,12 +33,14 @@ type EndpointId = {
 function applyRequestResultTypeDefinition(
   codeGenerator: CodeGenerator,
   schema: Request,
-  path: OutputPath
+  path: OutputPath,
+  config: GenerateConfig
 ): DefinitionOutput {
   const responseType = applyResponseByStatusCodeMap(
     codeGenerator,
     schema.responses,
-    [...path, responseOutputPathPart]
+    [...path, responseOutputPathPart],
+    config
   );
   const typeDefinition: DefinitionOutput = {
     type: OutputType.DEFINITION,
@@ -68,7 +70,8 @@ function applyPayloadRequestParameterCodeGenerationOutputs(
   request: Request,
   path: OutputPath,
   codeGenerator: CodeGenerator,
-  parameterLocation: ConcreteParameterLocation
+  parameterLocation: ConcreteParameterLocation,
+  config: GenerateConfig
 ): PayloadRequestParameterCodeGenerationOutput[] {
   const outputs: PayloadRequestParameterCodeGenerationOutput[] = [];
   request.parameters?.forEach(paramOrRef => {
@@ -88,9 +91,6 @@ function applyPayloadRequestParameterCodeGenerationOutputs(
         return `${p.name}${questionMark}: ${parameterSchemaOutput.createCode(
           path
         )}`;
-      },
-      createZodCode: () => {
-        throw new Error('Zod code generation not supported here');
       },
       createRequestCreationCode: () => {
         return `${p.name}: payload.${p.name}`;
@@ -150,34 +150,39 @@ type PayloadUtils = {
 function applyPayloadUtils(
   codeGenerator: CodeGenerator,
   request: Request,
-  path: OutputPath
+  path: OutputPath,
+  config: GenerateConfig
 ): PayloadUtils {
   const headerParamOutputs = applyPayloadRequestParameterCodeGenerationOutputs(
     request,
     path,
     codeGenerator,
-    'header'
+    'header',
+    config
   );
   const cookieParameterOutputs =
     applyPayloadRequestParameterCodeGenerationOutputs(
       request,
       path,
       codeGenerator,
-      'cookie'
+      'cookie',
+      config
     );
   const queryParameterOutputs =
     applyPayloadRequestParameterCodeGenerationOutputs(
       request,
       path,
       codeGenerator,
-      'query'
+      'query',
+      config
     );
   const pathParameterOutputs =
     applyPayloadRequestParameterCodeGenerationOutputs(
       request,
       path,
       codeGenerator,
-      'path'
+      'path',
+      config
     );
   const bodyOutput = applyPayloadRequestBodyCodeGenerationOutput(
     request,
@@ -301,7 +306,8 @@ function applyPayloadUtils(
 function applyEndpointIdConstDefinition(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
-  path: OutputPath
+  path: OutputPath,
+  config: GenerateConfig
 ): DefinitionOutput {
   const definition: DefinitionOutput = {
     type: OutputType.DEFINITION,
@@ -329,16 +335,20 @@ export function applyEndpointCallerFunction(
   const endpointIdConstDefinition = applyEndpointIdConstDefinition(
     codeGenerator,
     endpointId,
-    [...path, 'endpointId']
+    [...path, 'endpointId'],
+    config
   );
-  const payloadUtils = applyPayloadUtils(codeGenerator, request, [
-    ...path,
-    'payload',
-  ]);
+  const payloadUtils = applyPayloadUtils(
+    codeGenerator,
+    request,
+    [...path, 'payload'],
+    config
+  );
   const requestResultTypeDefinition = applyRequestResultTypeDefinition(
     codeGenerator,
     request,
-    [...path, requestResultOutputPathPart]
+    [...path, requestResultOutputPathPart],
+    config
   );
   const requiredOutputPaths: OutputPath[] = [
     endpointIdConstDefinition.path,

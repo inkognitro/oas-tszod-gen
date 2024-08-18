@@ -28,10 +28,10 @@ import {
   applyEndpointCallerFunction,
   requestResultOutputPathPart,
   responseOutputPathPart,
-} from '@oas3/codegen/ts/endpoint';
+} from './endpoint';
 import {mkdirp} from 'mkdirp';
-import {findTemplateOutput, templateFilePaths} from '@oas3/codegen/ts/template';
-import {applyObjectSchema, applySchema} from '@oas3/codegen/ts/schema';
+import {findTemplateOutput, templateFilePaths} from './template';
+import {applyObjectSchema, applySchema} from './schema';
 
 const fs = require('fs');
 const path = require('path');
@@ -884,11 +884,25 @@ export class DefaultCodeGenerator implements CodeGenerator {
     ];
   }
 
+  createOutputPathByZodComponentRef(componentRef: string): OutputPath {
+    return [...this.createOutputPathByComponentRef(componentRef), 'zodSchema'];
+  }
+
   createComponentTypeName(
     componentRef: string,
     referencingPath: OutputPath
   ): string {
     const outputPath = this.createOutputPathByComponentRef(componentRef);
     return this.createTypeName(outputPath, referencingPath);
+  }
+
+  createComponentZodSchemaName(
+    componentRef: string,
+    referencingPath: OutputPath
+  ): string {
+    const outputPath = this.createOutputPathByComponentRef(componentRef);
+    return `zod${capitalizeFirstLetter(
+      this.createTypeName(outputPath, referencingPath)
+    )}`;
   }
 }

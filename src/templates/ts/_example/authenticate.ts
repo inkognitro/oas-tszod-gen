@@ -25,9 +25,13 @@ export type AuthenticateRequestResult = RequestResult<
 >;
 
 export type AuthenticatePayload = {
-  xHeader: string;
-  emailOrUsername: string;
-  password: string;
+  headers: {
+    foo: string;
+  };
+  body: {
+    emailOrUsername: string;
+    password: string;
+  };
 };
 
 export function authenticate(
@@ -35,14 +39,13 @@ export function authenticate(
   payload: AuthenticatePayload,
   config?: RequestExecutionConfig
 ): Promise<AuthenticateRequestResult> {
-  const {xHeader, ...body} = payload;
   const request = createRequest({
     endpointId: authenticateEndpointId,
     headers: {
+      ...payload.headers,
       'Content-Type': 'application/json',
-      x: xHeader,
     },
-    body: body,
+    body: payload.body,
   });
   return requestHandler.execute(request, config);
 }

@@ -53,11 +53,7 @@ type ZodResponseSchema = {
 };
 
 type ZodRequestSchema = {
-  pathParams?: ZodSchema;
-  queryParams?: ZodSchema;
-  headers?: ZodSchema;
-  cookies?: ZodSchema;
-  body?: ZodSchema;
+  requestPayload?: ZodSchema;
   responseByStatusCode: {
     [statusCode: string]: ZodResponseSchema;
   };

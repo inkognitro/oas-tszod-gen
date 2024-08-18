@@ -6,17 +6,21 @@ import {
   RequestResult,
   Response,
 } from '../core';
+import {z} from 'zod';
 
 export const authenticateEndpointId = {
   method: 'post',
   path: '/v1/auth/authenticate',
 };
 
-type OkAuthenticateResponse = Response<200, {accessToken: string}>;
-type BadRequestAuthenticateResponse = Response<400>;
+const okAuthenticateResponseBodyZodSchema = z.object({});
+const badRequestAuthenticateResponseBodyZodSchema = z.object({});
 
-const zodOkAuthenticateResponseBodySchema = 'fooo...';
-const zodBadRequestAuthenticateResponseBodySchema = 'bar...';
+type OkAuthenticateResponse = Response<
+  200,
+  z.infer<typeof okAuthenticateResponseBodyZodSchema>
+>;
+type BadRequestAuthenticateResponse = Response<400>;
 
 export type AuthenticateResponse =
   | OkAuthenticateResponse
@@ -27,39 +31,38 @@ export type AuthenticateRequestResult = RequestResult<
   AuthenticateResponse
 >;
 
-export type AuthenticatePayload = {
-  xHeader: string;
-  emailOrUsername: string;
-  password: string;
-};
+const authenticatePayloadZodSchema = z.object({
+  headers: z.object({
+    foo: z.string(),
+  }),
+  body: z.object({
+    emailOrUsername: z.string(),
+    password: z.string(),
+  }),
+});
 
-const authenticateRequestBodySchema = 'fooo...';
-
-export const zodAuthenticateRequestBodySchema = z.infer<
-  typeof authenticateRequestBodySchema
->;
+export type AuthenticatePayload = z.infer<typeof authenticatePayloadZodSchema>;
 
 export function authenticate(
   requestHandler: RequestHandler,
   payload: AuthenticatePayload,
   config?: RequestExecutionConfig
 ): Promise<AuthenticateRequestResult> {
-  const {xHeader, ...body} = payload;
   const request = createRequest({
     endpointId: authenticateEndpointId,
     headers: {
+      ...payload.headers,
       'Content-Type': 'application/json',
-      x: xHeader,
     },
-    body: body,
+    body: payload.body,
     zodSchema: {
-      body: zodAuthenticateRequestBodySchema,
+      requestPayload: authenticatePayloadZodSchema,
       responseByStatusCode: {
         '200': {
-          body: zodOkAuthenticateResponseBodySchema,
+          body: okAuthenticateResponseBodyZodSchema,
         },
         '400': {
-          body: zodBadRequestAuthenticateResponseBodySchema,
+          body: badRequestAuthenticateResponseBodyZodSchema,
         },
       },
     },

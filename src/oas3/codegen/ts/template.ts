@@ -87,6 +87,19 @@ export const templateCreateRequestFunction: DefinitionOutput = {
   requiredOutputPaths: [],
 };
 
+export const templateZOfZodLibrary: DefinitionOutput = {
+  type: OutputType.DEFINITION,
+  definitionType: 'type',
+  path: ['zod'],
+  createName: () => {
+    return 'z';
+  },
+  createCode: () => {
+    throw new Error(createCodeErrorMessage);
+  },
+  requiredOutputPaths: [],
+};
+
 export const templateFilePaths = [
   '/core/core.ts',
   '/core/index.ts',
@@ -94,6 +107,7 @@ export const templateFilePaths = [
 ];
 
 const templateOutputs: Output[] = [
+  templateZOfZodLibrary,
   templateRequestType,
   templateResponseType,
   templateRequestResultType,

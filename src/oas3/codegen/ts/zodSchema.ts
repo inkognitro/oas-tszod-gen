@@ -29,15 +29,16 @@ import {
   Schema,
   StringSchema,
 } from '@oas3/specification';
+import {templateZOfZodLibrary} from './template';
 
-export function applySchema(
+export function applyZodSchema(
   codeGenerator: CodeGenerator,
   schema: Schema,
   path: OutputPath,
   preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
   if (isSchemaComponentRef(schema)) {
-    return applyComponentRefSchema(
+    return applyZodComponentRefSchema(
       codeGenerator,
       schema,
       path,
@@ -45,19 +46,19 @@ export function applySchema(
     );
   }
   if (isBooleanSchema(schema)) {
-    return applyBooleanSchema(schema, path);
+    return applyZodBooleanSchema(schema, path);
   }
   if (isStringSchema(schema)) {
-    return applyStringSchema(schema, path);
+    return applyZodStringSchema(schema, path);
   }
   if (isNumberSchema(schema)) {
-    return applyNumberSchema(schema, path);
+    return applyZodNumberSchema(schema, path);
   }
   if (isIntegerSchema(schema)) {
-    return applyIntegerSchema(schema, path);
+    return applyZodIntegerSchema(schema, path);
   }
   if (isArraySchema(schema)) {
-    return applyArraySchema(
+    return applyZodArraySchema(
       codeGenerator,
       schema,
       path,
@@ -65,7 +66,7 @@ export function applySchema(
     );
   }
   if (isObjectSchema(schema)) {
-    return applyObjectSchema(
+    return applyZodObjectSchema(
       codeGenerator,
       schema,
       path,
@@ -73,7 +74,7 @@ export function applySchema(
     );
   }
   if (isOneOfSchema(schema)) {
-    return applyOneOfSchema(
+    return applyZodOneOfSchema(
       codeGenerator,
       schema,
       path,
@@ -81,7 +82,7 @@ export function applySchema(
     );
   }
   if (isAllOfSchema(schema)) {
-    return applyAllOfSchema(
+    return applyZodAllOfSchema(
       codeGenerator,
       schema,
       path,
@@ -91,24 +92,24 @@ export function applySchema(
   throw new Error(`schema not supported: ${JSON.stringify(schema)}`);
 }
 
-function applyBooleanSchema(
+function applyZodBooleanSchema(
   schema: BooleanSchema,
   path: OutputPath
 ): CodeGenerationOutput {
   return {
     createCode: () => {
-      let code = 'boolean';
+      let code = 'z.boolean()';
       if (schema.nullable) {
-        code = `null | ${code}`;
+        code += '.nullable()';
       }
       return code;
     },
     path,
-    requiredOutputPaths: [],
+    requiredOutputPaths: [templateZOfZodLibrary.path],
   };
 }
 
-function applyStringSchema(
+function applyZodStringSchema(
   schema: StringSchema,
   path: OutputPath
 ): CodeGenerationOutput {
@@ -118,32 +119,36 @@ function applyStringSchema(
   }
   return {
     createCode: () => {
-      let code = 'string';
-      if (schema.enum && schema.enum.length > 0) {
-        code = `'${schema.enum.join("' | '")}'`;
+      if (schema.enum && schema.enum.length === 1) {
+        return `z.literal('${schema.enum[0].replaceAll("'", "\\'")}')`;
+      } else if (schema.enum && schema.enum.length > 1) {
+        return `z.union([${schema.enum
+          .map(v => `z.literal('${v.replaceAll("'", "\\'")}')`)
+          .join(',')}])`;
       } else if (schema.format === 'binary') {
-        code = 'any';
+        return 'z.any()';
       }
+      let code = 'z.string()';
       if (schema.nullable) {
-        code = `null | ${code}`;
+        code += '.nullable()';
       }
       return code;
     },
     path,
-    requiredOutputPaths: [],
+    requiredOutputPaths: [templateZOfZodLibrary.path],
     codeComment,
   };
 }
 
-function applyArraySchema(
+function applyZodArraySchema(
   codeGenerator: CodeGenerator,
   schema: ArraySchema,
   path: OutputPath,
   preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  const requiredOutputPaths: OutputPath[] = [];
+  const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
   const itemOutputPath = [...path, arraySchemaItemOutputPathPart];
-  const itemSummary = applySchema(
+  const itemSummary = applyZodSchema(
     codeGenerator,
     schema.items,
     itemOutputPath,
@@ -155,7 +160,7 @@ function applyArraySchema(
     : undefined;
   return {
     createCode: () => {
-      return `(${itemSummary.createCode(itemOutputPath)})[]`;
+      return `z.array(${itemSummary.createCode(itemOutputPath)})`;
     },
     codeComment,
     path,
@@ -163,42 +168,64 @@ function applyArraySchema(
   };
 }
 
-function applyNumberSchema(
+function applyZodNumberSchema(
   schema: NumberSchema,
   path: OutputPath
 ): CodeGenerationOutput {
+  const codeComment: undefined | string = undefined;
   return {
     createCode: () => {
-      let code = 'number';
+      let code = 'z.number().safe().finite()';
+      if (schema.minimum) {
+        code += `.gte(${schema.minimum})`;
+      } else if (schema.exclusiveMinimum) {
+        code += `.gt(${schema.exclusiveMinimum})`;
+      }
+      if (schema.maximum) {
+        code += `.lte(${schema.maximum})`;
+      } else if (schema.exclusiveMinimum) {
+        code += `.lt(${schema.exclusiveMinimum})`;
+      }
       if (schema.nullable) {
-        code = `null | ${code}`;
+        code += '.nullable()';
       }
       return code;
     },
+    codeComment,
     path,
-    requiredOutputPaths: [],
+    requiredOutputPaths: [templateZOfZodLibrary.path],
   };
 }
 
-function applyIntegerSchema(
+function applyZodIntegerSchema(
   schema: IntegerSchema,
   path: OutputPath
 ): CodeGenerationOutput {
   return {
     createCode: () => {
-      let code = 'number';
+      let code = 'z.number().int().safe().finite()';
+      if (schema.minimum) {
+        code += `.gte(${schema.minimum})`;
+      } else if (schema.exclusiveMinimum) {
+        code += `.gt(${schema.exclusiveMinimum})`;
+      }
+      if (schema.maximum) {
+        code += `.lte(${schema.maximum})`;
+      } else if (schema.exclusiveMinimum) {
+        code += `.lt(${schema.exclusiveMinimum})`;
+      }
       if (schema.nullable) {
-        code = `null | ${code}`;
+        code += '.nullable()';
       }
       return code;
     },
     codeComment: 'int',
     path,
-    requiredOutputPaths: [],
+    requiredOutputPaths: [templateZOfZodLibrary.path],
   };
 }
 
-export function applyComponentRefSchema(
+export function applyZodComponentRefSchema(
   codeGenerator: CodeGenerator,
   schema: ComponentRef,
   path: OutputPath,
@@ -223,15 +250,15 @@ export function applyComponentRefSchema(
   );
   return {
     createCode: referencingPath =>
-      codeGenerator.createComponentTypeName(schema.$ref, referencingPath),
+      codeGenerator.createComponentZodSchemaName(schema.$ref, referencingPath),
     path,
     requiredOutputPaths: [
-      codeGenerator.createOutputPathByComponentRef(schema.$ref),
+      codeGenerator.createOutputPathByZodComponentRef(schema.$ref),
     ],
   };
 }
 
-export function applyObjectSchema(
+export function applyZodObjectSchema(
   codeGenerator: CodeGenerator,
   schema: ObjectSchema,
   path: OutputPath,
@@ -243,12 +270,12 @@ export function applyObjectSchema(
       codeComment?: string;
     };
   } = {};
-  const requiredOutputPaths: OutputPath[] = [];
+  const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
   for (const propName in schema.properties) {
     const propSchema = schema.properties[propName];
     const propSchemaPath = [...path, propName];
     requiredOutputPaths.push(propSchemaPath);
-    directOutputByPropNameMap[propName] = applySchema(
+    directOutputByPropNameMap[propName] = applyZodSchema(
       codeGenerator,
       propSchema,
       propSchemaPath,
@@ -257,7 +284,7 @@ export function applyObjectSchema(
   }
   let additionalPropertiesDirectOutput: undefined | CodeGenerationOutput;
   if (schema.additionalProperties) {
-    additionalPropertiesDirectOutput = applySchema(
+    additionalPropertiesDirectOutput = applyZodSchema(
       codeGenerator,
       schema.additionalProperties,
       [...path, objectSchemaAdditionalPropsOutputPathPart],
@@ -269,41 +296,41 @@ export function applyObjectSchema(
       const codeRows: string[] = [];
       for (const propName in directOutputByPropNameMap) {
         const directOutput = directOutputByPropNameMap[propName];
-        const questionMark = !schema.required?.includes(propName) ? '?' : '';
+        const optional = !schema.required?.includes(propName)
+          ? '.optional()'
+          : '';
         const propComment = directOutput.codeComment
           ? ` // ${directOutput.codeComment}`
           : '';
         codeRows.push(
-          `${propName}${questionMark}: ${directOutput.createCode(
+          `${propName}${optional}: ${directOutput.createCode(
             path
-          )};${propComment}`
+          )}${optional},${propComment}`
         );
       }
+      let zodAdditionalPropsExtension = '';
       if (additionalPropertiesDirectOutput) {
-        const propComment = additionalPropertiesDirectOutput.codeComment
-          ? ` // ${additionalPropertiesDirectOutput.codeComment}`
-          : '';
-        codeRows.push(
-          `[key: string]: ${additionalPropertiesDirectOutput.createCode(
-            path
-          )};${propComment}`
-        );
+        zodAdditionalPropsExtension = `.extend(z.record(z.string(), ${additionalPropertiesDirectOutput.createCode(
+          path
+        )}))`;
       }
-      return `{\n${codeRows.join('\n')}\n}`;
+      return `z.object(\n${codeRows.join(
+        '\n'
+      )}\n)${zodAdditionalPropsExtension}`;
     },
     path,
     requiredOutputPaths,
   };
 }
 
-function applyOneOfSchema(
+function applyZodOneOfSchema(
   codeGenerator: CodeGenerator,
   schema: OneOfSchema,
   path: OutputPath,
   preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const oneOfItemDirectOutputs: CodeGenerationOutput[] = [];
-  const requiredOutputPaths: OutputPath[] = [];
+  const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
   schema.oneOf.forEach((itemSchema, index) => {
     const itemPath: OutputPath = [
       ...path,
@@ -311,7 +338,7 @@ function applyOneOfSchema(
       `${index}`,
     ];
     requiredOutputPaths.push(itemPath);
-    const itemOutput = applySchema(
+    const itemOutput = applyZodSchema(
       codeGenerator,
       itemSchema,
       itemPath,
@@ -330,23 +357,30 @@ function applyOneOfSchema(
           `| ${directOutput.createCode(referencingContext)}${itemComment}`
         );
       });
-      return `${codeRows.join('\n')}`;
+      const discriminatorName = schema.discriminator?.propertyName;
+      if (schema.discriminator?.propertyName) {
+        `z.discriminatedUnion('${discriminatorName}', [${codeRows.join(
+          '\n'
+        )}])`;
+      }
+      return `z.union([${codeRows.join('\n')}])`;
     },
     path,
     requiredOutputPaths,
   };
 }
 
-function applyAllOfSchema(
+function applyZodAllOfSchema(
   _codeGenerator: CodeGenerator,
   _schema: AllOfSchema,
   path: OutputPath,
   _preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  const requiredOutputPaths: OutputPath[] = [];
   return {
-    createCode: () => 'any',
+    createCode: () => {
+      return 'z.any()';
+    },
     path,
-    requiredOutputPaths,
+    requiredOutputPaths: [templateZOfZodLibrary.path],
   };
 }

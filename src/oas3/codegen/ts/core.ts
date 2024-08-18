@@ -10,6 +10,10 @@ export interface CodeGenerator {
     componentRef: string,
     referencingPath: OutputPath
   ): string;
+  createComponentZodSchemaName(
+    componentRef: string,
+    referencingPath: OutputPath
+  ): string;
   createEnumName(outputPath: OutputPath, referencingPath: OutputPath): string;
   createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string;
   createConstName(outputPath: OutputPath, referencingPath: OutputPath): string;
@@ -19,6 +23,7 @@ export interface CodeGenerator {
   ): string;
   createOperationOutputPath(operationId: string): OutputPath;
   createOutputPathByComponentRef(componentRef: string): OutputPath;
+  createOutputPathByZodComponentRef(componentRef: string): OutputPath;
   addOutput(
     output: Output,
     preventFromAddingTypesForComponentRefs?: string[]
@@ -74,7 +79,6 @@ export type CodeGenerationOutput = {
   path: OutputPath;
   requiredOutputPaths: OutputPath[];
   createCode: CreateCodeFunc;
-  createZodCode: CreateCodeFunc;
   codeComment?: string;
 };
 
