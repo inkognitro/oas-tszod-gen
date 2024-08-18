@@ -10,12 +10,16 @@ A tool to convert [OpenApi](https://swagger.io/specification/) specifications in
 ## Why should I use `oas-to-code`?
 - to use your [OAS3](https://swagger.io/specification/) specification as a single-source-of-truth for your endpoint definitions
 - to have the possibility for an automatic compatibility check of your api endpoints with your TS frontends
-- to have automatically generated [Zod](https://www.npmjs.com/package/zod) schemas per endpoint, which also can be used for form validations
 - to write less code that could lie, leading to fewer bugs and improved customer satisfaction
 
 ## Why did you write yet another library for this task?
-Good question. The aim of this library is not only to guarantee type-safety but also to generate
-endpoint caller functions with standalone types which then can be used in your code base.
+Before you consider using this library, I suggest having a look at [Zodios](https://www.zodios.org/)
+and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
+
+I coded my own solution because I wanted to
+- have fine-grained and separated functions and type definitions for each API endpoint
+- be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
+- have automatically generated [Zod](https://www.npmjs.com/package/zod) schemas for every endpoint to be able to use them for future form validations
 
 ## Semantic versioning
 **Worried about different code generation outputs after updating this library?**
