@@ -8,13 +8,10 @@
 A tool to convert [OpenApi](https://swagger.io/specification/) specifications into callable endpoint functions in [TS](https://www.typescriptlang.org/).
 
 ## Why should I use `oas-to-code`?
-Easy one to answer:
-- to have a single-source-of-truth for endpoint definitions
+- to use your [OAS3](https://swagger.io/specification/) specification as a single-source-of-truth for your endpoint definitions
 - to have the possibility for an automatic compatibility check of your api endpoints with your TS frontends
-- to write less code that could lie
-- to reduce the need for integration tests due to early type checks in a CI pipeline
-- to have automatically generated zod schemas per endpoint, which also can be used for form validation
-- to have a bigger customer satisfaction due to fewer bugs
+- to have automatically generated zod schemas per endpoint, which also can be used for form validations
+- to write less code that could lie, leading to fewer bugs and improved customer satisfaction
 
 ## Why did you write yet another library for this task?
 Good question. The aim of this library is not only to guarantee type-safety but also to generate
