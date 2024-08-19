@@ -2,7 +2,9 @@ import {
   arraySchemaItemOutputPathPart,
   CodeGenerationOutput,
   CodeGenerator,
+  ComponentRefOutput,
   CreateCodeFunc,
+  DefinitionOutput,
   objectSchemaAdditionalPropsOutputPathPart,
   oneOfSchemaItemOutputPathPart,
   OutputPath,
@@ -114,7 +116,7 @@ function applyZodStringSchema(
   path: OutputPath
 ): CodeGenerationOutput {
   let codeComment: undefined | string = undefined;
-  if (schema.format) {
+  if (schema.format && schema.format !== 'uuid') {
     codeComment = schema.format;
   }
   return {
@@ -129,6 +131,9 @@ function applyZodStringSchema(
         return 'z.any()';
       }
       let code = 'z.string()';
+      if (schema.format === 'uuid') {
+        code += '.uuid()';
+      }
       if (schema.nullable) {
         code += '.nullable()';
       }
@@ -172,7 +177,6 @@ function applyZodNumberSchema(
   schema: NumberSchema,
   path: OutputPath
 ): CodeGenerationOutput {
-  const codeComment: undefined | string = undefined;
   return {
     createCode: () => {
       let code = 'z.number().safe().finite()';
@@ -191,7 +195,6 @@ function applyZodNumberSchema(
       }
       return code;
     },
-    codeComment,
     path,
     requiredOutputPaths: [templateZOfZodLibrary.path],
   };
@@ -219,7 +222,6 @@ function applyZodIntegerSchema(
       }
       return code;
     },
-    codeComment: 'int',
     path,
     requiredOutputPaths: [templateZOfZodLibrary.path],
   };
@@ -231,30 +233,25 @@ export function applyZodComponentRefSchema(
   path: OutputPath,
   preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  codeGenerator.addOutput(
-    {
-      type: OutputType.COMPONENT_REF,
-      createName: referencingPath => {
-        return codeGenerator.createComponentTypeName(
-          schema.$ref,
-          referencingPath
-        );
-      },
-      componentRef: schema.$ref,
-      path,
-      requiredOutputPaths: [
-        codeGenerator.createOutputPathByComponentRef(schema.$ref),
-      ],
+  const output: ComponentRefOutput = {
+    type: OutputType.COMPONENT_REF,
+    createName: referencingPath => {
+      return codeGenerator.createComponentZodSchemaName(
+        schema.$ref,
+        referencingPath
+      );
     },
-    preventFromAddingTypesForComponentRefs
-  );
-  return {
-    createCode: referencingPath =>
-      codeGenerator.createComponentZodSchemaName(schema.$ref, referencingPath),
+    componentRef: schema.$ref,
     path,
     requiredOutputPaths: [
       codeGenerator.createOutputPathByZodComponentRef(schema.$ref),
     ],
+  };
+  codeGenerator.addOutput(output, preventFromAddingTypesForComponentRefs);
+  return {
+    ...output,
+    createCode: referencingPath =>
+      codeGenerator.createComponentZodSchemaName(schema.$ref, referencingPath),
   };
 }
 
@@ -303,7 +300,7 @@ export function applyZodObjectSchema(
           ? ` // ${directOutput.codeComment}`
           : '';
         codeRows.push(
-          `${propName}${optional}: ${directOutput.createCode(
+          `${propName}: ${directOutput.createCode(
             path
           )}${optional},${propComment}`
         );
@@ -314,9 +311,9 @@ export function applyZodObjectSchema(
           path
         )}))`;
       }
-      return `z.object(\n${codeRows.join(
+      return `z.object({\n${codeRows.join(
         '\n'
-      )}\n)${zodAdditionalPropsExtension}`;
+      )}\n})${zodAdditionalPropsExtension}`;
     },
     path,
     requiredOutputPaths,

@@ -73,10 +73,12 @@ export function isBooleanSchema(anyValue: unknown): anyValue is BooleanSchema {
   return true;
 }
 
+export type ObjectSchemaProperties = {[propName: string]: Schema};
+
 export type ObjectSchema = {
   type: 'object';
   required?: string[];
-  properties?: {[propName: string]: Schema};
+  properties?: ObjectSchemaProperties;
   additionalProperties?: Schema;
 };
 

@@ -95,7 +95,7 @@ export type GenerateConfig = {
   outputFolderPath: string;
   importRootAlias?: string;
   predefinedFolderOutputPaths?: OutputPath[];
-  shouldGenerateWithZod?: boolean;
+  shouldGenerateWithZod: boolean;
 };
 
 export class DefaultCodeGenerator implements CodeGenerator {
@@ -542,11 +542,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
               importAsName: requiredOutput.createName(output.path),
             };
 
-      const importPath = this.createImportPath(
-        requiredOutput.path,
-        output.path,
-        config
-      );
+      const importPath =
+        requiredOutput.fixedImportPath ??
+        this.createImportPath(requiredOutput.path, output.path, config);
       const importAssets = nextFileOutput.importAssetsByPath[importPath] ?? [];
       const isAssetAlreadyConsidered = !!importAssets.find(
         a => a.importAsName === importAsset.importAsName
@@ -901,8 +899,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
     referencingPath: OutputPath
   ): string {
     const outputPath = this.createOutputPathByComponentRef(componentRef);
-    return `zod${capitalizeFirstLetter(
-      this.createTypeName(outputPath, referencingPath)
-    )}`;
+    return `${this.createConstName(outputPath, referencingPath)}ZodSchema`;
   }
 }

@@ -8,6 +8,7 @@ export type Oas3ToTsConfig = {
   importRootAlias?: string;
   predefinedFolderOutputPaths?: OutputPath[];
   logger: Logger;
+  shouldGenerateWithZod?: boolean;
 };
 
 export function generateOas3ToTs(config: Oas3ToTsConfig) {
@@ -16,6 +17,8 @@ export function generateOas3ToTs(config: Oas3ToTsConfig) {
     codeGenerator.generate({
       outputFolderPath: config.outputFolderPath,
       predefinedFolderOutputPaths: config.predefinedFolderOutputPaths,
+      importRootAlias: config.importRootAlias,
+      shouldGenerateWithZod: !!config.shouldGenerateWithZod,
     });
   });
 }

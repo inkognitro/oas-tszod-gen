@@ -2,6 +2,7 @@ import {
   arraySchemaItemOutputPathPart,
   CodeGenerationOutput,
   CodeGenerator,
+  ComponentRefOutput,
   CreateCodeFunc,
   objectSchemaAdditionalPropsOutputPathPart,
   oneOfSchemaItemOutputPathPart,
@@ -204,30 +205,25 @@ export function applyComponentRefSchema(
   path: OutputPath,
   preventFromAddingTypesForComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  codeGenerator.addOutput(
-    {
-      type: OutputType.COMPONENT_REF,
-      createName: referencingPath => {
-        return codeGenerator.createComponentTypeName(
-          schema.$ref,
-          referencingPath
-        );
-      },
-      componentRef: schema.$ref,
-      path,
-      requiredOutputPaths: [
-        codeGenerator.createOutputPathByComponentRef(schema.$ref),
-      ],
+  const output: ComponentRefOutput = {
+    type: OutputType.COMPONENT_REF,
+    createName: referencingPath => {
+      return codeGenerator.createComponentTypeName(
+        schema.$ref,
+        referencingPath
+      );
     },
-    preventFromAddingTypesForComponentRefs
-  );
-  return {
-    createCode: referencingPath =>
-      codeGenerator.createComponentTypeName(schema.$ref, referencingPath),
+    componentRef: schema.$ref,
     path,
     requiredOutputPaths: [
       codeGenerator.createOutputPathByComponentRef(schema.$ref),
     ],
+  };
+  codeGenerator.addOutput(output, preventFromAddingTypesForComponentRefs);
+  return {
+    ...output,
+    createCode: referencingPath =>
+      codeGenerator.createComponentTypeName(schema.$ref, referencingPath),
   };
 }
 

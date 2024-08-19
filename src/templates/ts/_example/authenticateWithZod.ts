@@ -50,21 +50,10 @@ export function authenticate(
 ): Promise<AuthenticateRequestResult> {
   const request = createRequest({
     endpointId: authenticateEndpointId,
+    ...payload,
     headers: {
       ...payload.headers,
       'Content-Type': 'application/json',
-    },
-    body: payload.body,
-    zodSchema: {
-      requestPayload: authenticatePayloadZodSchema,
-      responseByStatusCode: {
-        '200': {
-          body: okAuthenticateResponseBodyZodSchema,
-        },
-        '400': {
-          body: badRequestAuthenticateResponseBodyZodSchema,
-        },
-      },
     },
   });
   return requestHandler.execute(request, config);

@@ -1,15 +1,18 @@
 import {
   CodeGenerator,
-  OutputType,
-  OutputPath,
   DefinitionOutput,
   getConcreteParameter,
-  CodeGenerationOutput,
+  OutputPath,
+  OutputType,
 } from './core';
 import {
   ConcreteParameterLocation,
+  ObjectSchema,
+  ObjectSchemaProperties,
+  Parameter,
   Request,
   RequestBodyContentByTypeMap,
+  Schema,
 } from '@oas3/specification';
 import {applyResponseByStatusCodeMap} from './response';
 import {
@@ -19,8 +22,9 @@ import {
   templateRequestResultType,
   templateRequestType,
 } from './template';
-import {applySchema} from './schema';
 import {GenerateConfig} from './generator';
+import {applyZodSchema} from '@oas3/codegen/ts/zodSchema';
+import {applySchema} from '@oas3/codegen/ts/schema';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -61,73 +65,107 @@ function applyRequestResultTypeDefinition(
   return typeDefinition;
 }
 
-type PayloadRequestParameterCodeGenerationOutput = CodeGenerationOutput & {
-  createRequestCreationCode: () => string;
-  payloadParameterName: string;
-};
-
-function applyPayloadRequestParameterCodeGenerationOutputs(
-  request: Request,
-  path: OutputPath,
+function createNullableOas3ObjectSchemaFromLocationParameters(
   codeGenerator: CodeGenerator,
-  parameterLocation: ConcreteParameterLocation,
-  config: GenerateConfig
-): PayloadRequestParameterCodeGenerationOutput[] {
-  const outputs: PayloadRequestParameterCodeGenerationOutput[] = [];
-  request.parameters?.forEach(paramOrRef => {
+  requestParameters: Parameter[],
+  parameterLocation: ConcreteParameterLocation
+): null | ObjectSchema {
+  const objectSchemaProps: ObjectSchemaProperties = {};
+  const requiredObjectSchemaPropNames: string[] = [];
+  let hasParametersForLocation = false;
+  requestParameters.forEach(paramOrRef => {
     const p = getConcreteParameter(paramOrRef, codeGenerator);
     if (p.in !== parameterLocation) {
       return;
     }
-    const parameterSchemaPath = [...path, parameterLocation, p.name];
-    const parameterSchemaOutput = applySchema(
-      codeGenerator,
-      p.schema,
-      parameterSchemaPath
-    );
-    outputs.push({
-      createCode: () => {
-        const questionMark = !p.required ? '?' : '';
-        return `${p.name}${questionMark}: ${parameterSchemaOutput.createCode(
-          path
-        )}`;
-      },
-      createRequestCreationCode: () => {
-        return `${p.name}: payload.${p.name}`;
-      },
-      requiredOutputPaths: parameterSchemaOutput.requiredOutputPaths,
-      path,
-      codeComment: parameterSchemaOutput.codeComment,
-      payloadParameterName: p.name,
-    });
-  });
-  return outputs;
-}
-
-type PayloadRequestBodyCodeGenerationOutput = CodeGenerationOutput & {
-  contentType: null | string;
-};
-
-function applyPayloadRequestBodyCodeGenerationOutput(
-  request: Request,
-  path: OutputPath,
-  codeGenerator: CodeGenerator
-): null | PayloadRequestBodyCodeGenerationOutput {
-  const contentType = findPreferredRequestBodyContentType(
-    request.requestBody?.content
-  );
-  const requestBodyContent = contentType
-    ? request.requestBody?.content?.[contentType] ?? null
-    : null;
-  const requestBodySchema = requestBodyContent?.schema;
-  if (!requestBodySchema) {
+    hasParametersForLocation = true;
+    objectSchemaProps[p.name] = p.schema;
+    if (p.required) {
+      requiredObjectSchemaPropNames.push(p.name);
+    }
+  }, []);
+  if (!hasParametersForLocation) {
     return null;
   }
-  const bodyOutput = applySchema(codeGenerator, requestBodySchema, [
-    ...path,
-    'body',
-  ]);
-  return {...bodyOutput, contentType};
+  return {
+    type: 'object',
+    required: requiredObjectSchemaPropNames,
+    properties: objectSchemaProps,
+  };
+}
+
+function createNullableOas3ObjectSchemaForRequestPayload(
+  codeGenerator: CodeGenerator,
+  parameterSchemas: Parameter[],
+  bodySchema: Schema | null
+): null | ObjectSchema {
+  const objectSchemaProps: ObjectSchemaProperties = {};
+  const requiredObjectSchemaPropNames: string[] = [];
+  let shouldAddPayload = false;
+
+  const headersObjectSchema =
+    createNullableOas3ObjectSchemaFromLocationParameters(
+      codeGenerator,
+      parameterSchemas ?? [],
+      'header'
+    );
+  if (headersObjectSchema) {
+    objectSchemaProps['headers'] = headersObjectSchema;
+    requiredObjectSchemaPropNames.push('headers');
+    shouldAddPayload = true;
+  }
+
+  const cookiesObjectSchema =
+    createNullableOas3ObjectSchemaFromLocationParameters(
+      codeGenerator,
+      parameterSchemas ?? [],
+      'cookie'
+    );
+  if (cookiesObjectSchema) {
+    objectSchemaProps['cookies'] = cookiesObjectSchema;
+    requiredObjectSchemaPropNames.push('cookies');
+    shouldAddPayload = true;
+  }
+
+  const pathParamsObjectSchema =
+    createNullableOas3ObjectSchemaFromLocationParameters(
+      codeGenerator,
+      parameterSchemas ?? [],
+      'path'
+    );
+  if (pathParamsObjectSchema) {
+    objectSchemaProps['pathParams'] = pathParamsObjectSchema;
+    requiredObjectSchemaPropNames.push('pathParams');
+    shouldAddPayload = true;
+  }
+
+  const queryParamsObjectSchema =
+    createNullableOas3ObjectSchemaFromLocationParameters(
+      codeGenerator,
+      parameterSchemas ?? [],
+      'query'
+    );
+  if (queryParamsObjectSchema) {
+    objectSchemaProps['queryParams'] = queryParamsObjectSchema;
+    requiredObjectSchemaPropNames.push('queryParams');
+    shouldAddPayload = true;
+  }
+
+  if (bodySchema) {
+    objectSchemaProps['body'] = bodySchema;
+    requiredObjectSchemaPropNames.push('body');
+    shouldAddPayload = true;
+  }
+
+  if (!shouldAddPayload) {
+    return null;
+  }
+
+  return {
+    type: 'object',
+    required: requiredObjectSchemaPropNames,
+    properties: objectSchemaProps,
+  };
 }
 
 function findPreferredRequestBodyContentType(
@@ -142,172 +180,195 @@ function findPreferredRequestBodyContentType(
   return Object.keys(contentByContentType)[0] ?? null;
 }
 
-type PayloadUtils = {
-  payloadDefinition: null | DefinitionOutput;
-  createRequestCreationCode: (endpointIdDefinition: DefinitionOutput) => string;
+type RequestBodyContentSettings = {
+  contentType: string;
+  schema: null | Schema;
 };
 
-function applyPayloadUtils(
+function findRequestBodyContentSettings(
+  requestSchema: Request
+): null | RequestBodyContentSettings {
+  const contentByContentTypes = requestSchema.requestBody?.content ?? {};
+  const contentType = findPreferredRequestBodyContentType(
+    contentByContentTypes
+  );
+  if (!contentType) {
+    return null;
+  }
+  const bodySchema = contentType
+    ? contentByContentTypes[contentType] ?? null
+    : null;
+  const requestBodySchema = bodySchema?.schema;
+  return {
+    contentType,
+    schema: requestBodySchema ?? null,
+  };
+}
+
+type AppliedPayloadOutputs = {
+  objectSchema: ObjectSchema;
+  typeDefinition: DefinitionOutput;
+  bodyContentType: null | string;
+};
+
+function applyPayloadIfRequired(
   codeGenerator: CodeGenerator,
-  request: Request,
+  requestSchema: Request,
   path: OutputPath,
   config: GenerateConfig
-): PayloadUtils {
-  const headerParamOutputs = applyPayloadRequestParameterCodeGenerationOutputs(
-    request,
-    path,
-    codeGenerator,
-    'header',
-    config
-  );
-  const cookieParameterOutputs =
-    applyPayloadRequestParameterCodeGenerationOutputs(
-      request,
-      path,
+): null | AppliedPayloadOutputs {
+  const requestBodyContentSettings =
+    findRequestBodyContentSettings(requestSchema);
+  const payloadOas3ObjectSchema =
+    createNullableOas3ObjectSchemaForRequestPayload(
       codeGenerator,
-      'cookie',
-      config
+      requestSchema.parameters ?? [],
+      requestBodyContentSettings?.schema ?? null
     );
-  const queryParameterOutputs =
-    applyPayloadRequestParameterCodeGenerationOutputs(
-      request,
-      path,
-      codeGenerator,
-      'query',
-      config
-    );
-  const pathParameterOutputs =
-    applyPayloadRequestParameterCodeGenerationOutputs(
-      request,
-      path,
-      codeGenerator,
-      'path',
-      config
-    );
-  const bodyOutput = applyPayloadRequestBodyCodeGenerationOutput(
-    request,
-    [...path, 'body'],
-    codeGenerator
-  );
-  const shouldAddPayload =
-    headerParamOutputs.length ||
-    cookieParameterOutputs.length ||
-    queryParameterOutputs.length ||
-    pathParameterOutputs.length ||
-    bodyOutput;
-  const payloadDefinition: null | DefinitionOutput = shouldAddPayload
-    ? {
-        type: OutputType.DEFINITION,
-        definitionType: 'type',
-        path,
-        createName: referencingPath => {
-          return codeGenerator.createTypeName(path, referencingPath);
-        },
-        createCode: () => {
-          const parts: string[] = [];
-
-          if (pathParameterOutputs.length) {
-            const codeParts: string[] = pathParameterOutputs.map(o =>
-              o.createCode(path)
-            );
-            parts.push(`pathParams: {${codeParts.join(';\n')}}`);
-          }
-
-          if (queryParameterOutputs.length) {
-            const codeParts: string[] = queryParameterOutputs.map(o =>
-              o.createCode(path)
-            );
-            parts.push(`queryParams: {${codeParts.join(';\n')}}`);
-          }
-
-          if (headerParamOutputs.length) {
-            const codeParts: string[] = headerParamOutputs.map(o =>
-              o.createCode(path)
-            );
-            parts.push(`headers: {${codeParts.join(';\n')}}`);
-          }
-
-          if (cookieParameterOutputs.length) {
-            const codeParts: string[] = cookieParameterOutputs.map(o =>
-              o.createCode(path)
-            );
-            parts.push(`cookies: {${codeParts.join(';\n')}}`);
-          }
-          if (bodyOutput) {
-            parts.push(`body: ${bodyOutput.createCode(path)}`);
-          }
-          return `{\n${parts.join(';\n')}\n}`;
-        },
-        requiredOutputPaths: [],
-      }
-    : null;
-  if (payloadDefinition) {
-    codeGenerator.addOutput(payloadDefinition);
+  if (!payloadOas3ObjectSchema) {
+    return null;
   }
-  return {
-    payloadDefinition,
-    createRequestCreationCode: (endpointIdDefinition: DefinitionOutput) => {
-      const parts: string[] = [];
-      parts.push(`endpointId: ${endpointIdDefinition.createName(path)}`);
-      const supportedSecuritySchemes =
-        request.security?.reduce<string[]>(
-          (allSecuritySchemes, permissionsBySecurityName) => {
-            const currentSecurityNames = Object.keys(permissionsBySecurityName);
-            const nextAllSecuritySchemes = [...allSecuritySchemes];
-            currentSecurityNames.forEach(securityScheme => {
-              if (!nextAllSecuritySchemes.includes(securityScheme)) {
-                nextAllSecuritySchemes.push(securityScheme);
-              }
-            });
-            return nextAllSecuritySchemes;
-          },
-          []
-        ) ?? [];
-      if (supportedSecuritySchemes.length) {
-        parts.push(
-          `supportedSecuritySchemes: ['${supportedSecuritySchemes.join(
-            "', '"
-          )}']`
-        );
-      }
-      const bodyContentType = bodyOutput?.contentType;
-      const shouldDefineContentTypeHeader =
-        bodyContentType &&
-        !headerParamOutputs.find(
-          p => p.payloadParameterName.toLowerCase() === 'content-type'
-        );
-      const contentTypeHeaderPart = shouldDefineContentTypeHeader
-        ? `'Content-Type': '${bodyContentType}'`
-        : null;
-      if (contentTypeHeaderPart && !headerParamOutputs.length) {
-        parts.push(`headers: { ${contentTypeHeaderPart} }`);
-      } else if (contentTypeHeaderPart && headerParamOutputs.length) {
-        parts.push(`headers: {...payload.headers, ${contentTypeHeaderPart}}`);
-      } else if (!contentTypeHeaderPart && headerParamOutputs.length) {
-        parts.push('headers: payload.headers');
-      }
-      if (cookieParameterOutputs.length) {
-        parts.push('cookies: payload.cookies');
-      }
-      if (pathParameterOutputs.length) {
-        parts.push('pathParams: payload.pathParams');
-      }
-      if (queryParameterOutputs.length) {
-        parts.push('queryParams: payload.queryParams');
-      }
-      if (bodyOutput) {
-        parts.push('body: payload.body');
-      }
-      return `{\n${parts.join(',\n')}\n}`;
-    },
+  if (config.shouldGenerateWithZod) {
+    const zodPayloadSchemaPath: OutputPath = [...path, 'zodSchema'];
+    const payloadZodSchemaDefinition: DefinitionOutput = {
+      type: OutputType.DEFINITION,
+      createName: referencingPath =>
+        codeGenerator.createConstName(zodPayloadSchemaPath, referencingPath),
+      definitionType: 'const',
+      ...applyZodSchema(
+        codeGenerator,
+        payloadOas3ObjectSchema,
+        zodPayloadSchemaPath
+      ),
+    };
+    codeGenerator.addOutput(payloadZodSchemaDefinition);
+    const payloadTypeDefinition: DefinitionOutput = {
+      type: OutputType.DEFINITION,
+      createName: referencingPath =>
+        codeGenerator.createTypeName(path, referencingPath),
+      definitionType: 'type',
+      path,
+      requiredOutputPaths: config.shouldGenerateWithZod
+        ? [payloadZodSchemaDefinition.path]
+        : [],
+      createCode: () => {
+        return `z.infer<typeof ${codeGenerator.createConstName(
+          payloadZodSchemaDefinition.path,
+          path
+        )}>`;
+      },
+    };
+    codeGenerator.addOutput(payloadTypeDefinition);
+    return {
+      typeDefinition: payloadTypeDefinition,
+      objectSchema: payloadOas3ObjectSchema,
+      bodyContentType: requestBodyContentSettings?.contentType ?? null,
+    };
+  }
+  const payloadTypeDefinition: DefinitionOutput = {
+    type: OutputType.DEFINITION,
+    createName: referencingPath =>
+      codeGenerator.createTypeName(path, referencingPath),
+    definitionType: 'type',
+    ...applySchema(codeGenerator, payloadOas3ObjectSchema, path),
   };
+  codeGenerator.addOutput(payloadTypeDefinition);
+  return {
+    typeDefinition: payloadTypeDefinition,
+    objectSchema: payloadOas3ObjectSchema,
+    bodyContentType: requestBodyContentSettings?.contentType ?? null,
+  };
+}
+
+type ForcedValue = {
+  name: string;
+  value: string;
+};
+
+function createNullableExplicitObjectFieldsCode(
+  objectSchema: ObjectSchema,
+  propName: string,
+  forcedValues: ForcedValue[] = []
+): null | string {
+  const codeParts = [];
+  const forcedValuesCodeParts: string[] = forcedValues.map(v => {
+    return `'${v.name.replaceAll("'", "\\'")}': '${v.value.replaceAll(
+      "'",
+      "\\'"
+    )}'`;
+  });
+  if (forcedValuesCodeParts.length) {
+    codeParts.push(forcedValuesCodeParts.join(',\n'));
+  }
+  if (objectSchema.properties?.[propName] && codeParts.length > 0) {
+    codeParts.unshift(`...payload.${propName}`);
+  }
+  return codeParts.length ? codeParts.join(',\n') : null;
+}
+
+function createRequestCreationCode(
+  path: OutputPath,
+  endpointIdDefinition: DefinitionOutput,
+  payloadUtils: null | AppliedPayloadOutputs
+): string {
+  const parts: string[] = [];
+  parts.push(`endpointId: ${endpointIdDefinition.createName(path)}`);
+  if (!payloadUtils) {
+    return `const request = createRequest(${parts.join(',\n')});`;
+  }
+  parts.push('...payload');
+
+  const forcedHeaderValues = payloadUtils.bodyContentType
+    ? [{name: 'Content-Type', value: payloadUtils.bodyContentType}]
+    : [];
+  const explicitHeadersCode = createNullableExplicitObjectFieldsCode(
+    payloadUtils.objectSchema,
+    'headers',
+    forcedHeaderValues
+  );
+  if (explicitHeadersCode) {
+    parts.push(`headers: {${explicitHeadersCode}}`);
+  }
+
+  const explicitCookiesCode = createNullableExplicitObjectFieldsCode(
+    payloadUtils.objectSchema,
+    'cookies'
+  );
+  if (explicitCookiesCode) {
+    parts.push(`cookies: {${explicitCookiesCode}}`);
+  }
+
+  const explicitPathParamsCode = createNullableExplicitObjectFieldsCode(
+    payloadUtils.objectSchema,
+    'pathParams'
+  );
+  if (explicitPathParamsCode) {
+    parts.push(`pathParams: {${explicitPathParamsCode}}`);
+  }
+
+  const explicitQueryParamsCode = createNullableExplicitObjectFieldsCode(
+    payloadUtils.objectSchema,
+    'queryParams'
+  );
+  if (explicitQueryParamsCode) {
+    parts.push(`queryParams: {${explicitQueryParamsCode}}`);
+  }
+
+  const explicitBodyCode = createNullableExplicitObjectFieldsCode(
+    payloadUtils.objectSchema,
+    'body'
+  );
+  if (explicitBodyCode) {
+    parts.push(`body: {${explicitBodyCode}}`);
+  }
+
+  return `const request = createRequest({${parts.join(',\n')}});`;
 }
 
 function applyEndpointIdConstDefinition(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
-  path: OutputPath,
-  config: GenerateConfig
+  path: OutputPath
 ): DefinitionOutput {
   const definition: DefinitionOutput = {
     type: OutputType.DEFINITION,
@@ -335,10 +396,9 @@ export function applyEndpointCallerFunction(
   const endpointIdConstDefinition = applyEndpointIdConstDefinition(
     codeGenerator,
     endpointId,
-    [...path, 'endpointId'],
-    config
+    [...path, 'endpointId']
   );
-  const payloadUtils = applyPayloadUtils(
+  const payloadUtils = applyPayloadIfRequired(
     codeGenerator,
     request,
     [...path, 'payload'],
@@ -358,8 +418,8 @@ export function applyEndpointCallerFunction(
     templateCreateRequestFunction.path,
     templateRequestExecutionConfigType.path,
   ];
-  if (payloadUtils.payloadDefinition) {
-    requiredOutputPaths.push(payloadUtils.payloadDefinition.path);
+  if (payloadUtils?.typeDefinition) {
+    requiredOutputPaths.push(payloadUtils?.typeDefinition.path);
   }
   codeGenerator.addOutput({
     type: OutputType.DEFINITION,
@@ -369,16 +429,15 @@ export function applyEndpointCallerFunction(
     },
     createCode: () => {
       const rhTn = templateRequestHandlerType.createName(path);
-      const pTn = payloadUtils.payloadDefinition?.createName(path);
+      const pTn = payloadUtils?.typeDefinition?.createName(path);
       const payloadParamCode = pTn ? `, payload: ${pTn}` : '';
       const rrTn = requestResultTypeDefinition.createName(path);
       const cfgTn = templateRequestExecutionConfigType.createName(path);
-      const bodyParts: string[] = [
-        `const request = createRequest(${payloadUtils.createRequestCreationCode(
-          endpointIdConstDefinition
-        )});`,
-        'return requestHandler.execute(request, config);',
-      ];
+      const bodyParts: string[] = [];
+      bodyParts.push(
+        createRequestCreationCode(path, endpointIdConstDefinition, payloadUtils)
+      );
+      bodyParts.push('return requestHandler.execute(request, config);');
       const funcBody = bodyParts.join('\n');
       return `(requestHandler: ${rhTn}${payloadParamCode}, config?: ${cfgTn}): Promise<${rrTn}> {${funcBody}}`;
     },

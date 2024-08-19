@@ -85,6 +85,7 @@ export type CodeGenerationOutput = {
 type GenericOutput<T extends OutputType, P extends object = {}> = P & {
   type: T;
   path: OutputPath;
+  fixedImportPath?: string;
   createName: (referencingPath: OutputPath) => string;
   requiredOutputPaths: OutputPath[];
 };

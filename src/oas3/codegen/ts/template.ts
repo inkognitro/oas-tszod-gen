@@ -50,7 +50,7 @@ export const templateRequestResultType: DefinitionOutput = {
 
 export const templateRequestHandlerType: DefinitionOutput = {
   type: OutputType.DEFINITION,
-  definitionType: 'type',
+  definitionType: 'const',
   path: ['core', 'core', 'requestHandler'],
   createName: () => {
     return 'RequestHandler';
@@ -63,7 +63,7 @@ export const templateRequestHandlerType: DefinitionOutput = {
 
 export const templateRequestExecutionConfigType: DefinitionOutput = {
   type: OutputType.DEFINITION,
-  definitionType: 'type',
+  definitionType: 'function',
   path: ['core', 'core', 'requestExecutionConfig'],
   createName: () => {
     return 'RequestExecutionConfig';
@@ -76,7 +76,7 @@ export const templateRequestExecutionConfigType: DefinitionOutput = {
 
 export const templateCreateRequestFunction: DefinitionOutput = {
   type: OutputType.DEFINITION,
-  definitionType: 'type',
+  definitionType: 'function',
   path: ['core', 'core', 'createRequest'],
   createName: () => {
     return 'createRequest';
@@ -89,7 +89,8 @@ export const templateCreateRequestFunction: DefinitionOutput = {
 
 export const templateZOfZodLibrary: DefinitionOutput = {
   type: OutputType.DEFINITION,
-  definitionType: 'type',
+  definitionType: 'const',
+  fixedImportPath: 'zod',
   path: ['zod'],
   createName: () => {
     return 'z';
