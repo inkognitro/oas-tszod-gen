@@ -64,6 +64,6 @@ The remaining entries of this array are used for the type or the variable name.
 
 Let's consider some example endpoints which might be defined in your OAS3 specification under the `paths` variable:
 
-1. The variables and type definitions for the endpoint which has `auth.authenticate` as a value in the `operationId` property will be generated to the `./auth/authenticate.ts` file.
-2. The variables and type definitions for the endpoint which has `userManagement.getUsers` as a value in the `operationId` property will be generated to the `./user-management/getUsers.ts` file.
-3. The variables and type definitions for the endpoint which has `userManagement.admin.getUsers` as a value in the `operationId` property will be generated to the `./user-management/admin/getUsers.ts` file.
+1. The variables and type definitions for the endpoint which has `auth.authenticate` as a value in the `operationId` property will be put into `./auth/authenticate.ts`
+2. The variables and type definitions for the endpoint which has `userManagement.getUsers` as a value in the `operationId` property will be put into `./user-management/getUsers.ts`
+3. The variables and type definitions for the endpoint which has `userManagement.admin.getUsers` as a value in the `operationId` property will be put into `./user-management/admin/getUsers.ts`
