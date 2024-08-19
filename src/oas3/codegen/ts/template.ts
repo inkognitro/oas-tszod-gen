@@ -19,7 +19,7 @@ export const templateRequestType: DefinitionOutput = {
   createCode: () => {
     throw new Error(createCodeErrorMessage);
   },
-  requiredOutputPaths: [],
+  getRequiredOutputPaths: () => [],
 };
 
 export const templateResponseType: DefinitionOutput = {
@@ -32,7 +32,7 @@ export const templateResponseType: DefinitionOutput = {
   createCode: () => {
     throw new Error(createCodeErrorMessage);
   },
-  requiredOutputPaths: [],
+  getRequiredOutputPaths: () => [],
 };
 
 export const templateRequestResultType: DefinitionOutput = {
@@ -45,7 +45,7 @@ export const templateRequestResultType: DefinitionOutput = {
   createCode: () => {
     throw new Error(createCodeErrorMessage);
   },
-  requiredOutputPaths: [],
+  getRequiredOutputPaths: () => [],
 };
 
 export const templateRequestHandlerType: DefinitionOutput = {
@@ -58,7 +58,7 @@ export const templateRequestHandlerType: DefinitionOutput = {
   createCode: () => {
     throw new Error(createCodeErrorMessage);
   },
-  requiredOutputPaths: [],
+  getRequiredOutputPaths: () => [],
 };
 
 export const templateRequestExecutionConfigType: DefinitionOutput = {
@@ -71,7 +71,7 @@ export const templateRequestExecutionConfigType: DefinitionOutput = {
   createCode: () => {
     throw new Error(createCodeErrorMessage);
   },
-  requiredOutputPaths: [],
+  getRequiredOutputPaths: () => [],
 };
 
 export const templateCreateRequestFunction: DefinitionOutput = {
@@ -84,7 +84,7 @@ export const templateCreateRequestFunction: DefinitionOutput = {
   createCode: () => {
     throw new Error(createCodeErrorMessage);
   },
-  requiredOutputPaths: [],
+  getRequiredOutputPaths: () => [],
 };
 
 export const templateZOfZodLibrary: DefinitionOutput = {
@@ -98,7 +98,7 @@ export const templateZOfZodLibrary: DefinitionOutput = {
   createCode: () => {
     throw new Error(createCodeErrorMessage);
   },
-  requiredOutputPaths: [],
+  getRequiredOutputPaths: () => [],
 };
 
 export const templateFilePaths = [

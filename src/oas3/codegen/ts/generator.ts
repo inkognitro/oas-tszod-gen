@@ -1,7 +1,9 @@
 import {
+  AddOutputConfig,
   areOutputPathsEqual,
   arraySchemaItemOutputPathPart,
   capitalizeFirstLetter,
+  CodeGenerationOutput,
   CodeGenerator,
   DefinitionOutput,
   doesOutputPathStartWithOtherOutputPath,
@@ -23,6 +25,7 @@ import {
   Schema,
   schemaComponentRefPrefix,
   Specification,
+  StringSchema,
 } from '@oas3/specification';
 import {
   applyEndpointCallerFunction,
@@ -30,8 +33,13 @@ import {
   responseOutputPathPart,
 } from './endpoint';
 import {mkdirp} from 'mkdirp';
-import {findTemplateOutput, templateFilePaths} from './template';
+import {
+  findTemplateOutput,
+  templateFilePaths,
+  templateZOfZodLibrary,
+} from './template';
 import {applyObjectSchema, applySchema} from './schema';
+import {applyZodSchema} from '@oas3/codegen/ts/zodSchema';
 
 const fs = require('fs');
 const path = require('path');
@@ -230,19 +238,8 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return contentParts.join('\n\n');
   }
 
-  private addOutputByComponentRef(componentRef: string) {
-    const preventFromAddingTypesForComponentRefs = [componentRef];
+  private findSchemaFromComponentRef(componentRef: string): 'any' | Schema {
     const components = this.oas3Specs.components;
-    const outputPath = this.createOutputPathByComponentRef(componentRef);
-    if (
-      this.outputs.find(
-        o =>
-          o.type !== OutputType.COMPONENT_REF &&
-          areOutputPathsEqual(o.path, outputPath)
-      )
-    ) {
-      return;
-    }
     if (
       componentRef.startsWith(schemaComponentRefPrefix) &&
       components.schemas
@@ -254,27 +251,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
           `could not find schema for componentRef "${componentRef}"`
         );
       }
-      const generationSummary = isObjectSchema(schema)
-        ? applyObjectSchema(
-            this,
-            schema,
-            outputPath,
-            preventFromAddingTypesForComponentRefs
-          )
-        : applySchema(
-            this,
-            schema,
-            outputPath,
-            preventFromAddingTypesForComponentRefs
-          );
-      this.addOutput({
-        type: OutputType.DEFINITION,
-        ...generationSummary,
-        definitionType: 'type',
-        createName: referencingPath =>
-          this.createComponentTypeName(componentRef, referencingPath),
-      });
-      return;
+      return schema;
     }
 
     if (
@@ -294,28 +271,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
       if (!isConcreteParameter(parameter)) {
         throw new Error('currently only concreteParameters are supported.');
       }
-      const generationSummary = isObjectSchema(parameter.schema)
-        ? applyObjectSchema(
-            this,
-            parameter.schema,
-            outputPath,
-            preventFromAddingTypesForComponentRefs
-          )
-        : applySchema(
-            this,
-            parameter.schema,
-            outputPath,
-            preventFromAddingTypesForComponentRefs
-          );
-      this.addOutput({
-        type: OutputType.DEFINITION,
-        ...generationSummary,
-        definitionType: 'type',
-        createName: referencingPath =>
-          this.createComponentTypeName(componentRef, referencingPath),
-      });
-      return;
+      return parameter.schema;
     }
+
     if (
       componentRef.startsWith(responseComponentRefPrefix) &&
       components.responses
@@ -324,42 +282,126 @@ export class DefaultCodeGenerator implements CodeGenerator {
       const jsonResponse =
         components.responses?.[responseName]?.content?.['application/json'];
       if (!jsonResponse) {
-        this.addOutput({
-          type: OutputType.DEFINITION,
-          definitionType: 'type',
-          path: outputPath,
-          createName: referencingPath =>
-            this.createComponentTypeName(componentRef, referencingPath),
-          createCode: () => {
-            return 'any';
-          },
-          requiredOutputPaths: [],
-        });
-        return;
+        return 'any';
       }
-      const generationSummary = isObjectSchema(jsonResponse.schema)
-        ? applyObjectSchema(
-            this,
-            jsonResponse.schema,
-            outputPath,
-            preventFromAddingTypesForComponentRefs
-          )
-        : applySchema(
-            this,
-            jsonResponse.schema,
-            outputPath,
-            preventFromAddingTypesForComponentRefs
-          );
+      return jsonResponse.schema;
+    }
+
+    throw new Error(`componentRef "${componentRef}" is not supported`);
+  }
+
+  private findOutputByOutputPath(outputPath: OutputPath): null | Output {
+    return (
+      this.outputs.find(
+        o =>
+          o.type !== OutputType.COMPONENT_REF &&
+          areOutputPathsEqual(o.path, outputPath)
+      ) ?? null
+    );
+  }
+
+  private addZodSchemaOutputByComponentRefIfNotExists(componentRef: string) {
+    const outputPath =
+      this.createZodSchemaOutputPathByComponentRef(componentRef);
+    if (this.findOutputByOutputPath(outputPath)) {
+      return;
+    }
+    const schema = this.findSchemaFromComponentRef(componentRef);
+    if (schema === 'any') {
       this.addOutput({
         type: OutputType.DEFINITION,
-        ...generationSummary,
-        definitionType: 'type',
+        definitionType: 'const',
+        path: outputPath,
         createName: referencingPath =>
-          this.createComponentTypeName(componentRef, referencingPath),
+          this.createComponentZodSchemaName(componentRef, referencingPath),
+        createCode: () => {
+          return 'z.any()';
+        },
+        getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
       });
       return;
     }
-    throw new Error(`componentRef "${componentRef}" is not supported`);
+    this.addOutput({
+      type: OutputType.DEFINITION,
+      definitionType: 'const',
+      createName: referencingPath =>
+        this.createComponentZodSchemaName(componentRef, referencingPath),
+      ...applyZodSchema(this, schema, outputPath, [componentRef]),
+    });
+  }
+
+  private addOutputByComponentRef(
+    componentRef: string,
+    createWithZodSchema: boolean
+  ) {
+    if (createWithZodSchema) {
+      this.addZodSchemaOutputByComponentRefIfNotExists(componentRef);
+    }
+    const outputPath = this.createOutputPathByComponentRef(componentRef);
+    if (this.findOutputByOutputPath(outputPath)) {
+      return;
+    }
+    const schema = this.findSchemaFromComponentRef(componentRef);
+    if (schema === 'any') {
+      this.addOutput({
+        type: OutputType.DEFINITION,
+        definitionType: 'type',
+        path: outputPath,
+        createName: referencingPath =>
+          this.createComponentTypeName(componentRef, referencingPath),
+        createCode: () => {
+          const zodSchemaOutput = this.findOutputByOutputPath(
+            this.createZodSchemaOutputPathByComponentRef(componentRef)
+          );
+          if (zodSchemaOutput) {
+            return `z.infer<typeof ${zodSchemaOutput.createName(outputPath)}>`;
+          }
+          return 'any';
+        },
+        getRequiredOutputPaths: () => {
+          const zodSchemaOutput = this.findOutputByOutputPath(
+            this.createZodSchemaOutputPathByComponentRef(componentRef)
+          );
+          if (zodSchemaOutput) {
+            return [templateZOfZodLibrary.path, zodSchemaOutput.path];
+          }
+          return [];
+        },
+      });
+      return;
+    }
+    const codeGenerationOutput = applySchema(this, schema, outputPath, [
+      componentRef,
+    ]);
+    const codeGenerationOutputWithZodSchemaConsideration: CodeGenerationOutput =
+      {
+        ...codeGenerationOutput,
+        createCode: referencingPath => {
+          const zodSchemaOutput = this.findOutputByOutputPath(
+            this.createZodSchemaOutputPathByComponentRef(componentRef)
+          );
+          if (zodSchemaOutput) {
+            return `z.infer<typeof ${zodSchemaOutput.createName(outputPath)}>`;
+          }
+          return codeGenerationOutput.createCode(referencingPath);
+        },
+        getRequiredOutputPaths: () => {
+          const zodSchemaOutput = this.findOutputByOutputPath(
+            this.createZodSchemaOutputPathByComponentRef(componentRef)
+          );
+          if (zodSchemaOutput) {
+            return [templateZOfZodLibrary.path, zodSchemaOutput.path];
+          }
+          return [];
+        },
+      };
+    this.addOutput({
+      type: OutputType.DEFINITION,
+      ...codeGenerationOutputWithZodSchemaConsideration,
+      definitionType: 'type',
+      createName: referencingPath =>
+        this.createComponentTypeName(componentRef, referencingPath),
+    });
   }
 
   hasSameFileContext(
@@ -498,7 +540,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
   ): FileOutput {
     const availableOutputs = this.outputs;
     let nextFileOutput = fileOutput;
-    output.requiredOutputPaths.forEach(requiredOutputPath => {
+    output.getRequiredOutputPaths().forEach(requiredOutputPath => {
       let requiredOutput = availableOutputs.find(o =>
         areOutputPathsEqual(o.path, requiredOutputPath)
       );
@@ -640,15 +682,21 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   addOutput(
     output: Output,
-    preventFromAddingTypesForComponentRefs: string[] = []
+    config: AddOutputConfig = {
+      preventFromAddingComponentRefs: [],
+      createWithZodSchema: false,
+    }
   ) {
     switch (output.type) {
       case OutputType.COMPONENT_REF:
         this.outputs.push(output);
         if (
-          !preventFromAddingTypesForComponentRefs.includes(output.componentRef)
+          !config.preventFromAddingComponentRefs.includes(output.componentRef)
         ) {
-          this.addOutputByComponentRef(output.componentRef);
+          this.addOutputByComponentRef(
+            output.componentRef,
+            config.createWithZodSchema
+          );
         }
         break;
       case OutputType.DEFINITION:
@@ -882,7 +930,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     ];
   }
 
-  createOutputPathByZodComponentRef(componentRef: string): OutputPath {
+  createZodSchemaOutputPathByComponentRef(componentRef: string): OutputPath {
     return [...this.createOutputPathByComponentRef(componentRef), 'zodSchema'];
   }
 

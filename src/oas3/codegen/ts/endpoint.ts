@@ -59,7 +59,10 @@ function applyRequestResultTypeDefinition(
     createName: referencingPath => {
       return codeGenerator.createTypeName(path, referencingPath);
     },
-    requiredOutputPaths: [templateRequestResultType.path, responseType.path],
+    getRequiredOutputPaths: () => [
+      templateRequestResultType.path,
+      responseType.path,
+    ],
   };
   codeGenerator.addOutput(typeDefinition);
   return typeDefinition;
@@ -248,9 +251,7 @@ function applyPayloadIfRequired(
         codeGenerator.createTypeName(path, referencingPath),
       definitionType: 'type',
       path,
-      requiredOutputPaths: config.shouldGenerateWithZod
-        ? [payloadZodSchemaDefinition.path]
-        : [],
+      getRequiredOutputPaths: () => [payloadZodSchemaDefinition.path],
       createCode: () => {
         return `z.infer<typeof ${codeGenerator.createConstName(
           payloadZodSchemaDefinition.path,
@@ -380,7 +381,7 @@ function applyEndpointIdConstDefinition(
     createCode: () => {
       return `{method:'${endpointId.method}', path:'${endpointId.path}'}`;
     },
-    requiredOutputPaths: [],
+    getRequiredOutputPaths: () => [],
   };
   codeGenerator.addOutput(definition);
   return definition;
@@ -442,6 +443,6 @@ export function applyEndpointCallerFunction(
       return `(requestHandler: ${rhTn}${payloadParamCode}, config?: ${cfgTn}): Promise<${rrTn}> {${funcBody}}`;
     },
     path,
-    requiredOutputPaths,
+    getRequiredOutputPaths: () => requiredOutputPaths,
   });
 }

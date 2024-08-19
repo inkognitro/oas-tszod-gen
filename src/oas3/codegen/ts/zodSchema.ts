@@ -4,7 +4,6 @@ import {
   CodeGenerator,
   ComponentRefOutput,
   CreateCodeFunc,
-  DefinitionOutput,
   objectSchemaAdditionalPropsOutputPathPart,
   oneOfSchemaItemOutputPathPart,
   OutputPath,
@@ -37,14 +36,14 @@ export function applyZodSchema(
   codeGenerator: CodeGenerator,
   schema: Schema,
   path: OutputPath,
-  preventFromAddingTypesForComponentRefs: string[] = []
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   if (isSchemaComponentRef(schema)) {
     return applyZodComponentRefSchema(
       codeGenerator,
       schema,
       path,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   if (isBooleanSchema(schema)) {
@@ -64,7 +63,7 @@ export function applyZodSchema(
       codeGenerator,
       schema,
       path,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   if (isObjectSchema(schema)) {
@@ -72,7 +71,7 @@ export function applyZodSchema(
       codeGenerator,
       schema,
       path,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   if (isOneOfSchema(schema)) {
@@ -80,7 +79,7 @@ export function applyZodSchema(
       codeGenerator,
       schema,
       path,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   if (isAllOfSchema(schema)) {
@@ -88,7 +87,7 @@ export function applyZodSchema(
       codeGenerator,
       schema,
       path,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   throw new Error(`schema not supported: ${JSON.stringify(schema)}`);
@@ -107,7 +106,7 @@ function applyZodBooleanSchema(
       return code;
     },
     path,
-    requiredOutputPaths: [templateZOfZodLibrary.path],
+    getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
   };
 }
 
@@ -140,7 +139,7 @@ function applyZodStringSchema(
       return code;
     },
     path,
-    requiredOutputPaths: [templateZOfZodLibrary.path],
+    getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
     codeComment,
   };
 }
@@ -149,7 +148,7 @@ function applyZodArraySchema(
   codeGenerator: CodeGenerator,
   schema: ArraySchema,
   path: OutputPath,
-  preventFromAddingTypesForComponentRefs: string[] = []
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
   const itemOutputPath = [...path, arraySchemaItemOutputPathPart];
@@ -157,7 +156,7 @@ function applyZodArraySchema(
     codeGenerator,
     schema.items,
     itemOutputPath,
-    preventFromAddingTypesForComponentRefs
+    preventFromAddingComponentRefs
   );
   requiredOutputPaths.push(itemOutputPath);
   const codeComment = itemSummary.codeComment
@@ -169,7 +168,7 @@ function applyZodArraySchema(
     },
     codeComment,
     path,
-    requiredOutputPaths,
+    getRequiredOutputPaths: () => requiredOutputPaths,
   };
 }
 
@@ -196,7 +195,7 @@ function applyZodNumberSchema(
       return code;
     },
     path,
-    requiredOutputPaths: [templateZOfZodLibrary.path],
+    getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
   };
 }
 
@@ -223,7 +222,7 @@ function applyZodIntegerSchema(
       return code;
     },
     path,
-    requiredOutputPaths: [templateZOfZodLibrary.path],
+    getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
   };
 }
 
@@ -231,7 +230,7 @@ export function applyZodComponentRefSchema(
   codeGenerator: CodeGenerator,
   schema: ComponentRef,
   path: OutputPath,
-  preventFromAddingTypesForComponentRefs: string[] = []
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
@@ -243,11 +242,14 @@ export function applyZodComponentRefSchema(
     },
     componentRef: schema.$ref,
     path,
-    requiredOutputPaths: [
-      codeGenerator.createOutputPathByZodComponentRef(schema.$ref),
+    getRequiredOutputPaths: () => [
+      codeGenerator.createZodSchemaOutputPathByComponentRef(schema.$ref),
     ],
   };
-  codeGenerator.addOutput(output, preventFromAddingTypesForComponentRefs);
+  codeGenerator.addOutput(output, {
+    preventFromAddingComponentRefs: preventFromAddingComponentRefs,
+    createWithZodSchema: true,
+  });
   return {
     ...output,
     createCode: referencingPath =>
@@ -259,7 +261,7 @@ export function applyZodObjectSchema(
   codeGenerator: CodeGenerator,
   schema: ObjectSchema,
   path: OutputPath,
-  preventFromAddingTypesForComponentRefs: string[] = []
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const directOutputByPropNameMap: {
     [propName: string]: {
@@ -276,7 +278,7 @@ export function applyZodObjectSchema(
       codeGenerator,
       propSchema,
       propSchemaPath,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   let additionalPropertiesDirectOutput: undefined | CodeGenerationOutput;
@@ -285,7 +287,7 @@ export function applyZodObjectSchema(
       codeGenerator,
       schema.additionalProperties,
       [...path, objectSchemaAdditionalPropsOutputPathPart],
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   return {
@@ -316,7 +318,7 @@ export function applyZodObjectSchema(
       )}\n})${zodAdditionalPropsExtension}`;
     },
     path,
-    requiredOutputPaths,
+    getRequiredOutputPaths: () => requiredOutputPaths,
   };
 }
 
@@ -324,7 +326,7 @@ function applyZodOneOfSchema(
   codeGenerator: CodeGenerator,
   schema: OneOfSchema,
   path: OutputPath,
-  preventFromAddingTypesForComponentRefs: string[] = []
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const oneOfItemDirectOutputs: CodeGenerationOutput[] = [];
   const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
@@ -339,7 +341,7 @@ function applyZodOneOfSchema(
       codeGenerator,
       itemSchema,
       itemPath,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
     oneOfItemDirectOutputs.push(itemOutput);
   });
@@ -351,19 +353,17 @@ function applyZodOneOfSchema(
           ? ` // ${directOutput.codeComment}`
           : '';
         codeRows.push(
-          `| ${directOutput.createCode(referencingContext)}${itemComment}`
+          `${directOutput.createCode(referencingContext)}${itemComment}`
         );
       });
       const discriminatorName = schema.discriminator?.propertyName;
       if (schema.discriminator?.propertyName) {
-        `z.discriminatedUnion('${discriminatorName}', [${codeRows.join(
-          '\n'
-        )}])`;
+        `z.discriminatedUnion('${discriminatorName}', [${codeRows.join(',')}])`;
       }
-      return `z.union([${codeRows.join('\n')}])`;
+      return `z.union([${codeRows.join(',')}])`;
     },
     path,
-    requiredOutputPaths,
+    getRequiredOutputPaths: () => requiredOutputPaths,
   };
 }
 
@@ -371,13 +371,13 @@ function applyZodAllOfSchema(
   _codeGenerator: CodeGenerator,
   _schema: AllOfSchema,
   path: OutputPath,
-  _preventFromAddingTypesForComponentRefs: string[] = []
+  _preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   return {
     createCode: () => {
       return 'z.any()';
     },
     path,
-    requiredOutputPaths: [templateZOfZodLibrary.path],
+    getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
   };
 }

@@ -49,7 +49,7 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
       const bodyCode = responseBodySummary.createCode(referencingPath);
       return `${responseTypeName}<${statusCodeDiscriminatorValue}, ${bodyCode}>`;
     },
-    requiredOutputPaths,
+    getRequiredOutputPaths: () => requiredOutputPaths,
   };
   codeGenerator.addOutput(typeDefinitionOutput);
   return typeDefinitionOutput;
@@ -99,7 +99,7 @@ export function applyResponseByStatusCodeMap(
           return `${responseType}<${statusCodeDiscriminatorValue}, ${bodyCode}>`;
         },
         path: responseOutputPath,
-        requiredOutputPaths: [],
+        getRequiredOutputPaths: () => [],
       };
       statusCodeResponseOutputs.push(responseOutput);
       continue;
@@ -125,7 +125,7 @@ export function applyResponseByStatusCodeMap(
         return statusCodeResponseType.createName(referencingPath);
       },
       path: responseOutputPath,
-      requiredOutputPaths: [statusCodeResponseType.path],
+      getRequiredOutputPaths: () => [statusCodeResponseType.path],
     });
   }
   const responseTypeDefinition: DefinitionOutput = {
@@ -148,7 +148,7 @@ export function applyResponseByStatusCodeMap(
       }
       return `${codeParts.join('\n')}`;
     },
-    requiredOutputPaths,
+    getRequiredOutputPaths: () => requiredOutputPaths,
   };
   codeGenerator.addOutput(responseTypeDefinition);
   return responseTypeDefinition;

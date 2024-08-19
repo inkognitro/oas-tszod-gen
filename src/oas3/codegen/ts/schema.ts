@@ -35,14 +35,14 @@ export function applySchema(
   codeGenerator: CodeGenerator,
   schema: Schema,
   path: OutputPath,
-  preventFromAddingTypesForComponentRefs: string[] = []
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   if (isSchemaComponentRef(schema)) {
     return applyComponentRefSchema(
       codeGenerator,
       schema,
       path,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   if (isBooleanSchema(schema)) {
@@ -62,7 +62,7 @@ export function applySchema(
       codeGenerator,
       schema,
       path,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   if (isObjectSchema(schema)) {
@@ -70,7 +70,7 @@ export function applySchema(
       codeGenerator,
       schema,
       path,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   if (isOneOfSchema(schema)) {
@@ -78,7 +78,7 @@ export function applySchema(
       codeGenerator,
       schema,
       path,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   if (isAllOfSchema(schema)) {
@@ -86,7 +86,7 @@ export function applySchema(
       codeGenerator,
       schema,
       path,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   throw new Error(`schema not supported: ${JSON.stringify(schema)}`);
@@ -105,7 +105,7 @@ function applyBooleanSchema(
       return code;
     },
     path,
-    requiredOutputPaths: [],
+    getRequiredOutputPaths: () => [],
   };
 }
 
@@ -131,7 +131,7 @@ function applyStringSchema(
       return code;
     },
     path,
-    requiredOutputPaths: [],
+    getRequiredOutputPaths: () => [],
     codeComment,
   };
 }
@@ -140,7 +140,7 @@ function applyArraySchema(
   codeGenerator: CodeGenerator,
   schema: ArraySchema,
   path: OutputPath,
-  preventFromAddingTypesForComponentRefs: string[] = []
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const requiredOutputPaths: OutputPath[] = [];
   const itemOutputPath = [...path, arraySchemaItemOutputPathPart];
@@ -148,7 +148,7 @@ function applyArraySchema(
     codeGenerator,
     schema.items,
     itemOutputPath,
-    preventFromAddingTypesForComponentRefs
+    preventFromAddingComponentRefs
   );
   requiredOutputPaths.push(itemOutputPath);
   const codeComment = itemSummary.codeComment
@@ -160,7 +160,7 @@ function applyArraySchema(
     },
     codeComment,
     path,
-    requiredOutputPaths,
+    getRequiredOutputPaths: () => requiredOutputPaths,
   };
 }
 
@@ -177,7 +177,7 @@ function applyNumberSchema(
       return code;
     },
     path,
-    requiredOutputPaths: [],
+    getRequiredOutputPaths: () => [],
   };
 }
 
@@ -195,7 +195,7 @@ function applyIntegerSchema(
     },
     codeComment: 'int',
     path,
-    requiredOutputPaths: [],
+    getRequiredOutputPaths: () => [],
   };
 }
 
@@ -203,7 +203,7 @@ export function applyComponentRefSchema(
   codeGenerator: CodeGenerator,
   schema: ComponentRef,
   path: OutputPath,
-  preventFromAddingTypesForComponentRefs: string[] = []
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
@@ -215,11 +215,14 @@ export function applyComponentRefSchema(
     },
     componentRef: schema.$ref,
     path,
-    requiredOutputPaths: [
+    getRequiredOutputPaths: () => [
       codeGenerator.createOutputPathByComponentRef(schema.$ref),
     ],
   };
-  codeGenerator.addOutput(output, preventFromAddingTypesForComponentRefs);
+  codeGenerator.addOutput(output, {
+    preventFromAddingComponentRefs: preventFromAddingComponentRefs,
+    createWithZodSchema: false,
+  });
   return {
     ...output,
     createCode: referencingPath =>
@@ -231,7 +234,7 @@ export function applyObjectSchema(
   codeGenerator: CodeGenerator,
   schema: ObjectSchema,
   path: OutputPath,
-  preventFromAddingTypesForComponentRefs: string[] = []
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const directOutputByPropNameMap: {
     [propName: string]: {
@@ -248,7 +251,7 @@ export function applyObjectSchema(
       codeGenerator,
       propSchema,
       propSchemaPath,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   let additionalPropertiesDirectOutput: undefined | CodeGenerationOutput;
@@ -257,7 +260,7 @@ export function applyObjectSchema(
       codeGenerator,
       schema.additionalProperties,
       [...path, objectSchemaAdditionalPropsOutputPathPart],
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
   }
   return {
@@ -288,7 +291,7 @@ export function applyObjectSchema(
       return `{\n${codeRows.join('\n')}\n}`;
     },
     path,
-    requiredOutputPaths,
+    getRequiredOutputPaths: () => requiredOutputPaths,
   };
 }
 
@@ -296,7 +299,7 @@ function applyOneOfSchema(
   codeGenerator: CodeGenerator,
   schema: OneOfSchema,
   path: OutputPath,
-  preventFromAddingTypesForComponentRefs: string[] = []
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const oneOfItemDirectOutputs: CodeGenerationOutput[] = [];
   const requiredOutputPaths: OutputPath[] = [];
@@ -311,7 +314,7 @@ function applyOneOfSchema(
       codeGenerator,
       itemSchema,
       itemPath,
-      preventFromAddingTypesForComponentRefs
+      preventFromAddingComponentRefs
     );
     oneOfItemDirectOutputs.push(itemOutput);
   });
@@ -329,7 +332,7 @@ function applyOneOfSchema(
       return `${codeRows.join('\n')}`;
     },
     path,
-    requiredOutputPaths,
+    getRequiredOutputPaths: () => requiredOutputPaths,
   };
 }
 
@@ -337,12 +340,12 @@ function applyAllOfSchema(
   _codeGenerator: CodeGenerator,
   _schema: AllOfSchema,
   path: OutputPath,
-  _preventFromAddingTypesForComponentRefs: string[] = []
+  _preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const requiredOutputPaths: OutputPath[] = [];
   return {
     createCode: () => 'any',
     path,
-    requiredOutputPaths,
+    getRequiredOutputPaths: () => requiredOutputPaths,
   };
 }

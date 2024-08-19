@@ -5,6 +5,11 @@ import {
   Schema,
 } from '@oas3/specification';
 
+export type AddOutputConfig = {
+  preventFromAddingComponentRefs: string[];
+  createWithZodSchema: boolean;
+};
+
 export interface CodeGenerator {
   createComponentTypeName(
     componentRef: string,
@@ -23,11 +28,8 @@ export interface CodeGenerator {
   ): string;
   createOperationOutputPath(operationId: string): OutputPath;
   createOutputPathByComponentRef(componentRef: string): OutputPath;
-  createOutputPathByZodComponentRef(componentRef: string): OutputPath;
-  addOutput(
-    output: Output,
-    preventFromAddingTypesForComponentRefs?: string[]
-  ): void;
+  createZodSchemaOutputPathByComponentRef(componentRef: string): OutputPath;
+  addOutput(output: Output, config?: AddOutputConfig): void;
   findComponentSchemaByRef(componentRef: string): null | Schema;
   findComponentParameterByRef(componentRef: string): null | Parameter;
   hasSameFileContext(outputPath1: OutputPath, outputPath2: OutputPath): boolean;
@@ -77,7 +79,7 @@ export type CreateCodeFunc = (referencingPath: OutputPath) => string;
 
 export type CodeGenerationOutput = {
   path: OutputPath;
-  requiredOutputPaths: OutputPath[];
+  getRequiredOutputPaths: () => OutputPath[];
   createCode: CreateCodeFunc;
   codeComment?: string;
 };
@@ -87,7 +89,7 @@ type GenericOutput<T extends OutputType, P extends object = {}> = P & {
   path: OutputPath;
   fixedImportPath?: string;
   createName: (referencingPath: OutputPath) => string;
-  requiredOutputPaths: OutputPath[];
+  getRequiredOutputPaths: () => OutputPath[];
 };
 
 export type DefinitionOutput = GenericOutput<
