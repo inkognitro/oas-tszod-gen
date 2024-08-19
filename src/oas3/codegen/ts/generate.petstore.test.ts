@@ -6,7 +6,7 @@ test('can generate files from pet store one specification', () => {
   expect(() => {
     generateOas3ToTs({
       getSpecification: () => {
-        return new Promise<object>(resolve => {
+        return new Promise(resolve => {
           resolve(petStore1Specification);
         });
       },
@@ -22,7 +22,7 @@ test('can generate files from pet store one specification with Zod', () => {
   expect(() => {
     generateOas3ToTs({
       getSpecification: () => {
-        return new Promise<object>(resolve => {
+        return new Promise(resolve => {
           resolve(petStore1Specification);
         });
       },
@@ -39,7 +39,7 @@ test('can generate files from pet store two specification', () => {
   expect(() => {
     generateOas3ToTs({
       getSpecification: () => {
-        return new Promise<object>(resolve => {
+        return new Promise(resolve => {
           resolve(petStore2Specification);
         });
       },
@@ -55,7 +55,7 @@ test('can generate files from pet store two specification with Zod', () => {
   expect(() => {
     generateOas3ToTs({
       getSpecification: () => {
-        return new Promise<object>(resolve => {
+        return new Promise(resolve => {
           resolve(petStore2Specification);
         });
       },
