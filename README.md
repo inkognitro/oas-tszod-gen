@@ -26,3 +26,34 @@ I coded my own solution because I wanted to
 
 As long as the API contract on the backend side was not violated through breaking changes,
 you don't have to worry about breaking changes in generated code output after migrating to the next **minor** version.
+
+
+## Usage
+The following script can be used in the development process of your application.
+This will generate several files and folders depending on your OAS3 specification.
+
+```typescript
+import { generateOas3ToTs } from './generate';
+const myOas3Specification = require('./path/to/my/oas3Specification.json');
+
+generateOas3ToTs({
+  getSpecification: () => {
+    return new Promise<object>(resolve => {
+      resolve(myOas3Specification);
+    });
+  },
+  outputFolderPath: './my-output-folder',
+  predefinedFolderOutputPaths: [
+    ['core'], // creates the outputs in the `./core` folder for generated outputs which have an `OutputPath` starting with the values ['core']
+    ['util', 'foo'], // creates the outputs in the `./util/foo` folder for generated outputs which have an `OutputPath` starting with the values ['util', 'foo']
+  ],
+  logger: {
+    log: (content) => {
+      console.log(content);
+    },
+  },
+  shouldGenerateWithZod: true, // In case of `false`, only TypeScript output is generated without Zod schemas
+});
+
+
+```
