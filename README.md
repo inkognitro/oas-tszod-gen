@@ -44,8 +44,8 @@ generateOas3ToTs({
   },
   outputFolderPath: './my-output-folder',
   predefinedFolderOutputPaths: [
-    ['core'], // creates the outputs in the `./core` folder for generated outputs which have an `OutputPath` starting with the values ['core']
-    ['util', 'foo'], // creates the outputs in the `./util/foo` folder for generated outputs which have an `OutputPath` starting with the values ['util', 'foo']
+    ['core'], // creates the outputs in the `./core` folder for generated outputs which have an `OutputPath` starting with ['core']
+    ['util', 'foo'], // creates the outputs in the `./util/foo` folder for generated outputs which have an `OutputPath` starting with ['util', 'foo']
   ],
   logger: {
     log: (content) => {
