@@ -38,7 +38,7 @@ const myOas3Specification = require('./path/to/my/oas3Specification.json');
 
 generateOas3ToTs({
   getSpecification: () => {
-    return new Promise<object>(resolve => {
+    return new Promise(resolve => {
       resolve(myOas3Specification);
     });
   },
