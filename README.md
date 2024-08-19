@@ -64,6 +64,6 @@ The remaining entries of this array are used for the type or the variable name.
 
 Let's consider some example endpoints which might be defined in your OAS3 specification under the `paths` variable:
 
-1. The outputs for the endpoint which has the operationId `auth.authenticate` will be put into `./auth/authenticate.ts`
-2. The outputs for the endpoint which has the operationId `userManagement.getUsers` will be put into `./user-management/getUsers.ts`
-3. The outputs for the endpoint which has the operationId `userManagement.admin.getUsers` will be put into `./user-management/admin/getUsers.ts`
+1. The outputs for the endpoint with the operationId `auth.authenticate` are going to be put into `./auth/authenticate.ts`
+2. The outputs for the endpoint with the operationId `userManagement.getUsers` are going to be put into `./user-management/getUsers.ts`
+3. The outputs for the endpoint with the operationId `userManagement.admin.getUsers` are going to be put into `./user-management/admin/getUsers.ts`
