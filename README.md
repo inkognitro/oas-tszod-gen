@@ -12,7 +12,7 @@ A tool to convert [OpenApiV3](https://swagger.io/specification/) specifications 
 - to have the possibility for an automatic compatibility check of your api endpoints with your TS frontends
 - to write less code that could lie, leading to fewer bugs and improved customer satisfaction
 
-## Why did you write yet another library for this task?
+## Why yet another library for this task?
 Before you consider using this library, I suggest having a look at [Zodios](https://www.zodios.org/)
 and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
 
