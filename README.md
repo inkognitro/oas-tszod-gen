@@ -33,7 +33,7 @@ The following script can be used in the development process of your application.
 This will generate several files and folders depending on your OAS3 specification.
 
 ```typescript
-import { generateOas3ToTs } from './generate';
+import { generateOas3ToTs } from 'oas-to-code';
 const myOas3Specification = require('./path/to/my/oas3Specification.json');
 
 generateOas3ToTs({
