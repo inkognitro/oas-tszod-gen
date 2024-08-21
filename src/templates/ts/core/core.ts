@@ -15,14 +15,16 @@ function createRequestUrl(endpointPath: string, params: PathParams): string {
     const paramPropNames = Object.keys(params);
     if (!paramPropNames.includes(urlVariableName)) {
       console.error(
-        `url variable "${urlVariableName}" not available in params: ${params}`
+        `url variable "${urlVariableName}" not available in params:`,
+        params
       );
       return;
     }
     const paramValue = params[urlVariableName];
     if (typeof paramValue !== 'string' && typeof paramValue !== 'number') {
       console.error(
-        `url variable "${urlVariableName}" must either be a string or a number, following params were given: ${params}`
+        `url variable "${urlVariableName}" must either be a string or a number, following params were given:`,
+        params
       );
       return;
     }
