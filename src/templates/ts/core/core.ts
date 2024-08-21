@@ -36,8 +36,8 @@ export type EndpointId = {
   path: string;
 };
 
-type Headers = {['Content-Type']?: string} & {
-  [key: string]: string;
+type Headers = {
+  [key: 'Content-Type' | string]: string;
 };
 
 type Cookies = {
