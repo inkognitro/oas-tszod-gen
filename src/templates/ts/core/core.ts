@@ -44,25 +44,29 @@ type Cookies = {
   [key: string]: string;
 };
 
+export type SecurityScheme = {
+  name: string;
+  requiredPermissions: string[];
+};
+
 export type Request<
+  PathParams extends object | undefined = any,
   QueryParams extends object | undefined = any,
   Body extends object | undefined = any,
 > = {
   endpointId: EndpointId;
   url: string;
-  supportedSecuritySchemes: string[];
-  appliedSecurityScheme: null | string;
+  supportedSecuritySchemes: SecurityScheme[];
   headers?: Headers;
   cookies?: Cookies;
-  pathParams?: PathParams;
-  queryParams?: QueryParams;
-  body?: Body;
+  pathParams: PathParams;
+  queryParams: QueryParams;
+  body: Body;
 };
 
 type RequestCreationSettings = {
   endpointId: EndpointId;
-  supportedSecuritySchemes?: string[];
-  appliedSecurityScheme?: string;
+  supportedSecuritySchemes?: SecurityScheme[];
   headers?: Headers;
   cookies?: Cookies;
   pathParams?: PathParams;
@@ -74,7 +78,6 @@ export function createRequest(settings: RequestCreationSettings): Request {
   return {
     endpointId: settings.endpointId,
     supportedSecuritySchemes: settings.supportedSecuritySchemes ?? [],
-    appliedSecurityScheme: settings.appliedSecurityScheme ?? null,
     url: createRequestUrl(settings.endpointId.path, settings.pathParams ?? {}),
     headers: settings.headers,
     cookies: settings.cookies,
@@ -108,8 +111,7 @@ export interface RequestResult<
 }
 
 export interface RequestExecutionConfig {
-  onUploadProgress?: () => void;
-  doNotApplyAuthCredentials?: boolean;
+  onUploadProgress?: (progress: number) => void;
 }
 
 export interface RequestHandler {

@@ -10,6 +10,7 @@ import {
   ObjectSchema,
   ObjectSchemaProperties,
   Parameter,
+  PermissionsBySecurityNameArray,
   Request,
   RequestBodyContentByTypeMap,
   Schema,
@@ -304,13 +305,37 @@ function createNullableExplicitObjectFieldsCode(
   if (objectSchema.properties?.[propName] && codeParts.length > 0) {
     codeParts.unshift(`...payload.${propName}`);
   }
-  return codeParts.length ? codeParts.join(',\n') : null;
+  return codeParts.length ? `{${codeParts.join(',\n')}}` : null;
+}
+
+function createNullableSupportedSecuritySchemesCode(
+  security: PermissionsBySecurityNameArray
+): null | string {
+  const codeParts: string[] = [];
+  security.forEach(permissionsBySecurityName => {
+    for (const securityName in permissionsBySecurityName) {
+      const permissions = permissionsBySecurityName[securityName];
+      if (!permissions.length) {
+        codeParts.push(`{ name: '${securityName}', requiredPermissions: [] }`);
+        continue;
+      }
+      const permissionsCode = `['${permissions.join(', ')}']`;
+      codeParts.push(
+        `{ name: '${securityName}', permissions: ${permissionsCode} }`
+      );
+    }
+  });
+  if (!codeParts.length) {
+    return null;
+  }
+  return `[${codeParts.join(',\n')}]`;
 }
 
 function createRequestCreationCode(
   path: OutputPath,
   endpointIdDefinition: DefinitionOutput,
-  payloadUtils: null | AppliedPayloadOutputs
+  payloadUtils: null | AppliedPayloadOutputs,
+  security?: null | PermissionsBySecurityNameArray
 ): string {
   const parts: string[] = [];
   parts.push(`endpointId: ${endpointIdDefinition.createName(path)}`);
@@ -328,7 +353,7 @@ function createRequestCreationCode(
     forcedHeaderValues
   );
   if (explicitHeadersCode) {
-    parts.push(`headers: {${explicitHeadersCode}}`);
+    parts.push(`headers: ${explicitHeadersCode}`);
   }
 
   const explicitCookiesCode = createNullableExplicitObjectFieldsCode(
@@ -336,7 +361,7 @@ function createRequestCreationCode(
     'cookies'
   );
   if (explicitCookiesCode) {
-    parts.push(`cookies: {${explicitCookiesCode}}`);
+    parts.push(`cookies: ${explicitCookiesCode}`);
   }
 
   const explicitPathParamsCode = createNullableExplicitObjectFieldsCode(
@@ -344,7 +369,7 @@ function createRequestCreationCode(
     'pathParams'
   );
   if (explicitPathParamsCode) {
-    parts.push(`pathParams: {${explicitPathParamsCode}}`);
+    parts.push(`pathParams: ${explicitPathParamsCode}`);
   }
 
   const explicitQueryParamsCode = createNullableExplicitObjectFieldsCode(
@@ -352,7 +377,7 @@ function createRequestCreationCode(
     'queryParams'
   );
   if (explicitQueryParamsCode) {
-    parts.push(`queryParams: {${explicitQueryParamsCode}}`);
+    parts.push(`queryParams: ${explicitQueryParamsCode}`);
   }
 
   const explicitBodyCode = createNullableExplicitObjectFieldsCode(
@@ -360,7 +385,15 @@ function createRequestCreationCode(
     'body'
   );
   if (explicitBodyCode) {
-    parts.push(`body: {${explicitBodyCode}}`);
+    parts.push(`body: ${explicitBodyCode}`);
+  }
+
+  if (security) {
+    const securitySchemesCode =
+      createNullableSupportedSecuritySchemesCode(security);
+    if (securitySchemesCode) {
+      parts.push(`supportedSecuritySchemes: ${securitySchemesCode}`);
+    }
   }
 
   return `const request = createRequest({${parts.join(',\n')}});`;
@@ -390,10 +423,12 @@ function applyEndpointIdConstDefinition(
 export function applyEndpointCallerFunction(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
-  request: Request,
+  requestSchema: Request,
   config: GenerateConfig
 ) {
-  const path = codeGenerator.createOperationOutputPath(request.operationId);
+  const path = codeGenerator.createOperationOutputPath(
+    requestSchema.operationId
+  );
   const endpointIdConstDefinition = applyEndpointIdConstDefinition(
     codeGenerator,
     endpointId,
@@ -401,13 +436,13 @@ export function applyEndpointCallerFunction(
   );
   const payloadUtils = applyPayloadIfRequired(
     codeGenerator,
-    request,
+    requestSchema,
     [...path, 'payload'],
     config
   );
   const requestResultTypeDefinition = applyRequestResultTypeDefinition(
     codeGenerator,
-    request,
+    requestSchema,
     [...path, requestResultOutputPathPart],
     config
   );
@@ -436,7 +471,12 @@ export function applyEndpointCallerFunction(
       const cfgTn = templateRequestExecutionConfigType.createName(path);
       const bodyParts: string[] = [];
       bodyParts.push(
-        createRequestCreationCode(path, endpointIdConstDefinition, payloadUtils)
+        createRequestCreationCode(
+          path,
+          endpointIdConstDefinition,
+          payloadUtils,
+          requestSchema.security
+        )
       );
       bodyParts.push('return requestHandler.execute(request, config);');
       const funcBody = bodyParts.join('\n');
