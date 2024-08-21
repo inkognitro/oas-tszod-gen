@@ -50,7 +50,7 @@ export const templateRequestResultType: DefinitionOutput = {
 
 export const templateRequestHandlerType: DefinitionOutput = {
   type: OutputType.DEFINITION,
-  definitionType: 'const',
+  definitionType: 'interface',
   path: ['core', 'core', 'requestHandler'],
   createName: () => {
     return 'RequestHandler';

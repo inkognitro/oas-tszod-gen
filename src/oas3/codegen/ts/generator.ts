@@ -214,6 +214,11 @@ export class DefaultCodeGenerator implements CodeGenerator {
             `export type ${o.createName(o.path)} = ${o.createCode(o.path)}`
           );
           break;
+        case 'interface':
+          definitionContents.push(
+            `export interface ${o.createName(o.path)} ${o.createCode(o.path)}`
+          );
+          break;
         default:
           throw new Error(`output type "${o.definitionType}" is not supported`);
       }
