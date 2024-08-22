@@ -31,7 +31,8 @@
   "keywords": [
     "oas-to-code",
     "oas3",
-    "oas3 code generator"
+    "oas3 code generator",
+    "oas to zod"
   ],
   "author": "Marcel Fischer",
   "license": "MIT",
