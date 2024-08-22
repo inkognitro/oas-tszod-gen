@@ -1,6 +1,6 @@
 import {
   CodeGenerator,
-  DefinitionOutput,
+  GeneratedDefinitionOutput,
   getConcreteParameter,
   OutputPath,
   OutputType,
@@ -40,14 +40,14 @@ function applyRequestResultTypeDefinition(
   schema: Request,
   path: OutputPath,
   config: GenerateConfig
-): DefinitionOutput {
+): GeneratedDefinitionOutput {
   const responseType = applyResponseByStatusCodeMap(
     codeGenerator,
     schema.responses,
     [...path, responseOutputPathPart],
     config
   );
-  const typeDefinition: DefinitionOutput = {
+  const typeDefinition: GeneratedDefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'type',
     path,
@@ -211,7 +211,7 @@ function findRequestBodyContentSettings(
 
 type AppliedPayloadOutputs = {
   objectSchema: ObjectSchema;
-  typeDefinition: DefinitionOutput;
+  typeDefinition: GeneratedDefinitionOutput;
   bodyContentType: null | string;
 };
 
@@ -234,7 +234,7 @@ function applyPayloadIfRequired(
   }
   if (config.shouldGenerateWithZod) {
     const zodPayloadSchemaPath: OutputPath = [...path, 'zodSchema'];
-    const payloadZodSchemaDefinition: DefinitionOutput = {
+    const payloadZodSchemaDefinition: GeneratedDefinitionOutput = {
       type: OutputType.DEFINITION,
       createName: referencingPath =>
         codeGenerator.createConstName(zodPayloadSchemaPath, referencingPath),
@@ -246,7 +246,7 @@ function applyPayloadIfRequired(
       ),
     };
     codeGenerator.addOutput(payloadZodSchemaDefinition);
-    const payloadTypeDefinition: DefinitionOutput = {
+    const payloadTypeDefinition: GeneratedDefinitionOutput = {
       type: OutputType.DEFINITION,
       createName: referencingPath =>
         codeGenerator.createTypeName(path, referencingPath),
@@ -267,7 +267,7 @@ function applyPayloadIfRequired(
       bodyContentType: requestBodyContentSettings?.contentType ?? null,
     };
   }
-  const payloadTypeDefinition: DefinitionOutput = {
+  const payloadTypeDefinition: GeneratedDefinitionOutput = {
     type: OutputType.DEFINITION,
     createName: referencingPath =>
       codeGenerator.createTypeName(path, referencingPath),
@@ -333,7 +333,7 @@ function createNullableSupportedSecuritySchemesCode(
 
 function createRequestCreationCode(
   path: OutputPath,
-  endpointIdDefinition: DefinitionOutput,
+  endpointIdDefinition: GeneratedDefinitionOutput,
   payloadUtils: null | AppliedPayloadOutputs,
   security?: null | PermissionsBySecurityNameArray
 ): string {
@@ -403,8 +403,8 @@ function applyEndpointIdConstDefinition(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
   path: OutputPath
-): DefinitionOutput {
-  const definition: DefinitionOutput = {
+): GeneratedDefinitionOutput {
+  const definition: GeneratedDefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'const',
     path,

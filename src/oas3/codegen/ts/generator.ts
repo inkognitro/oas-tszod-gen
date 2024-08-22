@@ -5,7 +5,7 @@ import {
   capitalizeFirstLetter,
   CodeGenerationOutput,
   CodeGenerator,
-  DefinitionOutput,
+  GeneratedDefinitionOutput,
   doesOutputPathStartWithOtherOutputPath,
   lowerCaseFirstLetter,
   objectSchemaAdditionalPropsOutputPathPart,
@@ -13,10 +13,11 @@ import {
   Output,
   OutputPath,
   OutputType,
+  DefinitionOutput,
+  TemplateDefinitionOutput,
 } from './core';
 import {
   isConcreteParameter,
-  isObjectSchema,
   isSpecification,
   Parameter,
   parameterComponentRefPrefix,
@@ -25,7 +26,6 @@ import {
   Schema,
   schemaComponentRefPrefix,
   Specification,
-  StringSchema,
 } from '@oas3/specification';
 import {
   applyEndpointCallerFunction,
@@ -34,11 +34,11 @@ import {
 } from './endpoint';
 import {mkdirp} from 'mkdirp';
 import {
-  findTemplateOutput,
-  templateFilePaths,
+  templateFilesToIgnore,
+  templateDefinitionOutputs,
   templateZOfZodLibrary,
 } from './template';
-import {applyObjectSchema, applySchema} from './schema';
+import {applySchema} from './schema';
 import {applyZodSchema} from '@oas3/codegen/ts/zodSchema';
 
 const fs = require('fs');
@@ -123,8 +123,8 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   generate(config: GenerateConfig) {
-    this.outputs = [];
-    this.initializeOperationFolderOutputPaths(config);
+    this.resetOutputs();
+    this.resetOperationFolderOutputPaths(config);
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
       this.generateRequestByMethodMapOutputs(path, requestByMethodMap, config);
@@ -133,8 +133,15 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.createFiles(fileOutputByFilePath, config);
   }
 
-  private initializeOperationFolderOutputPaths(config: GenerateConfig) {
-    this.operationFolderOutputPaths = config.predefinedFolderOutputPaths ?? [];
+  private resetOutputs() {
+    this.outputs = [...templateDefinitionOutputs];
+  }
+
+  private resetOperationFolderOutputPaths(config: GenerateConfig) {
+    this.operationFolderOutputPaths = [
+      ['core'],
+      ...(config.predefinedFolderOutputPaths ?? []),
+    ];
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
       for (const method in requestByMethodMap) {
@@ -161,24 +168,88 @@ export class DefaultCodeGenerator implements CodeGenerator {
         recursive: true,
       }
     );
+    templateFilesToIgnore.forEach(filePath => {
+      const fsFilePath = config.outputFolderPath + filePath;
+      if (fs.existsSync(fsFilePath)) {
+        fs.unlinkSync(fsFilePath);
+      }
+    });
     for (const filePath in fileOutputByFilePath) {
       const fileOutput = fileOutputByFilePath[filePath];
       const fsFilePath = `${cleanTargetFolderPath}${filePath}`;
-      if (templateFilePaths.includes(filePath)) {
-        appendToFile(fsFilePath, this.createFileContent(fileOutput)).then(
-          () => {
-            this.logger.log(`extended file: ${fsFilePath}`);
-          }
-        );
+      if (fs.existsSync(fsFilePath)) {
+        appendToFile(
+          fsFilePath,
+          this.createFileContent(fileOutput, config)
+        ).then(() => {
+          this.logger.log(`extended file: ${fsFilePath}`);
+        });
         continue;
       }
-      writeFile(fsFilePath, this.createFileContent(fileOutput)).then(() => {
-        this.logger.log(`created file: ${fsFilePath}`);
-      });
+      writeFile(fsFilePath, this.createFileContent(fileOutput, config)).then(
+        () => {
+          this.logger.log(`created file: ${fsFilePath}`);
+        }
+      );
     }
   }
 
-  private createFileContent(fileOutput: FileOutput): string {
+  private createDeclarationForGeneratedDefinitionOutput(
+    o: GeneratedDefinitionOutput
+  ): string {
+    switch (o.definitionType) {
+      case 'function':
+        return `export function ${o.createName(o.path)}${o.createCode(o.path)}`;
+      case 'const':
+        return `export const ${o.createName(o.path)} = ${o.createCode(o.path)}`;
+      case 'type':
+        return `export type ${o.createName(o.path)} = ${o.createCode(o.path)}`;
+      case 'interface':
+        return `export interface ${o.createName(o.path)} ${o.createCode(
+          o.path
+        )}`;
+      default:
+        throw new Error(`output type "${o.definitionType}" is not supported`);
+    }
+  }
+
+  private createDeclarationForTemplateDefinitionOutput(
+    o: TemplateDefinitionOutput,
+    config: GenerateConfig
+  ): null | string {
+    if (!o.createCode) {
+      return null;
+    }
+    const genericsDeclarationCode = o.createGenericsDeclarationCode
+      ? `<${o.createGenericsDeclarationCode()}>`
+      : '';
+    switch (o.definitionType) {
+      case 'function':
+        return `export function ${o.createName(
+          o.path
+        )}${genericsDeclarationCode}${o.createCode(config, o.path)}`;
+      case 'const':
+        return `export const ${o.createName(o.path)} = ${o.createCode(
+          config,
+          o.path
+        )}`;
+      case 'type':
+        return `export type ${o.createName(
+          o.path
+        )}${genericsDeclarationCode} = ${o.createCode(config, o.path)}`;
+      case 'interface':
+        return `export interface ${o.createName(
+          o.path
+        )}${genericsDeclarationCode} ${o.createCode(config, o.path)}`;
+      default:
+        throw new Error(`output type "${o.definitionType}" is not supported`);
+    }
+  }
+
+  private createFileContent(
+    fileOutput: FileOutput,
+    config: GenerateConfig
+  ): string {
     const importContents: string[] = [];
     for (const importPath in fileOutput.importAssetsByPath) {
       const importAssets = fileOutput.importAssetsByPath[importPath];
@@ -198,29 +269,23 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
     const definitionContents: string[] = [];
     fileOutput.definitions.forEach(o => {
-      switch (o.definitionType) {
-        case 'function':
+      switch (o.type) {
+        case OutputType.DEFINITION:
           definitionContents.push(
-            `export function ${o.createName(o.path)}${o.createCode(o.path)}`
+            this.createDeclarationForGeneratedDefinitionOutput(o)
           );
           break;
-        case 'const':
-          definitionContents.push(
-            `export const ${o.createName(o.path)} = ${o.createCode(o.path)}`
-          );
-          break;
-        case 'type':
-          definitionContents.push(
-            `export type ${o.createName(o.path)} = ${o.createCode(o.path)}`
-          );
-          break;
-        case 'interface':
-          definitionContents.push(
-            `export interface ${o.createName(o.path)} ${o.createCode(o.path)}`
-          );
+        case OutputType.TEMPLATE_DEFINITION:
+          // eslint-disable-next-line no-case-declarations
+          const templateCode =
+            this.createDeclarationForTemplateDefinitionOutput(o, config);
+          if (templateCode) {
+            definitionContents.push(templateCode);
+          }
           break;
         default:
-          throw new Error(`output type "${o.definitionType}" is not supported`);
+          // @ts-ignore
+          throw new Error(`output type "${o.type}" is not supported`);
       }
     });
 
@@ -550,9 +615,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
         areOutputPathsEqual(o.path, requiredOutputPath)
       );
       if (!requiredOutput) {
-        requiredOutput = findTemplateOutput(requiredOutputPath);
-      }
-      if (!requiredOutput) {
         return;
       }
 
@@ -626,6 +688,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
         case OutputType.COMPONENT_REF:
           break;
         case OutputType.DEFINITION:
+        case OutputType.TEMPLATE_DEFINITION:
           fileOutput = {
             ...fileOutput,
             definitions: [...fileOutput.definitions, output],

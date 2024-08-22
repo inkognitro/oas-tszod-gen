@@ -4,6 +4,7 @@ import {
   Parameter,
   Schema,
 } from '@oas3/specification';
+import {GenerateConfig} from '@oas3/codegen/ts/generator';
 
 export type AddOutputConfig = {
   preventFromAddingComponentRefs: string[];
@@ -37,6 +38,7 @@ export interface CodeGenerator {
 
 export enum OutputType {
   DEFINITION = 'DEFINITION',
+  TEMPLATE_DEFINITION = 'TEMPLATE_DEFINITION',
   COMPONENT_REF = 'COMPONENT_REF',
 }
 
@@ -75,7 +77,10 @@ export function doesOutputPathStartWithOtherOutputPath(
   return true;
 }
 
-export type CreateCodeFunc = (referencingPath: OutputPath) => string;
+export type CreateCodeFunc = (
+  referencingPath: OutputPath,
+  generateConfig?: GenerateConfig
+) => string;
 
 export type CodeGenerationOutput = {
   path: OutputPath;
@@ -92,14 +97,33 @@ type GenericOutput<T extends OutputType, P extends object = {}> = P & {
   getRequiredOutputPaths: () => OutputPath[];
 };
 
-export type DefinitionOutput = GenericOutput<
+type DefinitionType = 'const' | 'function' | 'type' | 'interface';
+
+export type GeneratedDefinitionOutput = GenericOutput<
   OutputType.DEFINITION,
   {
-    definitionType: 'const' | 'function' | 'type' | 'interface';
+    definitionType: DefinitionType;
     createCode: CreateCodeFunc;
     codeComment?: string;
   }
 >;
+
+export type TemplateDefinitionOutput = GenericOutput<
+  OutputType.TEMPLATE_DEFINITION,
+  {
+    definitionType: 'const' | 'function' | 'type' | 'interface';
+    createCode?: (
+      config: GenerateConfig,
+      referencingPath: OutputPath
+    ) => string;
+    createGenericsDeclarationCode?: () => string;
+    codeComment?: string;
+  }
+>;
+
+export type DefinitionOutput =
+  | TemplateDefinitionOutput
+  | GeneratedDefinitionOutput;
 
 export type ComponentRefOutput = GenericOutput<
   OutputType.COMPONENT_REF,
@@ -108,7 +132,10 @@ export type ComponentRefOutput = GenericOutput<
   }
 >;
 
-export type Output = DefinitionOutput | ComponentRefOutput;
+export type Output =
+  | GeneratedDefinitionOutput
+  | TemplateDefinitionOutput
+  | ComponentRefOutput;
 
 export function getConcreteParameter(
   parameterOrComponentRef: Parameter,

@@ -1,15 +1,9 @@
-function getUrlVariableNames(endpointPath: string): string[] {
-  const urlVariableNameRegex = /[^{}]+(?=})/g;
-  const urlVariableNames = endpointPath.match(urlVariableNameRegex);
-  return urlVariableNames ?? [];
-}
-
 type PathParams = {
   [paramName: string]: number | string;
 };
 
 function createRequestUrl(endpointPath: string, params: PathParams): string {
-  const urlVariableNames = getUrlVariableNames(endpointPath);
+  const urlVariableNames = endpointPath.match(/[^{}]+(?=})/g) ?? [];
   let url = endpointPath;
   urlVariableNames.forEach(urlVariableName => {
     const paramPropNames = Object.keys(params);
@@ -52,18 +46,18 @@ export type SecurityScheme = {
 };
 
 export type Request<
-  PathParams extends object | undefined = any,
-  QueryParams extends object | undefined = any,
-  Body extends object | undefined = any,
+  P extends PathParams | undefined = any,
+  Q extends object | undefined = any,
+  B extends object | undefined = any,
 > = {
   endpointId: EndpointId;
   url: string;
   supportedSecuritySchemes: SecurityScheme[];
   headers?: Headers;
   cookies?: Cookies;
-  pathParams: PathParams;
-  queryParams: QueryParams;
-  body: Body;
+  pathParams: P;
+  queryParams: Q;
+  body: B;
 };
 
 type RequestCreationSettings = {
@@ -93,14 +87,14 @@ type StatusCode = number | 'any'; // this is not "any" of TypeScript, it's a str
 
 export interface Response<
   S extends StatusCode = any,
-  Body = any,
+  B = any,
   H extends Headers = {},
   C extends Cookies = {},
 > {
   statusCode: S;
   headers: H;
   cookies: C;
-  body: Body;
+  body: B;
 }
 
 export interface RequestResult<
@@ -112,9 +106,8 @@ export interface RequestResult<
   hasRequestBeenCancelled: boolean;
 }
 
-export interface RequestExecutionConfig {
-  onUploadProgress?: (progress: number) => void;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface RequestExecutionConfig {}
 
 export interface RequestHandler {
   execute(

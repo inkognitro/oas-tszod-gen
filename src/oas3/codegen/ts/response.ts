@@ -9,7 +9,7 @@ import {
   CodeGenerator,
   OutputType,
   OutputPath,
-  DefinitionOutput,
+  GeneratedDefinitionOutput,
   containsOutputPath,
 } from './core';
 import {applyComponentRefSchema, applySchema} from './schema';
@@ -29,7 +29,7 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
   path: OutputPath,
   statusCode: string,
   schema: ResponseBodyContent
-): DefinitionOutput {
+): GeneratedDefinitionOutput {
   const requiredOutputPaths: OutputPath[] = [templateResponseType.path];
   const statusCodeDiscriminatorValue =
     findNumericStatusCode(statusCode) ?? 'any';
@@ -37,7 +37,7 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
     ...path,
     'body',
   ]);
-  const typeDefinitionOutput: DefinitionOutput = {
+  const typeDefinitionOutput: GeneratedDefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'type',
     path,
@@ -70,7 +70,7 @@ export function applyResponseByStatusCodeMap(
   schema: ResponseByStatusCodeMap,
   path: OutputPath,
   config: GenerateConfig
-): DefinitionOutput {
+): GeneratedDefinitionOutput {
   const statusCodeResponseOutputs: CodeGenerationOutput[] = [];
   const requiredOutputPaths: OutputPath[] = [];
   for (const statusCode in schema) {
@@ -128,7 +128,7 @@ export function applyResponseByStatusCodeMap(
       getRequiredOutputPaths: () => [statusCodeResponseType.path],
     });
   }
-  const responseTypeDefinition: DefinitionOutput = {
+  const responseTypeDefinition: GeneratedDefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'type',
     createName: referencingPath => {
