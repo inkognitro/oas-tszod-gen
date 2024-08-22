@@ -79,4 +79,8 @@ export class AuthRequestHandler implements RequestHandler {
     }
     return request;
   }
+
+  cancelRequestById(requestId: string): void {
+    this.nextRequestHandler.cancelRequestById(requestId);
+  }
 }

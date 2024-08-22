@@ -64,6 +64,7 @@ export const templateRequestType: TemplateDefinitionOutput = {
   },
   createCode: () => {
     const bodyCodeParts: string[] = [
+      'id: string;',
       `endpointId: ${templateEndpointIdType.createName(
         templateRequestTypePath
       )};`,
@@ -172,7 +173,7 @@ export const templateRequestHandlerType: TemplateDefinitionOutput = {
       templateRequestHandlerTypePath
     )}): Promise<${templateRequestResultType.createName(
       templateRequestHandlerTypePath
-    )}>\n}`;
+    )}>\ncancelRequestById(requestId: string): void;\n}`;
   },
   getRequiredOutputPaths: () => [
     templateRequestType.path,
@@ -336,27 +337,33 @@ export const templateCreateRequestFunction: TemplateDefinitionOutput = {
     return 'createRequest';
   },
   createCode: () => {
-    const objectCodeParts: string[] = [];
-    objectCodeParts.push('endpointId: settings.endpointId');
-    objectCodeParts.push(
-      'supportedSecuritySchemes: settings.supportedSecuritySchemes ?? []'
-    );
-    objectCodeParts.push(
+    const requestIdParts: string[] = [
+      "const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');",
+      "let requestId = '';",
+      'for (let i = 32; i > 0; i--) {',
+      'requestId += chars[Math.floor(Math.random() * chars.length)];',
+      '}',
+    ];
+    const objectCodeParts: string[] = [
+      'id: requestId',
+      'endpointId: settings.endpointId',
+      'supportedSecuritySchemes: settings.supportedSecuritySchemes ?? []',
       `url: ${templateCreateRequestUrlFunction.createName(
         templateCreateRequestFunctionPath
-      )}(settings.endpointId.path, settings.pathParams ?? {})`
-    );
-    objectCodeParts.push('headers: settings.headers');
-    objectCodeParts.push('cookies: settings.cookies');
-    objectCodeParts.push('pathParams: settings.pathParams');
-    objectCodeParts.push('queryParams: settings.queryParams');
-    objectCodeParts.push('body: settings.body');
-    const objectCode = `{\n${objectCodeParts.join(',\n')}\n}`;
+      )}(settings.endpointId.path, settings.pathParams ?? {})`,
+      'headers: settings.headers',
+      'cookies: settings.cookies',
+      'pathParams: settings.pathParams',
+      'queryParams: settings.queryParams',
+      'body: settings.body',
+    ];
     return `(settings: ${templateRequestCreationSettingsType.createName(
       templateCreateRequestFunctionPath
     )}): ${templateRequestType.createName(
       templateCreateRequestFunctionPath
-    )} {\nreturn ${objectCode}\n}`;
+    )} {\n${requestIdParts.join('\n')}\nreturn {\n${objectCodeParts.join(
+      ',\n'
+    )}\n}\n}`;
   },
   getRequiredOutputPaths: () => [
     templateRequestCreationSettingsType.path,

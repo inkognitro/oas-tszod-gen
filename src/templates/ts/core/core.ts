@@ -50,6 +50,7 @@ export type Request<
   Q extends object | undefined = any,
   B extends object | undefined = any,
 > = {
+  id: string;
   endpointId: EndpointId;
   url: string;
   supportedSecuritySchemes: SecurityScheme[];
@@ -71,7 +72,14 @@ type RequestCreationSettings = {
 };
 
 export function createRequest(settings: RequestCreationSettings): Request {
+  const chars =
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+  let requestId = '';
+  for (let i = 32; i > 0; i--) {
+    requestId += chars[Math.floor(Math.random() * chars.length)];
+  }
   return {
+    id: requestId,
     endpointId: settings.endpointId,
     supportedSecuritySchemes: settings.supportedSecuritySchemes ?? [],
     url: createRequestUrl(settings.endpointId.path, settings.pathParams ?? {}),
@@ -114,4 +122,5 @@ export interface RequestHandler {
     request: Request,
     config?: RequestExecutionConfig
   ): Promise<RequestResult>;
+  cancelRequestById(requestId: string): void;
 }
