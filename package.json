@@ -1,6 +1,6 @@
 {
   "name": "@inkognitro/oas-to-code",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "files": [
     "./dist",
     "./LICENSE",
