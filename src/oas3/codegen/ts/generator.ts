@@ -44,6 +44,21 @@ import {applyZodSchema} from '@oas3/codegen/ts/zodSchema';
 const fs = require('fs');
 const path = require('path');
 
+function removeDirectoryRecursively(path: string) {
+  if (!fs.existsSync(path)) {
+    return;
+  }
+  fs.readdirSync(path).forEach((file: string) => {
+    const curPath = path + '/' + file;
+    if (fs.lstatSync(curPath).isDirectory()) {
+      removeDirectoryRecursively(curPath);
+    } else {
+      fs.unlinkSync(curPath);
+    }
+  });
+  fs.rmdirSync(path);
+}
+
 async function writeFile(path: string, content: string) {
   const dirPath = path.split('/').slice(0, -1).join('/');
   await mkdirp(dirPath);
@@ -161,6 +176,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     config: GenerateConfig
   ) {
     const cleanTargetFolderPath = cleanUpFolderPath(config.outputFolderPath);
+    removeDirectoryRecursively(cleanTargetFolderPath);
     fs.cpSync(
       path.resolve(__dirname, '../../../templates/ts'),
       cleanTargetFolderPath,

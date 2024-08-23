@@ -340,7 +340,7 @@ function createRequestCreationCode(
   const parts: string[] = [];
   parts.push(`endpointId: ${endpointIdDefinition.createName(path)}`);
   if (!payloadUtils) {
-    return `const request = createRequest(${parts.join(',\n')});`;
+    return `const request = createRequest({${parts.join(',\n')}});`;
   }
   parts.push('...payload');
 
