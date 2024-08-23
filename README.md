@@ -96,7 +96,7 @@ const exampleAuthenticationProvider: HttpBearerAuthenticationProvider = {
   findToken: () => {
     return 'my-access-token';
   },
-  securitySchemeName: 'example', // OAS3 security name
+  securitySchemeName: 'example', // this is the name of one of your security definitions in your OAS3 specification
 };
 
 const requestHandler = new AuthRequestHandler(
