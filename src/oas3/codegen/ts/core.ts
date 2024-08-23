@@ -94,7 +94,6 @@ type GenericOutput<T extends OutputType, P extends object = {}> = P & {
   path: OutputPath;
   fixedImportPath?: string;
   createName: (referencingPath: OutputPath) => string;
-  getRequiredOutputPaths: () => OutputPath[];
 };
 
 type DefinitionType = 'const' | 'function' | 'type' | 'interface';
@@ -105,6 +104,7 @@ export type GeneratedDefinitionOutput = GenericOutput<
     definitionType: DefinitionType;
     createCode: CreateCodeFunc;
     codeComment?: string;
+    getRequiredOutputPaths: () => OutputPath[];
   }
 >;
 
@@ -118,6 +118,7 @@ export type TemplateDefinitionOutput = GenericOutput<
     ) => string;
     createGenericsDeclarationCode?: () => string;
     codeComment?: string;
+    getRequiredOutputPaths: (config: GenerateConfig) => OutputPath[];
   }
 >;
 
@@ -129,6 +130,7 @@ export type ComponentRefOutput = GenericOutput<
   OutputType.COMPONENT_REF,
   {
     componentRef: string;
+    getRequiredOutputPaths: () => OutputPath[];
   }
 >;
 

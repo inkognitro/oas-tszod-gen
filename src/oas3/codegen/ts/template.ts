@@ -62,8 +62,8 @@ export const templateRequestType: TemplateDefinitionOutput = {
     ];
     return genericCodeParts.join(',\n');
   },
-  createCode: () => {
-    const bodyCodeParts: string[] = [
+  createCode: config => {
+    let bodyCodeParts: string[] = [
       'id: string;',
       `endpointId: ${templateEndpointIdType.createName(
         templateRequestTypePath
@@ -78,15 +78,41 @@ export const templateRequestType: TemplateDefinitionOutput = {
       'queryParams: Q;',
       'body: B;',
     ];
+    if (config.shouldGenerateWithZod) {
+      bodyCodeParts = [
+        ...bodyCodeParts,
+        `headersZodSchema?: ${templateZodSchemaOfZodLibrary.createName(
+          templateRequestTypePath
+        )};`,
+        `cookiesZodSchema?: ${templateZodSchemaOfZodLibrary.createName(
+          templateRequestTypePath
+        )};`,
+        `pathParamsZodSchema?: ${templateZodSchemaOfZodLibrary.createName(
+          templateRequestTypePath
+        )};`,
+        `queryParamsZodSchema?: ${templateZodSchemaOfZodLibrary.createName(
+          templateRequestTypePath
+        )};`,
+        `bodyZodSchema?: ${templateZodSchemaOfZodLibrary.createName(
+          templateRequestTypePath
+        )};`,
+      ];
+    }
     return `{${bodyCodeParts.join('\n')}}`;
   },
-  getRequiredOutputPaths: () => [
-    templatePathParamsType.path,
-    templateEndpointIdType.path,
-    templateSecuritySchemeType.path,
-    templateHeadersType.path,
-    templateCookiesType.path,
-  ],
+  getRequiredOutputPaths: config => {
+    const requiredOutputPaths = [
+      templatePathParamsType.path,
+      templateEndpointIdType.path,
+      templateSecuritySchemeType.path,
+      templateHeadersType.path,
+      templateCookiesType.path,
+    ];
+    if (config.shouldGenerateWithZod) {
+      requiredOutputPaths.push(templateZodSchemaOfZodLibrary.path);
+    }
+    return requiredOutputPaths;
+  },
 };
 
 const templateResponseTypePath = ['core', 'core', 'response'];
@@ -288,7 +314,7 @@ const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
   createName: () => {
     return 'RequestCreationSettings';
   },
-  createCode: () => {
+  createCode: config => {
     const codeParts: string[] = [];
     codeParts.push(
       `endpointId: ${templateEndpointIdType.createName(
@@ -317,6 +343,33 @@ const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
     );
     codeParts.push('queryParams?: object;');
     codeParts.push('body?: object;');
+    if (config.shouldGenerateWithZod) {
+      codeParts.push(
+        `headersZodSchema?: ${templateZodSchemaOfZodLibrary.createName(
+          templateRequestCreationSettingsTypePath
+        )};`
+      );
+      codeParts.push(
+        `cookiesZodSchema?: ${templateZodSchemaOfZodLibrary.createName(
+          templateRequestCreationSettingsTypePath
+        )};`
+      );
+      codeParts.push(
+        `pathParamsZodSchema?: ${templateZodSchemaOfZodLibrary.createName(
+          templateRequestCreationSettingsTypePath
+        )};`
+      );
+      codeParts.push(
+        `queryParamsZodSchema?: ${templateZodSchemaOfZodLibrary.createName(
+          templateRequestCreationSettingsTypePath
+        )};`
+      );
+      codeParts.push(
+        `bodyZodSchema?: ${templateZodSchemaOfZodLibrary.createName(
+          templateRequestCreationSettingsTypePath
+        )};`
+      );
+    }
     return `{\n${codeParts.join('\n')}\n}`;
   },
   getRequiredOutputPaths: () => [
@@ -336,7 +389,7 @@ export const templateCreateRequestFunction: TemplateDefinitionOutput = {
   createName: () => {
     return 'createRequest';
   },
-  createCode: () => {
+  createCode: config => {
     const requestIdParts: string[] = [
       "const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');",
       "let requestId = '';",
@@ -357,6 +410,15 @@ export const templateCreateRequestFunction: TemplateDefinitionOutput = {
       'queryParams: settings.queryParams',
       'body: settings.body',
     ];
+    if (config.shouldGenerateWithZod) {
+      objectCodeParts.push('headersZodSchema: settings.headersZodSchema');
+      objectCodeParts.push('cookiesZodSchema: settings.cookiesZodSchema');
+      objectCodeParts.push('pathParamsZodSchema: settings.pathParamsZodSchema');
+      objectCodeParts.push(
+        'queryParamsZodSchema: settings.queryParamsZodSchema'
+      );
+      objectCodeParts.push('bodyZodSchema: settings.bodyZodSchema');
+    }
     return `(settings: ${templateRequestCreationSettingsType.createName(
       templateCreateRequestFunctionPath
     )}): ${templateRequestType.createName(
@@ -365,19 +427,36 @@ export const templateCreateRequestFunction: TemplateDefinitionOutput = {
       ',\n'
     )}\n}\n}`;
   },
-  getRequiredOutputPaths: () => [
-    templateRequestCreationSettingsType.path,
-    templateCreateRequestUrlFunction.path,
-  ],
+  getRequiredOutputPaths: config => {
+    const requiredOutputPaths = [
+      templateRequestCreationSettingsType.path,
+      templateCreateRequestUrlFunction.path,
+    ];
+    if (config.shouldGenerateWithZod) {
+      requiredOutputPaths.push(templateZodSchemaOfZodLibrary.path);
+    }
+    return requiredOutputPaths;
+  },
 };
 
 export const templateZOfZodLibrary: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'const',
   fixedImportPath: 'zod',
-  path: ['zod'],
+  path: ['zod', 'z'],
   createName: () => {
     return 'z';
+  },
+  getRequiredOutputPaths: () => [],
+};
+
+export const templateZodSchemaOfZodLibrary: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  fixedImportPath: 'zod',
+  path: ['z', 'zodSchema'],
+  createName: () => {
+    return 'ZodSchema';
   },
   getRequiredOutputPaths: () => [],
 };
@@ -394,6 +473,7 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateRequestCreationSettingsType,
   templateCreateRequestUrlFunction,
   templateZOfZodLibrary,
+  templateZodSchemaOfZodLibrary,
   templateCreateRequestFunction,
   templateRequestType,
   templateResponseType,

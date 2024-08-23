@@ -1,7 +1,9 @@
 import {
+  CodeGenerationOutput,
   CodeGenerator,
   GeneratedDefinitionOutput,
   getConcreteParameter,
+  Output,
   OutputPath,
   OutputType,
 } from './core';
@@ -26,6 +28,7 @@ import {
 import {GenerateConfig} from './generator';
 import {applyZodSchema} from '@oas3/codegen/ts/zodSchema';
 import {applySchema} from '@oas3/codegen/ts/schema';
+import {ZodSchema} from 'zod';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -211,6 +214,7 @@ function findRequestBodyContentSettings(
 
 type AppliedPayloadOutputs = {
   objectSchema: ObjectSchema;
+  zodSchemaDefinition?: GeneratedDefinitionOutput;
   typeDefinition: GeneratedDefinitionOutput;
   bodyContentType: null | string;
 };
@@ -264,6 +268,7 @@ function applyPayloadIfRequired(
     return {
       typeDefinition: payloadTypeDefinition,
       objectSchema: payloadOas3ObjectSchema,
+      zodSchemaDefinition: payloadZodSchemaDefinition,
       bodyContentType: requestBodyContentSettings?.contentType ?? null,
     };
   }
@@ -355,6 +360,16 @@ function createRequestCreationCode(
   if (explicitHeadersCode) {
     parts.push(`headers: ${explicitHeadersCode}`);
   }
+  if (
+    !!payloadUtils.objectSchema.properties?.['headers'] &&
+    payloadUtils.zodSchemaDefinition
+  ) {
+    parts.push(
+      `headersZodSchema: ${payloadUtils.zodSchemaDefinition.createName(
+        path
+      )}.shape.headers`
+    );
+  }
 
   const explicitCookiesCode = createNullableExplicitObjectFieldsCode(
     payloadUtils.objectSchema,
@@ -362,6 +377,16 @@ function createRequestCreationCode(
   );
   if (explicitCookiesCode) {
     parts.push(`cookies: ${explicitCookiesCode}`);
+  }
+  if (
+    !!payloadUtils.objectSchema.properties?.['cookies'] &&
+    payloadUtils.zodSchemaDefinition
+  ) {
+    parts.push(
+      `cookiesZodSchema: ${payloadUtils.zodSchemaDefinition.createName(
+        path
+      )}.shape.cookies`
+    );
   }
 
   const explicitPathParamsCode = createNullableExplicitObjectFieldsCode(
@@ -371,6 +396,16 @@ function createRequestCreationCode(
   if (explicitPathParamsCode) {
     parts.push(`pathParams: ${explicitPathParamsCode}`);
   }
+  if (
+    !!payloadUtils.objectSchema.properties?.['pathParams'] &&
+    payloadUtils.zodSchemaDefinition
+  ) {
+    parts.push(
+      `pathParamsZodSchema: ${payloadUtils.zodSchemaDefinition.createName(
+        path
+      )}.shape.pathParams`
+    );
+  }
 
   const explicitQueryParamsCode = createNullableExplicitObjectFieldsCode(
     payloadUtils.objectSchema,
@@ -379,6 +414,16 @@ function createRequestCreationCode(
   if (explicitQueryParamsCode) {
     parts.push(`queryParams: ${explicitQueryParamsCode}`);
   }
+  if (
+    !!payloadUtils.objectSchema.properties?.['queryParams'] &&
+    payloadUtils.zodSchemaDefinition
+  ) {
+    parts.push(
+      `queryParamsZodSchema: ${payloadUtils.zodSchemaDefinition.createName(
+        path
+      )}.shape.queryParams`
+    );
+  }
 
   const explicitBodyCode = createNullableExplicitObjectFieldsCode(
     payloadUtils.objectSchema,
@@ -386,6 +431,16 @@ function createRequestCreationCode(
   );
   if (explicitBodyCode) {
     parts.push(`body: ${explicitBodyCode}`);
+  }
+  if (
+    !!payloadUtils.objectSchema.properties?.['body'] &&
+    payloadUtils.zodSchemaDefinition
+  ) {
+    parts.push(
+      `bodyZodSchema: ${payloadUtils.zodSchemaDefinition.createName(
+        path
+      )}.shape.body`
+    );
   }
 
   if (security) {

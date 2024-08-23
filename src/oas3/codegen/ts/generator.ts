@@ -5,15 +5,15 @@ import {
   capitalizeFirstLetter,
   CodeGenerationOutput,
   CodeGenerator,
-  GeneratedDefinitionOutput,
+  DefinitionOutput,
   doesOutputPathStartWithOtherOutputPath,
+  GeneratedDefinitionOutput,
   lowerCaseFirstLetter,
   objectSchemaAdditionalPropsOutputPathPart,
   oneOfSchemaItemOutputPathPart,
   Output,
   OutputPath,
   OutputType,
-  DefinitionOutput,
   TemplateDefinitionOutput,
 } from './core';
 import {
@@ -34,8 +34,8 @@ import {
 } from './endpoint';
 import {mkdirp} from 'mkdirp';
 import {
-  templateFilesToIgnore,
   templateDefinitionOutputs,
+  templateFilesToIgnore,
   templateZOfZodLibrary,
 } from './template';
 import {applySchema} from './schema';
@@ -619,6 +619,23 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return areOutputPathsEqual(folderPath1, folderPath2);
   }
 
+  private getRequiredOutputPathsFromOutput(
+    o: Output,
+    config: GenerateConfig
+  ): OutputPath[] {
+    if (o.type === OutputType.DEFINITION) {
+      return o.getRequiredOutputPaths();
+    }
+    if (o.type === OutputType.COMPONENT_REF) {
+      return o.getRequiredOutputPaths();
+    }
+    if (o.type === OutputType.TEMPLATE_DEFINITION) {
+      return o.getRequiredOutputPaths(config);
+    }
+    // @ts-ignore
+    throw new Error(`output.type "${o.type}" is not supported`);
+  }
+
   private addImportsToFileOutput(
     fileOutput: FileOutput,
     output: Output,
@@ -626,65 +643,68 @@ export class DefaultCodeGenerator implements CodeGenerator {
   ): FileOutput {
     const availableOutputs = this.outputs;
     let nextFileOutput = fileOutput;
-    output.getRequiredOutputPaths().forEach(requiredOutputPath => {
-      let requiredOutput = availableOutputs.find(o =>
-        areOutputPathsEqual(o.path, requiredOutputPath)
-      );
-      if (!requiredOutput) {
-        return;
-      }
-
-      if (
-        output.type !== OutputType.COMPONENT_REF &&
-        this.isSameOutputFile(requiredOutput.path, output.path)
-      ) {
-        return;
-      }
-
-      if (output.type === OutputType.COMPONENT_REF) {
-        const componentOutputPath = this.createOutputPathByComponentRef(
-          output.componentRef
-        );
-        requiredOutput = availableOutputs.find(o =>
-          areOutputPathsEqual(o.path, componentOutputPath)
+    this.getRequiredOutputPathsFromOutput(output, config).forEach(
+      requiredOutputPath => {
+        let requiredOutput = availableOutputs.find(o =>
+          areOutputPathsEqual(o.path, requiredOutputPath)
         );
         if (!requiredOutput) {
           return;
         }
-        if (this.isSameOutputFile(requiredOutput.path, output.path)) {
+
+        if (
+          output.type !== OutputType.COMPONENT_REF &&
+          this.isSameOutputFile(requiredOutput.path, output.path)
+        ) {
           return;
         }
-      }
 
-      const importAsset: ImportAsset =
-        output.type === OutputType.COMPONENT_REF
-          ? {
-              name: output.createName(requiredOutput.path),
-              importAsName: output.createName(output.path),
-            }
-          : {
-              name: requiredOutput.createName(requiredOutput.path),
-              importAsName: requiredOutput.createName(output.path),
-            };
+        if (output.type === OutputType.COMPONENT_REF) {
+          const componentOutputPath = this.createOutputPathByComponentRef(
+            output.componentRef
+          );
+          requiredOutput = availableOutputs.find(o =>
+            areOutputPathsEqual(o.path, componentOutputPath)
+          );
+          if (!requiredOutput) {
+            return;
+          }
+          if (this.isSameOutputFile(requiredOutput.path, output.path)) {
+            return;
+          }
+        }
 
-      const importPath =
-        requiredOutput.fixedImportPath ??
-        this.createImportPath(requiredOutput.path, output.path, config);
-      const importAssets = nextFileOutput.importAssetsByPath[importPath] ?? [];
-      const isAssetAlreadyConsidered = !!importAssets.find(
-        a => a.importAsName === importAsset.importAsName
-      );
-      if (isAssetAlreadyConsidered) {
-        return;
+        const importAsset: ImportAsset =
+          output.type === OutputType.COMPONENT_REF
+            ? {
+                name: output.createName(requiredOutput.path),
+                importAsName: output.createName(output.path),
+              }
+            : {
+                name: requiredOutput.createName(requiredOutput.path),
+                importAsName: requiredOutput.createName(output.path),
+              };
+
+        const importPath =
+          requiredOutput.fixedImportPath ??
+          this.createImportPath(requiredOutput.path, output.path, config);
+        const importAssets =
+          nextFileOutput.importAssetsByPath[importPath] ?? [];
+        const isAssetAlreadyConsidered = !!importAssets.find(
+          a => a.importAsName === importAsset.importAsName
+        );
+        if (isAssetAlreadyConsidered) {
+          return;
+        }
+        nextFileOutput = {
+          ...nextFileOutput,
+          importAssetsByPath: {
+            ...nextFileOutput.importAssetsByPath,
+            [importPath]: [...importAssets, importAsset],
+          },
+        };
       }
-      nextFileOutput = {
-        ...nextFileOutput,
-        importAssetsByPath: {
-          ...nextFileOutput.importAssetsByPath,
-          [importPath]: [...importAssets, importAsset],
-        },
-      };
-    });
+    );
     return nextFileOutput;
   }
 
