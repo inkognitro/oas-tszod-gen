@@ -70,8 +70,8 @@ Let's consider some example endpoints which might be defined in your OAS3 specif
 
 ## Usage of generated code
 Following example demonstrates:
-1. How to "onion"-bootstrap different implementations of the `RequestHandler` interface
-2. How to trigger a request from an example endpoint which has the operationId `auth.authenticate` in the OAS3 specification
+1. How the requestHandler object gets created like an onion, with different implementations of the `RequestHandler` interface
+2. How to trigger a request from an endpoint which has the operationId `auth.authenticate` in the OAS3 specification
 
  ```typescript
 import {
@@ -117,13 +117,13 @@ const requestResult = await authenticate(
 console.log(requestResult);
 ```
 
-At the time of writing this, it exists the `ScopedRequestHandler` as the only additional `RequestHandler` implementation.
-With this one you can make sure its methods `cancelRequestById` and `cancelAllRequests`, only cancel the requests
-which originally have been triggered via its `execute` method.
+At the time of writing this, it only exists the `ScopedRequestHandler` as an additional `RequestHandler` implementation.
+With this you can make sure that its methods `cancelRequestById` and `cancelAllRequests` only cancel these requests
+which originally have been triggered via the `execute` method of exactly that `ScopedRequestHandler` instance.
 
-This might for example come into play when you want to provide a custom React hook
-`useRequestHandler` which provides a `RequestHandler` for components.
-When a component gets unmounted, you will be able to only cancel running requests which
-originally were triggered from inside exactly that component.
-The `cancelAllRequests` method then can be called from a `useEffect`'s cleanup function
+This might not only come into play when you want to provide a custom React hook
+`useRequestHandler` which provides a `RequestHandler` for several components:
+When a component is being unmounted, you will be able to only cancel running requests which
+originally have been triggered from exactly this component.
+The `cancelAllRequests` method then could be triggered from a `useEffect`'s cleanup function
 inside your `useRequestHandler` hook.
