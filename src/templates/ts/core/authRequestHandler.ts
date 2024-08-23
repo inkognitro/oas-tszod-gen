@@ -31,6 +31,11 @@ export class AuthRequestHandler implements RequestHandler {
   ) {
     this.authenticationProviders = authenticationProviders;
     this.nextRequestHandler = nextRequestHandler;
+    this.execute = this.execute.bind(this);
+    this.createRequestWithAuthentication =
+      this.createRequestWithAuthentication.bind(this);
+    this.cancelRequestById = this.cancelRequestById.bind(this);
+    this.cancelAllRequests = this.cancelAllRequests.bind(this);
   }
 
   execute(
@@ -82,5 +87,9 @@ export class AuthRequestHandler implements RequestHandler {
 
   cancelRequestById(requestId: string): void {
     this.nextRequestHandler.cancelRequestById(requestId);
+  }
+
+  cancelAllRequests() {
+    this.nextRequestHandler.cancelAllRequests();
   }
 }

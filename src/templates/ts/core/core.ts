@@ -123,4 +123,5 @@ export interface RequestHandler {
     config?: RequestExecutionConfig
   ): Promise<RequestResult>;
   cancelRequestById(requestId: string): void;
+  cancelAllRequests(): void;
 }

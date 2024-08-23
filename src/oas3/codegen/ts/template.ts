@@ -173,7 +173,7 @@ export const templateRequestHandlerType: TemplateDefinitionOutput = {
       templateRequestHandlerTypePath
     )}): Promise<${templateRequestResultType.createName(
       templateRequestHandlerTypePath
-    )}>\ncancelRequestById(requestId: string): void;\n}`;
+    )}>\ncancelRequestById(requestId: string): void;\ncancelAllRequests(): void;\n}`;
   },
   getRequiredOutputPaths: () => [
     templateRequestType.path,

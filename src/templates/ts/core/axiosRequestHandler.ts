@@ -10,66 +10,22 @@ interface RequestExecutionConfig {
   onUploadProgress?: (progress: number) => void;
 }
 
-function createRequestResult(
-  request: Request,
-  response: null | AxiosResponse,
-  hasRequestBeenCancelled: boolean
-): RequestResult {
-  return {
-    hasRequestBeenCancelled,
-    request,
-    response: !response
-      ? null
-      : {
-          status: response.status,
-          headers: response.headers,
-          body: response.data,
-        },
-  };
-}
-
-function createAxiosRequestConfig(
-  predefinedConfig: AxiosRequestConfig,
-  request: Request,
-  config?: RequestExecutionConfig
-): AxiosRequestConfig {
-  const requestConfig: AxiosRequestConfig = {
-    ...predefinedConfig,
-    method: request.endpointId.method as Method,
-    url: request.url,
-  };
-  if (request.headers) {
-    requestConfig.headers = request.headers;
-  }
-  if (request.body) {
-    requestConfig.data = request.body;
-  }
-  if (request.queryParams) {
-    requestConfig.params = request.queryParams;
-  }
-  const onUploadProgress = config?.onUploadProgress;
-  if (onUploadProgress) {
-    requestConfig.onUploadProgress = progressEvent => {
-      if (progressEvent.total === undefined) {
-        return;
-      }
-      onUploadProgress(Math.round(progressEvent.loaded / progressEvent.total));
-    };
-  }
-  return requestConfig;
-}
-
 type RequestIdToCancelTokenSourceMapping = {
   [requestId: string]: CancelTokenSource;
 };
 
 export class AxiosRequestHandler implements RequestHandler {
   private readonly predefinedAxiosRequestConfig: AxiosRequestConfig;
-  private readonly requestIdToCancelTokenSourceMapping: RequestIdToCancelTokenSourceMapping;
+  private readonly cancelTokenSourceByPendingRequestId: RequestIdToCancelTokenSourceMapping;
 
   constructor(predefinedAxiosRequestConfig: AxiosRequestConfig = {}) {
     this.predefinedAxiosRequestConfig = predefinedAxiosRequestConfig;
-    this.requestIdToCancelTokenSourceMapping = {};
+    this.cancelTokenSourceByPendingRequestId = {};
+    this.execute = this.execute.bind(this);
+    this.createRequestResult = this.createRequestResult.bind(this);
+    this.createAxiosRequestConfig = this.createAxiosRequestConfig.bind(this);
+    this.cancelRequestById = this.cancelRequestById.bind(this);
+    this.cancelAllRequests = this.cancelAllRequests.bind(this);
   }
 
   execute(
@@ -77,28 +33,32 @@ export class AxiosRequestHandler implements RequestHandler {
     config?: RequestExecutionConfig
   ): Promise<RequestResult> {
     const cancelTokenSource = axios.CancelToken.source();
-    const requestIdToCancelTokenSourceMapping =
-      this.requestIdToCancelTokenSourceMapping;
+    const cancelTokenSourceByPendingRequestId =
+      this.cancelTokenSourceByPendingRequestId;
     const axiosRequestCfg: AxiosRequestConfig = {
-      ...createAxiosRequestConfig(
+      ...this.createAxiosRequestConfig(
         this.predefinedAxiosRequestConfig,
         request,
         config
       ),
       cancelToken: cancelTokenSource.token,
     };
-    requestIdToCancelTokenSourceMapping[request.id] = cancelTokenSource;
+    cancelTokenSourceByPendingRequestId[request.id] = cancelTokenSource;
     return new Promise(resolve => {
       axios(axiosRequestCfg)
         .then((response): void => {
-          delete requestIdToCancelTokenSourceMapping[request.id];
-          const requestResult = createRequestResult(request, response, false);
+          delete cancelTokenSourceByPendingRequestId[request.id];
+          const requestResult = this.createRequestResult(
+            request,
+            response,
+            false
+          );
           resolve(requestResult);
         })
         .catch((error): void => {
-          delete requestIdToCancelTokenSourceMapping[request.id];
+          delete cancelTokenSourceByPendingRequestId[request.id];
           if (axios.isCancel(error)) {
-            const requestResult = createRequestResult(request, null, true);
+            const requestResult = this.createRequestResult(request, null, true);
             resolve(requestResult);
             return;
           }
@@ -106,7 +66,7 @@ export class AxiosRequestHandler implements RequestHandler {
             console.error(error);
             throw new Error('unexpected axios error above');
           }
-          const requestResult = createRequestResult(
+          const requestResult = this.createRequestResult(
             request,
             error.response,
             false
@@ -116,13 +76,73 @@ export class AxiosRequestHandler implements RequestHandler {
     });
   }
 
+  private createRequestResult(
+    request: Request,
+    response: null | AxiosResponse,
+    hasRequestBeenCancelled: boolean
+  ): RequestResult {
+    return {
+      hasRequestBeenCancelled,
+      request,
+      response: !response
+        ? null
+        : {
+            status: response.status,
+            headers: response.headers,
+            body: response.data,
+          },
+    };
+  }
+
+  private createAxiosRequestConfig(
+    predefinedConfig: AxiosRequestConfig,
+    request: Request,
+    config?: RequestExecutionConfig
+  ): AxiosRequestConfig {
+    const requestConfig: AxiosRequestConfig = {
+      ...predefinedConfig,
+      method: request.endpointId.method as Method,
+      url: request.url,
+    };
+    if (request.headers) {
+      requestConfig.headers = request.headers;
+    }
+    if (request.body) {
+      requestConfig.data = request.body;
+    }
+    if (request.queryParams) {
+      requestConfig.params = request.queryParams;
+    }
+    const onUploadProgress = config?.onUploadProgress;
+    if (onUploadProgress) {
+      requestConfig.onUploadProgress = progressEvent => {
+        if (progressEvent.total === undefined) {
+          return;
+        }
+        onUploadProgress(
+          Math.round(progressEvent.loaded / progressEvent.total)
+        );
+      };
+    }
+    return requestConfig;
+  }
+
   cancelRequestById(requestId: string) {
     const cancelTokenSource =
-      this.requestIdToCancelTokenSourceMapping[requestId];
+      this.cancelTokenSourceByPendingRequestId[requestId];
     if (!cancelTokenSource) {
       return;
     }
     cancelTokenSource.cancel();
-    delete this.requestIdToCancelTokenSourceMapping[requestId];
+    delete this.cancelTokenSourceByPendingRequestId[requestId];
+  }
+
+  cancelAllRequests() {
+    for (const requestId in this.cancelTokenSourceByPendingRequestId) {
+      const cancelTokenSource =
+        this.cancelTokenSourceByPendingRequestId[requestId];
+      cancelTokenSource.cancel();
+      delete this.cancelTokenSourceByPendingRequestId[requestId];
+    }
   }
 }
