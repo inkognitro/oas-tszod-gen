@@ -28,7 +28,7 @@ As long as the API contract on the backend side was not violated through breakin
 you don't have to worry about breaking changes in generated code output after migrating to the next **minor** version.
 
 
-## Usage
+## Usage of the generator
 The following script can be used in the development process of your application.
 This will generate several files and folders depending on your OAS3 specification.
 
@@ -67,3 +67,63 @@ Let's consider some example endpoints which might be defined in your OAS3 specif
 1. The outputs for the endpoint with the operationId `auth.authenticate` will be put into `./auth/authenticate.ts`
 2. The outputs for the endpoint with the operationId `userManagement.getUsers` will be put into `./user-management/getUsers.ts`
 3. The outputs for the endpoint with the operationId `userManagement.admin.getUsers` will be put into `./user-management/admin/getUsers.ts`
+
+## Usage of generated code
+Following example demonstrates:
+1. How to "onion"-bootstrap different implementations of the `RequestHandler` interface
+2. How to trigger a request from an example endpoint which has the operationId `auth.authenticate` in the OAS3 specification
+
+ ```typescript
+import {
+  AxiosRequestHandler,
+  AxiosRequestHandlerExecuteConfig,
+} from './axiosRequestHandler';
+import {
+  AuthRequestHandler,
+  AuthRequestHandlerExecuteConfig,
+  HttpBearerAuthenticationProvider,
+} from './authRequestHandler';
+import {authenticate} from './my-output-folder/auth';
+
+declare global {
+  interface RequestExecutionConfig
+    extends AxiosRequestHandlerExecuteConfig,
+      AuthRequestHandlerExecuteConfig {}
+}
+
+const exampleAuthenticationProvider: HttpBearerAuthenticationProvider = {
+  type: 'httpBearer',
+  findToken: () => {
+    return 'my-access-token';
+  },
+  securitySchemeName: 'example', // OAS3 security name
+};
+
+const requestHandler = new AuthRequestHandler(
+  [exampleAuthenticationProvider],
+  new AxiosRequestHandler({baseURL: 'https://my-api.com'})
+);
+
+const optionalConfig: RequestExecutionConfig = {
+  onUploadProgress: progress => console.log('uploadProgress', progress),
+};
+
+const requestResult = await authenticate(
+  requestHandler,
+  {usernameOrEmail: 'inkognitro', password: '12345678'},
+  optionalConfig
+);
+
+console.log(requestResult);
+```
+
+At the time of writing this, it exists the `ScopedRequestHandler` as the only additional `RequestHandler` implementation.
+With this one you can make sure its methods `cancelRequestById` and `cancelAllRequests`, only cancel the requests
+which originally have been triggered via its `execute` method.
+
+This might for example come into play when you want to provide a custom React hook
+`useRequestHandler` which provides a `RequestHandler` for components.
+When a component gets unmounted, you will be able to only cancel running requests which
+originally were triggered from inside exactly that component.
+The `cancelAllRequests` method then can be called from a `useEffect`'s cleanup function
+inside your `useRequestHandler` hook.
