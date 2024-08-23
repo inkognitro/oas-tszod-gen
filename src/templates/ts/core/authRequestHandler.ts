@@ -1,9 +1,4 @@
-import {
-  Request,
-  RequestExecutionConfig,
-  RequestHandler,
-  RequestResult,
-} from './core';
+import {Request, RequestHandler, RequestResult} from './core';
 
 export type HttpBasicAuthenticationProvider = {
   type: 'httpBasic';
@@ -21,6 +16,10 @@ export type AuthenticationProvider =
   | HttpBasicAuthenticationProvider
   | HttpBearerAuthenticationProvider;
 
+interface RequestExecutionConfig {
+  preventAuthentication?: boolean;
+}
+
 export class AuthRequestHandler implements RequestHandler {
   private readonly authenticationProviders: AuthenticationProvider[];
   private readonly nextRequestHandler: RequestHandler;
@@ -32,8 +31,8 @@ export class AuthRequestHandler implements RequestHandler {
     this.authenticationProviders = authenticationProviders;
     this.nextRequestHandler = nextRequestHandler;
     this.execute = this.execute.bind(this);
-    this.createRequestWithAuthentication =
-      this.createRequestWithAuthentication.bind(this);
+    this.createRequestWithPotentialAuthenticationData =
+      this.createRequestWithPotentialAuthenticationData.bind(this);
     this.cancelRequestById = this.cancelRequestById.bind(this);
     this.cancelAllRequests = this.cancelAllRequests.bind(this);
   }
@@ -43,12 +42,18 @@ export class AuthRequestHandler implements RequestHandler {
     config?: RequestExecutionConfig
   ): Promise<RequestResult> {
     return this.nextRequestHandler.execute(
-      this.createRequestWithAuthentication(request),
+      this.createRequestWithPotentialAuthenticationData(request, config),
       config
     );
   }
 
-  private createRequestWithAuthentication(request: Request): Request {
+  private createRequestWithPotentialAuthenticationData(
+    request: Request,
+    config?: RequestExecutionConfig
+  ): Request {
+    if (config?.preventAuthentication) {
+      return request;
+    }
     for (const index in request.supportedSecuritySchemes) {
       const securitySchemeName = request.supportedSecuritySchemes[index].name;
       const securityScheme = this.authenticationProviders.find(
