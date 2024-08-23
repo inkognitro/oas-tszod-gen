@@ -1,9 +1,6 @@
-import {
-  Request,
-  RequestExecutionConfig,
-  RequestHandler,
-  RequestResult,
-} from './core';
+import {Request, RequestHandler, RequestResult} from './core';
+
+export type ScopedRequestHandlerExecuteConfig = {};
 
 export class ScopedRequestHandler implements RequestHandler {
   private pendingRequestIds: string[];
@@ -19,7 +16,7 @@ export class ScopedRequestHandler implements RequestHandler {
 
   public execute(
     request: Request,
-    config?: RequestExecutionConfig
+    config?: ScopedRequestHandlerExecuteConfig
   ): Promise<RequestResult> {
     return new Promise(resolve => {
       this.pendingRequestIds.push(request.id);

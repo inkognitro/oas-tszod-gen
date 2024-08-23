@@ -16,9 +16,9 @@ export type AuthenticationProvider =
   | HttpBasicAuthenticationProvider
   | HttpBearerAuthenticationProvider;
 
-interface RequestExecutionConfig {
+export type AuthRequestHandlerExecuteConfig = {
   preventAuthentication?: boolean;
-}
+};
 
 export class AuthRequestHandler implements RequestHandler {
   private readonly authenticationProviders: AuthenticationProvider[];
@@ -39,7 +39,7 @@ export class AuthRequestHandler implements RequestHandler {
 
   execute(
     request: Request,
-    config?: RequestExecutionConfig
+    config?: AuthRequestHandlerExecuteConfig
   ): Promise<RequestResult> {
     return this.nextRequestHandler.execute(
       this.createRequestWithPotentialAuthenticationData(request, config),
@@ -49,7 +49,7 @@ export class AuthRequestHandler implements RequestHandler {
 
   private createRequestWithPotentialAuthenticationData(
     request: Request,
-    config?: RequestExecutionConfig
+    config?: AuthRequestHandlerExecuteConfig
   ): Request {
     if (config?.preventAuthentication) {
       return request;

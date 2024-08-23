@@ -6,9 +6,9 @@ import axios, {
 } from 'axios';
 import {RequestHandler, RequestResult, Request} from './core';
 
-interface RequestExecutionConfig {
+export type AxiosRequestHandlerExecuteConfig = {
   onUploadProgress?: (progress: number) => void;
-}
+};
 
 type RequestIdToCancelTokenSourceMapping = {
   [requestId: string]: CancelTokenSource;
@@ -30,7 +30,7 @@ export class AxiosRequestHandler implements RequestHandler {
 
   execute(
     request: Request,
-    config?: RequestExecutionConfig
+    config?: AxiosRequestHandlerExecuteConfig
   ): Promise<RequestResult> {
     const cancelTokenSource = axios.CancelToken.source();
     const cancelTokenSourceByPendingRequestId =
@@ -97,7 +97,7 @@ export class AxiosRequestHandler implements RequestHandler {
   private createAxiosRequestConfig(
     predefinedConfig: AxiosRequestConfig,
     request: Request,
-    config?: RequestExecutionConfig
+    config?: AxiosRequestHandlerExecuteConfig
   ): AxiosRequestConfig {
     const requestConfig: AxiosRequestConfig = {
       ...predefinedConfig,
