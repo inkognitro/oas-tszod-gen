@@ -93,6 +93,7 @@ type GenericOutput<T extends OutputType, P extends object = {}> = P & {
   type: T;
   path: OutputPath;
   fixedImportPath?: string;
+  isExternalLibrary?: boolean;
   createName: (referencingPath: OutputPath) => string;
 };
 

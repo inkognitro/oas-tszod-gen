@@ -713,6 +713,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
   ): FileOutputByFilePath {
     const fileOutputByFilePath: FileOutputByFilePath = {};
     this.outputs.forEach(output => {
+      if (output.isExternalLibrary) {
+        return;
+      }
       const filePath = this.createFilePathFromOutputPath(output.path);
       let fileOutput: FileOutput = fileOutputByFilePath[filePath] ?? {
         importAssetsByPath: {},

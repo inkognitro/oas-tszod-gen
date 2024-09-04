@@ -443,6 +443,7 @@ export const templateZOfZodLibrary: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'const',
   fixedImportPath: 'zod',
+  isExternalLibrary: true,
   path: ['zod', 'z'],
   createName: () => {
     return 'z';
@@ -454,6 +455,7 @@ export const templateZodSchemaOfZodLibrary: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'type',
   fixedImportPath: 'zod',
+  isExternalLibrary: true,
   path: ['z', 'zodSchema'],
   createName: () => {
     return 'ZodSchema';
