@@ -28,7 +28,6 @@ import {
 import {GenerateConfig} from './generator';
 import {applyZodSchema} from '@oas3/codegen/ts/zodSchema';
 import {applySchema} from '@oas3/codegen/ts/schema';
-import {ZodSchema} from 'zod';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
