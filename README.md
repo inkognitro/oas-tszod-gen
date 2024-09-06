@@ -19,7 +19,9 @@ and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
 I coded my own solution because I wanted to
 - have separated functions and type definitions for each API endpoint in a single file located in a folder of its context
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
-- have automatically generated [Zod](https://zod.dev) schemas for any endpoint request data that can be used for form validations
+- have automatically generated [Zod](https://zod.dev) schemas for endpoint DTOs
+- have the possibility to opt-in Zod or just the TypeScript definitions
+- have fewer dependencies to third-party libraries in my production code
 
 ## Semantic versioning
 **Worried about different code generation outputs after updating this library?**
@@ -68,12 +70,14 @@ Let's consider some example endpoints which might be defined in your OAS3 specif
 2. The outputs for the endpoint with the operationId `userManagement.getUsers` will be put into `./user-management/getUsers.ts`
 3. The outputs for the endpoint with the operationId `userManagement.admin.getUsers` will be put into `./user-management/admin/getUsers.ts`
 
+The same principles that apply to dots `.` also apply to slashes `/`.
+
 ## Usage of generated code
 Following example demonstrates:
 1. How the `requestHandler` object gets created like an onion, with different implementations of the `RequestHandler` interface
 2. How to trigger a request from an endpoint which has the operationId `auth.authenticate` in the OAS3 specification
 
- ```typescript
+```typescript
 import {
   AxiosRequestHandler,
   AxiosRequestHandlerExecuteConfig,
@@ -120,7 +124,11 @@ console.log(requestResult);
 ### RequestHandler
 The decision of having a `RequestHandler` interface with granular implementations was made with different environments
 in mind: `server` vs `client` | `prod` vs `test` | custom app requirements | combination of whatever.
-You can write your own implementations or just combine some of the existing ones, according to your needs:
+
+You can write your own implementations or just combine some of the existing ones below, according to your needs.
+
+The `RequestHandler` interface for custom implementations can be found here:
+https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/core.ts
 
 #### `FetchApiRequestHandler` :warning: not available yet
 This implementation is responsible for executing your requests through the http(s) protocol.
