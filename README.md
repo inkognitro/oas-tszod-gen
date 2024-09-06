@@ -126,7 +126,6 @@ The decision of having a `RequestHandler` interface with granular implementation
 in mind: `server` vs `client` | `prod` vs `test` | custom app requirements | combination of whatever.
 
 You can write your own implementations or just combine some of the existing ones below, according to your needs.
-
 The `RequestHandler` interface for custom implementations can be found
 [here](https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/core.ts).
 
