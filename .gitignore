@@ -6,3 +6,4 @@ generated-files-petstore2
 generated-files-other
 src/oas3/codegen/ts/generate.other.test.specs.json
 src/oas3/codegen/ts/generate.other.test.ts
+/coverage
