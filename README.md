@@ -74,7 +74,7 @@ The same principles that apply to dots `.` also apply to slashes `/`.
 
 ## Usage of generated code
 Following example demonstrates:
-1. How the `requestHandler` object gets created like an onion, with different implementations of the `RequestHandler` interface
+1. How a `RequestHandler` instance is created with different nested implementations (onion-like)
 2. How to trigger a request from an endpoint which has the operationId `auth.authenticate` in the OAS3 specification
 
 ```typescript
