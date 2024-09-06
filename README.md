@@ -70,7 +70,7 @@ Let's consider some example endpoints which might be defined in your OAS3 specif
 
 ## Usage of generated code
 Following example demonstrates:
-1. How the requestHandler object gets created like an onion, with different implementations of the `RequestHandler` interface
+1. How the `requestHandler` object gets created like an onion, with different implementations of the `RequestHandler` interface
 2. How to trigger a request from an endpoint which has the operationId `auth.authenticate` in the OAS3 specification
 
  ```typescript
@@ -117,13 +117,32 @@ const requestResult = await authenticate(
 console.log(requestResult);
 ```
 
-At the time of writing this, it only exists the `ScopedRequestHandler` as an additional `RequestHandler` implementation.
-With this you can make sure that its methods `cancelRequestById` and `cancelAllRequests` only cancel these requests
-which originally have been triggered via the `execute` method of exactly that `ScopedRequestHandler` instance.
+### RequestHandlers
+There are different kinds of `RequestHandler` implementations which can be bootstrapped together like an onion.
+You can write your own `RequestHandler` implementations and combine these with the available ones if needed.
 
-This might not only come into play when you want to provide a custom React hook
-`useRequestHandler` which provides a `RequestHandler` for several components:
-When a component is being unmounted, you will be able to only cancel running requests which
-originally have been triggered from exactly this component.
-The `cancelAllRequests` method then could be triggered from a `useEffect`'s cleanup function
-inside your `useRequestHandler` hook.
+The decision for different request handler for granular tasks was especially made with different environments in mind.
+Examples therefore are: `server` vs `client` | `prod` vs `test` | combination of whatever.
+
+#### FetchApiRequestHandler - :warning: Not available yet
+This `RequestHandler` implementation is responsible to execute your requests through the http(s) protocol.
+This implementation usually is the most inner implementation of an onion bootstrapped request handler object.
+
+#### AxiosRequestHandler
+This `RequestHandler` implementation is responsible to execute your requests through the http(s) protocol.
+This implementation usually is the most inner implementation of an onion bootstrapped request handler object.
+It requires the installation of the `axios` library in your code base and serves as an alternative to the `FetchApiRequestHandler`.
+
+#### AuthRequestHandler
+This implementation can be taken for automatic `Authorization` request header enrichment.
+As of the time of writing this only `httpBearer` and `httpBasic` authentication headers are supported.
+
+#### ScopedRequestHandler
+With this implementation you are able to make sure `cancelRequestById` and `cancelAllRequests`
+only cancel do the requests which originally were triggered by the `execute` method
+of exactly that `ScopedRequestHandler` instance.
+
+This might be useful when you intend to provide a separate `RequestHandler` instance for each
+React component which uses your custom `useRequestHandler` hook.
+So when the `cancelAllRequests` method is called e.g. due to unmounting a component,
+only the requests are cancelled which were triggered by exactly this RequestHandler instance.
