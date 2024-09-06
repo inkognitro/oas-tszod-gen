@@ -7,6 +7,8 @@ import axios, {
 import {RequestHandler, RequestResult, Request} from './core';
 
 export type AxiosRequestHandlerExecuteConfig = {
+  axiosRequestConfig?: AxiosRequestConfig;
+  ignoreGeneralAxiosRequestConfig?: boolean;
   onUploadProgress?: (progress: number) => void;
 };
 
@@ -15,11 +17,11 @@ type RequestIdToCancelTokenSourceMapping = {
 };
 
 export class AxiosRequestHandler implements RequestHandler {
-  private readonly predefinedAxiosRequestConfig: AxiosRequestConfig;
+  private readonly generalRequestConfig: AxiosRequestConfig;
   private readonly cancelTokenSourceByPendingRequestId: RequestIdToCancelTokenSourceMapping;
 
-  constructor(predefinedAxiosRequestConfig: AxiosRequestConfig = {}) {
-    this.predefinedAxiosRequestConfig = predefinedAxiosRequestConfig;
+  constructor(generalRequestConfig: AxiosRequestConfig = {}) {
+    this.generalRequestConfig = generalRequestConfig;
     this.cancelTokenSourceByPendingRequestId = {};
     this.execute = this.execute.bind(this);
     this.createRequestResult = this.createRequestResult.bind(this);
@@ -36,11 +38,7 @@ export class AxiosRequestHandler implements RequestHandler {
     const cancelTokenSourceByPendingRequestId =
       this.cancelTokenSourceByPendingRequestId;
     const axiosRequestCfg: AxiosRequestConfig = {
-      ...this.createAxiosRequestConfig(
-        this.predefinedAxiosRequestConfig,
-        request,
-        config
-      ),
+      ...this.createAxiosRequestConfig(request, config),
       cancelToken: cancelTokenSource.token,
     };
     cancelTokenSourceByPendingRequestId[request.id] = cancelTokenSource;
@@ -95,12 +93,13 @@ export class AxiosRequestHandler implements RequestHandler {
   }
 
   private createAxiosRequestConfig(
-    predefinedConfig: AxiosRequestConfig,
     request: Request,
     config?: AxiosRequestHandlerExecuteConfig
   ): AxiosRequestConfig {
     const requestConfig: AxiosRequestConfig = {
-      ...predefinedConfig,
+      ...(config?.ignoreGeneralAxiosRequestConfig
+        ? {}
+        : this.generalRequestConfig),
       method: request.endpointId.method as Method,
       url: request.url,
     };
@@ -124,7 +123,10 @@ export class AxiosRequestHandler implements RequestHandler {
         );
       };
     }
-    return requestConfig;
+    return {
+      ...requestConfig,
+      ...(config?.axiosRequestConfig ?? {}),
+    };
   }
 
   cancelRequestById(requestId: string) {
