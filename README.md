@@ -127,8 +127,8 @@ in mind: `server` vs `client` | `prod` vs `test` | custom app requirements | com
 
 You can write your own implementations or just combine some of the existing ones below, according to your needs.
 
-The `RequestHandler` interface for custom implementations can be found here:
-https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/core.ts
+The `RequestHandler` interface for custom implementations can be found
+[here](https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/core.ts).
 
 #### `FetchApiRequestHandler` :warning: not available yet
 This implementation is responsible for executing your requests through the http(s) protocol.
