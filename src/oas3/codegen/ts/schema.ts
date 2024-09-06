@@ -326,10 +326,10 @@ function applyOneOfSchema(
           ? ` // ${directOutput.codeComment}`
           : '';
         codeRows.push(
-          `| ${directOutput.createCode(referencingContext)}${itemComment}`
+          `${directOutput.createCode(referencingContext)}${itemComment}`
         );
       });
-      return `${codeRows.join('\n')}`;
+      return `${codeRows.join(' |\n')}`;
     },
     path,
     getRequiredOutputPaths: () => requiredOutputPaths,
