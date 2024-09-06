@@ -125,8 +125,7 @@ You can write your own implementations or just combine some of the existing ones
 #### `FetchApiRequestHandler` :warning: not available yet
 This implementation is responsible for executing your requests through the http(s) protocol.
 It is usually the most inner implementation of an onion bootstrapped request handler object
-and uses the built-in <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API" target="_blank">Fetch API</a>.
-
+and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 
 #### `AxiosRequestHandler`
 This implementation is responsible for executing your requests through the http(s) protocol.
