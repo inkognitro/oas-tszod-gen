@@ -118,8 +118,8 @@ console.log(requestResult);
 ```
 
 ### RequestHandler
-The decision of having a `RequestHandler` interface with fine-grained implementations was made
-especially with different environments in mind: `server` vs `client` | `prod` vs `test` | combination of whatever.
+The decision of having a `RequestHandler` interface with granular implementations was made with different environments
+in mind: `server` vs `client` | `prod` vs `test` | custom app requirements | combination of whatever.
 You can write your own implementations or just combine some of the existing ones, according to your needs:
 
 #### `FetchApiRequestHandler` :warning: Not available yet
