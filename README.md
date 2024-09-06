@@ -122,7 +122,7 @@ The decision of having a `RequestHandler` interface with granular implementation
 in mind: `server` vs `client` | `prod` vs `test` | custom app requirements | combination of whatever.
 You can write your own implementations or just combine some of the existing ones, according to your needs:
 
-#### `FetchApiRequestHandler` :warning: Not available yet
+#### `FetchApiRequestHandler` :warning: not available yet
 This implementation is responsible for executing your requests through the http(s) protocol.
 It is usually the most inner implementation of an onion bootstrapped request handler object.
 
