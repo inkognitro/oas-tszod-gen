@@ -20,7 +20,7 @@ I coded my own solution because I wanted to
 - have separated functions and type definitions for each API endpoint in a single file located in a folder of its context
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
 - have automatically generated [Zod](https://zod.dev) schemas for endpoint DTOs
-- have the possibility to opt-in Zod or just the TypeScript definitions
+- have the possibility to only generate TypeScript definitions and opt-in Zod schema generation
 - have fewer dependencies to third-party libraries in my production code
 
 ## Semantic versioning
@@ -150,5 +150,4 @@ With this implementation you are able to make sure that the methods `cancelReque
 cancel the requests which were made through the `execute` method of exactly that `ScopedRequestHandler` instance.
 
 This might be useful when you want to provide a separate `ScopedRequestHandler` instance for React components.
-This can be achieved by a custom `useScopedRequestHandler` hook which calls the `cancelAllRequests` method as soon as
-the component gets unmounted.
+Anyway, React stuff is out-of-scope of this package.
