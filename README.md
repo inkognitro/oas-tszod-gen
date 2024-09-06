@@ -137,11 +137,9 @@ This implementation can be taken for automatic `Authorization` request header en
 As of the time of writing this only `httpBearer` and `httpBasic` authentication headers are supported.
 
 #### `ScopedRequestHandler`
-With this implementation you are able to make sure `cancelRequestById` and `cancelAllRequests`
-only cancel do the requests which originally were triggered by the `execute` method
-of exactly that `ScopedRequestHandler` instance.
+With this implementation you are able to make sure that the methods `cancelRequestById` and `cancelAllRequests` do only
+cancel the requests which were made through the `execute` method of exactly that `ScopedRequestHandler` instance.
 
-This might be useful when you intend to provide a separate `RequestHandler` instance for each
-React component using a custom `useRequestHandler` hook.
-By calling the `cancelAllRequests` method then - e.g. due to unmounting the component -
-only the requests are going to be cancelled which were triggered by exactly this RequestHandler instance.
+This might be useful when you want to provide a separate `ScopedRequestHandler` instance for React components.
+This can be achieved by a custom `useScopedRequestHandler` hook which calls the `cancelAllRequests` method as soon as
+the component gets unmounted.
