@@ -164,11 +164,14 @@ For more information have a look at the peer dependencies section of the `packag
 npm install qs --save && npm install @types/qs --save-dev
 ```
 
-:warning: The `defaultConfig` of the FetchApiRequestHandler does not support cookies which will be passed
-in the `request.cookies` property. If explicit cookies are required for your use-case you should either consider using
-the `AxiosRequestHandler` or implement your own [CreateWithCookiesEnrichedRequestInit function](
-https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/fetchApiRequestHandler.ts#L4
-) when calling `new FetchApiRequestHandler(ownConfig)`.
+> :warning: **Explicit cookies are not supported by default**
+> 
+> The `defaultConfig` of the FetchApiRequestHandler does not support cookies which are passed in with the request
+> through the `request.cookies` property. If this has to be supported for your use-case, you need to implement this
+> functionality by yourself, or you could use the `AxiosRequestHandler` instead.
+> 
+> If you want to build that on your own have a look at the
+> [CreateWithCookiesEnrichedRequestInit function](https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/fetchApiRequestHandler.ts#L4).
 
 #### `AuthRequestHandler`
 This implementation can be taken for automatic `Authorization` request header enrichment.
