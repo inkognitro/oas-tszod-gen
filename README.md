@@ -147,8 +147,8 @@ It is usually the most inner implementation of an onion bootstrapped request han
 It requires the installation of the `axios` library in your code base
 and serves as a more widely supported alternative to the `FetchApiRequestHandler`.
 
-This implementation has the dependencies below which you have to install by yourself.
-For more information have a look at the peer dependencies section of the `package.json` file of this project.
+Some dependencies need to be installed for this type of request handler.
+For version information have a look at the `peerDependencies` in the `package.json` of this project.
 ```
 npm install axios --save
 ```
@@ -158,8 +158,8 @@ This implementation is responsible for executing your requests through the http(
 It is usually the most inner implementation of an onion bootstrapped request handler object
 and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 
-This implementation has the dependencies below which you have to install by yourself.
-For more information have a look at the peer dependencies section of the `package.json` file of this project.
+Some dependencies need to be installed for this type of request handler.
+For version information have a look at the `peerDependencies` in the `package.json` of this project.
 ```
 npm install qs --save && npm install @types/qs --save-dev
 ```
