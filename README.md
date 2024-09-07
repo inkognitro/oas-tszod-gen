@@ -7,21 +7,18 @@
 # oas-to-code
 A code generator to convert [OpenApiV3](https://swagger.io/specification/) specifications into endpoint caller functions for [TS](https://www.typescriptlang.org/) and [Zod](https://zod.dev).
 
-## Why should I use `oas-to-code`?
-- to use your [OAS3](https://swagger.io/specification/) specification as a single-source-of-truth for your endpoint definitions
-- to have the possibility for an automatic compatibility check of your api endpoints with your TS frontends
-- to write less code that could lie, leading to fewer bugs and improved customer satisfaction
-
 ## Why yet another library for this task?
 Before you consider using this library, I suggest having a look at [Zodios](https://www.zodios.org/)
 and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
 
+This code generator serves as a standalone alternative to the two libraries mentioned above.
+
 I coded my own solution because I wanted to
-- have separated functions and type definitions for each API endpoint in a single file located in a folder of its context
+- have full ownership over the code which is generated for production
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
+- have separated functions and type definitions for each API endpoint in a single file located in a folder of its context
 - have automatically generated [Zod](https://zod.dev) schemas for endpoint DTOs
 - have the possibility to only generate TypeScript definitions and opt-in Zod schema generation
-- have fewer dependencies to third-party libraries in my production code
 
 ## Semantic versioning
 **Worried about different code generation outputs after updating this library?**
