@@ -180,6 +180,6 @@ Anyway, React stuff is out-of-scope of this package.
 
 #### `ZodValidationRequestHandler` :warning: not available yet
 This implementation is responsible for validating the request and response data through their Zod schemas.
-This one is only available when ZodSchemas are generated: `withZod: true`
+This one is only available when Zod schemas are generated due to the `withZod: true` configuration.
 
 
