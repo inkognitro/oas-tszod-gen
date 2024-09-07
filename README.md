@@ -159,7 +159,7 @@ and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/A
 :warning: Following needs to be considered when using this implementation:
 1. This implementation requires following dependencies which you have to install on your project yourself:
    - `@types/qs@6.9.15` as of time writing. Recommended: `npm install @types/qs@latest`
-   - `qs@6.13.0` as of time writing. Recommended: `npm install @types/qs@latest`
+   - `qs@6.13.0` as of time writing. Recommended: `npm install qs@latest`
 
 
 2. The `defaultConfig` of the FetchApiRequestHandler does not support cookies which will be passed in the `request.cookies` property.
