@@ -53,8 +53,8 @@ export class FetchApiRequestHandler implements RequestHandler {
           if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
           }
-          const json = await response.json().then(); // todo: resolve and decide whether response should have GetBody() method instead
-          console.log(json);
+          // const json = await response.json().then(); // todo: resolve and decide whether response should have GetBody() method instead
+          // console.log(json);
         })
         .catch(error => {
           console.error(error.message);
