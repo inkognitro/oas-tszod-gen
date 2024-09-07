@@ -1,5 +1,6 @@
 module.exports = {
   coverageReporters: ['json-summary'],
+  coveragePathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/src/templates'],
   roots: ['<rootDir>/src'],
   testMatch: [
     '**/__tests__/**/*.+(ts|js)',
