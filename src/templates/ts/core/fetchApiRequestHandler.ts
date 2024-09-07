@@ -17,8 +17,8 @@ export const defaultFetchApiRequestHandlerRequestInit: RequestInit = {
 
 const defaultConfig: FetchApiRequestHandlerConfig = {
   generalRequestInit: defaultFetchApiRequestHandlerRequestInit,
-  createWithCookiesEnrichedRequestInit: () => {
-    const errorParts = [
+  createWithCookiesEnrichedRequestInit: currentRequestInit => {
+    const warningParts = [
       'The default configuration of the FetchApiRequestHandler class does not implement cookie value enrichment',
       "for the RequestInit-parameter of the Javascript's built-in Fetch API.",
       'Please specify your own "createWithCookiesEnrichedRequestInit" function in your custom configuration',
@@ -26,7 +26,8 @@ const defaultConfig: FetchApiRequestHandlerConfig = {
       'Please be aware that servers and clients should define different headers in your',
       '"createWithCookiesEnrichedRequestInit" function: "Set-Cookie" (server) Vs "Cookie" (client).',
     ];
-    throw new Error(errorParts.join(' '));
+    console.warn(warningParts.join(' '));
+    return currentRequestInit;
   },
 };
 
