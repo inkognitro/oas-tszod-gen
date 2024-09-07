@@ -144,18 +144,19 @@ You can write your own implementations or just combine some of the existing ones
 The `RequestHandler` interface for custom implementations can be found
 [here](https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/core.ts).
 
-#### `FetchApiRequestHandler` :warning: not available yet
+#### `FetchApiRequestHandler`
 This implementation is responsible for executing your requests through the http(s) protocol.
 It is usually the most inner implementation of an onion bootstrapped request handler object
 and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 
 :warning: Following caveats need to be considered when using this implementation:
 1. Required dependencies need to be installed by your side when using this request handler:
-   - `@types/qs@6.9.15` as of time wiring, recommended: `npm install @types/qs@latest`
-   - `qs@6.13.0` as of time writing, recommended: `npm install @types/qs@latest`
+   - `@types/qs@6.9.15` as of time writing. Recommended: `npm install @types/qs@latest`
+   - `qs@6.13.0` as of time writing. Recommended: `npm install @types/qs@latest`
 2. The `defaultConfig` of the FetchApiRequestHandler does not support cookies which are in the `request.cookies` property.
 If explicit cookies are required for your use-case you should either consider using the `AxiosRequestHandler` or implement
-your own [CreateWithCookiesEnrichedRequestInitFunc](https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/fetchApiRequestHandler.ts).
+your own [CreateWithCookiesEnrichedRequestInit function](https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/fetchApiRequestHandler.ts#L4)
+when calling new `FetchApiRequestHandler(ownConfig)`.
 
 
 #### `AxiosRequestHandler`
