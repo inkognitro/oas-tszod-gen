@@ -49,12 +49,12 @@ generateOas3ToTs({
   
   predefinedFolderOutputPaths: [
     ['core'],
-    // this puts variables and type definitions in the `./core` folder
-    // for generated outputs which have an `OutputPath` starting with ['core']
+    // For outputs having an `OutputPath` starting with ['core']:
+    // Variables and type definitions are put in the `{outputFolderPath}/core` folder
     
     ['util', 'foo'],
-    // this puts variables and type definitions in the `./util/foo` folder
-    // for generated outputs which have an `OutputPath` starting with ['util', 'foo']
+    // For outputs having an `OutputPath` starting with ['util', 'foo']:
+    // Variables and type definitions are put in the `{outputFolderPath}/util/foo` folder
   ],
   
   logger: {
@@ -69,7 +69,7 @@ generateOas3ToTs({
   requestHandlers: ['AxiosRequestHandler', 'AuthRequestHandler'], // optional
   // This will add only the defined RequestHandler implementations.
   // An empty array results in no added implementations.
-  // By default all available RequestHandler implementations are added.
+  // By default, all available RequestHandler implementations are added.
 });
 ```
 
