@@ -44,17 +44,32 @@ generateOas3ToTs({
       resolve(myOas3Specification);
     });
   },
+  
   outputFolderPath: './my-output-folder',
+  
   predefinedFolderOutputPaths: [
-    ['core'], // puts variables and type definitions in the `./core` folder for generated outputs which have an `OutputPath` starting with ['core']
-    ['util', 'foo'], // puts variables and type definitions in the `./util/foo` folder for generated outputs which have an `OutputPath` starting with ['util', 'foo']
+    ['core'],
+    // this puts variables and type definitions in the `./core` folder
+    // for generated outputs which have an `OutputPath` starting with ['core']
+    
+    ['util', 'foo'],
+    // this puts variables and type definitions in the `./util/foo` folder
+    // for generated outputs which have an `OutputPath` starting with ['util', 'foo']
   ],
+  
   logger: {
     log: (content) => {
       console.log(content);
     },
   },
-  shouldGenerateWithZod: true, // In case of `false`, only TypeScript output is generated without Zod schemas
+  
+  withZod: true, // optional
+  // By default or in case of `false`, only TypeScript types are generated without Zod schemas
+  
+  requestHandlers: ['AxiosRequestHandler', 'AuthRequestHandler'], // optional
+  // This will add only the defined RequestHandler implementations.
+  // An empty array results in no added implementations.
+  // By default all available RequestHandler implementations are added.
 });
 ```
 
@@ -150,3 +165,9 @@ cancel the requests which were made through the `execute` method of exactly that
 
 This might be useful when you want to provide a separate `ScopedRequestHandler` instance for React components.
 Anyway, React stuff is out-of-scope of this package.
+
+#### `ZodValidationRequestHandler` :warning: not available yet
+This implementation is responsible for validating the request and response data through their Zod schemas.
+This one is only available when ZodSchemas are generated: `withZod: true`
+
+
