@@ -78,7 +78,7 @@ export const templateRequestType: TemplateDefinitionOutput = {
       'queryParams: Q;',
       'body: B;',
     ];
-    if (config.shouldGenerateWithZod) {
+    if (config.withZod) {
       bodyCodeParts = [
         ...bodyCodeParts,
         `headersZodSchema?: ${templateZodSchemaOfZodLibrary.createName(
@@ -108,7 +108,7 @@ export const templateRequestType: TemplateDefinitionOutput = {
       templateHeadersType.path,
       templateCookiesType.path,
     ];
-    if (config.shouldGenerateWithZod) {
+    if (config.withZod) {
       requiredOutputPaths.push(templateZodSchemaOfZodLibrary.path);
     }
     return requiredOutputPaths;
@@ -343,7 +343,7 @@ const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
     );
     codeParts.push('queryParams?: object;');
     codeParts.push('body?: object;');
-    if (config.shouldGenerateWithZod) {
+    if (config.withZod) {
       codeParts.push(
         `headersZodSchema?: ${templateZodSchemaOfZodLibrary.createName(
           templateRequestCreationSettingsTypePath
@@ -410,7 +410,7 @@ export const templateCreateRequestFunction: TemplateDefinitionOutput = {
       'queryParams: settings.queryParams',
       'body: settings.body',
     ];
-    if (config.shouldGenerateWithZod) {
+    if (config.withZod) {
       objectCodeParts.push('headersZodSchema: settings.headersZodSchema');
       objectCodeParts.push('cookiesZodSchema: settings.cookiesZodSchema');
       objectCodeParts.push('pathParamsZodSchema: settings.pathParamsZodSchema');
@@ -432,7 +432,7 @@ export const templateCreateRequestFunction: TemplateDefinitionOutput = {
       templateRequestCreationSettingsType.path,
       templateCreateRequestUrlFunction.path,
     ];
-    if (config.shouldGenerateWithZod) {
+    if (config.withZod) {
       requiredOutputPaths.push(templateZodSchemaOfZodLibrary.path);
     }
     return requiredOutputPaths;
@@ -462,8 +462,6 @@ export const templateZodSchemaOfZodLibrary: TemplateDefinitionOutput = {
   },
   getRequiredOutputPaths: () => [],
 };
-
-export const templateFilesToIgnore = ['/core/core.ts'];
 
 export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templatePathParamsType,

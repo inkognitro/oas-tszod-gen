@@ -30,7 +30,7 @@ test('can generate files from pet store one specification with Zod', () => {
       logger: {
         log: () => {},
       },
-      shouldGenerateWithZod: true,
+      withZod: true,
     });
   }).not.toThrow();
 });
@@ -63,7 +63,7 @@ test('can generate files from pet store two specification with Zod', () => {
       logger: {
         log: () => {},
       },
-      shouldGenerateWithZod: true,
+      withZod: true,
     });
   }).not.toThrow();
 });

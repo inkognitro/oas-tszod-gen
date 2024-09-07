@@ -235,7 +235,7 @@ function applyPayloadIfRequired(
   if (!payloadOas3ObjectSchema) {
     return null;
   }
-  if (config.shouldGenerateWithZod) {
+  if (config.withZod) {
     const zodPayloadSchemaPath: OutputPath = [...path, 'zodSchema'];
     const payloadZodSchemaDefinition: GeneratedDefinitionOutput = {
       type: OutputType.DEFINITION,

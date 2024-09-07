@@ -1,6 +1,9 @@
-import {DefaultCodeGenerator, Logger} from './generator';
-
-type OutputPath = string[];
+import {
+  DefaultCodeGenerator,
+  Logger,
+  RequestHandlersGenerateConfig,
+} from './generator';
+import {OutputPath} from './core';
 
 export type Oas3ToTsConfig = {
   getSpecification: () => Promise<object>;
@@ -8,7 +11,8 @@ export type Oas3ToTsConfig = {
   importRootAlias?: string;
   predefinedFolderOutputPaths?: OutputPath[];
   logger: Logger;
-  shouldGenerateWithZod?: boolean;
+  withZod?: boolean;
+  requestHandlers?: RequestHandlersGenerateConfig;
 };
 
 export function generateOas3ToTs(config: Oas3ToTsConfig) {
@@ -18,7 +22,7 @@ export function generateOas3ToTs(config: Oas3ToTsConfig) {
       outputFolderPath: config.outputFolderPath,
       predefinedFolderOutputPaths: config.predefinedFolderOutputPaths,
       importRootAlias: config.importRootAlias,
-      shouldGenerateWithZod: !!config.shouldGenerateWithZod,
+      withZod: !!config.withZod,
     });
   });
 }

@@ -33,11 +33,7 @@ import {
   responseOutputPathPart,
 } from './endpoint';
 import {mkdirp} from 'mkdirp';
-import {
-  templateDefinitionOutputs,
-  templateFilesToIgnore,
-  templateZOfZodLibrary,
-} from './template';
+import {templateDefinitionOutputs, templateZOfZodLibrary} from './template';
 import {applySchema} from './schema';
 import {applyZodSchema} from '@oas3/codegen/ts/zodSchema';
 
@@ -60,13 +56,13 @@ function removeDirectoryRecursively(path: string) {
 }
 
 async function writeFile(path: string, content: string) {
-  const dirPath = path.split('/').slice(0, -1).join('/');
+  const dirPath = path.split('\\').join('/').split('/').slice(0, -1).join('/');
   await mkdirp(dirPath);
   fs.writeFileSync(path, content);
 }
 
 async function appendToFile(path: string, content: string) {
-  const dirPath = path.split('/').slice(0, -1).join('/');
+  const dirPath = path.split('\\').join('/').split('/').slice(0, -1).join('/');
   await mkdirp(dirPath);
   fs.appendFileSync(path, content);
 }
@@ -103,6 +99,7 @@ function cleanUpFolderPath(path: string): string {
     .join('/')
     .split('/')
     .filter(p => p !== '/')
+    .filter(p => p !== '')
     .join('/');
 }
 
@@ -114,11 +111,55 @@ export interface Logger {
   log(...data: any[]): void;
 }
 
+type RequestHandlerName =
+  | 'AuthRequestHandler'
+  | 'AxiosRequestHandler'
+  | 'FetchApiRequestHandler'
+  | 'ScopedRequestHandler'
+  | 'ZodValidationRequestHandler';
+
+type TemplateFileInfo = {
+  fileName: string;
+  folderPath: string;
+  requestHandlerName: RequestHandlerName;
+};
+
+const templateCoreFileInfos: TemplateFileInfo[] = [
+  {
+    fileName: 'fetchApiRequestHandler.ts',
+    folderPath: '/core',
+    requestHandlerName: 'FetchApiRequestHandler',
+  },
+  {
+    fileName: 'axiosRequestHandler.ts',
+    folderPath: '/core',
+    requestHandlerName: 'AxiosRequestHandler',
+  },
+  {
+    fileName: 'authRequestHandler.ts',
+    folderPath: '/core',
+    requestHandlerName: 'AuthRequestHandler',
+  },
+  {
+    fileName: 'scopedRequestHandler.ts',
+    folderPath: '/core',
+    requestHandlerName: 'ScopedRequestHandler',
+  },
+  {
+    fileName: 'zodValidationRequestHandler.ts',
+    folderPath: '/core',
+    requestHandlerName: 'ZodValidationRequestHandler',
+  },
+];
+
+export type RequestHandlersGenerateConfig = RequestHandlerName[];
+
 export type GenerateConfig = {
   outputFolderPath: string;
   importRootAlias?: string;
   predefinedFolderOutputPaths?: OutputPath[];
-  shouldGenerateWithZod: boolean;
+  withZod: boolean;
+  requestHandlers?: RequestHandlersGenerateConfig;
 };
 
 export class DefaultCodeGenerator implements CodeGenerator {
@@ -171,28 +212,76 @@ export class DefaultCodeGenerator implements CodeGenerator {
     }
   }
 
+  private getTemplateFileInfosToGenerate(
+    config: GenerateConfig
+  ): TemplateFileInfo[] {
+    const fileInfos = templateCoreFileInfos.filter(
+      fileInfo =>
+        config.withZod ||
+        fileInfo.requestHandlerName !== 'ZodValidationRequestHandler'
+    );
+    return fileInfos.filter(
+      f =>
+        !config.requestHandlers ||
+        config.requestHandlers.includes(f.requestHandlerName)
+    );
+  }
+
+  private createTemplateFileOutputByFilePath(
+    config: GenerateConfig
+  ): FileOutputByFilePath {
+    const templateFileInfos = this.getTemplateFileInfosToGenerate(config);
+    if (!templateFileInfos.length) {
+      return {};
+    }
+    const fileOutputByFilePath: FileOutputByFilePath = {};
+    const coreFolderTemplateFileInfos = templateFileInfos.filter(
+      fileInfo => fileInfo.folderPath === '/core'
+    );
+    if (coreFolderTemplateFileInfos.length) {
+      fileOutputByFilePath['/core/index.ts'] = {
+        definitions: [],
+        importAssetsByPath: {},
+        exportPaths: coreFolderTemplateFileInfos.map(
+          f => `./${f.fileName.split('.ts')[0]}`
+        ),
+      };
+    }
+    return fileOutputByFilePath;
+  }
+
+  private copyTemplateFiles(config: GenerateConfig) {
+    const templateFileInfos = this.getTemplateFileInfosToGenerate(config);
+    templateFileInfos.forEach(fileInfo => {
+      fs.cpSync(
+        path.resolve(
+          __dirname,
+          '../../../templates/ts',
+          cleanUpFolderPath(fileInfo.folderPath),
+          fileInfo.fileName
+        ),
+        path.resolve(
+          config.outputFolderPath,
+          cleanUpFolderPath(fileInfo.folderPath),
+          fileInfo.fileName
+        )
+      );
+    });
+  }
+
   private createFiles(
     fileOutputByFilePath: FileOutputByFilePath,
     config: GenerateConfig
   ) {
     const cleanTargetFolderPath = cleanUpFolderPath(config.outputFolderPath);
     removeDirectoryRecursively(cleanTargetFolderPath);
-    fs.cpSync(
-      path.resolve(__dirname, '../../../templates/ts'),
-      cleanTargetFolderPath,
-      {
-        recursive: true,
-      }
-    );
-    templateFilesToIgnore.forEach(filePath => {
-      const fsFilePath = config.outputFolderPath + filePath;
-      if (fs.existsSync(fsFilePath)) {
-        fs.unlinkSync(fsFilePath);
-      }
-    });
+    this.copyTemplateFiles(config);
     for (const filePath in fileOutputByFilePath) {
       const fileOutput = fileOutputByFilePath[filePath];
-      const fsFilePath = `${cleanTargetFolderPath}${filePath}`;
+      const fsFilePath = path.resolve(
+        config.outputFolderPath,
+        cleanUpFolderPath(filePath)
+      );
       if (fs.existsSync(fsFilePath)) {
         appendToFile(
           fsFilePath,
@@ -711,7 +800,8 @@ export class DefaultCodeGenerator implements CodeGenerator {
   private createFileOutputByFilePath(
     config: GenerateConfig
   ): FileOutputByFilePath {
-    const fileOutputByFilePath: FileOutputByFilePath = {};
+    const fileOutputByFilePath: FileOutputByFilePath =
+      this.createTemplateFileOutputByFilePath(config);
     this.outputs.forEach(output => {
       if (output.isExternalLibrary) {
         return;
@@ -747,19 +837,44 @@ export class DefaultCodeGenerator implements CodeGenerator {
   private getFileOutputByFilePathWithAddedIndexFiles(
     fileOutputByFilePath: FileOutputByFilePath
   ): FileOutputByFilePath {
+    function getMergedUniqueStrings(arr1: string[], arr2: string[]): string[] {
+      const mergedArr = [...arr1, ...arr2];
+      return mergedArr.filter((value, index, array) => {
+        return array.indexOf(value) === index;
+      });
+    }
     let nextFileOutputByFilePath = fileOutputByFilePath;
     for (const filePath in fileOutputByFilePath) {
       const folderPath = filePath.split('/').slice(0, -1).join('/');
       const indexFilePath = `${folderPath}/index.ts`;
-      if (!fileOutputByFilePath[indexFilePath]) {
+      const fileOutput = this.createFileOutputForIndexTsFile(
+        folderPath,
+        fileOutputByFilePath
+      );
+      const existingFileOutput = fileOutputByFilePath[indexFilePath];
+      if (!existingFileOutput) {
         nextFileOutputByFilePath = {
           ...nextFileOutputByFilePath,
-          [indexFilePath]: this.createFileOutputForIndexTsFile(
-            folderPath,
-            fileOutputByFilePath
-          ),
+          [indexFilePath]: fileOutput,
         };
+        continue;
       }
+      // As of time of writing this:
+      // This case only occurs for the already existing "/core/index.ts" filePath, which was defined in
+      // the method "createTemplateFileOutputByFilePath" of this class.
+      // This already existing fileOutput contains only values in the "exportPaths" property.
+      // Therefore, only the "exportPaths" has to be merged as of right now.
+      const mergedFileOutput: FileOutput = {
+        ...existingFileOutput,
+        exportPaths: getMergedUniqueStrings(
+          fileOutput.exportPaths,
+          existingFileOutput.exportPaths
+        ),
+      };
+      nextFileOutputByFilePath = {
+        ...nextFileOutputByFilePath,
+        [indexFilePath]: mergedFileOutput,
+      };
     }
     return nextFileOutputByFilePath;
   }
@@ -770,8 +885,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
   ): FileOutput {
     const exportPaths: string[] = [];
     for (const filePath in fileOutputByFilePath) {
+      const fileName = filePath.split('/').pop();
       const fileFolderPath = filePath.split('/').slice(0, -1).join('/');
-      if (folderPath === fileFolderPath) {
+      if (folderPath === fileFolderPath && fileName !== 'index.ts') {
         const exportPath = filePath
           .split('/')
           .slice(-1)

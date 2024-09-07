@@ -1,8 +1,48 @@
-type PathParams = {
+import {ZodSchema} from 'zod';
+
+export type PathParams = {
   [paramName: string]: number | string;
 };
 
-function createRequestUrl(endpointPath: string, params: PathParams): string {
+export type StatusCode = number | 'any'; // This is not "any" of TypeScript, it's a string placeholder for unspecified status codes
+
+export type SecurityScheme = {
+  name: string;
+  requiredPermissions: string[];
+};
+
+export type Headers = {
+  [key: 'Content-Type' | string]: string;
+};
+
+export type Cookies = {
+  [key: string]: string;
+};
+
+export type EndpointId = {
+  method: string;
+  path: string;
+};
+
+export type RequestCreationSettings = {
+  endpointId: EndpointId;
+  supportedSecuritySchemes?: SecurityScheme[];
+  headers?: Headers;
+  cookies?: Cookies;
+  pathParams?: PathParams;
+  queryParams?: object;
+  body?: object;
+  headersZodSchema?: ZodSchema;
+  cookiesZodSchema?: ZodSchema;
+  pathParamsZodSchema?: ZodSchema;
+  queryParamsZodSchema?: ZodSchema;
+  bodyZodSchema?: ZodSchema;
+};
+
+export function createRequestUrl(
+  endpointPath: string,
+  params: PathParams
+): string {
   const urlVariableNames = endpointPath.match(/[^{}]+(?=})/g) ?? [];
   let url = endpointPath;
   urlVariableNames.forEach(urlVariableName => {
@@ -27,50 +67,6 @@ function createRequestUrl(endpointPath: string, params: PathParams): string {
   return url;
 }
 
-export type EndpointId = {
-  method: string;
-  path: string;
-};
-
-type Headers = {
-  [key: 'Content-Type' | string]: string;
-};
-
-type Cookies = {
-  [key: string]: string;
-};
-
-export type SecurityScheme = {
-  name: string;
-  requiredPermissions: string[];
-};
-
-export type Request<
-  P extends PathParams | undefined = any,
-  Q extends object | undefined = any,
-  B extends object | undefined = any,
-> = {
-  id: string;
-  endpointId: EndpointId;
-  url: string;
-  supportedSecuritySchemes: SecurityScheme[];
-  headers?: Headers;
-  cookies?: Cookies;
-  pathParams: P;
-  queryParams: Q;
-  body: B;
-};
-
-type RequestCreationSettings = {
-  endpointId: EndpointId;
-  supportedSecuritySchemes?: SecurityScheme[];
-  headers?: Headers;
-  cookies?: Cookies;
-  pathParams?: PathParams;
-  queryParams?: object;
-  body?: object;
-};
-
 export function createRequest(settings: RequestCreationSettings): Request {
   const chars =
     'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
@@ -88,10 +84,34 @@ export function createRequest(settings: RequestCreationSettings): Request {
     pathParams: settings.pathParams,
     queryParams: settings.queryParams,
     body: settings.body,
+    headersZodSchema: settings.headersZodSchema,
+    cookiesZodSchema: settings.cookiesZodSchema,
+    pathParamsZodSchema: settings.pathParamsZodSchema,
+    queryParamsZodSchema: settings.queryParamsZodSchema,
+    bodyZodSchema: settings.bodyZodSchema,
   };
 }
 
-type StatusCode = number | 'any'; // this is not "any" of TypeScript, it's a string placeholder for unspecified status codes
+export type Request<
+  P extends PathParams | undefined = any,
+  Q extends object | undefined = any,
+  B extends object | undefined = any,
+> = {
+  id: string;
+  endpointId: EndpointId;
+  url: string;
+  supportedSecuritySchemes: SecurityScheme[];
+  headers?: Headers;
+  cookies?: Cookies;
+  pathParams: P;
+  queryParams: Q;
+  body: B;
+  headersZodSchema?: ZodSchema; // only defined when "withZod: true"
+  cookiesZodSchema?: ZodSchema; // only defined when "withZod: true"
+  pathParamsZodSchema?: ZodSchema; // only defined when "withZod: true"
+  queryParamsZodSchema?: ZodSchema; // only defined when "withZod: true"
+  bodyZodSchema?: ZodSchema; // only defined when "withZod: true"
+};
 
 export interface Response<
   S extends StatusCode = any,
@@ -114,7 +134,6 @@ export interface RequestResult<
   hasRequestBeenCancelled: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface RequestExecutionConfig {}
 
 export interface RequestHandler {
