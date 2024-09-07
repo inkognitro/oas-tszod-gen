@@ -14,7 +14,7 @@ and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
 This code generator serves as a standalone alternative to the two libraries mentioned above.
 
 I coded my own solution because I wanted to
-- have full ownership over the code which is generated for production
+- have full ownership over the code which is generated for production (inspired by [Shadcn](https://ui.shadcn.com/))
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
 - have separated functions and type definitions for each API endpoint in a single file located in a folder of its context
 - have automatically generated [Zod](https://zod.dev) schemas for endpoint DTOs
@@ -147,22 +147,28 @@ It is usually the most inner implementation of an onion bootstrapped request han
 It requires the installation of the `axios` library in your code base
 and serves as a more widely supported alternative to the `FetchApiRequestHandler`.
 
+This implementation has the dependencies below which you have to install by yourself.
+For more information have a look at the peer dependencies section of the `package.json` file of this project.
+```
+npm install axios --save
+```
 
 #### `FetchApiRequestHandler`
 This implementation is responsible for executing your requests through the http(s) protocol.
 It is usually the most inner implementation of an onion bootstrapped request handler object
 and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 
-:warning: Following needs to be considered when using this implementation:
-1. This implementation requires following dependencies which you have to install on your project yourself:
-   - `@types/qs@6.9.15` as of time writing. Recommended: `npm install @types/qs@latest`
-   - `qs@6.13.0` as of time writing. Recommended: `npm install qs@latest`
+This implementation has the dependencies below which you have to install by yourself.
+For more information have a look at the peer dependencies section of the `package.json` file of this project.
+```
+npm install qs --save && npm install @types/qs --save-dev
+```
 
-
-2. The `defaultConfig` of the FetchApiRequestHandler does not support cookies which will be passed in the `request.cookies` property.
-  If explicit cookies are required for your use-case you should either consider using the `AxiosRequestHandler` or implement
-  your own [CreateWithCookiesEnrichedRequestInit function](https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/fetchApiRequestHandler.ts#L4)
-  when calling `new FetchApiRequestHandler(ownConfig)`.
+:warning: The `defaultConfig` of the FetchApiRequestHandler does not support cookies which will be passed
+in the `request.cookies` property. If explicit cookies are required for your use-case you should either consider using
+the `AxiosRequestHandler` or implement your own [CreateWithCookiesEnrichedRequestInit function](
+https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/fetchApiRequestHandler.ts#L4
+) when calling `new FetchApiRequestHandler(ownConfig)`.
 
 #### `AuthRequestHandler`
 This implementation can be taken for automatic `Authorization` request header enrichment.
