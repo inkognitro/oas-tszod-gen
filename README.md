@@ -166,8 +166,8 @@ npm install qs --save && npm install @types/qs --save-dev
 
 > :warning: **Explicit cookies are not supported by default**
 > 
-> The `defaultConfig` of the FetchApiRequestHandler does not support cookies which are passed in with the request
-> through the `request.cookies` property. If this has to be supported for your use-case, you need to implement this
+> The `defaultConfig` of the FetchApiRequestHandler does not support cookies which are passed within the `Request`
+> object through its `cookies` property. If this has to be supported for your use-case, you need to implement this
 > functionality by yourself, or you could use the `AxiosRequestHandler` instead.
 > 
 > If you want to build that on your own have a look at the
