@@ -12,13 +12,13 @@ export type AxiosRequestHandlerExecuteConfig = {
   onUploadProgress?: (progress: number) => void;
 };
 
-type RequestIdToCancelTokenSourceMapping = {
+type CancelTokenSourceByRequestIdMap = {
   [requestId: string]: CancelTokenSource;
 };
 
 export class AxiosRequestHandler implements RequestHandler {
   private readonly generalRequestConfig: AxiosRequestConfig;
-  private readonly cancelTokenSourceByPendingRequestId: RequestIdToCancelTokenSourceMapping;
+  private readonly cancelTokenSourceByPendingRequestId: CancelTokenSourceByRequestIdMap;
 
   constructor(generalRequestConfig: AxiosRequestConfig = {}) {
     this.generalRequestConfig = generalRequestConfig;
@@ -143,6 +143,9 @@ export class AxiosRequestHandler implements RequestHandler {
     for (const requestId in this.cancelTokenSourceByPendingRequestId) {
       const cancelTokenSource =
         this.cancelTokenSourceByPendingRequestId[requestId];
+      if (!cancelTokenSource) {
+        return;
+      }
       cancelTokenSource.cancel();
       delete this.cancelTokenSourceByPendingRequestId[requestId];
     }

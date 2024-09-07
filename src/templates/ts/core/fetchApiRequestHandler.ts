@@ -1,28 +1,37 @@
-import {Request, RequestHandler, RequestResult} from './core';
+import {Cookies, Request, RequestHandler, RequestResult} from './core';
+import {stringify} from 'qs';
 
-function createSerializedQueryStringUrlPart(
-  queryParams: object
-): null | string {
-  const queryStrParts: string[] = [];
-  for (const key in queryParams) {
-    // eslint-disable-next-line no-prototype-builtins
-    if (!queryParams.hasOwnProperty(key)) {
-      continue;
-    }
-    // @ts-ignore
-    const value = queryParams[key] as string;
-    queryStrParts.push(
-      encodeURIComponent(key) + '=' + encodeURIComponent(value)
-    );
-  }
-  if (queryStrParts.length === 0) {
-    return null;
-  }
-  return `?${queryStrParts.join('&')}`;
-}
+type CreateWithCookiesEnrichedRequestInitFunc = (
+  currentRequestInit: RequestInit,
+  cookies: Cookies
+) => RequestInit;
 
-const defaultRequestInit: RequestInit = {
+type FetchApiRequestHandlerConfig = {
+  generalRequestInit: RequestInit;
+  createWithCookiesEnrichedRequestInit: CreateWithCookiesEnrichedRequestInitFunc;
+};
+
+export const defaultFetchApiRequestHandlerRequestInit: RequestInit = {
   credentials: 'same-origin',
+};
+
+const defaultConfig: FetchApiRequestHandlerConfig = {
+  generalRequestInit: defaultFetchApiRequestHandlerRequestInit,
+  createWithCookiesEnrichedRequestInit: () => {
+    const errorParts = [
+      'The default configuration of the FetchApiRequestHandler class does not implement cookie value enrichment',
+      "for the RequestInit-parameter of the Javascript's built-in Fetch API.",
+      'Please specify your own "createWithCookiesEnrichedRequestInit" function in your custom configuration',
+      'when calling the FetchApiRequestHandler\'s constructor with "new FetchApiRequestHandler(customConfig)".',
+      'Please be aware that servers and clients should define different headers in your',
+      '"createWithCookiesEnrichedRequestInit" function: "Set-Cookie" (server) Vs "Cookie" (client).',
+    ];
+    throw new Error(errorParts.join(' '));
+  },
+};
+
+type AbortControllerByRequestId = {
+  [requestId: string]: AbortController;
 };
 
 export type FetchApiRequestHandlerExecuteConfig = {
@@ -31,10 +40,12 @@ export type FetchApiRequestHandlerExecuteConfig = {
 };
 
 export class FetchApiRequestHandler implements RequestHandler {
-  private readonly generalRequestInit: RequestInit;
+  private readonly config: FetchApiRequestHandlerConfig;
+  private readonly abortControllerByPendingRequestIds: AbortControllerByRequestId;
 
-  constructor(generalRequestInit: RequestInit = defaultRequestInit) {
-    this.generalRequestInit = generalRequestInit;
+  constructor(config: FetchApiRequestHandlerConfig = defaultConfig) {
+    this.config = config;
+    this.abortControllerByPendingRequestIds = {};
   }
 
   public execute(
@@ -42,13 +53,16 @@ export class FetchApiRequestHandler implements RequestHandler {
     config?: FetchApiRequestHandlerExecuteConfig
   ): Promise<RequestResult> {
     return new Promise(resolve => {
-      const queryStrUrlPart = request.queryParams
-        ? createSerializedQueryStringUrlPart(request.queryParams)
+      const queryStrUrlPart = Object.keys(request.queryParams).length
+        ? `?${stringify(request.queryParams)}`
         : null;
-      fetch(
-        `${request.url}${queryStrUrlPart}`,
-        this.createFetchApiRequestInit(request, config)
-      )
+      const abortController = new AbortController();
+      this.abortControllerByPendingRequestIds[request.id] = abortController;
+      const requestInit: RequestInit = {
+        ...this.createFetchApiRequestInit(request, config),
+        signal: abortController.signal,
+      };
+      fetch(`${request.url}${queryStrUrlPart}`, requestInit)
         .then(response => {
           if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
@@ -62,28 +76,48 @@ export class FetchApiRequestHandler implements RequestHandler {
     });
   }
 
-  public cancelAllRequests() {
-    throw new Error('implement me!');
+  cancelRequestById(requestId: string) {
+    const controller = this.abortControllerByPendingRequestIds[requestId];
+    if (!controller) {
+      return;
+    }
+    controller.abort();
+    delete this.abortControllerByPendingRequestIds[requestId];
   }
 
-  public cancelRequestById(requestId: string) {
-    throw new Error('implement me!');
+  cancelAllRequests() {
+    for (const requestId in this.abortControllerByPendingRequestIds) {
+      const controller = this.abortControllerByPendingRequestIds[requestId];
+      if (!controller) {
+        return;
+      }
+      controller.abort();
+      delete this.abortControllerByPendingRequestIds[requestId];
+    }
   }
 
   private createFetchApiRequestInit(
     request: Request,
     config?: FetchApiRequestHandlerExecuteConfig
   ): RequestInit {
-    const requestInit: RequestInit = {
+    let requestInit: RequestInit = {
       ...(config?.ignoreGeneralFetchApiRequestInit
         ? {}
-        : this.generalRequestInit),
+        : this.config.generalRequestInit),
       method: request.endpointId.method,
     };
     if (request.headers) {
       requestInit.headers = request.headers;
     }
-    // todo: implement other request parts
+    if (request.body) {
+      requestInit.body = request.body;
+    }
+    if (request.cookies) {
+      requestInit = this.config.createWithCookiesEnrichedRequestInit(
+        requestInit,
+        request.cookies
+      );
+    }
     return {
       ...requestInit,
       ...(config?.fetchApiRequestInit ?? {}),
