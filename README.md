@@ -15,8 +15,8 @@ This code generator serves as a standalone alternative to the two libraries ment
 
 I coded my own solution because I wanted to
 - have full ownership over the code which is generated for production (inspired by [Shadcn](https://ui.shadcn.com/))
-- be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
 - have separated functions and type definitions for each API endpoint in a single file located in a folder of its context
+- be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
 - have automatically generated [Zod](https://zod.dev) schemas for endpoint DTOs
 - have the possibility to only generate TypeScript definitions and opt-in Zod schema generation
 
