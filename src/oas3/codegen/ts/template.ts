@@ -130,7 +130,7 @@ export const templateResponseType: TemplateDefinitionOutput = {
       `S extends ${templateStatusCodeType.createName(
         templateResponseTypePath
       )} = any`,
-      'B = any',
+      'B extends Blob | ArrayBuffer | FormData | string | any = any, // any for POJOs',
       `H extends ${templateHeadersType.createName(
         templateResponseTypePath
       )} = {}`,
@@ -145,7 +145,7 @@ export const templateResponseType: TemplateDefinitionOutput = {
       'statusCode: S;',
       'headers: H;',
       'cookies: C;',
-      'body: B;',
+      'revealBody: () => B;',
     ];
     return `{${bodyCodeParts.join('\n')}}`;
   },

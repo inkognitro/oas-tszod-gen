@@ -119,14 +119,14 @@ export type Request<
 
 export interface Response<
   S extends StatusCode = any,
-  B = any,
+  B extends Blob | ArrayBuffer | FormData | string | any = any, // any for POJOs
   H extends Headers = {},
   C extends ResponseSetCookies = {},
 > {
   statusCode: S;
   headers: H;
   cookies: C;
-  body: B;
+  revealBody: () => Promise<B>;
 }
 
 export interface RequestResult<
