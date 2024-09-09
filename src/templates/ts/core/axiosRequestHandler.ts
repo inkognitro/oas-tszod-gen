@@ -232,22 +232,18 @@ export class AxiosRequestHandler implements RequestHandler {
   cancelRequestById(requestId: string) {
     const cancelTokenSource =
       this.cancelTokenSourceByPendingRequestId[requestId];
-    if (!cancelTokenSource) {
-      return;
+    if (cancelTokenSource) {
+      cancelTokenSource.cancel();
     }
-    cancelTokenSource.cancel();
-    delete this.cancelTokenSourceByPendingRequestId[requestId];
   }
 
   cancelAllRequests() {
     for (const requestId in this.cancelTokenSourceByPendingRequestId) {
       const cancelTokenSource =
         this.cancelTokenSourceByPendingRequestId[requestId];
-      if (!cancelTokenSource) {
-        return;
+      if (cancelTokenSource) {
+        cancelTokenSource.cancel();
       }
-      cancelTokenSource.cancel();
-      delete this.cancelTokenSourceByPendingRequestId[requestId];
     }
   }
 }
