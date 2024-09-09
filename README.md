@@ -99,11 +99,13 @@ declare global {
       AuthRequestHandlerExecuteConfig {}
 }
 
+const exampleAuthAccessToken: null | string = null;
+
 const exampleAuthenticationProvider: HttpBearerAuthenticationProvider = {
   type: 'httpBearer',
   
   findToken: (): string | null => {
-    return 'my-access-token';
+    return exampleAuthAccessToken;
   },
   
   securitySchemeName: 'example',
@@ -127,17 +129,29 @@ const requestHandler = new AuthRequestHandler(
   });
 );
 
-const optionalConfig: RequestExecutionConfig = {
-  onUploadProgress: progress => console.log('uploadProgress', progress),
-};
+async function login() {
+  const optionalConfig: RequestExecutionConfig = {
+    onUploadProgress: progress => console.log('uploadProgress', progress),
+  };
 
-const requestResult = await authenticate(
-  requestHandler,
-  {usernameOrEmail: 'inkognitro', password: '12345678'},
-  optionalConfig
-);
+  const requestResult = await authenticate(
+    requestHandler,
+    {usernameOrEmail: 'inkognitro', password: '12345678'},
+    optionalConfig
+  );
 
-console.log(requestResult);
+  if (!rr.response || rr.response.statusCode !== 200) {
+    console.log('Something went wrong!');
+    return;
+  }
+
+  const body = await rr.response.revealBody();
+  exampleAuthAccessToken = body.accessToken;
+  
+  console.log('Successfully logged in!');
+}
+
+login();
 ```
 
 ### RequestHandler
