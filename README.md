@@ -135,7 +135,7 @@ const requestHandler = new AuthRequestHandler(
     // In case of browsers:
     // Allow cookies to be passed along with the request for a different api (sub-)domain (CORS)
     // Source: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
-  })
+  });
 );
 
 const optionalConfig: RequestExecutionConfig = {
