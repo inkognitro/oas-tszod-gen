@@ -197,7 +197,7 @@ Anyway, React stuff is out-of-scope of this package.
 This implementation is responsible for validating the request and response data through their Zod schemas.
 This one is only available when Zod schemas are generated due to the `withZod: true` configuration.
 
-## Promise: Resolve Vs Reject
+### Promise: Resolve Vs Reject
 Due to convenience, the provided `RequestHandler` implementations distinguish between "expected" and
 "unexpected" events.
 
