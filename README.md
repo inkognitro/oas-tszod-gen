@@ -12,9 +12,10 @@ Before you consider using this library, I suggest having a look at [Zodios](http
 and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
 This code generator serves as a standalone alternative to the two libraries.
 I coded my own solution because I wanted to:
-- have the opt-in possibility to generate things also only in TypeScript without [Zod](https://zod.dev).
-- have the possibility to set request cookies explicitly (and also read response cookies)
-- to read cookies in a unified way, no matter what underlying implementation (e.g. Axios, FetchApi)
+- have generated [Zod](https://zod.dev) schemas only as an opt-in possibility.
+- have the possibility to go with [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API,
+[Axios](https://axios-http.com/docs/intro) or another implementation under the hood.
+- have cookies typed in a unified way for requests and responses no matter what underlying implementation (Axios, FetchApi)
 - have separated functions and type definitions for each API endpoint in a single file, located in context folders
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
 
@@ -157,7 +158,7 @@ The `RequestHandler` interface for custom implementations can be found
 #### `AxiosRequestHandler`
 This implementation is responsible for executing your requests through the http(s) protocol.
 It is usually the most inner implementation of an onion bootstrapped request handler object.
-It requires the installation of the `axios` library in your code base
+It requires the installation of the [Axios](https://axios-http.com/docs/intro) library in your code base
 and serves as a more widely supported alternative to the `FetchApiRequestHandler`.
 
 Some dependencies need to be installed for this type of request handler.
