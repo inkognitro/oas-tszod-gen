@@ -129,7 +129,6 @@ function createNullableOas3ObjectSchemaForRequestPayload(
     );
   if (cookiesObjectSchema) {
     objectSchemaProps['cookies'] = cookiesObjectSchema;
-    requiredObjectSchemaPropNames.push('cookies');
     shouldAddPayload = true;
   }
 
@@ -375,7 +374,8 @@ function createRequestCreationCode(
     'cookies'
   );
   if (explicitCookiesCode) {
-    parts.push(`cookies: ${explicitCookiesCode}`);
+    // cookies should always be optional due to environment behaviour (e.g. browser set them automatically)
+    parts.push(`cookies?: ${explicitCookiesCode}`);
   }
   if (
     !!payloadUtils.objectSchema.properties?.['cookies'] &&

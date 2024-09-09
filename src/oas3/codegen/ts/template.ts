@@ -73,7 +73,9 @@ export const templateRequestType: TemplateDefinitionOutput = {
         templateRequestTypePath
       )}[];`,
       `headers?: ${templateHeadersType.createName(templateRequestTypePath)};`,
-      `cookies?: ${templateCookiesType.createName(templateRequestTypePath)};`,
+      `cookies?: ${templateRequestCookiesType.createName(
+        templateRequestTypePath
+      )};`,
       'pathParams: P;',
       'queryParams: Q;',
       'body: B;',
@@ -106,7 +108,7 @@ export const templateRequestType: TemplateDefinitionOutput = {
       templateEndpointIdType.path,
       templateSecuritySchemeType.path,
       templateHeadersType.path,
-      templateCookiesType.path,
+      templateRequestCookiesType.path,
     ];
     if (config.withZod) {
       requiredOutputPaths.push(templateZodSchemaOfZodLibrary.path);
@@ -132,7 +134,7 @@ export const templateResponseType: TemplateDefinitionOutput = {
       `H extends ${templateHeadersType.createName(
         templateResponseTypePath
       )} = {}`,
-      `C extends ${templateCookiesType.createName(
+      `C extends ${templateResponseSetCookiesType.createName(
         templateResponseTypePath
       )} = {}`,
     ];
@@ -150,7 +152,7 @@ export const templateResponseType: TemplateDefinitionOutput = {
   getRequiredOutputPaths: () => [
     templateStatusCodeType.path,
     templateHeadersType.path,
-    templateCookiesType.path,
+    templateResponseSetCookiesType.path,
   ],
 };
 
@@ -178,6 +180,7 @@ export const templateRequestResultType: TemplateDefinitionOutput = {
       'request: Req;',
       'response: null | Res;',
       'hasRequestBeenCancelled: boolean;',
+      'error?: Error; // must only be set when the RequestResult Promise was rejected',
     ];
     return `{${bodyCodeParts.join('\n')}}`;
   },
@@ -262,15 +265,30 @@ const templateHeadersType: TemplateDefinitionOutput = {
   getRequiredOutputPaths: () => [],
 };
 
-const templateCookiesType: TemplateDefinitionOutput = {
+const templateResponseSetCookiesType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'type',
-  path: ['core', 'core', 'cookies'],
+  path: ['core', 'core', 'responseSetCookies'],
   createName: () => {
-    return 'Cookies';
+    return 'ResponseSetCookies';
   },
   createCode: () => {
-    return '{\n[key: string]: string;\n}';
+    const codeComment =
+      '// string format: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie';
+    return `{\n[cookieName: string]: string; ${codeComment}\n}`;
+  },
+  getRequiredOutputPaths: () => [],
+};
+
+const templateRequestCookiesType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: ['core', 'core', 'requestCookies'],
+  createName: () => {
+    return 'RequestCookies';
+  },
+  createCode: () => {
+    return '{\n[cookieName: string]: string;\n}';
   },
   getRequiredOutputPaths: () => [],
 };
@@ -332,7 +350,7 @@ const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
       )};`
     );
     codeParts.push(
-      `cookies?: ${templateCookiesType.createName(
+      `cookies?: ${templateRequestCookiesType.createName(
         templateRequestCreationSettingsTypePath
       )};`
     );
@@ -376,7 +394,7 @@ const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
     templateEndpointIdType.path,
     templateSecuritySchemeType.path,
     templateHeadersType.path,
-    templateCookiesType.path,
+    templateRequestCookiesType.path,
     templatePathParamsType.path,
   ],
 };
@@ -468,7 +486,8 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateStatusCodeType,
   templateSecuritySchemeType,
   templateHeadersType,
-  templateCookiesType,
+  templateRequestCookiesType,
+  templateResponseSetCookiesType,
   templateEndpointIdType,
   templateRequestCreationSettingsType,
   templateCreateRequestUrlFunction,
