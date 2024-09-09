@@ -16,6 +16,54 @@ import {
   ResponseSetCookies,
 } from './core';
 
+class ResultResponse implements CoreResponse {
+  private readonly response: AxiosResponse;
+
+  public readonly statusCode: number;
+  public readonly headers: Headers;
+  public readonly cookies: ResponseSetCookies;
+
+  constructor(response: AxiosResponse) {
+    this.response = response;
+    this.statusCode = response.status;
+    this.headers = this.createPlainHeaders(response);
+    this.cookies = this.createPlainCookies(response);
+    this.revealBody = this.revealBody.bind(this);
+  }
+
+  revealBody(): Promise<any> {
+    return new Promise(resolve => resolve(this.response.data));
+  }
+
+  private createPlainHeaders(axiosResponse: AxiosResponse): Headers {
+    const stringHeaders =
+      axiosResponse.headers instanceof AxiosHeaders
+        ? axiosResponse.headers.toJSON(true)
+        : axiosResponse.headers;
+    const plainHeaders: Headers = {};
+    for (const headerName in stringHeaders) {
+      const headerValue = stringHeaders[headerName];
+      if (typeof headerValue === 'string') {
+        plainHeaders[headerName] = headerValue;
+      }
+    }
+    return plainHeaders;
+  }
+
+  private createPlainCookies(axiosResponse: AxiosResponse): ResponseSetCookies {
+    const setCookieHeaders = axiosResponse.headers['set-cookie'];
+    if (!setCookieHeaders) {
+      return {};
+    }
+    const cookies: ResponseSetCookies = {};
+    setCookieHeaders.forEach(setCookieHeader => {
+      const cookieName = setCookieHeader.split('=')[0];
+      cookies[cookieName] = setCookieHeader;
+    });
+    return cookies;
+  }
+}
+
 export type AxiosRequestHandlerExecuteConfig = {
   refineAxiosRequestConfig?: (
     preparedConfig: AxiosRequestConfig
@@ -40,15 +88,11 @@ export class AxiosRequestHandler implements RequestHandler {
     this.generalRequestConfig = generalRequestConfig;
     this.cancelTokenSourceByPendingRequestId = {};
     this.execute = this.execute.bind(this);
-    this.createCoreResponse = this.createCoreResponse.bind(this);
-    this.createCoreResponsePlainHeaders =
-      this.createCoreResponsePlainHeaders.bind(this);
-    this.createCoreResponseCookies = this.createCoreResponseCookies.bind(this);
-    this.findAxiosRequestConfigCookieHeaders =
-      this.findAxiosRequestConfigCookieHeaders.bind(this);
-    this.createAxiosRequestConfigHeaders =
-      this.createAxiosRequestConfigHeaders.bind(this);
-    this.createAxiosRequestConfig = this.createAxiosRequestConfig.bind(this);
+    this.findRequestConfigCookieHeaders =
+      this.findRequestConfigCookieHeaders.bind(this);
+    this.createRequestConfigHeaders =
+      this.createRequestConfigHeaders.bind(this);
+    this.createRequestConfig = this.createRequestConfig.bind(this);
     this.cancelRequestById = this.cancelRequestById.bind(this);
     this.cancelAllRequests = this.cancelAllRequests.bind(this);
   }
@@ -61,7 +105,7 @@ export class AxiosRequestHandler implements RequestHandler {
     const cancelTokenSourceByPendingRequestId =
       this.cancelTokenSourceByPendingRequestId;
     const axiosRequestCfg: AxiosRequestConfig = {
-      ...this.createAxiosRequestConfig(request, config),
+      ...this.createRequestConfig(request, config),
       cancelToken: cancelTokenSource.token,
     };
     cancelTokenSourceByPendingRequestId[request.id] = cancelTokenSource;
@@ -72,7 +116,7 @@ export class AxiosRequestHandler implements RequestHandler {
           resolve({
             hasRequestBeenCancelled: false,
             request,
-            response: this.createCoreResponse(response),
+            response: new ResultResponse(response),
           });
         })
         .catch((error): void => {
@@ -89,7 +133,7 @@ export class AxiosRequestHandler implements RequestHandler {
               hasRequestBeenCancelled: false,
               request,
               response: error.response
-                ? this.createCoreResponse(error.response)
+                ? new ResultResponse(error.response)
                 : null,
               error: error,
             });
@@ -99,7 +143,7 @@ export class AxiosRequestHandler implements RequestHandler {
             hasRequestBeenCancelled: false,
             request,
             response: error.response
-              ? this.createCoreResponse(error.response)
+              ? new ResultResponse(error.response)
               : null,
             error: error,
           });
@@ -110,88 +154,25 @@ export class AxiosRequestHandler implements RequestHandler {
     });
   }
 
-  private createCoreResponsePlainHeaders(
-    axiosResponse: AxiosResponse
-  ): Headers {
-    const stringHeaders =
-      axiosResponse.headers instanceof AxiosHeaders
-        ? axiosResponse.headers.toJSON(true)
-        : axiosResponse.headers;
-    const plainHeaders: Headers = {};
-    for (const headerName in stringHeaders) {
-      const headerValue = stringHeaders[headerName];
-      if (typeof headerValue === 'string') {
-        plainHeaders[headerName] = headerValue;
+  cancelRequestById(requestId: string) {
+    const cancelTokenSource =
+      this.cancelTokenSourceByPendingRequestId[requestId];
+    if (cancelTokenSource) {
+      cancelTokenSource.cancel();
+    }
+  }
+
+  cancelAllRequests() {
+    for (const requestId in this.cancelTokenSourceByPendingRequestId) {
+      const cancelTokenSource =
+        this.cancelTokenSourceByPendingRequestId[requestId];
+      if (cancelTokenSource) {
+        cancelTokenSource.cancel();
       }
     }
-    return plainHeaders;
   }
 
-  private createCoreResponse(axiosResponse: AxiosResponse): CoreResponse {
-    const headers = this.createCoreResponsePlainHeaders(axiosResponse);
-    return {
-      statusCode: axiosResponse.status,
-      headers,
-      revealBody: () => axiosResponse.data,
-      cookies: this.createCoreResponseCookies(axiosResponse),
-    };
-  }
-
-  private createCoreResponseCookies(
-    axiosResponse: AxiosResponse
-  ): ResponseSetCookies {
-    const setCookieHeaders = axiosResponse.headers['set-cookie'];
-    if (!setCookieHeaders) {
-      return {};
-    }
-    const cookies: ResponseSetCookies = {};
-    setCookieHeaders.forEach(setCookieHeader => {
-      const cookieName = setCookieHeader.split('=')[0];
-      cookies[cookieName] = setCookieHeader;
-    });
-    return cookies;
-  }
-
-  private findAxiosRequestConfigCookieHeaders(
-    request: Request
-  ): null | RawAxiosRequestHeaders {
-    const currentCookieDefinition = request.headers?.['Cookie'];
-    const cookieDefinitions: string[] = currentCookieDefinition
-      ? [currentCookieDefinition]
-      : [];
-    if (request.cookies) {
-      for (const cookieName in request.cookies) {
-        const cookieValue = request.cookies[cookieName];
-        cookieDefinitions.push(`${cookieName}=${cookieValue}`);
-      }
-    }
-    if (!cookieDefinitions.length) {
-      return null;
-    }
-    return {
-      Cookie: cookieDefinitions.join('; '),
-    };
-  }
-
-  private createAxiosRequestConfigHeaders(
-    requestConfig: AxiosRequestConfig,
-    request: Request
-  ): RawAxiosRequestHeaders {
-    const currentHeaders: RawAxiosRequestHeaders | undefined =
-      requestConfig.headers instanceof AxiosHeaders
-        ? requestConfig.headers.toJSON()
-        : request.headers;
-    const cookieHeaders = request.cookies
-      ? this.findAxiosRequestConfigCookieHeaders(request)
-      : {};
-    return {
-      ...(currentHeaders ?? {}),
-      ...(request.headers ?? {}),
-      ...cookieHeaders,
-    };
-  }
-
-  private createAxiosRequestConfig(
+  private createRequestConfig(
     request: Request,
     config?: AxiosRequestHandlerExecuteConfig
   ): AxiosRequestConfig {
@@ -201,7 +182,7 @@ export class AxiosRequestHandler implements RequestHandler {
       url: request.url,
     };
     if (request.headers) {
-      requestConfig.headers = this.createAxiosRequestConfigHeaders(
+      requestConfig.headers = this.createRequestConfigHeaders(
         requestConfig,
         request
       );
@@ -229,21 +210,42 @@ export class AxiosRequestHandler implements RequestHandler {
     return config.refineAxiosRequestConfig(requestConfig);
   }
 
-  cancelRequestById(requestId: string) {
-    const cancelTokenSource =
-      this.cancelTokenSourceByPendingRequestId[requestId];
-    if (cancelTokenSource) {
-      cancelTokenSource.cancel();
-    }
+  private createRequestConfigHeaders(
+    requestConfig: AxiosRequestConfig,
+    request: Request
+  ): RawAxiosRequestHeaders {
+    const currentHeaders: RawAxiosRequestHeaders | undefined =
+      requestConfig.headers instanceof AxiosHeaders
+        ? requestConfig.headers.toJSON()
+        : request.headers;
+    const cookieHeaders = request.cookies
+      ? this.findRequestConfigCookieHeaders(request)
+      : {};
+    return {
+      ...(currentHeaders ?? {}),
+      ...(request.headers ?? {}),
+      ...cookieHeaders,
+    };
   }
 
-  cancelAllRequests() {
-    for (const requestId in this.cancelTokenSourceByPendingRequestId) {
-      const cancelTokenSource =
-        this.cancelTokenSourceByPendingRequestId[requestId];
-      if (cancelTokenSource) {
-        cancelTokenSource.cancel();
+  private findRequestConfigCookieHeaders(
+    request: Request
+  ): null | RawAxiosRequestHeaders {
+    const currentCookieDefinition = request.headers?.['Cookie'];
+    const cookieDefinitions: string[] = currentCookieDefinition
+      ? [currentCookieDefinition]
+      : [];
+    if (request.cookies) {
+      for (const cookieName in request.cookies) {
+        const cookieValue = request.cookies[cookieName];
+        cookieDefinitions.push(`${cookieName}=${cookieValue}`);
       }
     }
+    if (!cookieDefinitions.length) {
+      return null;
+    }
+    return {
+      Cookie: cookieDefinitions.join('; '),
+    };
   }
 }
