@@ -5,8 +5,10 @@ import axios, {
   AxiosResponse,
   AxiosHeaders,
   RawAxiosRequestHeaders,
+  AxiosInstance,
 } from 'axios';
 import {
+  Headers,
   RequestHandler,
   RequestResult,
   Request,
@@ -26,13 +28,26 @@ type CancelTokenSourceByRequestIdMap = {
 };
 
 export class AxiosRequestHandler implements RequestHandler {
+  private readonly axiosInstance: AxiosInstance;
   private readonly generalRequestConfig: AxiosRequestConfig;
   private readonly cancelTokenSourceByPendingRequestId: CancelTokenSourceByRequestIdMap;
 
-  constructor(generalRequestConfig: AxiosRequestConfig = {}) {
+  constructor(
+    axiosInstance: AxiosInstance,
+    generalRequestConfig: AxiosRequestConfig = {}
+  ) {
+    this.axiosInstance = axiosInstance;
     this.generalRequestConfig = generalRequestConfig;
     this.cancelTokenSourceByPendingRequestId = {};
     this.execute = this.execute.bind(this);
+    this.createCoreResponse = this.createCoreResponse.bind(this);
+    this.createCoreResponsePlainHeaders =
+      this.createCoreResponsePlainHeaders.bind(this);
+    this.createCoreResponseCookies = this.createCoreResponseCookies.bind(this);
+    this.findAxiosRequestConfigCookieHeaders =
+      this.findAxiosRequestConfigCookieHeaders.bind(this);
+    this.createAxiosRequestConfigHeaders =
+      this.createAxiosRequestConfigHeaders.bind(this);
     this.createAxiosRequestConfig = this.createAxiosRequestConfig.bind(this);
     this.cancelRequestById = this.cancelRequestById.bind(this);
     this.cancelAllRequests = this.cancelAllRequests.bind(this);
@@ -51,7 +66,8 @@ export class AxiosRequestHandler implements RequestHandler {
     };
     cancelTokenSourceByPendingRequestId[request.id] = cancelTokenSource;
     return new Promise((resolve, reject) => {
-      axios(axiosRequestCfg)
+      this.axiosInstance
+        .request(axiosRequestCfg)
         .then((response): void => {
           resolve({
             hasRequestBeenCancelled: false,
@@ -94,11 +110,29 @@ export class AxiosRequestHandler implements RequestHandler {
     });
   }
 
+  private createCoreResponsePlainHeaders(
+    axiosResponse: AxiosResponse
+  ): Headers {
+    const stringHeaders =
+      axiosResponse.headers instanceof AxiosHeaders
+        ? axiosResponse.headers.toJSON(true)
+        : axiosResponse.headers;
+    const plainHeaders: Headers = {};
+    for (const headerName in stringHeaders) {
+      const headerValue = stringHeaders[headerName];
+      if (typeof headerValue === 'string') {
+        plainHeaders[headerName] = headerValue;
+      }
+    }
+    return plainHeaders;
+  }
+
   private createCoreResponse(axiosResponse: AxiosResponse): CoreResponse {
+    const headers = this.createCoreResponsePlainHeaders(axiosResponse);
     return {
       statusCode: axiosResponse.status,
-      headers: axiosResponse.headers,
-      body: axiosResponse.data,
+      headers,
+      revealBody: () => axiosResponse.data,
       cookies: this.createCoreResponseCookies(axiosResponse),
     };
   }
