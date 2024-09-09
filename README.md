@@ -12,10 +12,10 @@ Before you consider using this library, I suggest having a look at [Zodios](http
 and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
 This code generator serves as a standalone alternative to the two libraries.
 I coded my own solution because I wanted to:
-- have generated [Zod](https://zod.dev) schemas only as an opt-in possibility.
+- have generated [Zod](https://zod.dev) schemas as an opt-in possibility only
 - have the possibility to go with the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API),
 [Axios](https://axios-http.com/docs/intro) or another implementation under the hood.
-- have cookies typed in a unified way for requests and responses no matter what underlying implementation (Axios, FetchApi)
+- have also cookies typed in a uniform way for requests and responses no matter what underlying implementation (Axios, FetchApi)
 - have separated functions and type definitions for each API endpoint in a single file, located in context folders
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
 
