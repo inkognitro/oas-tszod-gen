@@ -12,7 +12,6 @@ Before you consider using this library, I suggest having a look at [Zodios](http
 and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
 This code generator serves as a standalone alternative to the two libraries.
 I coded my own solution because I wanted to:
-- have full ownership over the code which is generated
 - have the opt-in possibility to generate things also only in TypeScript without [Zod](https://zod.dev).
 - have the possibility to set request cookies explicitly (and also read response cookies)
 - to read cookies in a unified way, no matter what underlying implementation (e.g. Axios, FetchApi)
