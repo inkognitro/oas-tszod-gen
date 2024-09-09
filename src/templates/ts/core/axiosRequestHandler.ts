@@ -3,12 +3,21 @@ import axios, {
   CancelTokenSource,
   Method,
   AxiosResponse,
+  AxiosHeaders,
+  RawAxiosRequestHeaders,
 } from 'axios';
-import {RequestHandler, RequestResult, Request} from './core';
+import {
+  RequestHandler,
+  RequestResult,
+  Request,
+  Response as CoreResponse,
+  ResponseSetCookies,
+} from './core';
 
 export type AxiosRequestHandlerExecuteConfig = {
-  axiosRequestConfig?: AxiosRequestConfig;
-  ignoreGeneralAxiosRequestConfig?: boolean;
+  refineAxiosRequestConfig?: (
+    preparedConfig: AxiosRequestConfig
+  ) => AxiosRequestConfig;
   onUploadProgress?: (progress: number) => void;
 };
 
@@ -24,7 +33,6 @@ export class AxiosRequestHandler implements RequestHandler {
     this.generalRequestConfig = generalRequestConfig;
     this.cancelTokenSourceByPendingRequestId = {};
     this.execute = this.execute.bind(this);
-    this.createRequestResult = this.createRequestResult.bind(this);
     this.createAxiosRequestConfig = this.createAxiosRequestConfig.bind(this);
     this.cancelRequestById = this.cancelRequestById.bind(this);
     this.cancelAllRequests = this.cancelAllRequests.bind(this);
@@ -42,53 +50,110 @@ export class AxiosRequestHandler implements RequestHandler {
       cancelToken: cancelTokenSource.token,
     };
     cancelTokenSourceByPendingRequestId[request.id] = cancelTokenSource;
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       axios(axiosRequestCfg)
         .then((response): void => {
-          delete cancelTokenSourceByPendingRequestId[request.id];
-          const requestResult = this.createRequestResult(
+          resolve({
+            hasRequestBeenCancelled: false,
             request,
-            response,
-            false
-          );
-          resolve(requestResult);
+            response: this.createCoreResponse(response),
+          });
         })
         .catch((error): void => {
-          delete cancelTokenSourceByPendingRequestId[request.id];
           if (axios.isCancel(error)) {
-            const requestResult = this.createRequestResult(request, null, true);
-            resolve(requestResult);
+            resolve({
+              hasRequestBeenCancelled: true,
+              request,
+              response: null,
+            });
             return;
           }
           if (!error.request) {
-            console.error(error);
-            throw new Error('unexpected axios error above');
+            reject({
+              hasRequestBeenCancelled: false,
+              request,
+              response: error.response
+                ? this.createCoreResponse(error.response)
+                : null,
+              error: error,
+            });
+            return;
           }
-          const requestResult = this.createRequestResult(
+          resolve({
+            hasRequestBeenCancelled: false,
             request,
-            error.response,
-            false
-          );
-          resolve(requestResult);
+            response: error.response
+              ? this.createCoreResponse(error.response)
+              : null,
+            error: error,
+          });
+        })
+        .finally(() => {
+          delete cancelTokenSourceByPendingRequestId[request.id];
         });
     });
   }
 
-  private createRequestResult(
-    request: Request,
-    response: null | AxiosResponse,
-    hasRequestBeenCancelled: boolean
-  ): RequestResult {
+  private createCoreResponse(axiosResponse: AxiosResponse): CoreResponse {
     return {
-      hasRequestBeenCancelled,
-      request,
-      response: !response
-        ? null
-        : {
-            status: response.status,
-            headers: response.headers,
-            body: response.data,
-          },
+      statusCode: axiosResponse.status,
+      headers: axiosResponse.headers,
+      body: axiosResponse.data,
+      cookies: this.createCoreResponseCookies(axiosResponse),
+    };
+  }
+
+  private createCoreResponseCookies(
+    axiosResponse: AxiosResponse
+  ): ResponseSetCookies {
+    const setCookieHeaders = axiosResponse.headers['set-cookie'];
+    if (!setCookieHeaders) {
+      return {};
+    }
+    const cookies: ResponseSetCookies = {};
+    setCookieHeaders.forEach(setCookieHeader => {
+      const cookieName = setCookieHeader.split('=')[0];
+      cookies[cookieName] = setCookieHeader;
+    });
+    return cookies;
+  }
+
+  private findAxiosRequestConfigCookieHeaders(
+    request: Request
+  ): null | RawAxiosRequestHeaders {
+    const currentCookieDefinition = request.headers?.['Cookie'];
+    const cookieDefinitions: string[] = currentCookieDefinition
+      ? [currentCookieDefinition]
+      : [];
+    if (request.cookies) {
+      for (const cookieName in request.cookies) {
+        const cookieValue = request.cookies[cookieName];
+        cookieDefinitions.push(`${cookieName}=${cookieValue}`);
+      }
+    }
+    if (!cookieDefinitions.length) {
+      return null;
+    }
+    return {
+      Cookie: cookieDefinitions.join('; '),
+    };
+  }
+
+  private createAxiosRequestConfigHeaders(
+    requestConfig: AxiosRequestConfig,
+    request: Request
+  ): RawAxiosRequestHeaders {
+    const currentHeaders: RawAxiosRequestHeaders | undefined =
+      requestConfig.headers instanceof AxiosHeaders
+        ? requestConfig.headers.toJSON()
+        : request.headers;
+    const cookieHeaders = request.cookies
+      ? this.findAxiosRequestConfigCookieHeaders(request)
+      : {};
+    return {
+      ...(currentHeaders ?? {}),
+      ...(request.headers ?? {}),
+      ...cookieHeaders,
     };
   }
 
@@ -97,14 +162,15 @@ export class AxiosRequestHandler implements RequestHandler {
     config?: AxiosRequestHandlerExecuteConfig
   ): AxiosRequestConfig {
     const requestConfig: AxiosRequestConfig = {
-      ...(config?.ignoreGeneralAxiosRequestConfig
-        ? {}
-        : this.generalRequestConfig),
+      ...this.generalRequestConfig,
       method: request.endpointId.method as Method,
       url: request.url,
     };
     if (request.headers) {
-      requestConfig.headers = request.headers;
+      requestConfig.headers = this.createAxiosRequestConfigHeaders(
+        requestConfig,
+        request
+      );
     }
     if (request.body) {
       requestConfig.data = request.body;
@@ -123,10 +189,10 @@ export class AxiosRequestHandler implements RequestHandler {
         );
       };
     }
-    return {
-      ...requestConfig,
-      ...(config?.axiosRequestConfig ?? {}),
-    };
+    if (!config?.refineAxiosRequestConfig) {
+      return requestConfig;
+    }
+    return config.refineAxiosRequestConfig(requestConfig);
   }
 
   cancelRequestById(requestId: string) {

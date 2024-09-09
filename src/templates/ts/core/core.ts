@@ -15,7 +15,11 @@ export type Headers = {
   [key: 'Content-Type' | string]: string;
 };
 
-export type Cookies = {
+export type RequestCookies = {
+  [key: string]: string;
+};
+
+export type ResponseSetCookies = {
   [key: string]: string;
 };
 
@@ -28,7 +32,7 @@ export type RequestCreationSettings = {
   endpointId: EndpointId;
   supportedSecuritySchemes?: SecurityScheme[];
   headers?: Headers;
-  cookies?: Cookies;
+  cookies?: RequestCookies;
   pathParams?: PathParams;
   queryParams?: object;
   body?: object;
@@ -102,7 +106,7 @@ export type Request<
   url: string;
   supportedSecuritySchemes: SecurityScheme[];
   headers?: Headers;
-  cookies?: Cookies;
+  cookies?: RequestCookies;
   pathParams: P;
   queryParams: Q;
   body: B;
@@ -117,7 +121,7 @@ export interface Response<
   S extends StatusCode = any,
   B = any,
   H extends Headers = {},
-  C extends Cookies = {},
+  C extends ResponseSetCookies = {},
 > {
   statusCode: S;
   headers: H;
@@ -132,6 +136,7 @@ export interface RequestResult<
   request: Req;
   response: null | Res;
   hasRequestBeenCancelled: boolean;
+  error?: Error; // must only be set when the Promise<RequestResult> was rejected
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
