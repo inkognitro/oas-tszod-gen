@@ -121,12 +121,14 @@ const exampleAuthenticationProvider: HttpBearerAuthenticationProvider = {
   // The name of one of your security definitions in your OAS3 specification
 };
 
+const myAxiosInstance = axios.create();
+
 const requestHandler = new AuthRequestHandler(
   [exampleAuthenticationProvider],
   // In case of multiple authentication providers, the order does matter:
   // The first found token by the "findToken" method is added to the request header.
   
-  new AxiosRequestHandler({
+  new AxiosRequestHandler(myAxiosInstance, {
     baseURL: 'https://api.acme.com',
     
     withCredentials: true,
@@ -169,7 +171,7 @@ For version information have a look at the `peerDependencies` in the `package.js
 npm install axios --save
 ```
 
-#### `FetchApiRequestHandler`
+#### `FetchApiRequestHandler` :warning: work in progress
 This implementation is responsible for executing your requests through the http(s) protocol.
 It is usually the most inner implementation of an onion bootstrapped request handler object
 and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
@@ -179,15 +181,6 @@ For version information have a look at the `peerDependencies` in the `package.js
 ```
 npm install qs --save && npm install @types/qs --save-dev
 ```
-
-> :warning: **Explicit cookies are not supported by default**
-> 
-> The `defaultConfig` of the FetchApiRequestHandler does not support cookies which are passed within the `Request`
-> object through its `cookies` property. If this has to be supported for your use-case, you need to implement this
-> functionality by yourself, or you could use the `AxiosRequestHandler` instead.
-> 
-> If you want to build that on your own have a look at the
-> [CreateWithCookiesEnrichedRequestInit function](https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/fetchApiRequestHandler.ts#L4).
 
 #### `AuthRequestHandler`
 This implementation can be taken for automatic `Authorization` request header enrichment.
