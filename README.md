@@ -192,7 +192,7 @@ The provided `RequestHandler` implementations distinguish between "expected" and
 
 In case of responses which could not be received (e.g. due to cancellation)
 or responses having not a 2xx status code are "expected".
-In such cases the Promises which were delivered by the `requestHandler.execute` method will therefore be `resolved`.
+In such a case the Promise which was delivered by the `requestHandler.execute` method, will be `resolved`.
 On the other hand, "unexpected" things like a programming error are going to result in a `rejected` Promise.
 
 With that behaviour you only need to consider the `then`-method or just simply `await` the Promise in an async function.
