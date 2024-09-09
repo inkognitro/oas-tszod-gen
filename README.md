@@ -15,6 +15,9 @@ This code generator serves as a standalone alternative to the two libraries ment
 
 I coded my own solution because I wanted to
 - have full ownership over the code which is generated for production (inspired by [Shadcn](https://ui.shadcn.com/))
+- have the possibility to set request cookies explicitly
+- have the possibility to read response cookies in a unified way, no matter whether Axios, FetchApi
+or another implementation for http requests is used
 - have separated functions and type definitions for each API endpoint in a single file located in a folder of its context
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
 - have automatically generated [Zod](https://zod.dev) schemas for endpoint DTOs
@@ -109,15 +112,28 @@ declare global {
 
 const exampleAuthenticationProvider: HttpBearerAuthenticationProvider = {
   type: 'httpBearer',
-  findToken: () => {
+  
+  findToken: (): string | null => {
     return 'my-access-token';
   },
-  securitySchemeName: 'example', // this is the name of one of your security definitions in your OAS3 specification
+  
+  securitySchemeName: 'example',
+  // The name of one of your security definitions in your OAS3 specification
 };
 
 const requestHandler = new AuthRequestHandler(
   [exampleAuthenticationProvider],
-  new AxiosRequestHandler({baseURL: 'https://my-api.com'})
+  // In case of multiple authentication providers, the order does matter:
+  // The first found token by the "findToken" method is added to the request header.
+  
+  new AxiosRequestHandler({
+    baseURL: 'https://api.acme.com',
+    
+    withCredentials: true,
+    // In case of browsers:
+    // Allow cookies to be passed along with the request for a different api (sub-)domain (CORS)
+    // Source: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
+  })
 );
 
 const optionalConfig: RequestExecutionConfig = {
@@ -135,7 +151,7 @@ console.log(requestResult);
 
 ### RequestHandler
 The decision of having a `RequestHandler` interface with granular implementations was made with different environments
-in mind: `server` vs `client` | `prod` vs `test` | custom app requirements | combination of whatever.
+in mind: `server` vs `client` | `prod` vs `test` | custom "middleware" behaviour.
 
 You can write your own implementations or just combine some of the existing ones below, according to your needs.
 The `RequestHandler` interface for custom implementations can be found
