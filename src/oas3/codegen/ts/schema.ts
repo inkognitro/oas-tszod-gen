@@ -123,7 +123,7 @@ function applyStringSchema(
       if (schema.enum && schema.enum.length > 0) {
         code = `'${schema.enum.join("' | '")}'`;
       } else if (schema.format === 'binary') {
-        code = 'any';
+        code = 'Blob';
       }
       if (schema.nullable) {
         code = `null | ${code}`;
