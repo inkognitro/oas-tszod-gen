@@ -12,14 +12,12 @@ Before you consider using this library, I suggest having a look at [Zodios](http
 and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
 This code generator serves as a standalone alternative to the two libraries.
 I coded my own solution because I wanted to:
-- have full ownership over the code which is generated for production (inspired by [Shadcn](https://ui.shadcn.com/))
-- have the possibility to set request cookies explicitly
-- have the possibility to read response cookies in a unified way, no matter whether Axios, FetchApi
-or another implementation for http requests is used
-- have separated functions and type definitions for each API endpoint in a single file located in a folder of its context
+- have full ownership over the code which is generated
+- have the opt-in possibility to generate things also only in TypeScript without [Zod](https://zod.dev).
+- have the possibility to set request cookies explicitly (and also read response cookies)
+- to read cookies in a unified way, no matter what underlying implementation (e.g. Axios, FetchApi)
+- have separated functions and type definitions for each API endpoint in a single file, located in context folders
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
-- have automatically generated [Zod](https://zod.dev) schemas for endpoint DTOs
-- have the possibility to only generate TypeScript definitions and opt-in Zod schema generation
 
 ## Semantic versioning
 **Worried about different code generation outputs after updating this library?**
