@@ -187,13 +187,15 @@ This implementation is responsible for validating the request and response data 
 This one is only available when Zod schemas are generated due to the `withZod: true` configuration.
 
 ### Promise: Resolve Vs Reject
-Due to convenience, the provided `RequestHandler` implementations distinguish between "expected" and
-"unexpected" events.
+The provided `RequestHandler` implementations distinguish between "expected" and
+"unexpected" events. This means in other words:
 
-For example: Occurrences of responses which could not be received, e.g. due to cancellation,
-or also responses having no 2xx status code, are "expected" and the Promises delivered by the
-`requestHandler.execute` method will be `resolved` in such a case.
+In case of responses which could not be received (e.g. due to cancellation)
+or responses having not a 2xx status code are "expected".
+In such cases the Promises which were delivered by the `requestHandler.execute` method will therefore be `resolved`.
 On the other hand, "unexpected" things like a programming error are going to result in a `rejected` Promise.
+
+With that behaviour you only need to consider the `then`-method or just simply `await` the Promise in an async function.
 
 ## Semantic versioning
 **Worried about different code generation outputs after updating this library?**
