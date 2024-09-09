@@ -525,21 +525,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
         createName: referencingPath =>
           this.createComponentTypeName(componentRef, referencingPath),
         createCode: () => {
-          const zodSchemaOutput = this.findOutputByOutputPath(
-            this.createZodSchemaOutputPathByComponentRef(componentRef)
-          );
-          if (zodSchemaOutput) {
-            return `z.infer<typeof ${zodSchemaOutput.createName(outputPath)}>`;
-          }
           return 'any';
         },
         getRequiredOutputPaths: () => {
-          const zodSchemaOutput = this.findOutputByOutputPath(
-            this.createZodSchemaOutputPathByComponentRef(componentRef)
-          );
-          if (zodSchemaOutput) {
-            return [templateZOfZodLibrary.path, zodSchemaOutput.path];
-          }
           return [];
         },
       });
@@ -552,21 +540,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
       {
         ...codeGenerationOutput,
         createCode: referencingPath => {
-          const zodSchemaOutput = this.findOutputByOutputPath(
-            this.createZodSchemaOutputPathByComponentRef(componentRef)
-          );
-          if (zodSchemaOutput) {
-            return `z.infer<typeof ${zodSchemaOutput.createName(outputPath)}>`;
-          }
           return codeGenerationOutput.createCode(referencingPath);
         },
         getRequiredOutputPaths: () => {
-          const zodSchemaOutput = this.findOutputByOutputPath(
-            this.createZodSchemaOutputPathByComponentRef(componentRef)
-          );
-          if (zodSchemaOutput) {
-            return [templateZOfZodLibrary.path, zodSchemaOutput.path];
-          }
           return [];
         },
       };

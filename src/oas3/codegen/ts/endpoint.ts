@@ -234,9 +234,11 @@ function applyPayloadIfRequired(
   if (!payloadOas3ObjectSchema) {
     return null;
   }
+  let payloadZodSchemaDefinition: undefined | GeneratedDefinitionOutput =
+    undefined;
   if (config.withZod) {
     const zodPayloadSchemaPath: OutputPath = [...path, 'zodSchema'];
-    const payloadZodSchemaDefinition: GeneratedDefinitionOutput = {
+    payloadZodSchemaDefinition = {
       type: OutputType.DEFINITION,
       createName: referencingPath =>
         codeGenerator.createConstName(zodPayloadSchemaPath, referencingPath),
@@ -248,27 +250,6 @@ function applyPayloadIfRequired(
       ),
     };
     codeGenerator.addOutput(payloadZodSchemaDefinition);
-    const payloadTypeDefinition: GeneratedDefinitionOutput = {
-      type: OutputType.DEFINITION,
-      createName: referencingPath =>
-        codeGenerator.createTypeName(path, referencingPath),
-      definitionType: 'type',
-      path,
-      getRequiredOutputPaths: () => [payloadZodSchemaDefinition.path],
-      createCode: () => {
-        return `z.infer<typeof ${codeGenerator.createConstName(
-          payloadZodSchemaDefinition.path,
-          path
-        )}>`;
-      },
-    };
-    codeGenerator.addOutput(payloadTypeDefinition);
-    return {
-      typeDefinition: payloadTypeDefinition,
-      objectSchema: payloadOas3ObjectSchema,
-      zodSchemaDefinition: payloadZodSchemaDefinition,
-      bodyContentType: requestBodyContentSettings?.contentType ?? null,
-    };
   }
   const payloadTypeDefinition: GeneratedDefinitionOutput = {
     type: OutputType.DEFINITION,
@@ -281,6 +262,7 @@ function applyPayloadIfRequired(
   return {
     typeDefinition: payloadTypeDefinition,
     objectSchema: payloadOas3ObjectSchema,
+    zodSchemaDefinition: payloadZodSchemaDefinition,
     bodyContentType: requestBodyContentSettings?.contentType ?? null,
   };
 }
