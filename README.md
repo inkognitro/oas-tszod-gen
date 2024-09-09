@@ -10,10 +10,8 @@ A code generator to convert [OpenApiV3](https://swagger.io/specification/) speci
 ## Why yet another library for this task?
 Before you consider using this library, I suggest having a look at [Zodios](https://www.zodios.org/)
 and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
-
-This code generator serves as a standalone alternative to the two libraries mentioned above.
-
-I coded my own solution because I wanted to
+This code generator serves as a standalone alternative to the two libraries.
+I coded my own solution because I wanted to:
 - have full ownership over the code which is generated for production (inspired by [Shadcn](https://ui.shadcn.com/))
 - have the possibility to set request cookies explicitly
 - have the possibility to read response cookies in a unified way, no matter whether Axios, FetchApi
