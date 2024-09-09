@@ -15,16 +15,9 @@ I coded my own solution because I wanted to:
 - have generated [Zod](https://zod.dev) schemas as an opt-in possibility only
 - have the possibility to go with the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API),
 [Axios](https://axios-http.com/docs/intro) or another implementation under the hood
-- have also cookies typed in a uniform way for requests and responses no matter with what underlying implementation
+- have also cookies typed in a uniform way for requests and responses, no matter with what underlying implementation
 - have separated functions and type definitions for each API endpoint in a single file, located in context folders
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
-
-## Semantic versioning
-**Worried about different code generation outputs after updating this library?**
-
-As long as the API contract on the backend side was not violated through breaking changes,
-you don't have to worry about breaking changes in generated code output after migrating to the next **minor** version.
-
 
 ## Usage of the generator
 The following script can be used in the development process of your application.
@@ -201,3 +194,9 @@ For example: Occurrences of responses which could not be received, e.g. due to c
 or also responses having no 2xx status code, are "expected" and the Promises delivered by the
 `requestHandler.execute` method will be `resolved` in such a case.
 On the other hand, "unexpected" things like a programming error are going to result in a `rejected` Promise.
+
+## Semantic versioning
+**Worried about different code generation outputs after updating this library?**
+
+As long as the API contract on the backend side was not violated through breaking changes,
+you don't have to worry about breaking changes in generated code output after migrating to the next **minor** version.
