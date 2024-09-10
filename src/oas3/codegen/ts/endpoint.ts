@@ -179,8 +179,26 @@ function findPreferredRequestBodyContentType(
   if (!contentByContentType) {
     return null;
   }
-  if (contentByContentType['application/json']) {
-    return 'application/json';
+  const contentTypes = Object.keys(contentByContentType);
+  const jsonCt = contentTypes.find(ct =>
+    ct.toLowerCase().match(/application\/[^+]*[+]?(json);?.*/)
+  );
+  if (jsonCt) {
+    return jsonCt;
+  }
+  const formDataCt = contentTypes.find(
+    ct => ct.toLowerCase() === 'multipart/form-data'
+  );
+  if (formDataCt) {
+    return formDataCt;
+  }
+  const textCt = contentTypes.find(
+    ct =>
+      ct.toLowerCase().startsWith('text/') ||
+      ct.toLowerCase() === 'application/x-www-form-urlencoded'
+  );
+  if (textCt) {
+    return textCt;
   }
   return Object.keys(contentByContentType)[0] ?? null;
 }
