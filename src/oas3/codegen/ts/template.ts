@@ -260,7 +260,7 @@ const templateHeadersType: TemplateDefinitionOutput = {
     return 'Headers';
   },
   createCode: () => {
-    return "{\n[key: 'Content-Type' | string]: string;\n}";
+    return '{\n[headerName: string]: string;\n}';
   },
   getRequiredOutputPaths: () => [],
 };

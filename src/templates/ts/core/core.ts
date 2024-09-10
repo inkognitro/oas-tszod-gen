@@ -12,15 +12,15 @@ export type SecurityScheme = {
 };
 
 export type Headers = {
-  [key: 'Content-Type' | string]: string;
+  [headerName: string]: string;
 };
 
 export type RequestCookies = {
-  [key: string]: string;
+  [cookieName: string]: string;
 };
 
 export type ResponseSetCookies = {
-  [key: string]: string;
+  [cookieName: string]: string;
 };
 
 export type EndpointId = {
