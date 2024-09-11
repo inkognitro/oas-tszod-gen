@@ -78,7 +78,7 @@ After generating endpoint caller functions out of your OAS3 specification into y
 you should also be able to understand how to apply the generated code.
 The following sections should serve as an API documentation.
 
-## Create and use the RequestHandler
+## Simple login example
 Following example demonstrates how a `RequestHandler` instance is created with two different implementations.
 Furthermore, a login process is simulated with the `exampleAuthAccessToken` variable.
 In order to process the login, a request is triggered to the `authenticate` endpoint.
