@@ -1,14 +1,15 @@
 import {
-  CodeGenerationOutput,
   CodeGenerator,
+  DefinitionOutput,
   GeneratedDefinitionOutput,
   getConcreteParameter,
-  Output,
   OutputPath,
   OutputType,
 } from './core';
 import {
   ConcreteParameterLocation,
+  isObjectSchema,
+  isStringSchema,
   ObjectSchema,
   ObjectSchemaProperties,
   Parameter,
@@ -27,7 +28,7 @@ import {
 } from './template';
 import {GenerateConfig} from './generator';
 import {applyZodSchema} from '@oas3/codegen/ts/zodSchema';
-import {applySchema} from '@oas3/codegen/ts/schema';
+import {applyObjectSchema} from '@oas3/codegen/ts/schema';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -228,11 +229,94 @@ function findRequestBodyContentSettings(
   };
 }
 
+function applyNullableFormDataDefinition(
+  codeGenerator: CodeGenerator,
+  schema: Schema,
+  path: OutputPath
+): null | DefinitionOutput {
+  if (!isObjectSchema(schema)) {
+    return null;
+  }
+  const schemaProps: ObjectSchemaProperties | undefined = schema.properties;
+  if (!schemaProps) {
+    return null;
+  }
+  const stringFieldNames: string[] = [];
+  const binaryFieldNames: string[] = [];
+  for (const propName in schemaProps) {
+    const propSchema = schemaProps[propName];
+    if (isStringSchema(propSchema) && propSchema.format === 'binary') {
+      binaryFieldNames.push(propName);
+      continue;
+    }
+    stringFieldNames.push(propName);
+  }
+  const output: DefinitionOutput = {
+    type: OutputType.DEFINITION,
+    definitionType: 'interface',
+    path,
+    createCode: () => {
+      const codeParts: string[] = [];
+      stringFieldNames.forEach(fieldName => {
+        codeParts.push(`append(name: '${fieldName}', value: string): void;`);
+      });
+      binaryFieldNames.forEach(fieldName => {
+        codeParts.push(
+          `append(name: '${fieldName}', value: Blob, fileName?: string): void;`
+        );
+      });
+      if (!stringFieldNames.length) {
+        codeParts.push('append(name: string, value: string): void;');
+      }
+      if (!binaryFieldNames.length) {
+        codeParts.push(
+          'append(name: string, value: Blob, fileName?: string): void;'
+        );
+      }
+      return `extends FormData {\n${codeParts.join('\n')}\n}`;
+    },
+    createName: referencingPath => {
+      return codeGenerator.createTypeName(path, referencingPath);
+    },
+    getRequiredOutputPaths: () => {
+      return [];
+    },
+  };
+  codeGenerator.addOutput(output);
+  return output;
+}
+
+function createOas3ObjectSchemaWithoutProperty(
+  schema: ObjectSchema,
+  propertyNameToRemove: string
+): ObjectSchema {
+  const currentProps = schema.properties;
+  if (!currentProps) {
+    return schema;
+  }
+  const nextPropNames = Object.keys(currentProps).filter(
+    p => p !== propertyNameToRemove
+  );
+  const nextProps: ObjectSchemaProperties = {};
+  nextPropNames.forEach(propName => {
+    const currentProperty = currentProps[propName];
+    if (currentProperty) {
+      nextProps[propName] = currentProperty;
+    }
+  });
+  return {
+    ...schema,
+    properties: nextProps,
+    required: schema.required?.filter(p => p !== propertyNameToRemove),
+  };
+}
+
 type AppliedPayloadOutputs = {
   objectSchema: ObjectSchema;
   zodSchemaDefinition?: GeneratedDefinitionOutput;
   typeDefinition: GeneratedDefinitionOutput;
   bodyContentType: null | string;
+  bodyFormDataDefinition: null | DefinitionOutput;
 };
 
 function applyPayloadIfRequired(
@@ -252,6 +336,20 @@ function applyPayloadIfRequired(
   if (!payloadOas3ObjectSchema) {
     return null;
   }
+  const oas3ObjectSchemaBodyProperty =
+    payloadOas3ObjectSchema.properties?.['body'];
+  let requestBodyFormDataDefinition: null | DefinitionOutput = null;
+  if (
+    oas3ObjectSchemaBodyProperty &&
+    requestBodyContentSettings?.contentType.toLowerCase() ===
+      'multipart/form-data'
+  ) {
+    requestBodyFormDataDefinition = applyNullableFormDataDefinition(
+      codeGenerator,
+      oas3ObjectSchemaBodyProperty,
+      [...path, 'bodyFormData']
+    );
+  }
   let payloadZodSchemaDefinition: undefined | GeneratedDefinitionOutput =
     undefined;
   if (config.withZod) {
@@ -269,19 +367,45 @@ function applyPayloadIfRequired(
     };
     codeGenerator.addOutput(payloadZodSchemaDefinition);
   }
+  function createAdditionalObjectPropertyCodeRows(): string[] {
+    if (requestBodyFormDataDefinition) {
+      return [`body: ${requestBodyFormDataDefinition.createName(path)}`];
+    }
+    return [];
+  }
+  const preventFromAddingComponentRefs: string[] = [];
+  const payloadPropsCodeOutput = applyObjectSchema(
+    codeGenerator,
+    requestBodyFormDataDefinition
+      ? createOas3ObjectSchemaWithoutProperty(payloadOas3ObjectSchema, 'body')
+      : payloadOas3ObjectSchema,
+    path,
+    preventFromAddingComponentRefs,
+    createAdditionalObjectPropertyCodeRows
+  );
   const payloadTypeDefinition: GeneratedDefinitionOutput = {
     type: OutputType.DEFINITION,
     createName: referencingPath =>
       codeGenerator.createTypeName(path, referencingPath),
     definitionType: 'type',
-    ...applySchema(codeGenerator, payloadOas3ObjectSchema, path),
+    path,
+    createCode: payloadPropsCodeOutput.createCode,
+    getRequiredOutputPaths: () => {
+      const fixedOutputs = payloadPropsCodeOutput.getRequiredOutputPaths();
+      if (requestBodyFormDataDefinition) {
+        return [...fixedOutputs, requestBodyFormDataDefinition.path];
+      }
+      return fixedOutputs;
+    },
   };
   codeGenerator.addOutput(payloadTypeDefinition);
+
   return {
     typeDefinition: payloadTypeDefinition,
     objectSchema: payloadOas3ObjectSchema,
     zodSchemaDefinition: payloadZodSchemaDefinition,
     bodyContentType: requestBodyContentSettings?.contentType ?? null,
+    bodyFormDataDefinition: requestBodyFormDataDefinition ?? null,
   };
 }
 

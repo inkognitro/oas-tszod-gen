@@ -24,34 +24,6 @@ function getTransferFormatByContentType(
   return 'blob';
 }
 
-function recursivelyAddFieldsToFormData(
-  formData: FormData,
-  obj: Record<string, any>,
-  subKeyPrefix?: string
-) {
-  for (const key in obj) {
-    const value = obj[key];
-    const formDataFieldKey = subKeyPrefix
-      ? subKeyPrefix + '[' + key + ']'
-      : key;
-    if (value instanceof Blob) {
-      formData.append(formDataFieldKey, value);
-      continue;
-    }
-    if (typeof value === 'object') {
-      recursivelyAddFieldsToFormData(formData, value, formDataFieldKey);
-      continue;
-    }
-    formData.append(formDataFieldKey, `${value}`);
-  }
-}
-
-function createRequestBodyFormData(obj: object) {
-  const formData = new FormData();
-  recursivelyAddFieldsToFormData(formData, obj);
-  return formData;
-}
-
 class ResultResponse implements CoreResponse {
   private readonly response: Response;
 
@@ -248,7 +220,6 @@ export class FetchApiRequestHandler implements RequestHandler {
       case 'json':
         return JSON.stringify(request.body);
       case 'formData':
-        return createRequestBodyFormData(request.body);
       case 'blob':
       case 'text':
       default:

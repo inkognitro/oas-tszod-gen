@@ -234,7 +234,8 @@ export function applyObjectSchema(
   codeGenerator: CodeGenerator,
   schema: ObjectSchema,
   path: OutputPath,
-  preventFromAddingComponentRefs: string[] = []
+  preventFromAddingComponentRefs: string[] = [],
+  createAdditionalObjectPropertyCodeRows?: () => string[]
 ): CodeGenerationOutput {
   const directOutputByPropNameMap: {
     [propName: string]: {
@@ -265,7 +266,7 @@ export function applyObjectSchema(
   }
   return {
     createCode: () => {
-      const codeRows: string[] = [];
+      let codeRows: string[] = [];
       for (const propName in directOutputByPropNameMap) {
         const directOutput = directOutputByPropNameMap[propName];
         const questionMark = !schema.required?.includes(propName) ? '?' : '';
@@ -277,6 +278,9 @@ export function applyObjectSchema(
             path
           )};${propComment}`
         );
+      }
+      if (createAdditionalObjectPropertyCodeRows) {
+        codeRows = [...codeRows, ...createAdditionalObjectPropertyCodeRows()];
       }
       if (additionalPropertiesDirectOutput) {
         const propComment = additionalPropertiesDirectOutput.codeComment
