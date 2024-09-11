@@ -1,7 +1,7 @@
 module.exports = {
   coverageReporters: ['json-summary'],
   collectCoverageFrom: [
-    '<rootDir>/src/**/*.{js,jsx}',
+    '<rootDir>/src/**/*.{js,jsx,ts,tsx}',
     '!<rootDir>/dist/',
     '!<rootDir>/node_modules/',
     '!<rootDir>/src/templates/',
