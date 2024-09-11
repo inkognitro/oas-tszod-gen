@@ -134,7 +134,6 @@ const templateJsonValueType: TemplateDefinitionOutput = {
     const validTypes = [
       'null',
       'string',
-      'string',
       'number',
       'boolean',
       '{[propName: string]: JsonValue}',
