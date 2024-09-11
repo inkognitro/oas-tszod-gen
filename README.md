@@ -159,7 +159,6 @@ login();
 ## RequestHandler implementations
 The decision of having a `RequestHandler` interface with granular implementations was made with different environments
 in mind: `server` vs `client` | `prod` vs `test` | custom "middleware" behaviour.
-
 You can write your own implementations or just combine some of the existing ones below, according to your needs.
 The `RequestHandler` interface for custom implementations can be found
 [here](https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/core.ts).
@@ -169,7 +168,6 @@ This implementation is responsible for executing your requests through the http(
 It is usually the most inner implementation of an onion bootstrapped request handler object.
 It requires the installation of the [Axios](https://axios-http.com/docs/intro) library in your code base
 and serves as a more widely supported alternative to the `FetchApiRequestHandler`.
-
 Some dependencies need to be installed for this type of request handler.
 For version information have a look at the `peerDependencies` in the `package.json` of this project.
 ```
@@ -180,7 +178,6 @@ npm install axios --save
 This implementation is responsible for executing your requests through the http(s) protocol.
 It is usually the most inner implementation of an onion bootstrapped request handler object
 and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
-
 Some dependencies need to be installed for this type of request handler.
 For version information have a look at the `peerDependencies` in the `package.json` of this project.
 ```
@@ -194,7 +191,6 @@ As of the time of writing this only `httpBearer` and `httpBasic` authentication 
 ### ScopedRequestHandler
 With this implementation you are able to make sure that the methods `cancelRequestById` and `cancelAllRequests` do only
 cancel the requests which were made through the `execute` method of exactly that `ScopedRequestHandler` instance.
-
 This might be useful when you want to provide a separate `ScopedRequestHandler` instance for React components.
 Anyway, React stuff is out-of-scope of this package.
 
@@ -204,9 +200,7 @@ This one is only available when Zod schemas are generated due to the `withZod: t
 
 ## RequestHandler - Promises: `resolve` vs `reject`
 The provided `RequestHandler` implementations distinguish between "expected" and
-"unexpected" events:
-
-An "expected" event is for example a response which could not be received due to cancellation or network issues.
+"unexpected" events: An "expected" event is for example a response which could not be received due to cancellation or network issues.
 A response which has no 2xx status code are is considered to be "expected" too.
 In such a cases the Promise which was delivered by the `requestHandler.execute` method, is going to be `resolved`.
 On the other hand, things like programming errors or other runtime errors due to wrong source code are considered
@@ -217,6 +211,5 @@ This is for developer convenience.
 
 ## Semantic versioning
 **Worried about different code generation outputs after updating this library?**
-
 As long as the API contract on the backend side was not violated through breaking changes,
 you don't have to worry about breaking changes in generated code output after migrating to the next **minor** version.
