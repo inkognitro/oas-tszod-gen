@@ -203,13 +203,13 @@ This one is only available when Zod schemas are generated due to the `withZod: t
 ## Promises: `resolve` vs `reject`
 The provided `RequestHandler` implementations distinguish between "expected" and
 "unexpected" events: An "expected" event is for example a response which could not be received due to cancellation or network issues.
-A response which has no 2xx status code are is considered to be "expected" too.
-In such a cases the Promise which was delivered by the `requestHandler.execute` method, is going to be `resolved`.
+A response with no 2xx status code is considered to be "expected" as well.
+In such cases, the Promise which was delivered by the `requestHandler.execute` method, is going to be `resolved`.
 On the other hand, things like programming errors or other runtime errors due to wrong source code are considered
-to be "unexpected" and should result in a `rejected` Promise.
+to be "unexpected" and will result in a `rejected` Promise. This applies to al provided RequestHandler implementations.
 
-With this behaviour errors should only be caught at a root level of your application.
-This is for developer convenience.
+This behaviour should lead to better developer experience because errors must then only be caught at a root level
+of an application.
 
 ## Semantic versioning
 **Worried about different code generation outputs after updating this library?**
