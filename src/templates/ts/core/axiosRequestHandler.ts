@@ -17,6 +17,9 @@ import {
   ResponseBody,
 } from './core';
 
+// todo: solve "responseType" property misconception, which has e.g. to be set to "blob" BEFORE a response is received:
+//  https://stackoverflow.com/questions/56286368/how-can-i-read-http-errors-when-responsetype-is-blob-in-axios-with-vuejs
+
 class ResultResponse implements CoreResponse {
   private readonly response: AxiosResponse;
 
