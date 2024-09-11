@@ -78,10 +78,13 @@ After generating endpoint caller functions out of your OAS3 specification into y
 you should also be able to understand how to apply the generated code.
 The following sections should serve as an API documentation.
 
-## Simple login example
+## A simple login example
 Following example demonstrates how a `RequestHandler` instance is created with two different implementations.
-Furthermore, a login process is simulated with the `exampleAuthAccessToken` variable.
-In order to process the login, a request is triggered to the `authenticate` endpoint.
+In order to process a login, a request is triggered by calling the generated `authenticate` method.
+The previously created requestHandler instance is passed as a first argument to the `authenticate` function.
+After receiving the `RequestResult` and the check of the according response status 200, TypeScript automatically 
+knows how the delivered response body looks like.
+Now the received access token can be stored in the `exampleAuthAccessToken` variable.
 
 ```typescript
 import {
