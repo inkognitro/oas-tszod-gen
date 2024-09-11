@@ -208,8 +208,8 @@ In such cases, the Promise which was delivered by the `requestHandler.execute` m
 On the other hand, things like programming errors or other runtime errors due to wrong source code are considered
 to be "unexpected" and will result in a `rejected` Promise. This applies to al provided RequestHandler implementations.
 
-This behaviour should lead to better developer experience because errors must then only be caught at a root level
-of an application.
+This behaviour should lead to better developer experience because thrown errors must only be caught at a root level
+of an application then.
 
 ## Semantic versioning
 **Worried about different code generation outputs after updating this library?**
