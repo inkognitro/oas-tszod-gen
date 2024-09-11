@@ -14,6 +14,7 @@ import {
   Request,
   Response as CoreResponse,
   ResponseSetCookies,
+  ResponseBody,
 } from './core';
 
 class ResultResponse implements CoreResponse {
@@ -31,7 +32,7 @@ class ResultResponse implements CoreResponse {
     this.revealBody = this.revealBody.bind(this);
   }
 
-  revealBody(): Promise<any> {
+  revealBody(): Promise<ResponseBody> {
     return new Promise(resolve => resolve(this.response.data));
   }
 

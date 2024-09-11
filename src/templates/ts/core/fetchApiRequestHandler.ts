@@ -4,6 +4,7 @@ import {
   RequestHandler,
   RequestResult,
   Response as CoreResponse,
+  ResponseBody,
   ResponseSetCookies,
 } from './core';
 import {stringify} from 'qs';
@@ -62,7 +63,7 @@ class ResultResponse implements CoreResponse {
     return cookies;
   }
 
-  revealBody(): Promise<any> {
+  revealBody(): Promise<ResponseBody> {
     const contentType = this.response.headers.get('content-type');
     if (!contentType) {
       return this.response.blob();
@@ -74,8 +75,6 @@ class ResultResponse implements CoreResponse {
       case 'text':
         return this.response.text();
       case 'formData':
-        // todo: cannot convert string | File into correct data type like an integer without a ZodSchema
-        //  handle it also in the type hints like that with "FormData"
         return this.response.formData();
       case 'blob':
       default:
