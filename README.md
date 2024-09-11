@@ -186,7 +186,7 @@ npm install qs --save && npm install @types/qs --save-dev
 
 ### AuthRequestHandler
 This implementation can be taken for automatic `Authorization` request header enrichment.
-As of the time of writing this only `httpBearer` and `httpBasic` authentication headers are supported.
+As of the time of writing this, only `httpBearer` and `httpBasic` authentication headers are supported.
 
 ### ScopedRequestHandler
 With this implementation you are able to make sure that the methods `cancelRequestById` and `cancelAllRequests` do only
@@ -194,9 +194,11 @@ cancel the requests which were made through the `execute` method of exactly that
 This might be useful when you want to provide a separate `ScopedRequestHandler` instance for React components.
 Anyway, React stuff is out-of-scope of this package.
 
-### ZodValidationRequestHandler :warning: not available yet
+### ZodValidationRequestHandler
 This implementation is responsible for validating the request and response data through their Zod schemas.
 This one is only available when Zod schemas are generated due to the `withZod: true` configuration.
+
+:warning: not available yet
 
 ## Promises: `resolve` vs `reject`
 The provided `RequestHandler` implementations distinguish between "expected" and
