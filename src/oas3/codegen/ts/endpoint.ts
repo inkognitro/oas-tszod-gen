@@ -348,7 +348,7 @@ function createRequestCreationCode(
   parts.push('...payload');
 
   const forcedHeaderValues = payloadUtils.bodyContentType
-    ? [{name: 'Content-Type', value: payloadUtils.bodyContentType}]
+    ? [{name: 'content-type', value: payloadUtils.bodyContentType}]
     : [];
   const explicitHeadersCode = createNullableExplicitObjectFieldsCode(
     payloadUtils.objectSchema,
