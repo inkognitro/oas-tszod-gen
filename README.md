@@ -174,7 +174,7 @@ For version information have a look at the `peerDependencies` in the `package.js
 npm install axios --save
 ```
 
-#### `FetchApiRequestHandler` :warning: work in progress
+#### `FetchApiRequestHandler`
 This implementation is responsible for executing your requests through the http(s) protocol.
 It is usually the most inner implementation of an onion bootstrapped request handler object
 and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
