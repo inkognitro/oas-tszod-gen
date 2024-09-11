@@ -214,4 +214,4 @@ of an application.
 ## Semantic versioning
 **Worried about different code generation outputs after updating this library?**
 As long as the API contract on the backend side was not violated through breaking changes,
-you don't have to worry about breaking changes in generated code output after migrating to the next **minor** version.
+you don't have to worry about breaking changes in generated code output when upgrading to the next **minor** version.
