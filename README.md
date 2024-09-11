@@ -1,7 +1,4 @@
 [![CI](https://github.com/inkognitro/oas-to-code/actions/workflows/ci.yml/badge.svg)](https://github.com/inkognitro/oas-to-code/actions?query=workflow%3Aci)
-
-![Functions](./badges/jest/coverage-functions.svg)
-![Lines](./badges/jest/coverage-lines.svg)
 ![Total](./badges/jest/coverage-total.svg)
 
 # oas-to-code
