@@ -253,11 +253,8 @@ const templateQueryParamsType: TemplateDefinitionOutput = {
       'QueryParams',
       'QueryParams[]',
       'string',
-      'string[]',
       'number',
-      'number[]',
       'boolean',
-      'boolean[]',
     ];
     return `{\n[paramName: string]: ${propTypes.join('\n|')};\n}`;
   },
