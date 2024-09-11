@@ -1,12 +1,10 @@
 module.exports = {
   coverageReporters: ['json-summary'],
-  collectCoverageFrom: [
-    '<rootDir>/src/**/*.{js,jsx,ts,tsx}',
-    '!<rootDir>/dist/',
-    '!<rootDir>/node_modules/',
-    '!<rootDir>/src/templates/',
-    '!<rootDir>/generated-files-petstore1',
-    '!<rootDir>/generated-files-petstore2',
+  coveragePathIgnorePatterns: [
+    '<rootDir>/dist/',
+    '<rootDir>/src/templates',
+    '<rootDir>/generated-files-petstore1',
+    '<rootDir>/generated-files-petstore2',
   ],
   roots: ['<rootDir>/src'],
   testMatch: [
