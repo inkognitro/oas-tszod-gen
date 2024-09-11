@@ -198,7 +198,7 @@ Anyway, React stuff is out-of-scope of this package.
 This implementation is responsible for validating the request and response data through their Zod schemas.
 This one is only available when Zod schemas are generated due to the `withZod: true` configuration.
 
-## RequestHandler - Promises: `resolve` vs `reject`
+## Promises: `resolve` vs `reject`
 The provided `RequestHandler` implementations distinguish between "expected" and
 "unexpected" events: An "expected" event is for example a response which could not be received due to cancellation or network issues.
 A response which has no 2xx status code are is considered to be "expected" too.
