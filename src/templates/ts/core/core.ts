@@ -51,7 +51,6 @@ export type RequestCreationSettings = {
   pathParamsZodSchema?: ZodSchema; // only available with "withZod: true"
   queryParamsZodSchema?: ZodSchema; // only available with "withZod: true"
   bodyZodSchema?: ZodSchema; // only available with "withZod: true"
-  // convertResponseBodyFromFormData?: (responseBody: FormData) => object; // todo: implement formData to responseBody conversion, according to types
 };
 
 export function createRequestUrl(
