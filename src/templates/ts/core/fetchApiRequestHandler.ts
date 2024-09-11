@@ -8,9 +8,52 @@ import {
 } from './core';
 import {stringify} from 'qs';
 
+function getTransferFormatByContentType(
+  contentType: string
+): 'text' | 'json' | 'formData' | 'blob' {
+  const ct = contentType.trim().toLowerCase();
+  if (ct.startsWith('text/') || ct === 'application/x-www-form-urlencoded') {
+    return 'text';
+  }
+  if (ct.match(/application\/[^+]*[+]?(json);?.*/)) {
+    return 'json';
+  }
+  if (ct === 'multipart/form-data') {
+    return 'formData';
+  }
+  return 'blob';
+}
+
+function recursivelyAddFieldsToFormData(
+  formData: FormData,
+  obj: Record<string, any>,
+  subKeyPrefix?: string
+) {
+  for (const key in obj) {
+    const value = obj[key];
+    const formDataFieldKey = subKeyPrefix
+      ? subKeyPrefix + '[' + key + ']'
+      : key;
+    if (value instanceof Blob) {
+      formData.append(formDataFieldKey, value);
+      continue;
+    }
+    if (typeof value === 'object') {
+      recursivelyAddFieldsToFormData(formData, value, formDataFieldKey);
+      continue;
+    }
+    formData.append(formDataFieldKey, `${value}`);
+  }
+}
+
+function createRequestBodyFormData(obj: object) {
+  const formData = new FormData();
+  recursivelyAddFieldsToFormData(formData, obj);
+  return formData;
+}
+
 class ResultResponse implements CoreResponse {
   private readonly response: Response;
-  private readonly cachedBody: undefined | any;
 
   public readonly statusCode: number;
   public readonly headers: Headers;
@@ -21,21 +64,51 @@ class ResultResponse implements CoreResponse {
     this.statusCode = response.status;
     this.headers = this.createPlainHeaders(response);
     this.cookies = this.createPlainCookies(response);
+    this.revealBody = this.revealBody.bind(this);
   }
 
   private createPlainHeaders(response: Response): Headers {
-    return {}; // todo: implement
+    const plainHeaders: Headers = {};
+    response.headers.forEach((header, headerKey) => {
+      if (typeof header === 'string') {
+        plainHeaders[headerKey] = header;
+      }
+    });
+    return plainHeaders;
   }
 
   private createPlainCookies(response: Response): ResponseSetCookies {
-    return {}; // todo: implement
+    const setCookieHeaders = response.headers.getSetCookie();
+    if (!setCookieHeaders) {
+      return {};
+    }
+    const cookies: ResponseSetCookies = {};
+    setCookieHeaders.forEach(setCookieHeader => {
+      const cookieName = setCookieHeader.split('=')[0];
+      cookies[cookieName] = setCookieHeader;
+    });
+    return cookies;
   }
 
   revealBody(): Promise<any> {
-    // todo: implement
-    return new Promise(resolve => {
-      resolve('foo');
-    });
+    const contentType = this.response.headers.get('content-type');
+    if (!contentType) {
+      return this.response.blob();
+    }
+    const format = getTransferFormatByContentType(contentType);
+    switch (format) {
+      case 'json':
+        return this.response.json();
+      case 'text':
+        return this.response.text();
+      case 'formData':
+        // todo: cannot convert string | File into correct data type like an integer without a ZodSchema
+        //  handle it also in the type hints like that with "FormData"
+        return this.response.formData();
+      case 'blob':
+      default:
+        return this.response.blob();
+    }
   }
 }
 
@@ -68,6 +141,10 @@ export class FetchApiRequestHandler implements RequestHandler {
     this.cancelRequestById = this.cancelRequestById.bind(this);
     this.cancelAllRequests = this.cancelAllRequests.bind(this);
     this.createRequestInit = this.createRequestInit.bind(this);
+    this.createRequestInitHeaders = this.createRequestInitHeaders.bind(this);
+    this.findRequestInitCookieHeaders =
+      this.findRequestInitCookieHeaders.bind(this);
+    this.createRequestInitBody = this.createRequestInitBody.bind(this);
   }
 
   public execute(
@@ -76,11 +153,11 @@ export class FetchApiRequestHandler implements RequestHandler {
   ): Promise<RequestResult> {
     const abortControllerByPendingRequestIds =
       this.abortControllerByPendingRequestIds;
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       const queryStrUrlPart =
         request.queryParams && Object.keys(request.queryParams).length
           ? `?${stringify(request.queryParams)}`
-          : null;
+          : '';
       const abortController = new AbortController();
       abortControllerByPendingRequestIds[request.id] = abortController;
       const requestInit: RequestInit = {
@@ -99,23 +176,13 @@ export class FetchApiRequestHandler implements RequestHandler {
           });
         })
         .catch(error => {
-          if (abortController.signal.aborted) {
-            resolve({
-              request: request,
-              response: error.response
-                ? new ResultResponse(error.response)
-                : null,
-              hasRequestBeenCancelled: true,
-            });
-            return;
-          }
           resolve({
             request: request,
             response: error.response
               ? new ResultResponse(error.response)
               : null,
-            hasRequestBeenCancelled: false,
-            error,
+            hasRequestBeenCancelled: abortController.signal.aborted,
+            error: abortController.signal.aborted ? undefined : error,
           });
         })
         .finally(() => {
@@ -148,16 +215,45 @@ export class FetchApiRequestHandler implements RequestHandler {
       ...(this.generalRequestInit ? this.generalRequestInit : {}),
       method: request.endpointId.method,
     };
+    let requestHeaders = {};
     if (request.headers) {
-      requestInit.headers = this.createRequestInitHeaders(requestInit, request);
+      requestHeaders = this.createRequestInitHeaders(requestInit, request);
+      requestInit.headers = requestHeaders;
     }
     if (request.body) {
-      requestInit.body = request.body;
+      requestInit.body = this.createRequestInitBody(requestHeaders, request);
     }
     if (!config?.refineFetchApiRequestInit) {
       return requestInit;
     }
     return config.refineFetchApiRequestInit(requestInit);
+  }
+
+  private createRequestInitBody(
+    headers: Headers,
+    request: Request
+  ): string | FormData | Blob {
+    const contentTypeHeaderKey = Object.keys(headers).find(
+      key => key.toLowerCase() === 'content-type'
+    );
+    if (!contentTypeHeaderKey) {
+      return request.body; // treat as Blob
+    }
+    const contentType = headers[contentTypeHeaderKey];
+    if (!contentType) {
+      return request.body; // treat as Blob
+    }
+    const format = getTransferFormatByContentType(contentType);
+    switch (format) {
+      case 'json':
+        return JSON.stringify(request.body);
+      case 'formData':
+        return createRequestBodyFormData(request.body);
+      case 'blob':
+      case 'text':
+      default:
+        return request.body;
+    }
   }
 
   private createRequestInitHeaders(
