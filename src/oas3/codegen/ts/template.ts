@@ -57,8 +57,12 @@ export const templateRequestType: TemplateDefinitionOutput = {
       `P extends ${templatePathParamsType.createName(
         templateRequestTypePath
       )} | undefined = any`,
-      'Q extends object | undefined = any',
-      'B extends object | undefined = any',
+      `Q extends ${templateQueryParamsType.createName(
+        templateRequestTypePath
+      )} | undefined = any`,
+      `B extends ${templateRequestBodyType.createName(
+        templateRequestTypePath
+      )} | undefined = any`,
     ];
     return genericCodeParts.join(',\n');
   },
@@ -105,6 +109,8 @@ export const templateRequestType: TemplateDefinitionOutput = {
   getRequiredOutputPaths: config => {
     const requiredOutputPaths = [
       templatePathParamsType.path,
+      templateQueryParamsType.path,
+      templateRequestBodyType.path,
       templateEndpointIdType.path,
       templateSecuritySchemeType.path,
       templateHeadersType.path,
@@ -115,6 +121,28 @@ export const templateRequestType: TemplateDefinitionOutput = {
     }
     return requiredOutputPaths;
   },
+};
+
+const templateJsonValueType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: ['core', 'core', 'JsonValue'],
+  createName: () => {
+    return 'JsonValue';
+  },
+  createCode: () => {
+    const validTypes = [
+      'null',
+      'string',
+      'string',
+      'number',
+      'boolean',
+      '{[propName: string]: JsonValue}',
+      'JsonValue[]',
+    ];
+    return `${validTypes.join('\n|')}`;
+  },
+  getRequiredOutputPaths: () => [],
 };
 
 const templateResponseTypePath = ['core', 'core', 'response'];
@@ -130,7 +158,9 @@ export const templateResponseType: TemplateDefinitionOutput = {
       `S extends ${templateStatusCodeType.createName(
         templateResponseTypePath
       )} = any`,
-      'B extends Blob | ArrayBuffer | FormData | string | any = any, // any for POJOs',
+      `B extends ${templateResponseBodyType.createName(
+        templateResponseTypePath
+      )} = any`,
       `H extends ${templateHeadersType.createName(
         templateResponseTypePath
       )} = {}`,
@@ -152,6 +182,7 @@ export const templateResponseType: TemplateDefinitionOutput = {
   getRequiredOutputPaths: () => [
     templateStatusCodeType.path,
     templateHeadersType.path,
+    templateJsonValueType.path,
     templateResponseSetCookiesType.path,
   ],
 };
@@ -182,7 +213,7 @@ export const templateRequestResultType: TemplateDefinitionOutput = {
       'hasRequestBeenCancelled: boolean;',
       'error?: Error; // must only be set when the RequestResult Promise was rejected',
     ];
-    return `{${bodyCodeParts.join('\n')}}`;
+    return `{\n${bodyCodeParts.join('\n')}\n}`;
   },
   getRequiredOutputPaths: () => [],
 };
@@ -209,6 +240,62 @@ export const templateRequestHandlerType: TemplateDefinitionOutput = {
     templateRequestExecutionConfigType.path,
     templateRequestResultType.path,
   ],
+};
+
+const templateQueryParamsType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: ['core', 'core', 'queryParams'],
+  createName: () => {
+    return 'QueryParams';
+  },
+  createCode: () => {
+    const propTypes: string[] = [
+      'QueryParams',
+      'QueryParams[]',
+      'string',
+      'string[]',
+      'number',
+      'number[]',
+      'boolean',
+      'boolean[]',
+    ];
+    return `{\n[paramName: string]: ${propTypes.join('\n|')};\n}`;
+  },
+  getRequiredOutputPaths: () => [],
+};
+
+const templateRequestBodyTypePath = ['core', 'core', 'requestBody'];
+const templateRequestBodyType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: templateRequestBodyTypePath,
+  createName: () => {
+    return 'RequestBody';
+  },
+  createCode: () => {
+    return `Blob | FormData | ${templateJsonValueType.createName(
+      templateRequestBodyTypePath
+    )} | string`;
+  },
+  getRequiredOutputPaths: () => [],
+};
+
+const templateResponseBodyTypePath = ['core', 'core', 'responseBody'];
+const templateResponseBodyType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: templateResponseBodyTypePath,
+  createName: () => {
+    return 'ResponseBody';
+  },
+  createCode: () => {
+    return `Blob | FormData | ${templateJsonValueType.createName(
+      templateRequestBodyTypePath
+    )} | string`;
+  },
+  codeComment: 'ArrayBuffer is ignored because it can be created from Blob',
+  getRequiredOutputPaths: () => [],
 };
 
 const templatePathParamsType: TemplateDefinitionOutput = {
@@ -359,7 +446,11 @@ const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
         templateRequestCreationSettingsTypePath
       )};`
     );
-    codeParts.push('queryParams?: object;');
+    codeParts.push(
+      `queryParams?: ${templateQueryParamsType.createName(
+        templateRequestCreationSettingsTypePath
+      )};`
+    );
     codeParts.push('body?: object;');
     if (config.withZod) {
       codeParts.push(
@@ -396,6 +487,7 @@ const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
     templateHeadersType.path,
     templateRequestCookiesType.path,
     templatePathParamsType.path,
+    templateQueryParamsType.path,
   ],
 };
 
@@ -482,19 +574,23 @@ export const templateZodSchemaOfZodLibrary: TemplateDefinitionOutput = {
 };
 
 export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
-  templatePathParamsType,
   templateStatusCodeType,
-  templateSecuritySchemeType,
   templateHeadersType,
+  templatePathParamsType,
+  templateQueryParamsType,
   templateRequestCookiesType,
-  templateResponseSetCookiesType,
-  templateEndpointIdType,
+  templateRequestBodyType,
+  templateJsonValueType,
   templateRequestCreationSettingsType,
   templateCreateRequestUrlFunction,
+  templateEndpointIdType,
+  templateSecuritySchemeType,
   templateZOfZodLibrary,
   templateZodSchemaOfZodLibrary,
   templateCreateRequestFunction,
   templateRequestType,
+  templateResponseSetCookiesType,
+  templateResponseBodyType,
   templateResponseType,
   templateRequestResultType,
   templateRequestExecutionConfigType,

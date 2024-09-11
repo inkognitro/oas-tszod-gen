@@ -28,19 +28,30 @@ export type EndpointId = {
   path: string;
 };
 
+export type QueryParams = {
+  [propertyName: string]:
+    | QueryParams
+    | string
+    | string[]
+    | number
+    | number[]
+    | boolean;
+};
+
 export type RequestCreationSettings = {
   endpointId: EndpointId;
   supportedSecuritySchemes?: SecurityScheme[];
   headers?: Headers;
   cookies?: RequestCookies;
   pathParams?: PathParams;
-  queryParams?: object;
-  body?: object;
-  headersZodSchema?: ZodSchema;
-  cookiesZodSchema?: ZodSchema;
-  pathParamsZodSchema?: ZodSchema;
-  queryParamsZodSchema?: ZodSchema;
-  bodyZodSchema?: ZodSchema;
+  queryParams?: QueryParams;
+  body?: RequestBody;
+  headersZodSchema?: ZodSchema; // only available with "withZod: true"
+  cookiesZodSchema?: ZodSchema; // only available with "withZod: true"
+  pathParamsZodSchema?: ZodSchema; // only available with "withZod: true"
+  queryParamsZodSchema?: ZodSchema; // only available with "withZod: true"
+  bodyZodSchema?: ZodSchema; // only available with "withZod: true"
+  // convertResponseBodyFromFormData?: (responseBody: FormData) => object; // todo: implement formData to responseBody conversion, according to types
 };
 
 export function createRequestUrl(
@@ -88,18 +99,20 @@ export function createRequest(settings: RequestCreationSettings): Request {
     pathParams: settings.pathParams,
     queryParams: settings.queryParams,
     body: settings.body,
-    headersZodSchema: settings.headersZodSchema,
-    cookiesZodSchema: settings.cookiesZodSchema,
-    pathParamsZodSchema: settings.pathParamsZodSchema,
-    queryParamsZodSchema: settings.queryParamsZodSchema,
-    bodyZodSchema: settings.bodyZodSchema,
+    headersZodSchema: settings.headersZodSchema, // only available with "withZod: true"
+    cookiesZodSchema: settings.cookiesZodSchema, // only available with "withZod: true"
+    pathParamsZodSchema: settings.pathParamsZodSchema, // only available with "withZod: true"
+    queryParamsZodSchema: settings.queryParamsZodSchema, // only available with "withZod: true"
+    bodyZodSchema: settings.bodyZodSchema, // only available with "withZod: true"
   };
 }
 
+export type RequestBody = Blob | FormData | JsonValue | string;
+
 export type Request<
   P extends PathParams | undefined = any,
-  Q extends object | undefined = any,
-  B extends object | undefined = any,
+  Q extends QueryParams | undefined = any,
+  B extends RequestBody | undefined = any,
 > = {
   id: string;
   endpointId: EndpointId;
@@ -110,16 +123,26 @@ export type Request<
   pathParams: P;
   queryParams: Q;
   body: B;
-  headersZodSchema?: ZodSchema; // only defined when "withZod: true"
-  cookiesZodSchema?: ZodSchema; // only defined when "withZod: true"
-  pathParamsZodSchema?: ZodSchema; // only defined when "withZod: true"
-  queryParamsZodSchema?: ZodSchema; // only defined when "withZod: true"
-  bodyZodSchema?: ZodSchema; // only defined when "withZod: true"
+  headersZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  cookiesZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  pathParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  queryParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  bodyZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
 };
+
+export type JsonValue =
+  | null
+  | string
+  | number
+  | boolean
+  | {[propName: string]: JsonValue}
+  | JsonValue[];
+
+export type ResponseBody = Blob | FormData | JsonValue | string; // ArrayBuffer is ignored because it can be created from Blob
 
 export interface Response<
   S extends StatusCode = any,
-  B extends Blob | ArrayBuffer | FormData | string | any = any, // any for POJOs
+  B extends ResponseBody = any,
   H extends Headers = {},
   C extends ResponseSetCookies = {},
 > {
