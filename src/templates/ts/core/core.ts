@@ -4,8 +4,6 @@ export type PathParams = {
   [paramName: string]: number | string;
 };
 
-export type StatusCode = number | 'any'; // This is not "any" of TypeScript, it's a string placeholder for unspecified status codes
-
 export type SecurityScheme = {
   name: string;
   requiredPermissions: string[];
@@ -38,6 +36,14 @@ export type QueryParams = {
     | boolean;
 };
 
+export type ResponseSchema = {
+  status: number | 'any'; // "any" is used for unexpected status codes
+  contentType: string;
+  headersZodSchema?: ZodSchema; // only available with "withZod: true"
+  cookiesZodSchema?: ZodSchema; // only available with "withZod: true"
+  bodyZodSchema?: ZodSchema; // only available with "withZod: true"
+};
+
 export type RequestCreationSettings = {
   endpointId: EndpointId;
   supportedSecuritySchemes?: SecurityScheme[];
@@ -51,6 +57,7 @@ export type RequestCreationSettings = {
   pathParamsZodSchema?: ZodSchema; // only available with "withZod: true"
   queryParamsZodSchema?: ZodSchema; // only available with "withZod: true"
   bodyZodSchema?: ZodSchema; // only available with "withZod: true"
+  expectedResponseSchemas: ResponseSchema[];
 };
 
 export function createRequestUrl(
@@ -103,6 +110,7 @@ export function createRequest(settings: RequestCreationSettings): Request {
     pathParamsZodSchema: settings.pathParamsZodSchema, // only available with "withZod: true"
     queryParamsZodSchema: settings.queryParamsZodSchema, // only available with "withZod: true"
     bodyZodSchema: settings.bodyZodSchema, // only available with "withZod: true"
+    expectedResponseSchemas: settings.expectedResponseSchemas,
   };
 }
 
@@ -127,6 +135,7 @@ export type Request<
   pathParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
   queryParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
   bodyZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  expectedResponseSchemas: ResponseSchema[];
 };
 
 export type JsonValue =
@@ -140,12 +149,12 @@ export type JsonValue =
 export type ResponseBody = Blob | FormData | JsonValue | string; // ArrayBuffer is ignored because it can be created from Blob
 
 export interface Response<
-  S extends StatusCode = any,
+  S extends number = any,
   B extends ResponseBody = any,
   H extends Headers = {},
   C extends ResponseSetCookies = {},
 > {
-  statusCode: S;
+  status: S;
   headers: H;
   cookies: C;
   revealBody: () => Promise<B>;

@@ -104,6 +104,11 @@ export const templateRequestType: TemplateDefinitionOutput = {
         )};`,
       ];
     }
+    bodyCodeParts.push(
+      `expectedResponseSchemas?: ${templateResponseSchemaType.createName(
+        templateRequestTypePath
+      )};`
+    );
     return `{${bodyCodeParts.join('\n')}}`;
   },
   getRequiredOutputPaths: config => {
@@ -115,6 +120,7 @@ export const templateRequestType: TemplateDefinitionOutput = {
       templateSecuritySchemeType.path,
       templateHeadersType.path,
       templateRequestCookiesType.path,
+      templateResponseSchemaType.path,
     ];
     if (config.withZod) {
       requiredOutputPaths.push(templateZodSchemaOfZodLibrary.path);
@@ -154,9 +160,7 @@ export const templateResponseType: TemplateDefinitionOutput = {
   },
   createGenericsDeclarationCode: () => {
     const genericCodeParts: string[] = [
-      `S extends ${templateStatusCodeType.createName(
-        templateResponseTypePath
-      )} = any`,
+      'S extends number = any',
       `B extends ${templateResponseBodyType.createName(
         templateResponseTypePath
       )} = any`,
@@ -171,7 +175,7 @@ export const templateResponseType: TemplateDefinitionOutput = {
   },
   createCode: () => {
     const bodyCodeParts: string[] = [
-      'statusCode: S;',
+      'status: S;',
       'headers: H;',
       'cookies: C;',
       'revealBody: () => B;',
@@ -179,7 +183,6 @@ export const templateResponseType: TemplateDefinitionOutput = {
     return `{${bodyCodeParts.join('\n')}}`;
   },
   getRequiredOutputPaths: () => [
-    templateStatusCodeType.path,
     templateHeadersType.path,
     templateJsonValueType.path,
     templateResponseSetCookiesType.path,
@@ -307,19 +310,31 @@ const templatePathParamsType: TemplateDefinitionOutput = {
   getRequiredOutputPaths: () => [],
 };
 
-const templateStatusCodeType: TemplateDefinitionOutput = {
+const templateResponseSchemaType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'type',
-  path: ['core', 'core', 'statusCode'],
+  path: ['core', 'core', 'responseSchema'],
   createName: () => {
-    return 'StatusCode';
+    return 'ResponseSchema';
   },
-  createCode: () => {
-    const codeComment =
-      'This is not "any" of TypeScript, it\'s a string placeholder for unspecified status codes';
-    return `number | 'any'; // ${codeComment}`;
+  createCode: config => {
+    const codeParts: string[] = [
+      'status: number | \'any\'; // "any" is used for unexpected status codes',
+      'contentType: string;',
+    ];
+    if (config.withZod) {
+      codeParts.push('headersZodSchema?: ZodSchema;');
+      codeParts.push('cookiesZodSchema?: ZodSchema;');
+      codeParts.push('bodyZodSchema?: ZodSchema;');
+    }
+    return `{\n${codeParts.join('\n')}\n}`;
   },
-  getRequiredOutputPaths: () => [],
+  getRequiredOutputPaths: config => {
+    if (config.withZod) {
+      return [templateZodSchemaOfZodLibrary.path];
+    }
+    return [];
+  },
 };
 
 const templateSecuritySchemeType: TemplateDefinitionOutput = {
@@ -475,6 +490,11 @@ const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
         )};`
       );
     }
+    codeParts.push(
+      `expectedResponseSchemas: ${templateResponseSchemaType.createName(
+        templateRequestCreationSettingsTypePath
+      )}[];`
+    );
     return `{\n${codeParts.join('\n')}\n}`;
   },
   getRequiredOutputPaths: () => [
@@ -484,6 +504,7 @@ const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
     templateRequestCookiesType.path,
     templatePathParamsType.path,
     templateQueryParamsType.path,
+    templateResponseSchemaType.path,
   ],
 };
 
@@ -525,6 +546,9 @@ export const templateCreateRequestFunction: TemplateDefinitionOutput = {
       );
       objectCodeParts.push('bodyZodSchema: settings.bodyZodSchema');
     }
+    objectCodeParts.push(
+      'expectedResponseSchemas: settings.expectedResponseSchemas'
+    );
     return `(settings: ${templateRequestCreationSettingsType.createName(
       templateCreateRequestFunctionPath
     )}): ${templateRequestType.createName(
@@ -570,7 +594,6 @@ export const templateZodSchemaOfZodLibrary: TemplateDefinitionOutput = {
 };
 
 export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
-  templateStatusCodeType,
   templateHeadersType,
   templatePathParamsType,
   templateQueryParamsType,
@@ -585,6 +608,7 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateZodSchemaOfZodLibrary,
   templateCreateRequestFunction,
   templateRequestType,
+  templateResponseSchemaType,
   templateResponseSetCookiesType,
   templateResponseBodyType,
   templateResponseType,

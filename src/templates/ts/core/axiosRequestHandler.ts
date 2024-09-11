@@ -20,13 +20,13 @@ import {
 class ResultResponse implements CoreResponse {
   private readonly response: AxiosResponse;
 
-  public readonly statusCode: number;
+  public readonly status: number;
   public readonly headers: Headers;
   public readonly cookies: ResponseSetCookies;
 
   constructor(response: AxiosResponse) {
     this.response = response;
-    this.statusCode = response.status;
+    this.status = response.status;
     this.headers = this.createPlainHeaders(response);
     this.cookies = this.createPlainCookies(response);
     this.revealBody = this.revealBody.bind(this);
