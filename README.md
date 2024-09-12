@@ -28,7 +28,7 @@ through different `RequestHandler` implementations
 > [Axios Vs Fetch](https://blog.logrocket.com/axios-vs-fetch-best-http-requests/).
 
 # Generator: Setup and usage
-First install the package with the script below as a dev dependency:
+First install the package as a dev dependency, with the script below:
 ```
 npm install oas-to-code --save-dev
 ```
