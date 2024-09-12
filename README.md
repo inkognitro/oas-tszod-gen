@@ -175,7 +175,7 @@ async function login() {
     optionalConfig
   );
 
-  if (!requestResult.response || requestResult.response.statusCode !== 200) {
+  if (!requestResult.response || requestResult.response.status !== 200) {
     console.log('Something went wrong!');
     return;
   }
