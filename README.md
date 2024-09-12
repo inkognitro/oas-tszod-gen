@@ -77,7 +77,7 @@ generateOas3ToTs({
 });
 ```
 
-Finally run the following code in your console to generate the output files into the `./generated-api` folder:
+Finally run the script to generate the output files into the `./generated-api` folder:
 ```
 node api.generate.js
 ```
