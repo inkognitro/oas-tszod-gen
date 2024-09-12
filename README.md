@@ -224,7 +224,7 @@ and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/A
 This request handler implementation requires a custom `stringifyQueryParams` function to convert an object
 of type `QueryParams` into a `string`.
 At time of writing this, the [qs](https://www.npmjs.com/package/qs) package is the most commonly used library
-for such tasks and is therefore recommended.
+for such tasks and therefore recommended.
 Creating a FetchApiRequestHandler instance comes with the following two steps.
 
 Install the [qs](https://www.npmjs.com/package/qs) library like so:
