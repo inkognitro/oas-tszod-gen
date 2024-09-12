@@ -26,7 +26,6 @@ through different `RequestHandler` implementations
 > Others just want to use `fetch` for backend stuff of their [NextJs](https://nextjs.org/docs/app/api-reference/functions/fetch)
 > app and profit from optimized caching. There are lots of articles out there which discuss things like
 > [Axios Vs Fetch](https://blog.logrocket.com/axios-vs-fetch-best-http-requests/).
-> I hope that with this library it is possible to provide something useful to the TS community.
 
 # Generator: Setup and usage
 The following script can be used in the development process of your application.
