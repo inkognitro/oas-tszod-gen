@@ -33,14 +33,14 @@ First install the package with the script below as a dev dependency:
 npm install oas-to-code --save-dev
 ```
 
-After installing this package you will be able to generate TS code out from your OAS3 specification
-with the script below by running `node generate-api.js`. Don't forget to add the `apiOas3Specification.json` file in your codebase beforehand.
+Now create a new file `api.specs.json` in your project's root folder and paste your OpenApi specification into it.
+As a next step, create a `api.generate.js` file in the root folder of your project and paste the following content:
 
 ```typescript
-// ./generate-api.js
+// api.generate.js
 
 import { generateOas3ToTs } from 'oas-to-code';
-const oas3Specification = require('./apiOas3Specification.json');
+const oas3Specification = require('./api.specs.json');
 
 generateOas3ToTs({
   getSpecification: () => {
@@ -49,7 +49,7 @@ generateOas3ToTs({
     });
   },
   
-  outputFolderPath: './my-output-folder',
+  outputFolderPath: './generated-api',
   
   predefinedFolderOutputPaths: [
     ['core'],
@@ -77,6 +77,8 @@ generateOas3ToTs({
 });
 ```
 
+Finally run `node api.generate.js` to generate the output files into the `./generated-api` folder.
+
 **Important:**
 It is recommended to add your output folder in the `.gitignore` file and to regenerate the output in your CI pipeline.
 It's recommended because on every execution of the `generateOas3ToTs` function, the output folder will be deleted and
@@ -100,7 +102,7 @@ The same principles that apply to dots `.` also apply to slashes `/`.
 ## Out of scope
 Linting is out of scope of this package. The generator is responsible to generate valid TypeScript definitions.
 That's what it does. Your code setup should be responsible for linting your code, so it might make sense for you to run
-`eslint --fix ./my-output-folder` right after the `generateOas3ToTs` function was executed,
+`eslint --fix ./generated-api` right after the `generateOas3ToTs` function was executed,
 e.g. with a script in your `package.json`.
 
 # Usage of generated code
@@ -123,8 +125,8 @@ import {
   AxiosRequestHandler,
   AxiosRequestHandlerExecutionConfig,
   HttpBearerAuthenticationProvider,
-} from './my-output-folder/core';
-import { authenticate } from './my-output-folder/auth';
+} from './generated-api/core';
+import { authenticate } from './generated-api/auth';
 
 declare global {
   interface RequestHandlerExecutionConfig
@@ -228,7 +230,7 @@ npm install @types/qs --save-dev
 
 Create a FetchApiRequestHandler instance as written below:
 ```typescript
-import { FetchApiRequestHandler } from './my-output-folder/core';
+import { FetchApiRequestHandler } from './generated-api/core';
 import { stringify } from 'qs';
 
 const fetchApiRequestHandler = new FetchApiRequestHandler({
