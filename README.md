@@ -168,19 +168,19 @@ async function login() {
       onUploadProgress: progressEvent => console.log('uploadProgressEvent', progressEvent)
     })
   };
-
+  
   const requestResult = await authenticate(
     requestHandler,
     {usernameOrEmail: 'inkognitro', password: '12345678'},
     optionalConfig
   );
 
-  if (!rr.response || rr.response.statusCode !== 200) {
+  if (!requestResult.response || requestResult.response.statusCode !== 200) {
     console.log('Something went wrong!');
     return;
   }
 
-  const body = await rr.response.revealBody();
+  const body = await requestResult.response.revealBody();
   exampleAuthAccessToken = body.accessToken;
   
   console.log('Successfully logged in!');
