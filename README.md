@@ -28,9 +28,9 @@ through different `RequestHandler` implementations
 > [Axios Vs Fetch](https://blog.logrocket.com/axios-vs-fetch-best-http-requests/).
 
 # Generator: Setup and usage
-First install the package with the script below:
+First install the package with the script below as a dev dependency:
 ```
-npm install oas-to-code --save
+npm install oas-to-code --save-dev
 ```
 
 After installing the package you will be able to generate TS code out from your OAS3 specification
