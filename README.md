@@ -33,18 +33,19 @@ First install the package with the script below as a dev dependency:
 npm install oas-to-code --save-dev
 ```
 
-After installing the package you will be able to generate TS code out from your OAS3 specification
-with the script below. Please don't forget to add your specification.json file and adjusting the
-path in the `require` statement.
+After installing this package you will be able to generate TS code out from your OAS3 specification
+with the script below by running `node generate-api.js`. Don't forget to add the `apiOas3Specification.json` file in your codebase beforehand.
 
 ```typescript
+// ./generate-api.js
+
 import { generateOas3ToTs } from 'oas-to-code';
-const myOas3Specification = require('./path/to/my/oas3Specification.json');
+const oas3Specification = require('./apiOas3Specification.json');
 
 generateOas3ToTs({
   getSpecification: () => {
     return new Promise(resolve => {
-      resolve(myOas3Specification);
+      resolve(oas3Specification);
     });
   },
   
