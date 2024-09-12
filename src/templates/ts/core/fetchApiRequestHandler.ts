@@ -1,5 +1,6 @@
 import {
   Headers,
+  QueryParams,
   Request,
   RequestHandler,
   RequestResult,
@@ -84,6 +85,7 @@ class ResultResponse implements CoreResponse {
 }
 
 type FetchApiRequestHandlerConfig = {
+  stringifyQueryParams: (queryParams: QueryParams) => string;
   baseUrl?: string;
   generalRequestInit?: RequestInit;
 };
@@ -127,7 +129,7 @@ export class FetchApiRequestHandler implements RequestHandler {
     return new Promise(resolve => {
       const queryStrUrlPart =
         request.queryParams && Object.keys(request.queryParams).length
-          ? `?${stringify(request.queryParams)}`
+          ? `?${this.config.stringifyQueryParams(request.queryParams)}`
           : '';
       const abortController = new AbortController();
       abortControllerByPendingRequestIds[request.id] = abortController;

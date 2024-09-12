@@ -186,7 +186,7 @@ It is usually the most inner implementation of an onion bootstrapped request han
 It requires the installation of the [Axios](https://axios-http.com/docs/intro) library in your code base
 and serves as a more widely supported alternative to the `FetchApiRequestHandler`.
 Some dependencies need to be installed for this type of request handler.
-For version information have a look at the `peerDependencies` in the `package.json` of this project.
+For the recommended version have a look at the `peerDependencies` in the `package.json` of this project.
 ```
 npm install axios --save
 ```
@@ -195,10 +195,36 @@ npm install axios --save
 This implementation is responsible for executing your requests through the http(s) protocol.
 It is usually the most inner implementation of an onion bootstrapped request handler object
 and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
-Some dependencies need to be installed for this type of request handler.
-For version information have a look at the `peerDependencies` in the `package.json` of this project.
+
+This request handler requires a custom `stringifyQueryParams` method to convert an object of type `QueryParams`
+into a string. At time of writing this the [qs](https://www.npmjs.com/package/qs) package is most commonly used for that.
+It is therefore recommended to go with the steps below to instantiate a FetchApiRequestHandler object.
+
+First install the [qs](https://www.npmjs.com/package/qs) package like so:
 ```
-npm install qs --save && npm install @types/qs --save-dev
+npm install qs --save
+
+npm install @types/qs --save-dev
+```
+
+Then create a FetchApiRequestHandler instance as written below:
+```typescript
+import { FetchApiRequestHandler } from './my-output-folder/core';
+import { stringify } from 'qs';
+
+const fetchApiRequestHandler = new FetchApiRequestHandler({
+  // This one is required
+  stringifyQueryParams: queryParams => {
+    return stringify(queryParams);
+  },
+
+  // Following is optional stuff
+  baseUrl: 'http://localhost:8000',
+  generalRequestInit: {
+    credentials: 'include', // Send credential headers
+    mode: 'cors', // Enable CORS
+  },
+});
 ```
 
 ### AuthRequestHandler
