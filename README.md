@@ -196,18 +196,20 @@ This implementation is responsible for executing your requests through the http(
 It is usually the most inner implementation of an onion bootstrapped request handler object
 and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 
-This request handler requires a custom `stringifyQueryParams` method to convert an object of type `QueryParams`
-into a string. At time of writing this the [qs](https://www.npmjs.com/package/qs) package is most commonly used for that.
-It is therefore recommended to go with the steps below to instantiate a FetchApiRequestHandler object.
+This request handler implementation requires a custom `stringifyQueryParams` function to convert an object
+of type `QueryParams` into a `string`.
+At time of writing this, the [qs](https://www.npmjs.com/package/qs) package is the most commonly used library
+for such tasks and is therefore recommended.
+Creating a FetchApiRequestHandler instance comes with the following two steps.
 
-First install the [qs](https://www.npmjs.com/package/qs) package like so:
+Install the [qs](https://www.npmjs.com/package/qs) library like so:
 ```
 npm install qs --save
 
 npm install @types/qs --save-dev
 ```
 
-Then create a FetchApiRequestHandler instance as written below:
+Create a FetchApiRequestHandler instance as written below:
 ```typescript
 import { FetchApiRequestHandler } from './my-output-folder/core';
 import { stringify } from 'qs';
