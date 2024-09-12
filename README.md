@@ -111,15 +111,13 @@ Now the received access token can be stored in the `exampleAuthAccessToken` vari
 
 ```typescript
 import {
-  AxiosRequestHandler,
-  AxiosRequestHandlerExecutionConfig,
-} from './axiosRequestHandler';
-import {
   AuthRequestHandler,
   AuthRequestHandlerExecutionConfig,
+  AxiosRequestHandler,
+  AxiosRequestHandlerExecutionConfig,
   HttpBearerAuthenticationProvider,
-} from './authRequestHandler';
-import {authenticate} from './my-output-folder/auth';
+} from './my-output-folder/core';
+import { authenticate } from './my-output-folder/auth';
 
 declare global {
   interface RequestHandlerExecutionConfig
@@ -272,3 +270,9 @@ of an application then.
 **Worried about different code generation outputs after updating this library?**
 As long as the API contract on the backend side was not violated through breaking changes,
 you don't have to worry about breaking changes in generated code output when upgrading to the next **minor** version.
+
+## Out of scope
+Linting is out of scope of this package. The generator is responsible to generate valid TypeScript definitions.
+That's what it does. Your code setup should be responsible for linting your code, so it might make sense for you to run
+`eslint --fix ./my-output-folder` right after the `generateOas3ToTs` function was executed,
+e.g. with a script in your `package.json`.
