@@ -38,8 +38,8 @@ with the script below.
 
 > :bulb:
 > It is recommended to add your output folder in the `.gitignore` file and to regenerate 
-> the output in your CI pipeline because on every execution of `generateOas3ToTs` the output folder will be deleted 
-> and the generated output is built from scratch again.
+> the output in your CI pipeline because on every execution of the `generateOas3ToTs` function,
+> the output folder will be deleted and the generated output is built from scratch again.
 
 ```typescript
 import { generateOas3ToTs } from 'oas-to-code';
