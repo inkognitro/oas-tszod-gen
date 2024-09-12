@@ -9,12 +9,24 @@ Before you consider using this library, I suggest having a look at [Zodios](http
 and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
 This code generator serves as a standalone alternative to the two libraries.
 I coded my own solution because I wanted to:
-- have generated [Zod](https://zod.dev) schemas as an opt-in possibility only
-- have the possibility to go with the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API),
-[Axios](https://axios-http.com/docs/intro) or another implementation under the hood
-- have also cookies typed in a uniform way for requests and responses, no matter with what underlying implementation
-- have separated functions and type definitions for each API endpoint in a single file, located in context folders
+- have full ownership of my production code
+- have the possibility to go with other implementations under the hood than [Axios](https://axios-http.com/docs/intro)
+  (e.g. with [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)) having a uniform adapter API
+- have generated [Zod](https://zod.dev) schemas as an opt-in possibility
+- have the possibility to explicitly set cookies
+- have separated functions and type definitions for each endpoint in a single file, located in its context folder
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
+- have a uniform way as an alternative to [Axios' interceptors](https://axios-http.com/docs/interceptors)
+through different `RequestHandler` implementations
+
+> :bulb:
+> It seems insane to challenge the usage of the [Axios](https://axios-http.com/docs/intro) library despite all its advantages.
+> But one might have PWAs and [service workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
+> in mind where [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API) is out of scope.
+> Others just want to use `fetch` for backend stuff of their [NextJs](https://nextjs.org/docs/app/api-reference/functions/fetch)
+> app and profit from optimized caching. There are lots of articles out there which discuss things like
+> [Axios Vs Fetch](https://blog.logrocket.com/axios-vs-fetch-best-http-requests/).
+> I hope that with this library it is possible to provide something useful to the TS community.
 
 # Generator: Setup and usage
 The following script can be used in the development process of your application.
