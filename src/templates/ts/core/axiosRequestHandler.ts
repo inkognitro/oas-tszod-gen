@@ -68,11 +68,10 @@ class ResultResponse implements CoreResponse {
   }
 }
 
-export type AxiosRequestHandlerExecuteConfig = {
+export type AxiosRequestHandlerExecutionConfig = {
   refineAxiosRequestConfig?: (
     preparedConfig: AxiosRequestConfig
   ) => AxiosRequestConfig;
-  onUploadProgress?: (progress: number) => void;
 };
 
 type CancelTokenSourceByRequestIdMap = {
@@ -103,7 +102,7 @@ export class AxiosRequestHandler implements RequestHandler {
 
   execute(
     request: Request,
-    config?: AxiosRequestHandlerExecuteConfig
+    config?: AxiosRequestHandlerExecutionConfig
   ): Promise<RequestResult> {
     const cancelTokenSource = axios.CancelToken.source();
     const cancelTokenSourceByPendingRequestId =
@@ -178,7 +177,7 @@ export class AxiosRequestHandler implements RequestHandler {
 
   private createRequestConfig(
     request: Request,
-    config?: AxiosRequestHandlerExecuteConfig
+    config?: AxiosRequestHandlerExecutionConfig
   ): AxiosRequestConfig {
     const requestConfig: AxiosRequestConfig = {
       ...this.generalRequestConfig,
@@ -196,17 +195,6 @@ export class AxiosRequestHandler implements RequestHandler {
     }
     if (request.queryParams) {
       requestConfig.params = request.queryParams;
-    }
-    const onUploadProgress = config?.onUploadProgress;
-    if (onUploadProgress) {
-      requestConfig.onUploadProgress = progressEvent => {
-        if (progressEvent.total === undefined) {
-          return;
-        }
-        onUploadProgress(
-          Math.round(progressEvent.loaded / progressEvent.total)
-        );
-      };
     }
     if (!config?.refineAxiosRequestConfig) {
       return requestConfig;

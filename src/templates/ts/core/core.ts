@@ -171,12 +171,12 @@ export interface RequestResult<
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface RequestExecutionConfig {}
+export interface RequestHandlerExecutionConfig {}
 
 export interface RequestHandler {
   execute(
     request: Request,
-    config?: RequestExecutionConfig
+    config?: RequestHandlerExecutionConfig
   ): Promise<RequestResult>;
   cancelRequestById(requestId: string): void;
   cancelAllRequests(): void;

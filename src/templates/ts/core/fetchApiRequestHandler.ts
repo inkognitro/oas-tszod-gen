@@ -92,7 +92,7 @@ type AbortControllerByRequestId = {
   [requestId: string]: AbortController;
 };
 
-export type FetchApiRequestHandlerExecuteConfig = {
+export type FetchApiRequestHandlerExecutionConfig = {
   refineFetchApiRequestInit?: (preparedRequestInit: RequestInit) => RequestInit;
 };
 
@@ -120,7 +120,7 @@ export class FetchApiRequestHandler implements RequestHandler {
 
   public execute(
     request: Request,
-    config?: FetchApiRequestHandlerExecuteConfig
+    config?: FetchApiRequestHandlerExecutionConfig
   ): Promise<RequestResult> {
     const abortControllerByPendingRequestIds =
       this.abortControllerByPendingRequestIds;
@@ -180,7 +180,7 @@ export class FetchApiRequestHandler implements RequestHandler {
 
   private createRequestInit(
     request: Request,
-    config?: FetchApiRequestHandlerExecuteConfig
+    config?: FetchApiRequestHandlerExecutionConfig
   ): RequestInit {
     const requestInit: RequestInit = {
       ...(this.generalRequestInit ? this.generalRequestInit : {}),

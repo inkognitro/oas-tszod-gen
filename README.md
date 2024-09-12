@@ -89,19 +89,19 @@ Now the received access token can be stored in the `exampleAuthAccessToken` vari
 ```typescript
 import {
   AxiosRequestHandler,
-  AxiosRequestHandlerExecuteConfig,
+  AxiosRequestHandlerExecutionConfig,
 } from './axiosRequestHandler';
 import {
   AuthRequestHandler,
-  AuthRequestHandlerExecuteConfig,
+  AuthRequestHandlerExecutionConfig,
   HttpBearerAuthenticationProvider,
 } from './authRequestHandler';
 import {authenticate} from './my-output-folder/auth';
 
 declare global {
-  interface RequestExecutionConfig
-    extends AxiosRequestHandlerExecuteConfig,
-      AuthRequestHandlerExecuteConfig {}
+  interface RequestHandlerExecutionConfig
+    extends AxiosRequestHandlerExecutionConfig,
+      AuthRequestHandlerExecutionConfig {}
 }
 
 const exampleAuthAccessToken: null | string = null;
@@ -136,7 +136,10 @@ const requestHandler = new AuthRequestHandler(
 
 async function login() {
   const optionalConfig: RequestExecutionConfig = {
-    onUploadProgress: progress => console.log('uploadProgress', progress),
+    refineAxiosRequestConfig: (currentConfig) => ({
+      ...currentConfig,
+      onUploadProgress: progressEvent => console.log('uploadProgressEvent', progressEvent)
+    })
   };
 
   const requestResult = await authenticate(
