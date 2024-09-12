@@ -36,9 +36,10 @@ npm install oas-to-code --save
 After installing the package you will be able to generate TS code out from your OAS3 specification
 with the script below.
 
-**It is recommended to add your output folder in the `.gitignore` file and to regenerate
-the output in your CI pipeline because on every execution of `generateOas3ToTs` the output folder will be deleted
-and the generated output is built from scratch again.**
+> :bulb:
+> It is recommended to add your output folder in the `.gitignore` file and to regenerate 
+> the output in your CI pipeline because on every execution of `generateOas3ToTs` the output folder will be deleted 
+> and the generated output is built from scratch again.
 
 ```typescript
 import { generateOas3ToTs } from 'oas-to-code';
