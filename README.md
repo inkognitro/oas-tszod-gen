@@ -223,7 +223,7 @@ The provided `RequestHandler` implementations distinguish between "expected" and
 A response with no 2xx status code is considered to be "expected" as well.
 In such cases, the Promise which was delivered by the `requestHandler.execute` method, is going to be `resolved`.
 On the other hand, things like programming errors or other runtime errors due to wrong source code are considered
-to be "unexpected" and will result in a `rejected` Promise. This applies to al provided RequestHandler implementations.
+to be "unexpected" and will result in a `rejected` Promise. This applies to all provided RequestHandler implementations.
 
 This behaviour should lead to a better developer experience because thrown errors must only be caught at a root level
 of an application then.
