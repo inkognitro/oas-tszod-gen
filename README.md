@@ -104,8 +104,12 @@ The same principles that apply to dots `.` also apply to slashes `/`.
 ## Out of scope
 Linting is out of scope of this package. The generator is responsible to generate valid TypeScript definitions.
 That's what it does. Your code setup should be responsible for linting your code, so it might make sense for you to run
-`eslint --fix ./generated-api` right after the `generateOas3ToTs` function was executed,
-e.g. with a script in your `package.json`.
+Eslint right after the `generateOas3ToTs` function was executed, e.g. with a script in your `package.json` like so:
+```json
+"scripts": {
+  "api:generate": "node api.generate.js && eslint --fix ./generated-api"
+}
+```
 
 # Usage of generated code
 After generating endpoint caller functions out of your OAS3 specification into your codebase,
