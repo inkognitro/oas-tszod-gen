@@ -12,19 +12,33 @@ function isResponseBodyContent(
   if (typeof value !== 'object') {
     return false;
   }
-  if (!isSchema(value.schema)) {
-    return false;
-  }
-  return true;
+  return isSchema(value.schema);
 }
 
 export type ResponseBodyContentByContentTypeMap = {
   [contentType: 'application/json' | string]: ResponseBodyContent;
 };
 
+export type ResponseHeader = {
+  schema: Schema;
+};
+
+function isResponseHeader(anyValue: unknown): anyValue is ResponseHeader {
+  const value = anyValue as ResponseHeader;
+  if (typeof value !== 'object') {
+    return false;
+  }
+  return isSchema(value.schema);
+}
+
+export type ResponseHeaderByNameMap = {
+  [name: string]: ResponseHeader;
+};
+
 export type Response = {
   description?: string;
   content?: ResponseBodyContentByContentTypeMap;
+  headers?: ResponseHeaderByNameMap;
 };
 
 export function isResponse(anyValue: unknown): anyValue is Response {
@@ -34,6 +48,14 @@ export function isResponse(anyValue: unknown): anyValue is Response {
   }
   if (!!value.description && typeof value.description !== 'string') {
     return false;
+  }
+  if (value.headers) {
+    for (const headerName in value.headers) {
+      const responseHeader = value.headers[headerName];
+      if (!isResponseHeader(responseHeader)) {
+        return false;
+      }
+    }
   }
   if (value.content) {
     for (const contentType in value.content) {
