@@ -96,6 +96,12 @@ Let's consider some example endpoints which might be defined in your OAS3 specif
 
 The same principles that apply to dots `.` also apply to slashes `/`.
 
+## Out of scope
+Linting is out of scope of this package. The generator is responsible to generate valid TypeScript definitions.
+That's what it does. Your code setup should be responsible for linting your code, so it might make sense for you to run
+`eslint --fix ./my-output-folder` right after the `generateOas3ToTs` function was executed,
+e.g. with a script in your `package.json`.
+
 # Usage of generated code
 After generating endpoint caller functions out of your OAS3 specification into your codebase,
 you should also be able to understand how to apply the generated code.
@@ -270,9 +276,3 @@ of an application then.
 **Worried about different code generation outputs after updating this library?**
 As long as the API contract on the backend side was not violated through breaking changes,
 you don't have to worry about breaking changes in generated code output when upgrading to the next **minor** version.
-
-## Out of scope
-Linting is out of scope of this package. The generator is responsible to generate valid TypeScript definitions.
-That's what it does. Your code setup should be responsible for linting your code, so it might make sense for you to run
-`eslint --fix ./my-output-folder` right after the `generateOas3ToTs` function was executed,
-e.g. with a script in your `package.json`.
