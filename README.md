@@ -109,7 +109,7 @@ The following sections should serve as an API documentation.
 
 ## A simple login example
 Following example demonstrates how a `RequestHandler` instance is created with two different implementations.
-In order to process a login, a request is triggered by calling the generated `authenticate` method.
+In order to process a login, a request is triggered by calling the generated `authenticate` endpoint caller function.
 The previously created requestHandler instance is passed as a first argument to the `authenticate` function.
 After receiving the `RequestResult` and the check of the according response status 200, TypeScript automatically 
 knows how the delivered response body looks like.
