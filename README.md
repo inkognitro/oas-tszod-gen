@@ -28,8 +28,17 @@ through different `RequestHandler` implementations
 > [Axios Vs Fetch](https://blog.logrocket.com/axios-vs-fetch-best-http-requests/).
 
 # Generator: Setup and usage
-The following script can be used in the development process of your application.
-This will generate several files and folders depending on your OAS3 specification.
+First install the package with the script below:
+```
+npm install oas-to-code --save
+```
+
+After installing the package you will be able to generate TS code out from your OAS3 specification
+with the script below.
+
+> :warning: It is recommended to add your output folder in the `.gitignore` file and to regenerate
+> the output in your CI pipeline because on every execution of `generateOas3ToTs` the output folder will be deleted
+> and the generated output is built from scratch again.
 
 ```typescript
 import { generateOas3ToTs } from 'oas-to-code';
