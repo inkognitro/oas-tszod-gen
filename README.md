@@ -34,7 +34,8 @@ npm install oas-to-code --save-dev
 ```
 
 After installing the package you will be able to generate TS code out from your OAS3 specification
-with the script below.
+with the script below. Please don't forget to adding your specification.json file and adjusting the
+path of the `require` statement.
 
 > :bulb:
 > It is recommended to add your output folder in the `.gitignore` file and to regenerate 
