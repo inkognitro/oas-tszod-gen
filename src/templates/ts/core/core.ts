@@ -149,18 +149,26 @@ export type JsonValue =
 
 export type ResponseBody = Blob | FormData | JsonValue | string; // ArrayBuffer is ignored because it can be created from Blob
 
-export interface Response<
-  S extends number = any,
+export interface ResponsePayload<
   ContentType extends string = any,
   B extends ResponseBody = any,
-  H extends Headers = {},
-  C extends ResponseSetCookies = {},
+  H extends Headers = any,
+  C extends ResponseSetCookies = any,
 > {
-  status: S;
   contentType: ContentType | null; // case-sensitive, according to oas3 specs
   headers: H;
   cookies: C;
   revealBody: () => Promise<B>;
+}
+
+export interface Response<
+  S extends number = any,
+  ContentType extends string = any,
+  B extends ResponseBody = any,
+  H extends Headers = any,
+  C extends ResponseSetCookies = any,
+> extends ResponsePayload<ContentType, B, H, C> {
+  status: S;
 }
 
 export interface RequestResult<

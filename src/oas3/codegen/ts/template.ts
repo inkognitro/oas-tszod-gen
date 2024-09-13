@@ -82,7 +82,7 @@ export const templateRequestType: TemplateDefinitionOutput = {
       )};`,
       'pathParams: P;',
       'queryParams: Q;',
-      'contentType: string | null; // case-sensitive, according to oas3 specs, used for the "content-type" header by default',
+      'contentType: string | null; // case-sensitive, according to oas3 specs; used for the "content-type" header by default',
       'body: B;',
       `schema: ${templateRequestSchemaType.createName(
         templateRequestTypePath
@@ -147,25 +147,21 @@ export const templateResponseType: TemplateDefinitionOutput = {
       )} = any`,
       `H extends ${templateHeadersType.createName(
         templateResponseTypePath
-      )} = {}`,
+      )} = any`,
       `C extends ${templateResponseSetCookiesType.createName(
         templateResponseTypePath
-      )} = {}`,
+      )} = any`,
     ];
     return genericCodeParts.join(',\n');
   },
   createCode: () => {
-    const bodyCodeParts: string[] = [
-      'status: S;',
-      'contentType: ContentType | null; // case-sensitive; according to oas3 specs; NULL if not defined in specs',
-      'headers: H;',
-      'cookies: C;',
-      'revealBody: () => Promise<B>',
-    ];
-    return `{${bodyCodeParts.join('\n')}}`;
+    return `extends ${templateResponsePayloadType.createName(
+      templateResponseTypePath
+    )}<ContentType, B, H, C> {\nstatus: S;\n}`;
   },
   getRequiredOutputPaths: () => [
     templateHeadersType.path,
+    templateResponsePayloadType.path,
     templateResponseBodyType.path,
     templateResponseSetCookiesType.path,
   ],
@@ -277,6 +273,39 @@ const templateResponseBodyType: TemplateDefinitionOutput = {
   },
   codeComment: 'ArrayBuffer is ignored because it can be created from Blob',
   getRequiredOutputPaths: () => [],
+};
+
+const templateResponsePayloadTypePath = ['core', 'core', 'responsePayload'];
+const templateResponsePayloadType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: templateResponsePayloadTypePath,
+  createName: () => {
+    return 'ResponsePayload';
+  },
+  createGenericsDeclarationCode: () => {
+    const codeParts: string[] = [
+      'ContentType extends string = any',
+      'B extends ResponseBody = any',
+      'H extends Headers = any',
+      'C extends ResponseSetCookies = any',
+    ];
+    return `${codeParts.join(',\n')}`;
+  },
+  createCode: () => {
+    const codeParts: string[] = [
+      'contentType: ContentType | null; // case-sensitive, according to oas3 specs; NULL if not defined in specs',
+      'headers: H;',
+      'cookies: C;',
+      'revealBody: () => Promise<B>;',
+    ];
+    return `{\n${codeParts.join('\n')}\n}`;
+  },
+  getRequiredOutputPaths: () => [
+    templateResponseBodyType.path,
+    templateHeadersType.path,
+    templateResponseSetCookiesType.path,
+  ],
 };
 
 const templatePathParamsType: TemplateDefinitionOutput = {
@@ -608,6 +637,7 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateResponseSchemaType,
   templateResponseSetCookiesType,
   templateResponseBodyType,
+  templateResponsePayloadType,
   templateResponseType,
   templateRequestResultType,
   templateRequestExecutionConfigType,
