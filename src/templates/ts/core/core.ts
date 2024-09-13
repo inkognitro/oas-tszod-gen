@@ -1,5 +1,33 @@
 import {ZodSchema} from 'zod';
 
+export function createRequestUrl(
+  endpointPath: string,
+  params: PathParams
+): string {
+  const urlVariableNames = endpointPath.match(/[^{}]+(?=})/g) ?? [];
+  let url = endpointPath;
+  urlVariableNames.forEach(urlVariableName => {
+    const paramPropNames = Object.keys(params);
+    if (!paramPropNames.includes(urlVariableName)) {
+      console.error(
+        `url variable "${urlVariableName}" not available in params:`,
+        params
+      );
+      return;
+    }
+    const paramValue = params[urlVariableName];
+    if (typeof paramValue !== 'string' && typeof paramValue !== 'number') {
+      console.error(
+        `url variable "${urlVariableName}" must either be a string or a number, following params were given:`,
+        params
+      );
+      return;
+    }
+    url = url.split(`{${urlVariableName}}`).join(`${paramValue}`);
+  });
+  return url;
+}
+
 export type PathParams = {
   [paramName: string]: number | string;
 };
@@ -36,14 +64,6 @@ export type QueryParams = {
     | boolean;
 };
 
-export type ResponseSchema = {
-  status: number | 'any'; // "any" is used for unexpected status codes
-  contentType: string;
-  headersZodSchema?: ZodSchema; // only available with "withZod: true"
-  cookiesZodSchema?: ZodSchema; // only available with "withZod: true"
-  bodyZodSchema?: ZodSchema; // only available with "withZod: true"
-};
-
 export type RequestCreationSettings = {
   endpointId: EndpointId;
   supportedSecuritySchemes?: SecurityScheme[];
@@ -51,42 +71,10 @@ export type RequestCreationSettings = {
   cookies?: RequestCookies;
   pathParams?: PathParams;
   queryParams?: QueryParams;
+  contentType: string | null;
   body?: RequestBody;
-  headersZodSchema?: ZodSchema; // only available with "withZod: true"
-  cookiesZodSchema?: ZodSchema; // only available with "withZod: true"
-  pathParamsZodSchema?: ZodSchema; // only available with "withZod: true"
-  queryParamsZodSchema?: ZodSchema; // only available with "withZod: true"
-  bodyZodSchema?: ZodSchema; // only available with "withZod: true"
-  expectedResponseSchemas: ResponseSchema[];
+  schema: RequestSchema;
 };
-
-export function createRequestUrl(
-  endpointPath: string,
-  params: PathParams
-): string {
-  const urlVariableNames = endpointPath.match(/[^{}]+(?=})/g) ?? [];
-  let url = endpointPath;
-  urlVariableNames.forEach(urlVariableName => {
-    const paramPropNames = Object.keys(params);
-    if (!paramPropNames.includes(urlVariableName)) {
-      console.error(
-        `url variable "${urlVariableName}" not available in params:`,
-        params
-      );
-      return;
-    }
-    const paramValue = params[urlVariableName];
-    if (typeof paramValue !== 'string' && typeof paramValue !== 'number') {
-      console.error(
-        `url variable "${urlVariableName}" must either be a string or a number, following params were given:`,
-        params
-      );
-      return;
-    }
-    url = url.split(`{${urlVariableName}}`).join(`${paramValue}`);
-  });
-  return url;
-}
 
 export function createRequest(settings: RequestCreationSettings): Request {
   const chars =
@@ -104,15 +92,33 @@ export function createRequest(settings: RequestCreationSettings): Request {
     cookies: settings.cookies,
     pathParams: settings.pathParams,
     queryParams: settings.queryParams,
+    contentType: settings.contentType,
     body: settings.body,
-    headersZodSchema: settings.headersZodSchema, // only available with "withZod: true"
-    cookiesZodSchema: settings.cookiesZodSchema, // only available with "withZod: true"
-    pathParamsZodSchema: settings.pathParamsZodSchema, // only available with "withZod: true"
-    queryParamsZodSchema: settings.queryParamsZodSchema, // only available with "withZod: true"
-    bodyZodSchema: settings.bodyZodSchema, // only available with "withZod: true"
-    expectedResponseSchemas: settings.expectedResponseSchemas,
+    schema: settings.schema,
   };
 }
+
+export type ResponseSchema = {
+  status: number | 'any'; // "any" is used for unexpected status codes
+  headersZodSchema?: ZodSchema; // only available with "withZod: true"
+  cookiesZodSchema?: ZodSchema; // only available with "withZod: true"
+  bodyVariants: {
+    contentType: string;
+    zodSchema?: ZodSchema; // only available with "withZod: true"
+  }[];
+};
+
+type RequestSchema = {
+  headersZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  cookiesZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  pathParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  queryParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  bodyVariants: {
+    contentType: string; // case-sensitive, according to oas3 specs
+    zodSchema?: ZodSchema; // only available with "withZod: true"
+  }[];
+  responses: ResponseSchema[];
+};
 
 export type RequestBody = Blob | FormData | JsonValue | string;
 
@@ -129,13 +135,9 @@ export type Request<
   cookies?: RequestCookies;
   pathParams: P;
   queryParams: Q;
+  contentType: string | null; // case-sensitive, according to oas3 specs, used for the "content-type" header by default
   body: B;
-  headersZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  cookiesZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  pathParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  queryParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  bodyZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  expectedResponseSchemas: ResponseSchema[];
+  schema: RequestSchema;
 };
 
 export type JsonValue =
@@ -150,11 +152,13 @@ export type ResponseBody = Blob | FormData | JsonValue | string; // ArrayBuffer 
 
 export interface Response<
   S extends number = any,
+  ContentType extends string = any,
   B extends ResponseBody = any,
   H extends Headers = {},
   C extends ResponseSetCookies = {},
 > {
   status: S;
+  contentType: ContentType | null; // case-sensitive, according to oas3 specs
   headers: H;
   cookies: C;
   revealBody: () => Promise<B>;

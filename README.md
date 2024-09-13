@@ -180,12 +180,26 @@ async function login() {
   
   const requestResult = await authenticate(
     requestHandler,
-    {usernameOrEmail: 'inkognitro', password: '12345678'},
+    {
+      contentType: 'application/json',
+      body: {
+        usernameOrEmail: 'inkognitro',
+        password: '12345678'
+      },
+    },
     optionalConfig
   );
 
   if (!requestResult.response || requestResult.response.status !== 200) {
     console.log('Something went wrong!');
+    return;
+  }
+
+  // The following check is only required if the response with
+  // the status code 200 can have arbitrary content types,
+  // according to the given oas3 specification
+  if (rr.response.contentType !== 'multipart/form-data') {
+    console.log('unsupported response body content of type FormData');
     return;
   }
 
