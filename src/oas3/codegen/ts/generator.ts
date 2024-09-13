@@ -15,9 +15,6 @@ import {
   TemplateDefinitionOutput,
 } from './core';
 import {
-  isParameterComponentRef,
-  isResponseComponentRef,
-  isSchemaComponentRef,
   isSpecification,
   Parameter,
   parameterComponentRefPrefix,
@@ -180,8 +177,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   generate(config: GenerateConfig) {
-    this.resetOutputs();
-    this.resetOperationFolderOutputPaths(config);
+    this.reset(config);
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
       this.generateRequestByMethodMapOutputs(path, requestByMethodMap, config);
@@ -190,8 +186,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.createFiles(fileOutputByFilePath, config);
   }
 
-  private resetOutputs() {
+  private reset(config: GenerateConfig) {
     this.outputs = [...templateDefinitionOutputs];
+    this.resetOperationFolderOutputPaths(config);
   }
 
   private resetOperationFolderOutputPaths(config: GenerateConfig) {
