@@ -312,7 +312,6 @@ const templateResponseSchemaType: TemplateDefinitionOutput = {
     ];
     if (config.withZod) {
       codeParts.push('headersZodSchema?: ZodSchema;');
-      codeParts.push('cookiesZodSchema?: ZodSchema;');
     }
     return `{\n${codeParts.join('\n')}\n}`;
   },

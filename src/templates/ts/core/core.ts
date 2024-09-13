@@ -101,7 +101,6 @@ export function createRequest(settings: RequestCreationSettings): Request {
 export type ResponseSchema = {
   status: number | 'any'; // "any" is used for unexpected status codes
   headersZodSchema?: ZodSchema; // only available with "withZod: true"
-  cookiesZodSchema?: ZodSchema; // only available with "withZod: true"
   bodyVariants: {
     contentType: string;
     zodSchema?: ZodSchema; // only available with "withZod: true"
