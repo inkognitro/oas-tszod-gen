@@ -30,12 +30,14 @@ class ResultResponse implements CoreResponse {
   private readonly response: Response;
 
   public readonly status: number;
+  public readonly contentType: null | string;
   public readonly headers: Headers;
   public readonly cookies: ResponseSetCookies;
 
   constructor(response: Response) {
     this.response = response;
     this.status = response.status;
+    this.contentType = null; // todo: support this from response schema
     this.headers = this.createPlainHeaders(response);
     this.cookies = this.createPlainCookies(response);
     this.revealBody = this.revealBody.bind(this);

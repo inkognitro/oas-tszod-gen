@@ -12,7 +12,6 @@ import {
   CodeGenerationOutput,
   CodeGenerator,
   DefinitionOutput,
-  GeneratedDefinitionOutput,
   OutputPath,
   OutputType,
 } from './core';
@@ -58,9 +57,9 @@ function applyResponseHeaders(
     createName: referencingPath => {
       return codeGenerator.createTypeName(path, referencingPath);
     },
-    ...applyObjectSchema(codeGenerator, objectSchema, path),
+    ...applyObjectSchema(codeGenerator, objectSchema, path, config),
   };
-  codeGenerator.addOutput(typeDefinition);
+  codeGenerator.addOutput(typeDefinition, config);
   let zodSchemaDefinition: undefined | DefinitionOutput;
   if (config.withZod) {
     const zodSchemaDefinitionPath = [...path, 'zodSchema'];
@@ -73,10 +72,11 @@ function applyResponseHeaders(
       ...applyZodObjectSchema(
         codeGenerator,
         objectSchema,
-        zodSchemaDefinitionPath
+        zodSchemaDefinitionPath,
+        config
       ),
     };
-    codeGenerator.addOutput(zodSchemaDefinition);
+    codeGenerator.addOutput(zodSchemaDefinition, config);
   }
   return {
     typeDefinition,
@@ -101,14 +101,16 @@ function applyResponseBodyContent(
   const typeCodeOutput: CodeGenerationOutput = applySchema(
     codeGenerator,
     contentSchema.schema,
-    path
+    path,
+    config
   );
   let zodSchemaCodeOutput: CodeGenerationOutput | undefined;
   if (config.withZod) {
     zodSchemaCodeOutput = applyZodSchema(
       codeGenerator,
       contentSchema.schema,
-      path
+      path,
+      config
     );
   }
   return {
@@ -195,7 +197,7 @@ function applyConcreteResponse(
       return [...outputPaths, templateResponseType.path];
     },
   };
-  codeGenerator.addOutput(typeDefinition);
+  codeGenerator.addOutput(typeDefinition, config);
   return {
     typeDefinition,
     headersZodSchemaDefinition,

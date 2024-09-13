@@ -544,15 +544,17 @@ export class DefaultCodeGenerator implements CodeGenerator {
     componentRef: string,
     config: GenerateConfig
   ) {
-    if (isResponseComponentRef(componentRef)) {
+    if (componentRef.startsWith(responseComponentRefPrefix)) {
       this.addOutputByResponseComponentRef(componentRef, config);
       return;
     }
-    if (isParameterComponentRef(componentRef)) {
+    if (componentRef.startsWith(parameterComponentRefPrefix)) {
       this.addOutputByParameterComponentRef(componentRef, config);
+      return;
     }
-    if (isSchemaComponentRef(componentRef)) {
+    if (componentRef.startsWith(schemaComponentRefPrefix)) {
       this.addOutputBySchemaComponentRef(componentRef, config);
+      return;
     }
     throw new Error(`case for "${componentRef}" is not supported`);
   }
@@ -1119,12 +1121,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
       folderOutputPathParts.length
     );
     let fileNameOutputPathPart: string | null = null;
-    if (isParameterComponentRef(componentRef)) {
+    if (componentRef.startsWith(parameterComponentRefPrefix)) {
       fileNameOutputPathPart = componentParametersFileNameOutputPathPart;
-    } else if (isResponseComponentRef(componentRef)) {
+    } else if (componentRef.startsWith(responseComponentRefPrefix)) {
       fileNameOutputPathPart = componentResponsesFileNameOutputPathPart;
       typeNamePathParts.push('responsePayload');
-    } else if (isSchemaComponentRef(componentRef)) {
+    } else if (componentRef.startsWith(schemaComponentRefPrefix)) {
       fileNameOutputPathPart = componentSchemasFileNameOutputPathPart;
     }
     if (!fileNameOutputPathPart) {
