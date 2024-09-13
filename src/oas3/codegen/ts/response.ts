@@ -28,15 +28,18 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
   codeGenerator: CodeGenerator,
   path: OutputPath,
   statusCode: string,
-  schema: ResponseBodyContent
+  schema: ResponseBodyContent,
+  config: GenerateConfig
 ): GeneratedDefinitionOutput {
   const requiredOutputPaths: OutputPath[] = [templateResponseType.path];
   const statusCodeDiscriminatorValue =
     findNumericStatusCode(statusCode) ?? 'any';
-  const responseBodySummary = applySchema(codeGenerator, schema.schema, [
-    ...path,
-    'body',
-  ]);
+  const responseBodySummary = applySchema(
+    codeGenerator,
+    schema.schema,
+    [...path, 'body'],
+    config
+  );
   const typeDefinitionOutput: GeneratedDefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'type',
@@ -51,7 +54,7 @@ function applyStatusCodeResponseAndGetTypeDefinitionOutput(
     },
     getRequiredOutputPaths: () => requiredOutputPaths,
   };
-  codeGenerator.addOutput(typeDefinitionOutput);
+  codeGenerator.addOutput(typeDefinitionOutput, config);
   return typeDefinitionOutput;
 }
 
@@ -85,7 +88,8 @@ export function applyResponseByStatusCodeMap(
       const responseBodyContent = applyComponentRefSchema(
         codeGenerator,
         responseOrRef,
-        responseBodyOutputPath
+        responseBodyOutputPath,
+        config
       );
       if (!containsOutputPath(requiredOutputPaths, templateResponseType.path)) {
         requiredOutputPaths.push(templateResponseType.path);
@@ -115,7 +119,8 @@ export function applyResponseByStatusCodeMap(
         codeGenerator,
         responseOutputPath,
         statusCode,
-        responseBodyContent
+        responseBodyContent,
+        config
       );
     if (!containsOutputPath(requiredOutputPaths, statusCodeResponseType.path)) {
       requiredOutputPaths.push(statusCodeResponseType.path);
@@ -150,6 +155,6 @@ export function applyResponseByStatusCodeMap(
     },
     getRequiredOutputPaths: () => requiredOutputPaths,
   };
-  codeGenerator.addOutput(responseTypeDefinition);
+  codeGenerator.addOutput(responseTypeDefinition, config);
   return responseTypeDefinition;
 }

@@ -2,6 +2,7 @@ import {
   ConcreteParameter,
   isParameterComponentRef,
   Parameter,
+  Response,
   Schema,
 } from '@oas3/specification';
 import {GenerateConfig} from '@oas3/codegen/ts/generator';
@@ -29,10 +30,15 @@ export interface CodeGenerator {
   ): string;
   createOperationOutputPath(operationId: string): OutputPath;
   createOutputPathByComponentRef(componentRef: string): OutputPath;
-  createZodSchemaOutputPathByComponentRef(componentRef: string): OutputPath;
-  addOutput(output: Output, config?: AddOutputConfig): void;
+  createOutputPathByComponentRefForZodSchema(componentRef: string): OutputPath;
+  addOutput(
+    output: Output,
+    config: GenerateConfig,
+    preventFromAddingComponentRefs?: string[]
+  ): void;
   findComponentSchemaByRef(componentRef: string): null | Schema;
   findComponentParameterByRef(componentRef: string): null | Parameter;
+  findComponentResponseByRef(componentRef: string): null | Response;
   hasSameFileContext(outputPath1: OutputPath, outputPath2: OutputPath): boolean;
 }
 

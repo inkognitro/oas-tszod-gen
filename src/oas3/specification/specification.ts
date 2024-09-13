@@ -1,4 +1,4 @@
-import {isResponse, Response} from './response';
+import {isConcreteResponse, ConcreteResponse} from './response';
 import {isSchema, Schema} from './schema';
 import {isSecurityScheme, SecurityScheme} from './security';
 import {isParameter, isRequest, Parameter, Request} from './request';
@@ -44,7 +44,7 @@ function isRequestDefinitionsByPathMap(
 }
 
 type ResponseByNameMap = {
-  [requestPath: string]: Response;
+  [requestPath: string]: ConcreteResponse;
 };
 
 function isResponseByNameMap(anyValue: unknown): anyValue is ResponseByNameMap {
@@ -54,7 +54,7 @@ function isResponseByNameMap(anyValue: unknown): anyValue is ResponseByNameMap {
   }
   for (const name in value) {
     const response = value[name];
-    if (!isResponse(response)) {
+    if (!isConcreteResponse(response)) {
       return false;
     }
   }

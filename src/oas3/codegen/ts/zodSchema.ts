@@ -31,11 +31,13 @@ import {
   StringSchema,
 } from '@oas3/specification';
 import {templateZOfZodLibrary} from './template';
+import {GenerateConfig} from '@oas3/codegen/ts/generator';
 
 export function applyZodSchema(
   codeGenerator: CodeGenerator,
   schema: Schema,
   path: OutputPath,
+  config: GenerateConfig,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   if (isSchemaComponentRef(schema)) {
@@ -43,6 +45,7 @@ export function applyZodSchema(
       codeGenerator,
       schema,
       path,
+      config,
       preventFromAddingComponentRefs
     );
   }
@@ -63,6 +66,7 @@ export function applyZodSchema(
       codeGenerator,
       schema,
       path,
+      config,
       preventFromAddingComponentRefs
     );
   }
@@ -71,6 +75,7 @@ export function applyZodSchema(
       codeGenerator,
       schema,
       path,
+      config,
       preventFromAddingComponentRefs
     );
   }
@@ -79,6 +84,7 @@ export function applyZodSchema(
       codeGenerator,
       schema,
       path,
+      config,
       preventFromAddingComponentRefs
     );
   }
@@ -148,6 +154,7 @@ function applyZodArraySchema(
   codeGenerator: CodeGenerator,
   schema: ArraySchema,
   path: OutputPath,
+  config: GenerateConfig,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
@@ -156,6 +163,7 @@ function applyZodArraySchema(
     codeGenerator,
     schema.items,
     itemOutputPath,
+    config,
     preventFromAddingComponentRefs
   );
   requiredOutputPaths.push(itemOutputPath);
@@ -230,6 +238,7 @@ export function applyZodComponentRefSchema(
   codeGenerator: CodeGenerator,
   schema: ComponentRef,
   path: OutputPath,
+  config: GenerateConfig,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const output: ComponentRefOutput = {
@@ -243,13 +252,10 @@ export function applyZodComponentRefSchema(
     componentRef: schema.$ref,
     path,
     getRequiredOutputPaths: () => [
-      codeGenerator.createZodSchemaOutputPathByComponentRef(schema.$ref),
+      codeGenerator.createOutputPathByComponentRefForZodSchema(schema.$ref),
     ],
   };
-  codeGenerator.addOutput(output, {
-    preventFromAddingComponentRefs: preventFromAddingComponentRefs,
-    createWithZodSchema: true,
-  });
+  codeGenerator.addOutput(output, config, preventFromAddingComponentRefs);
   return {
     ...output,
     createCode: referencingPath =>
@@ -261,6 +267,7 @@ export function applyZodObjectSchema(
   codeGenerator: CodeGenerator,
   schema: ObjectSchema,
   path: OutputPath,
+  config: GenerateConfig,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const directOutputByPropNameMap: {
@@ -278,6 +285,7 @@ export function applyZodObjectSchema(
       codeGenerator,
       propSchema,
       propSchemaPath,
+      config,
       preventFromAddingComponentRefs
     );
   }
@@ -287,6 +295,7 @@ export function applyZodObjectSchema(
       codeGenerator,
       schema.additionalProperties,
       [...path, objectSchemaAdditionalPropsOutputPathPart],
+      config,
       preventFromAddingComponentRefs
     );
   }
@@ -326,6 +335,7 @@ function applyZodOneOfSchema(
   codeGenerator: CodeGenerator,
   schema: OneOfSchema,
   path: OutputPath,
+  config: GenerateConfig,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const oneOfItemDirectOutputs: CodeGenerationOutput[] = [];
@@ -341,6 +351,7 @@ function applyZodOneOfSchema(
       codeGenerator,
       itemSchema,
       itemPath,
+      config,
       preventFromAddingComponentRefs
     );
     oneOfItemDirectOutputs.push(itemOutput);

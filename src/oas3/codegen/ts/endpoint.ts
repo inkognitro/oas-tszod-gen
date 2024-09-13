@@ -68,7 +68,7 @@ function applyRequestResultTypeDefinition(
       responseType.path,
     ],
   };
-  codeGenerator.addOutput(typeDefinition);
+  codeGenerator.addOutput(typeDefinition, config);
   return typeDefinition;
 }
 
@@ -232,7 +232,8 @@ function findRequestBodyContentSettings(
 function applyNullableFormDataDefinition(
   codeGenerator: CodeGenerator,
   schema: Schema,
-  path: OutputPath
+  path: OutputPath,
+  config: GenerateConfig
 ): null | DefinitionOutput {
   if (!isObjectSchema(schema)) {
     return null;
@@ -282,7 +283,7 @@ function applyNullableFormDataDefinition(
       return [];
     },
   };
-  codeGenerator.addOutput(output);
+  codeGenerator.addOutput(output, config);
   return output;
 }
 
@@ -347,7 +348,8 @@ function applyPayloadIfRequired(
     requestBodyFormDataDefinition = applyNullableFormDataDefinition(
       codeGenerator,
       oas3ObjectSchemaBodyProperty,
-      [...path, 'bodyFormData']
+      [...path, 'bodyFormData'],
+      config
     );
   }
   let payloadZodSchemaDefinition: undefined | GeneratedDefinitionOutput =
@@ -362,10 +364,11 @@ function applyPayloadIfRequired(
       ...applyZodSchema(
         codeGenerator,
         payloadOas3ObjectSchema,
-        zodPayloadSchemaPath
+        zodPayloadSchemaPath,
+        config
       ),
     };
-    codeGenerator.addOutput(payloadZodSchemaDefinition);
+    codeGenerator.addOutput(payloadZodSchemaDefinition, config);
   }
   function createAdditionalObjectPropertyCodeRows(): string[] {
     if (requestBodyFormDataDefinition) {
@@ -380,6 +383,7 @@ function applyPayloadIfRequired(
       ? createOas3ObjectSchemaWithoutProperty(payloadOas3ObjectSchema, 'body')
       : payloadOas3ObjectSchema,
     path,
+    config,
     preventFromAddingComponentRefs,
     createAdditionalObjectPropertyCodeRows
   );
@@ -398,8 +402,7 @@ function applyPayloadIfRequired(
       return fixedOutputs;
     },
   };
-  codeGenerator.addOutput(payloadTypeDefinition);
-
+  codeGenerator.addOutput(payloadTypeDefinition, config);
   return {
     typeDefinition: payloadTypeDefinition,
     objectSchema: payloadOas3ObjectSchema,
@@ -574,13 +577,16 @@ function createRequestCreationCode(
     }
   }
 
+  // todo: implement expectedResponseSchemas here
+
   return `const request = createRequest({${parts.join(',\n')}});`;
 }
 
 function applyEndpointIdConstDefinition(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
-  path: OutputPath
+  path: OutputPath,
+  config: GenerateConfig
 ): GeneratedDefinitionOutput {
   const definition: GeneratedDefinitionOutput = {
     type: OutputType.DEFINITION,
@@ -594,7 +600,7 @@ function applyEndpointIdConstDefinition(
     },
     getRequiredOutputPaths: () => [],
   };
-  codeGenerator.addOutput(definition);
+  codeGenerator.addOutput(definition, config);
   return definition;
 }
 
@@ -610,7 +616,8 @@ export function applyEndpointCallerFunction(
   const endpointIdConstDefinition = applyEndpointIdConstDefinition(
     codeGenerator,
     endpointId,
-    [...path, 'endpointId']
+    [...path, 'endpointId'],
+    config
   );
   const payloadUtils = applyPayloadIfRequired(
     codeGenerator,
@@ -635,32 +642,35 @@ export function applyEndpointCallerFunction(
   if (payloadUtils?.typeDefinition) {
     requiredOutputPaths.push(payloadUtils?.typeDefinition.path);
   }
-  codeGenerator.addOutput({
-    type: OutputType.DEFINITION,
-    definitionType: 'function',
-    createName: referencingPath => {
-      return codeGenerator.createFunctionName(path, referencingPath);
+  codeGenerator.addOutput(
+    {
+      type: OutputType.DEFINITION,
+      definitionType: 'function',
+      createName: referencingPath => {
+        return codeGenerator.createFunctionName(path, referencingPath);
+      },
+      createCode: () => {
+        const rhTn = templateRequestHandlerType.createName(path);
+        const pTn = payloadUtils?.typeDefinition?.createName(path);
+        const payloadParamCode = pTn ? `, payload: ${pTn}` : '';
+        const rrTn = requestResultTypeDefinition.createName(path);
+        const cfgTn = templateRequestExecutionConfigType.createName(path);
+        const bodyParts: string[] = [];
+        bodyParts.push(
+          createRequestCreationCode(
+            path,
+            endpointIdConstDefinition,
+            payloadUtils,
+            requestSchema.security
+          )
+        );
+        bodyParts.push('return requestHandler.execute(request, config);');
+        const funcBody = bodyParts.join('\n');
+        return `(requestHandler: ${rhTn}${payloadParamCode}, config?: ${cfgTn}): Promise<${rrTn}> {${funcBody}}`;
+      },
+      path,
+      getRequiredOutputPaths: () => requiredOutputPaths,
     },
-    createCode: () => {
-      const rhTn = templateRequestHandlerType.createName(path);
-      const pTn = payloadUtils?.typeDefinition?.createName(path);
-      const payloadParamCode = pTn ? `, payload: ${pTn}` : '';
-      const rrTn = requestResultTypeDefinition.createName(path);
-      const cfgTn = templateRequestExecutionConfigType.createName(path);
-      const bodyParts: string[] = [];
-      bodyParts.push(
-        createRequestCreationCode(
-          path,
-          endpointIdConstDefinition,
-          payloadUtils,
-          requestSchema.security
-        )
-      );
-      bodyParts.push('return requestHandler.execute(request, config);');
-      const funcBody = bodyParts.join('\n');
-      return `(requestHandler: ${rhTn}${payloadParamCode}, config?: ${cfgTn}): Promise<${rrTn}> {${funcBody}}`;
-    },
-    path,
-    getRequiredOutputPaths: () => requiredOutputPaths,
-  });
+    config
+  );
 }

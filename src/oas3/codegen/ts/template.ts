@@ -276,7 +276,7 @@ const templateResponseBodyType: TemplateDefinitionOutput = {
 };
 
 const templateResponsePayloadTypePath = ['core', 'core', 'responsePayload'];
-const templateResponsePayloadType: TemplateDefinitionOutput = {
+export const templateResponsePayloadType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'type',
   path: templateResponsePayloadTypePath,

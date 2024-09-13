@@ -35,14 +35,16 @@ export type ResponseHeaderByNameMap = {
   [name: string]: ResponseHeader;
 };
 
-export type Response = {
+export type ConcreteResponse = {
   description?: string;
   content?: ResponseBodyContentByContentTypeMap;
   headers?: ResponseHeaderByNameMap;
 };
 
-export function isResponse(anyValue: unknown): anyValue is Response {
-  const value = anyValue as Response;
+export function isConcreteResponse(
+  anyValue: unknown
+): anyValue is ConcreteResponse {
+  const value = anyValue as ConcreteResponse;
   if (typeof value !== 'object') {
     return false;
   }
@@ -68,8 +70,14 @@ export function isResponse(anyValue: unknown): anyValue is Response {
   return true;
 }
 
+export type Response = ConcreteResponse | ComponentRef;
+
+export function isResponse(anyValue: unknown): anyValue is Response {
+  return isConcreteResponse(anyValue) || isResponseComponentRef(anyValue);
+}
+
 export type ResponseByStatusCodeMap = {
-  [statusCode: string]: Response | ComponentRef;
+  [statusCode: string]: Response;
 };
 
 export function isResponseByStatusCodeMap(
@@ -81,7 +89,7 @@ export function isResponseByStatusCodeMap(
   const value = anyValue as ResponseByStatusCodeMap;
   for (const statusCode in value) {
     const responseOrRef = value[statusCode];
-    if (!isResponseComponentRef(responseOrRef) && !isResponse(responseOrRef)) {
+    if (!isResponse(responseOrRef)) {
       return false;
     }
   }
