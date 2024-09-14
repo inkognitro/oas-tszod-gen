@@ -6,7 +6,7 @@ A code generator to convert [OpenApiV3](https://swagger.io/specification/) speci
 
 ## Why yet another library for this task?
 Before you consider using this library, I suggest having a look at [Zodios](https://www.zodios.org/)
-and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
+and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client).
 This code generator serves as a standalone alternative to the two libraries with the option to exchange Axios with Fetch
 under the hood, while using the same functions in your application. However, I coded my own solution because I wanted to:
 
