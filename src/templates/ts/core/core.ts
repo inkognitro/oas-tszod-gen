@@ -149,7 +149,7 @@ export type JsonValue =
 
 export type ResponseBody = Blob | FormData | JsonValue | string; // ArrayBuffer is ignored because it can be created from Blob
 
-export interface ResponsePayload<
+export interface ResponseTemplate<
   ContentType extends string = any,
   B extends ResponseBody = any,
   H extends Headers = any,
@@ -167,9 +167,20 @@ export interface Response<
   B extends ResponseBody = any,
   H extends Headers = any,
   C extends ResponseSetCookies = any,
-> extends ResponsePayload<ContentType, B, H, C> {
+> extends ResponseTemplate<ContentType, B, H, C> {
   status: S;
 }
+
+export type ResponseFromTemplate<
+  S extends number = any,
+  T extends ResponseTemplate = any,
+> = Response<
+  S,
+  T['contentType'],
+  Awaited<ReturnType<T['revealBody']>>,
+  T['headers'],
+  T['cookies']
+>;
 
 export interface RequestResult<
   Req extends Request = any,

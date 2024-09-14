@@ -2,7 +2,6 @@ import {
   CodeGenerator,
   DefinitionOutput,
   GeneratedDefinitionOutput,
-  getConcreteParameter,
   OutputPath,
   OutputType,
 } from './core';
@@ -29,6 +28,7 @@ import {
 import {GenerateConfig} from './generator';
 import {applyZodSchema} from '@oas3/codegen/ts/zodSchema';
 import {applyObjectSchema} from '@oas3/codegen/ts/schema';
+import {getConcreteParameter} from '@oas3/codegen/ts/parameter';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -576,8 +576,6 @@ function createRequestCreationCode(
       parts.push(`supportedSecuritySchemes: ${securitySchemesCode}`);
     }
   }
-
-  // todo: implement expectedResponseSchemas here
 
   return `const request = createRequest({${parts.join(',\n')}});`;
 }

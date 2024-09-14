@@ -1,5 +1,4 @@
 import {
-  ComponentRef,
   isConcreteResponse,
   ObjectSchema,
   ObjectSchemaProperties,
@@ -7,19 +6,14 @@ import {
   ResponseBodyContent,
   ResponseHeaderByNameMap,
   Response,
+  isResponseComponentRef,
 } from '@oas3/specification';
-import {
-  CodeGenerationOutput,
-  CodeGenerator,
-  DefinitionOutput,
-  OutputPath,
-  OutputType,
-} from './core';
+import {CodeGenerationOutput, CodeGenerator, OutputPath} from './core';
 import {GenerateConfig} from './generator';
 import {applyZodObjectSchema, applyZodSchema} from '@oas3/codegen/ts/zodSchema';
 import {applyObjectSchema, applySchema} from '@oas3/codegen/ts/schema';
 import {
-  templateResponsePayloadType,
+  templateResponseTemplateType,
   templateResponseType,
 } from '@oas3/codegen/ts/template';
 
@@ -40,8 +34,8 @@ function createObjectSchemaFromHeadersSchema(
 }
 
 type ApplyResponseHeadersResult = {
-  typeDefinition: DefinitionOutput;
-  zodSchemaDefinition?: DefinitionOutput;
+  typeCodeOutput: CodeGenerationOutput;
+  zodSchemaCodeOutput?: CodeGenerationOutput;
 };
 
 function applyResponseHeaders(
@@ -51,36 +45,24 @@ function applyResponseHeaders(
   config: GenerateConfig
 ): ApplyResponseHeadersResult {
   const objectSchema = createObjectSchemaFromHeadersSchema(headersSchema);
-  const typeDefinition: DefinitionOutput = {
-    type: OutputType.DEFINITION,
-    definitionType: 'type',
-    createName: referencingPath => {
-      return codeGenerator.createTypeName(path, referencingPath);
-    },
-    ...applyObjectSchema(codeGenerator, objectSchema, path, config),
-  };
-  codeGenerator.addOutput(typeDefinition, config);
-  let zodSchemaDefinition: undefined | DefinitionOutput;
+  const typeCodeOutput: CodeGenerationOutput = applyObjectSchema(
+    codeGenerator,
+    objectSchema,
+    path,
+    config
+  );
+  let zodSchemaCodeOutput: undefined | CodeGenerationOutput;
   if (config.withZod) {
-    const zodSchemaDefinitionPath = [...path, 'zodSchema'];
-    zodSchemaDefinition = {
-      type: OutputType.DEFINITION,
-      definitionType: 'const',
-      createName: referencingPath => {
-        return codeGenerator.createTypeName(path, referencingPath);
-      },
-      ...applyZodObjectSchema(
-        codeGenerator,
-        objectSchema,
-        zodSchemaDefinitionPath,
-        config
-      ),
-    };
-    codeGenerator.addOutput(zodSchemaDefinition, config);
+    zodSchemaCodeOutput = applyZodObjectSchema(
+      codeGenerator,
+      objectSchema,
+      [...path, 'zodSchema'],
+      config
+    );
   }
   return {
-    typeDefinition,
-    zodSchemaDefinition,
+    typeCodeOutput,
+    zodSchemaCodeOutput,
   };
 }
 
@@ -121,9 +103,8 @@ function applyResponseBodyContent(
 }
 
 type ApplyConcreteResponseResult = {
-  typeDefinition: DefinitionOutput;
-  headersZodSchemaDefinition?: DefinitionOutput;
-  bodyResults: ApplyResponseBodyResult[];
+  typeCodeOutput: CodeGenerationOutput;
+  headersZodSchemaCodeOutput?: CodeGenerationOutput;
 };
 
 function applyConcreteResponse(
@@ -140,10 +121,6 @@ function applyConcreteResponse(
         config
       )
     : null;
-  let headersZodSchemaDefinition: undefined | DefinitionOutput;
-  if (headersResult) {
-    headersZodSchemaDefinition = headersResult.zodSchemaDefinition;
-  }
   const bodyResults: ApplyResponseBodyResult[] = [];
   for (const contentType in schema.content) {
     const contentSchema = schema.content[contentType];
@@ -158,23 +135,18 @@ function applyConcreteResponse(
       )
     );
   }
-  const typeDefinition: DefinitionOutput = {
-    type: OutputType.DEFINITION,
-    definitionType: 'type',
-    createName: referencingPath => {
-      return codeGenerator.createTypeName(path, referencingPath);
-    },
+  const typeCodeOutput: CodeGenerationOutput = {
     path,
     createCode: () => {
       if (!bodyResults.length) {
         return 'any';
       }
       const headersCodePart: string = headersResult
-        ? `, ${headersResult.typeDefinition.createName(path)}`
+        ? `, ${headersResult.typeCodeOutput.createCode(path)}`
         : '';
       const responseDefinitionCodeParts: string[] = bodyResults.map(
         bodyResult => {
-          return `${templateResponsePayloadType.createName(path)}<'${
+          return `${templateResponseTemplateType.createName(path)}<'${
             bodyResult.contentType
           }',${bodyResult.typeCodeOutput.createCode(path)}${headersCodePart}>`;
         }
@@ -197,38 +169,31 @@ function applyConcreteResponse(
       return [...outputPaths, templateResponseType.path];
     },
   };
-  codeGenerator.addOutput(typeDefinition, config);
+
   return {
-    typeDefinition,
-    headersZodSchemaDefinition,
-    bodyResults,
+    typeCodeOutput,
+    headersZodSchemaCodeOutput: headersResult?.zodSchemaCodeOutput,
   };
 }
 
-export type ApplyResponseResult = {
-  typeCodeOutput: CodeGenerationOutput;
-  headersZodSchemaDefinition?: DefinitionOutput;
-  bodyResults: ApplyResponseBodyResult[];
-};
+// todo: add applyResponse function if required
 
-export function applyResponse(
-  codeGenerator: CodeGenerator,
-  schema: Response,
-  path: OutputPath,
-  config: GenerateConfig
-): ApplyResponseResult {
-  if (isConcreteResponse(schema)) {
-    const result = applyConcreteResponse(codeGenerator, schema, path, config);
-    return {
-      typeCodeOutput: {
-        ...result.typeDefinition,
-        getRequiredOutputPaths: () => [
-          ...result.typeDefinition.getRequiredOutputPaths(config),
-        ],
-      },
-      headersZodSchemaDefinition: result.headersZodSchemaDefinition,
-      bodyResults: result.bodyResults,
-    };
+// todo: use or remove
+export function getConcreteResponse(
+  response: Response,
+  codeGenerator: CodeGenerator
+): ConcreteResponse {
+  if (!isResponseComponentRef(response)) {
+    return response;
   }
-  codeGenerator.findComponentResponseByRef();
+  const responseRef = codeGenerator.findComponentResponseByRef(response.$ref);
+  if (!responseRef) {
+    throw new Error(
+      `could not find schema for component with ref "${response.$ref}"`
+    );
+  }
+  if (isResponseComponentRef(responseRef)) {
+    return getConcreteResponse(responseRef, codeGenerator);
+  }
+  return responseRef;
 }

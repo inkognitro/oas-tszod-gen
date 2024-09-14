@@ -1,16 +1,5 @@
-import {
-  ConcreteParameter,
-  isParameterComponentRef,
-  Parameter,
-  Response,
-  Schema,
-} from '@oas3/specification';
+import {Parameter, Response, Schema} from '@oas3/specification';
 import {GenerateConfig} from '@oas3/codegen/ts/generator';
-
-export type AddOutputConfig = {
-  preventFromAddingComponentRefs: string[];
-  createWithZodSchema: boolean;
-};
 
 export interface CodeGenerator {
   createComponentTypeName(
@@ -145,27 +134,6 @@ export type Output =
   | GeneratedDefinitionOutput
   | TemplateDefinitionOutput
   | ComponentRefOutput;
-
-export function getConcreteParameter(
-  parameterOrComponentRef: Parameter,
-  codeGenerator: CodeGenerator
-): ConcreteParameter {
-  if (!isParameterComponentRef(parameterOrComponentRef)) {
-    return parameterOrComponentRef;
-  }
-  const componentParameter = codeGenerator.findComponentParameterByRef(
-    parameterOrComponentRef.$ref
-  );
-  if (!componentParameter) {
-    throw new Error(
-      `could not find schema for component with ref "${parameterOrComponentRef.$ref}"`
-    );
-  }
-  if (isParameterComponentRef(componentParameter)) {
-    return getConcreteParameter(componentParameter, codeGenerator);
-  }
-  return componentParameter;
-}
 
 export function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);

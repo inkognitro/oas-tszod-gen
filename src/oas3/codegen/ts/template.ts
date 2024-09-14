@@ -155,13 +155,13 @@ export const templateResponseType: TemplateDefinitionOutput = {
     return genericCodeParts.join(',\n');
   },
   createCode: () => {
-    return `extends ${templateResponsePayloadType.createName(
+    return `extends ${templateResponseTemplateType.createName(
       templateResponseTypePath
     )}<ContentType, B, H, C> {\nstatus: S;\n}`;
   },
   getRequiredOutputPaths: () => [
     templateHeadersType.path,
-    templateResponsePayloadType.path,
+    templateResponseTemplateType.path,
     templateResponseBodyType.path,
     templateResponseSetCookiesType.path,
   ],
@@ -275,13 +275,13 @@ const templateResponseBodyType: TemplateDefinitionOutput = {
   getRequiredOutputPaths: () => [],
 };
 
-const templateResponsePayloadTypePath = ['core', 'core', 'responsePayload'];
-export const templateResponsePayloadType: TemplateDefinitionOutput = {
+const templateResponseTemplateTypePath = ['core', 'core', 'responseTemplate'];
+export const templateResponseTemplateType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'type',
-  path: templateResponsePayloadTypePath,
+  path: templateResponseTemplateTypePath,
   createName: () => {
-    return 'ResponsePayload';
+    return 'ResponseTemplate';
   },
   createGenericsDeclarationCode: () => {
     const codeParts: string[] = [
@@ -305,6 +305,45 @@ export const templateResponsePayloadType: TemplateDefinitionOutput = {
     templateResponseBodyType.path,
     templateHeadersType.path,
     templateResponseSetCookiesType.path,
+  ],
+};
+
+const templateResponseFromTemplateTypePath = [
+  'core',
+  'core',
+  'responseFromTemplate',
+];
+export const templateResponseFromTemplateType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: templateResponseTemplateTypePath,
+  createName: () => {
+    return 'ResponseFromTemplate';
+  },
+  createGenericsDeclarationCode: () => {
+    const codeParts: string[] = [
+      'S extends number = any',
+      `T extends ${templateResponseTemplateType.createName(
+        templateResponseFromTemplateTypePath
+      )} = any`,
+    ];
+    return `${codeParts.join(',\n')}`;
+  },
+  createCode: () => {
+    const codeParts: string[] = [
+      'S',
+      "T['contentType']",
+      "Awaited<ReturnType<T['revealBody']>>",
+      "T['headers']",
+      "T['cookies']",
+    ];
+    return `${templateResponseType.createName(
+      templateResponseFromTemplateTypePath
+    )}<\n${codeParts.join(',\n')}\n>`;
+  },
+  getRequiredOutputPaths: () => [
+    templateResponseType.path,
+    templateResponseTemplateType.path,
   ],
 };
 
@@ -637,7 +676,8 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateResponseSchemaType,
   templateResponseSetCookiesType,
   templateResponseBodyType,
-  templateResponsePayloadType,
+  templateResponseTemplateType,
+  templateResponseFromTemplateType,
   templateResponseType,
   templateRequestResultType,
   templateRequestExecutionConfigType,
