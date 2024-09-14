@@ -82,7 +82,7 @@ export const templateRequestType: TemplateDefinitionOutput = {
       )};`,
       'pathParams: P;',
       'queryParams: Q;',
-      'contentType: string | null; // case-sensitive, according to oas3 specs; used for the "content-type" header by default',
+      'contentType: string | null; // case-sensitive, according to oas3 specs; used as default "content-type" request header',
       'body: B;',
       `schema: ${templateRequestSchemaType.createName(
         templateRequestTypePath
@@ -278,7 +278,7 @@ export const templateResponseBodyDataType: TemplateDefinitionOutput = {
   },
   createCode: () => {
     const codeParts: string[] = [
-      'contentType: ContentType | null; // case-sensitive, according to oas3 specs; NULL if real "content-type" is not defined in specs',
+      'contentType: ContentType | null; // case-sensitive, according to oas3 specs; NULL if the real "content-type" response header is not defined in specs (case-insensitive check)',
       'revealBody: () => Promise<B>;',
     ];
     return `{\n${codeParts.join('\n')}\n}`;
