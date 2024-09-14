@@ -7,6 +7,7 @@ import {
 import {CodeGenerator, OutputPath} from '@oas3/codegen/ts/core';
 import {GenerateConfig} from '@oas3/codegen/ts/generator';
 
+// todo: use or remove
 function createObjectSchemaForHeadersZodSchema(
   headersSchema: ResponseHeaderByNameMap
 ): ObjectSchema {
@@ -29,4 +30,6 @@ export function addZodResponseOutputs(
   path: OutputPath,
   config: GenerateConfig,
   preventFromAddingComponentRefs: string[] = []
-) {}
+) {
+  // todo: implement
+}
