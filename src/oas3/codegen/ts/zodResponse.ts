@@ -1,8 +1,11 @@
 import {
   ObjectSchema,
   ObjectSchemaProperties,
+  Response,
   ResponseHeaderByNameMap,
 } from '@oas3/specification';
+import {CodeGenerator, OutputPath} from '@oas3/codegen/ts/core';
+import {GenerateConfig} from '@oas3/codegen/ts/generator';
 
 function createObjectSchemaForHeadersZodSchema(
   headersSchema: ResponseHeaderByNameMap
@@ -19,3 +22,11 @@ function createObjectSchemaForHeadersZodSchema(
     required: requiredProps,
   };
 }
+
+export function addZodResponseOutputs(
+  generator: CodeGenerator,
+  response: Response,
+  path: OutputPath,
+  config: GenerateConfig,
+  preventFromAddingComponentRefs: string[] = []
+) {}

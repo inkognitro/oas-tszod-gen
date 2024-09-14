@@ -39,6 +39,8 @@ import {
   findComponentResponseByRef,
   findComponentSchemaByRef,
 } from '@oas3/specification/util';
+import {applyResponse} from '@oas3/codegen/ts/response';
+import {addZodResponseOutputs} from '@oas3/codegen/ts/zodResponse';
 
 const fs = require('fs');
 const path = require('path');
@@ -438,8 +440,8 @@ export class DefaultCodeGenerator implements CodeGenerator {
     if (this.findOutputByOutputPath(outputPath)) {
       return;
     }
-    const schema = findComponentResponseByRef(this.oas3Specs, componentRef);
-    if (!schema) {
+    const response = findComponentResponseByRef(this.oas3Specs, componentRef);
+    if (!response) {
       const output: DefinitionOutput = {
         type: OutputType.DEFINITION,
         definitionType: 'type',
@@ -454,7 +456,21 @@ export class DefaultCodeGenerator implements CodeGenerator {
       this.addOutput(output, config);
       return;
     }
-    // todo: implement
+    const output: DefinitionOutput = {
+      type: OutputType.DEFINITION,
+      ...applyResponse(this, response, outputPath, config, [componentRef]),
+      definitionType: 'type',
+      createName: referencingPath =>
+        this.createComponentTypeName(componentRef, referencingPath),
+    };
+    this.addOutput(output, config);
+    if (config.withZod) {
+      const outputPathZodSchema =
+        this.createOutputPathByComponentRefForZodSchema(componentRef);
+      addZodResponseOutputs(this, response, outputPathZodSchema, config, [
+        componentRef,
+      ]);
+    }
   }
 
   private addOutputByParameterComponentRef(

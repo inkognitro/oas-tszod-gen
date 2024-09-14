@@ -155,13 +155,13 @@ export const templateResponseType: TemplateDefinitionOutput = {
     return genericCodeParts.join(',\n');
   },
   createCode: () => {
-    return `extends ${templateResponseTemplateType.createName(
+    return `extends ${templateResponseDataType.createName(
       templateResponseTypePath
     )}<ContentType, B, H, C> {\nstatus: S;\n}`;
   },
   getRequiredOutputPaths: () => [
     templateHeadersType.path,
-    templateResponseTemplateType.path,
+    templateResponseDataType.path,
     templateResponseBodyType.path,
     templateResponseSetCookiesType.path,
   ],
@@ -275,75 +275,57 @@ const templateResponseBodyType: TemplateDefinitionOutput = {
   getRequiredOutputPaths: () => [],
 };
 
-const templateResponseTemplateTypePath = ['core', 'core', 'responseTemplate'];
-export const templateResponseTemplateType: TemplateDefinitionOutput = {
+const templateResponseBodyDataTypePath = ['core', 'core', 'responseBodyData'];
+export const templateResponseBodyDataType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'type',
-  path: templateResponseTemplateTypePath,
+  path: templateResponseBodyDataTypePath,
   createName: () => {
-    return 'ResponseTemplate';
+    return 'ResponseBodyData';
   },
   createGenericsDeclarationCode: () => {
     const codeParts: string[] = [
       'ContentType extends string = any',
       'B extends ResponseBody = any',
+    ];
+    return `${codeParts.join(',\n')}`;
+  },
+  createCode: () => {
+    const codeParts: string[] = [
+      'contentType: ContentType | null; // case-sensitive, according to oas3 specs; NULL if real content type is not defined in specs',
+      'revealBody: () => Promise<B>;',
+    ];
+    return `{\n${codeParts.join('\n')}\n}`;
+  },
+  getRequiredOutputPaths: () => [templateResponseBodyType.path],
+};
+
+const templateResponseDataTypePath = ['core', 'core', 'responseData'];
+export const templateResponseDataType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: templateResponseDataTypePath,
+  createName: () => {
+    return 'ResponseData';
+  },
+  createGenericsDeclarationCode: () => {
+    const codeParts: string[] = [
+      `B extends ${templateResponseBodyDataType.createName(
+        templateResponseDataTypePath
+      )} = any`,
       'H extends Headers = any',
       'C extends ResponseSetCookies = any',
     ];
     return `${codeParts.join(',\n')}`;
   },
   createCode: () => {
-    const codeParts: string[] = [
-      'contentType: ContentType | null; // case-sensitive, according to oas3 specs; NULL if not defined in specs',
-      'headers: H;',
-      'cookies: C;',
-      'revealBody: () => Promise<B>;',
-    ];
-    return `{\n${codeParts.join('\n')}\n}`;
+    const codeParts: string[] = ['headers: H;', 'cookies: C;'];
+    return `B & {\n${codeParts.join('\n')}\n}`;
   },
   getRequiredOutputPaths: () => [
-    templateResponseBodyType.path,
+    templateResponseBodyDataType.path,
     templateHeadersType.path,
     templateResponseSetCookiesType.path,
-  ],
-};
-
-const templateResponseFromTemplateTypePath = [
-  'core',
-  'core',
-  'responseFromTemplate',
-];
-export const templateResponseFromTemplateType: TemplateDefinitionOutput = {
-  type: OutputType.TEMPLATE_DEFINITION,
-  definitionType: 'type',
-  path: templateResponseTemplateTypePath,
-  createName: () => {
-    return 'ResponseFromTemplate';
-  },
-  createGenericsDeclarationCode: () => {
-    const codeParts: string[] = [
-      'S extends number = any',
-      `T extends ${templateResponseTemplateType.createName(
-        templateResponseFromTemplateTypePath
-      )} = any`,
-    ];
-    return `${codeParts.join(',\n')}`;
-  },
-  createCode: () => {
-    const codeParts: string[] = [
-      'S',
-      "T['contentType']",
-      "Awaited<ReturnType<T['revealBody']>>",
-      "T['headers']",
-      "T['cookies']",
-    ];
-    return `${templateResponseType.createName(
-      templateResponseFromTemplateTypePath
-    )}<\n${codeParts.join(',\n')}\n>`;
-  },
-  getRequiredOutputPaths: () => [
-    templateResponseType.path,
-    templateResponseTemplateType.path,
   ],
 };
 
@@ -676,8 +658,8 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateResponseSchemaType,
   templateResponseSetCookiesType,
   templateResponseBodyType,
-  templateResponseTemplateType,
-  templateResponseFromTemplateType,
+  templateResponseBodyDataType,
+  templateResponseDataType,
   templateResponseType,
   templateRequestResultType,
   templateRequestExecutionConfigType,
