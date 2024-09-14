@@ -1,5 +1,43 @@
 import {ZodSchema} from 'zod';
 
+export type Headers = {
+  [headerName: string]: string;
+};
+
+export type PathParams = {
+  [paramName: string]: number | string;
+};
+
+export type QueryParams = {
+  [paramName: string]: QueryParams | QueryParams[] | string | number | boolean;
+};
+
+export type RequestCookies = {
+  [cookieName: string]: string;
+};
+
+export type RequestBody = Blob | FormData | JsonValue | string;
+
+export type JsonValue =
+  | null
+  | string
+  | number
+  | boolean
+  | {[propName: string]: JsonValue}
+  | JsonValue[];
+
+export type RequestCreationSettings = {
+  endpointId: EndpointId;
+  supportedSecuritySchemes?: SecurityScheme[];
+  headers?: Headers;
+  cookies?: RequestCookies;
+  pathParams?: PathParams;
+  queryParams?: QueryParams;
+  contentType: string | null;
+  body?: RequestBody;
+  schema: RequestSchema;
+};
+
 export function createRequestUrl(
   endpointPath: string,
   params: PathParams
@@ -28,8 +66,9 @@ export function createRequestUrl(
   return url;
 }
 
-export type PathParams = {
-  [paramName: string]: number | string;
+export type EndpointId = {
+  method: string;
+  path: string;
 };
 
 export type SecurityScheme = {
@@ -37,43 +76,17 @@ export type SecurityScheme = {
   requiredPermissions: string[];
 };
 
-export type Headers = {
-  [headerName: string]: string;
-};
-
-export type RequestCookies = {
-  [cookieName: string]: string;
-};
-
-export type ResponseSetCookies = {
-  [cookieName: string]: string;
-};
-
-export type EndpointId = {
-  method: string;
-  path: string;
-};
-
-export type QueryParams = {
-  [propertyName: string]:
-    | QueryParams
-    | string
-    | string[]
-    | number
-    | number[]
-    | boolean;
-};
-
-export type RequestCreationSettings = {
-  endpointId: EndpointId;
-  supportedSecuritySchemes?: SecurityScheme[];
-  headers?: Headers;
-  cookies?: RequestCookies;
-  pathParams?: PathParams;
-  queryParams?: QueryParams;
-  contentType: string | null;
-  body?: RequestBody;
-  schema: RequestSchema;
+export type RequestSchema = {
+  status: number | 'any'; // "any" is used for unexpected status codes
+  bodyVariants: {
+    contentType: string; // case-sensitive, according to oas3 specs
+    zodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  }[];
+  headersZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  cookiesZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  pathParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  queryParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  responses: ResponseSchema[];
 };
 
 export function createRequest(settings: RequestCreationSettings): Request {
@@ -98,29 +111,6 @@ export function createRequest(settings: RequestCreationSettings): Request {
   };
 }
 
-export type ResponseSchema = {
-  status: number | 'any'; // "any" is used for unexpected status codes
-  headersZodSchema?: ZodSchema; // only available with "withZod: true"
-  bodyVariants: {
-    contentType: string;
-    zodSchema?: ZodSchema; // only available with "withZod: true"
-  }[];
-};
-
-type RequestSchema = {
-  headersZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  cookiesZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  pathParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  queryParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  bodyVariants: {
-    contentType: string; // case-sensitive, according to oas3 specs
-    zodSchema?: ZodSchema; // only available with "withZod: true"
-  }[];
-  responses: ResponseSchema[];
-};
-
-export type RequestBody = Blob | FormData | JsonValue | string;
-
 export type Request<
   P extends PathParams | undefined = any,
   Q extends QueryParams | undefined = any,
@@ -134,26 +124,31 @@ export type Request<
   cookies?: RequestCookies;
   pathParams: P;
   queryParams: Q;
-  contentType: string | null; // case-sensitive, according to oas3 specs, used for the "content-type" header by default
+  contentType: string | null; // case-sensitive, according to oas3 specs; used as default "content-type" request header
   body: B;
   schema: RequestSchema;
 };
 
-export type JsonValue =
-  | null
-  | string
-  | number
-  | boolean
-  | {[propName: string]: JsonValue}
-  | JsonValue[];
+export type ResponseSchema = {
+  status: number | 'any'; // "any" is used for unexpected status codes
+  bodyVariants: {
+    contentType: string; // case-sensitive, according to oas3 specs
+    zodSchema?: ZodSchema;
+  }[];
+  headersZodSchema?: ZodSchema;
+};
 
-export type ResponseBody = Blob | FormData | JsonValue | string; // ArrayBuffer is ignored because it can be created from Blob
+export type ResponseSetCookies = {
+  [cookieName: string]: string; // string format: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
+};
+
+export type ResponseBody = Blob | FormData | JsonValue | string;
 
 export type ResponseBodyData<
   ContentType extends string = any,
   B extends ResponseBody = any,
 > = {
-  contentType: ContentType | null; // case-sensitive, according to oas3 specs; NULL if real content type is not defined in specs
+  contentType: ContentType | null; // case-sensitive, according to oas3 specs; NULL if the real "content-type" response header is not defined in specs (case-insensitive check)
   revealBody: () => Promise<B>;
 };
 
@@ -180,16 +175,15 @@ export interface RequestResult<
   request: Req;
   response: null | Res;
   hasRequestBeenCancelled: boolean;
-  error?: Error; // must only be set when the Promise<RequestResult> was rejected
+  error?: Error; // must only be set when the RequestResult Promise was rejected
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface RequestHandlerExecutionConfig {}
+export interface RequestExecutionConfig {}
 
 export interface RequestHandler {
   execute(
     request: Request,
-    config?: RequestHandlerExecutionConfig
+    config?: RequestExecutionConfig
   ): Promise<RequestResult>;
   cancelRequestById(requestId: string): void;
   cancelAllRequests(): void;
