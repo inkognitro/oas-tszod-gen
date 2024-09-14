@@ -26,7 +26,7 @@ export function applyEndpointResponse(
   config: GenerateConfig
 ): DefinitionOutput {
   const responseOutputs: CodeGenerationOutput[] = [];
-  for (const statusCodeStr in schema.responses) {
+  for (const statusCodeStr in schema) {
     const statusInCode = findNumericStatusCode(statusCodeStr) ?? 'any';
     const responseSchema = schema[statusCodeStr];
     const responseOutputPath: OutputPath = [...path, statusCodeStr];
@@ -57,11 +57,13 @@ export function applyEndpointResponse(
     path,
     createName: referencingPath =>
       codeGenerator.createTypeName(path, referencingPath),
-    createCode: () => {
+    createCode: referencingPath => {
       if (!responseOutputs.length) {
-        return templateResponseType.createName(path);
+        return templateResponseType.createName(referencingPath);
       }
-      return responseOutputs.join(' | ');
+      return responseOutputs
+        .map(o => o.createCode(referencingPath))
+        .join(' | ');
     },
     getRequiredOutputPaths: () => {
       const outputPaths: OutputPath[] = [];

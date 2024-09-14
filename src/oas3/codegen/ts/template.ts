@@ -278,7 +278,7 @@ export const templateResponseBodyDataType: TemplateDefinitionOutput = {
   },
   createCode: () => {
     const codeParts: string[] = [
-      'contentType: ContentType | null; // case-sensitive, according to oas3 specs; NULL if real content type is not defined in specs',
+      'contentType: ContentType | null; // case-sensitive, according to oas3 specs; NULL if real "content-type" is not defined in specs',
       'revealBody: () => Promise<B>;',
     ];
     return `{\n${codeParts.join('\n')}\n}`;
