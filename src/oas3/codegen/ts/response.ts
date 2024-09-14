@@ -14,14 +14,15 @@ import {
   CodeGenerationOutput,
   CodeGenerator,
   ComponentRefOutput,
+  containsOutputPath,
   OutputPath,
   OutputType,
 } from './core';
 import {GenerateConfig} from './generator';
 import {applyObjectSchema, applySchema} from '@oas3/codegen/ts/schema';
 import {
+  templateResponseBodyDataType,
   templateResponseDataType,
-  templateResponseType,
 } from '@oas3/codegen/ts/template';
 import {findConcreteSchema} from '@oas3/specification/util';
 
@@ -119,35 +120,43 @@ function applyConcreteResponse(
   return {
     path,
     createCode: () => {
-      if (!bodyResults.length) {
+      const responseBodyCodeParts: string[] = bodyResults.map(bodyResult => {
+        return `${templateResponseBodyDataType.createName(path)}<'${
+          bodyResult.contentType
+        }', ${bodyResult.codeOutput.createCode(path)}>`;
+      });
+      if (!bodyResults.length && !headersCodeOutput) {
         return 'any';
       }
-      const headersCodePart: string = headersCodeOutput
-        ? `, ${headersCodeOutput.createCode(path)}`
-        : '';
-      const responseDefinitionCodeParts: string[] = bodyResults.map(
-        bodyResult => {
-          return `${templateResponseDataType.createName(path)}<'${
-            bodyResult.contentType
-          }',${bodyResult.codeOutput.createCode(path)}${headersCodePart}>`;
-        }
-      );
-      return `${responseDefinitionCodeParts.join(' | ')}`;
+      const codeParts: string[] = [
+        !bodyResults.length ? 'any' : `${responseBodyCodeParts.join(' | ')}`,
+      ];
+      if (headersCodeOutput) {
+        codeParts.push(headersCodeOutput.createCode(path));
+      }
+      return `${templateResponseDataType.createName(path)}<${codeParts.join(
+        ', '
+      )}>`;
     },
     getRequiredOutputPaths: () => {
-      const outputPaths: OutputPath[] = bodyResults.reduce<OutputPath[]>(
-        (current, bodyResult) => {
-          const next = [...current];
-          bodyResult.codeOutput.getRequiredOutputPaths().forEach(path => {
-            if (!current.includes(path)) {
-              next.push(path);
-            }
-          });
-          return next;
-        },
-        []
-      );
-      return [...outputPaths, templateResponseType.path];
+      const outputPaths: OutputPath[] = [];
+      headersCodeOutput?.getRequiredOutputPaths().forEach(path => {
+        if (!containsOutputPath(outputPaths, path)) {
+          outputPaths.push(path);
+        }
+      });
+      bodyResults.forEach(r => {
+        r.codeOutput.getRequiredOutputPaths().forEach(path => {
+          if (!containsOutputPath(outputPaths, path)) {
+            outputPaths.push(path);
+          }
+        });
+      });
+      return [
+        ...outputPaths,
+        templateResponseBodyDataType.path,
+        templateResponseDataType.path,
+      ];
     },
   };
 }
