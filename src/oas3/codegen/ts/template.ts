@@ -133,7 +133,7 @@ const templateJsonValueType: TemplateDefinitionOutput = {
 const templateResponseTypePath = ['core', 'core', 'response'];
 export const templateResponseType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
-  definitionType: 'interface',
+  definitionType: 'type',
   path: templateResponseTypePath,
   createName: () => {
     return 'Response';
@@ -141,30 +141,16 @@ export const templateResponseType: TemplateDefinitionOutput = {
   createGenericsDeclarationCode: () => {
     const genericCodeParts: string[] = [
       'S extends number = any',
-      'ContentType extends string = any',
-      `B extends ${templateResponseBodyType.createName(
-        templateResponseTypePath
-      )} = any`,
-      `H extends ${templateHeadersType.createName(
-        templateResponseTypePath
-      )} = any`,
-      `C extends ${templateResponseSetCookiesType.createName(
+      `D extends ${templateResponseDataType.createName(
         templateResponseTypePath
       )} = any`,
     ];
     return genericCodeParts.join(',\n');
   },
   createCode: () => {
-    return `extends ${templateResponseDataType.createName(
-      templateResponseTypePath
-    )}<ContentType, B, H, C> {\nstatus: S;\n}`;
+    return 'D & {\nstatus: S;\n}';
   },
-  getRequiredOutputPaths: () => [
-    templateHeadersType.path,
-    templateResponseDataType.path,
-    templateResponseBodyType.path,
-    templateResponseSetCookiesType.path,
-  ],
+  getRequiredOutputPaths: () => [templateResponseDataType.path],
 };
 
 const templateRequestResultTypePath = ['core', 'core', 'requestResult'];

@@ -16,14 +16,14 @@ import {
 } from './core';
 import {
   isSpecification,
-  Parameter,
   parameterComponentRefPrefix,
   RequestByMethodMap,
   responseComponentRefPrefix,
-  Schema,
   schemaComponentRefPrefix,
   Specification,
-  Response,
+  findComponentParameterByRef,
+  findComponentResponseByRef,
+  findComponentSchemaByRef,
 } from '@oas3/specification';
 import {
   applyEndpointCallerFunction,
@@ -33,14 +33,9 @@ import {
 import {mkdirp} from 'mkdirp';
 import {templateDefinitionOutputs, templateZOfZodLibrary} from './template';
 import {applySchema} from './schema';
-import {applyZodSchema} from '@oas3/codegen/ts/zodSchema';
-import {
-  findComponentParameterByRef,
-  findComponentResponseByRef,
-  findComponentSchemaByRef,
-} from '@oas3/specification/util';
-import {applyResponse} from '@oas3/codegen/ts/response';
-import {addZodResponseOutputs} from '@oas3/codegen/ts/zodResponse';
+import {applyZodSchema} from './zodSchema';
+import {applyResponse} from './response';
+import {addZodResponseOutputs} from './zodResponse';
 
 const fs = require('fs');
 const path = require('path');
@@ -971,7 +966,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       case 500:
         return 'InternalServerError';
       default:
-        throw new Error(`case for statusCode ${statusCode} is not supported`);
+        return `${statusCode}`;
     }
   }
 
@@ -1017,7 +1012,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       const statusCodeIndex = responseOutputPathPartIndex + 1;
       const statusCode = parseInt(parts[statusCodeIndex]);
       const statusCodeOutputPathPart = isNaN(statusCode)
-        ? 'any'
+        ? `${statusCode}`
         : this.createResponseStatusCodeName(statusCode);
       parts = [
         ...parts.slice(0, statusCodeIndex),

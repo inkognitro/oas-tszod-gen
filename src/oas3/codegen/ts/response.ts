@@ -9,6 +9,7 @@ import {
   Response,
   isResponseComponentRef,
   isConcreteResponse,
+  findConcreteSchema,
 } from '@oas3/specification';
 import {
   CodeGenerationOutput,
@@ -24,7 +25,7 @@ import {
   templateResponseBodyDataType,
   templateResponseDataType,
 } from '@oas3/codegen/ts/template';
-import {findConcreteSchema} from '@oas3/specification/util';
+import {applyNullableFormDataDefinition} from '@oas3/codegen/ts/formData';
 
 function createHeadersObjectSchema(
   codeGenerator: CodeGenerator,
@@ -76,16 +77,35 @@ function applyResponseBodyContent(
   path: OutputPath,
   config: GenerateConfig
 ): ApplyResponseBodyResult {
-  // todo: generate FormData type in case of "multipart/form-data"
-  const typeCodeOutput: CodeGenerationOutput = applySchema(
-    codeGenerator,
-    contentSchema.schema,
-    path,
-    config
-  );
+  if (contentType.toLowerCase() === 'multipart/form-data') {
+    const typedFormData = applyNullableFormDataDefinition(
+      codeGenerator,
+      contentSchema.schema,
+      path,
+      config
+    );
+    return {
+      contentType,
+      codeOutput: {
+        path,
+        createCode: referencingPath => {
+          if (typedFormData) {
+            return typedFormData.createName(referencingPath);
+          }
+          return 'FormData';
+        },
+        getRequiredOutputPaths: () => {
+          if (typedFormData) {
+            return [typedFormData.path];
+          }
+          return [];
+        },
+      },
+    };
+  }
   return {
     contentType,
-    codeOutput: typeCodeOutput,
+    codeOutput: applySchema(codeGenerator, contentSchema.schema, path, config),
   };
 }
 

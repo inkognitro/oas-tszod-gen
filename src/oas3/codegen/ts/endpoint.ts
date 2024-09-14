@@ -7,8 +7,6 @@ import {
 } from './core';
 import {
   ConcreteParameterLocation,
-  isObjectSchema,
-  isStringSchema,
   ObjectSchema,
   ObjectSchemaProperties,
   Parameter,
@@ -16,8 +14,8 @@ import {
   Request,
   RequestBodyContentByTypeMap,
   Schema,
+  findConcreteParameter,
 } from '@oas3/specification';
-import {applyResponseByStatusCodeMap} from './endpointResponseOld';
 import {
   templateCreateRequestFunction,
   templateRequestExecutionConfigType,
@@ -26,9 +24,10 @@ import {
   templateRequestType,
 } from './template';
 import {GenerateConfig} from './generator';
-import {applyZodSchema} from '@oas3/codegen/ts/zodSchema';
-import {applyObjectSchema} from '@oas3/codegen/ts/schema';
-import {findConcreteParameter} from '@oas3/specification/util';
+import {applyZodSchema} from './zodSchema';
+import {applyObjectSchema} from './schema';
+import {applyEndpointResponse} from './endpointResponse';
+import {applyNullableFormDataDefinition} from './formData';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -38,13 +37,13 @@ type EndpointId = {
   path: string;
 };
 
-function applyRequestResultTypeDefinition(
+function applyRequestResult(
   codeGenerator: CodeGenerator,
   schema: Request,
   path: OutputPath,
   config: GenerateConfig
 ): DefinitionOutput {
-  const responseType = applyResponseByStatusCodeMap(
+  const endpointResponseDefinition = applyEndpointResponse(
     codeGenerator,
     schema.responses,
     [...path, responseOutputPathPart],
@@ -57,7 +56,7 @@ function applyRequestResultTypeDefinition(
     createCode: () => {
       const requestResultTypeName = templateRequestResultType.createName(path);
       const requestTypeName = templateRequestType.createName(path);
-      const responseTypeName = responseType.createName(path);
+      const responseTypeName = endpointResponseDefinition.createName(path);
       return `${requestResultTypeName}<${requestTypeName}, ${responseTypeName}>`;
     },
     createName: referencingPath => {
@@ -65,7 +64,7 @@ function applyRequestResultTypeDefinition(
     },
     getRequiredOutputPaths: () => [
       templateRequestResultType.path,
-      responseType.path,
+      endpointResponseDefinition.path,
     ],
   };
   codeGenerator.addOutput(typeDefinition, config);
@@ -237,64 +236,6 @@ function findRequestBodyContentSettings(
     contentType,
     schema: requestBodySchema ?? null,
   };
-}
-
-function applyNullableFormDataDefinition(
-  codeGenerator: CodeGenerator,
-  schema: Schema,
-  path: OutputPath,
-  config: GenerateConfig
-): null | AnyDefinitionOutput {
-  if (!isObjectSchema(schema)) {
-    return null;
-  }
-  const schemaProps: ObjectSchemaProperties | undefined = schema.properties;
-  if (!schemaProps) {
-    return null;
-  }
-  const stringFieldNames: string[] = [];
-  const binaryFieldNames: string[] = [];
-  for (const propName in schemaProps) {
-    const propSchema = schemaProps[propName];
-    if (isStringSchema(propSchema) && propSchema.format === 'binary') {
-      binaryFieldNames.push(propName);
-      continue;
-    }
-    stringFieldNames.push(propName);
-  }
-  const output: AnyDefinitionOutput = {
-    type: OutputType.DEFINITION,
-    definitionType: 'interface',
-    path,
-    createCode: () => {
-      const codeParts: string[] = [];
-      stringFieldNames.forEach(fieldName => {
-        codeParts.push(`append(name: '${fieldName}', value: string): void;`);
-      });
-      binaryFieldNames.forEach(fieldName => {
-        codeParts.push(
-          `append(name: '${fieldName}', value: Blob, fileName?: string): void;`
-        );
-      });
-      if (!stringFieldNames.length) {
-        codeParts.push('append(name: string, value: string): void;');
-      }
-      if (!binaryFieldNames.length) {
-        codeParts.push(
-          'append(name: string, value: Blob, fileName?: string): void;'
-        );
-      }
-      return `extends FormData {\n${codeParts.join('\n')}\n}`;
-    },
-    createName: referencingPath => {
-      return codeGenerator.createTypeName(path, referencingPath);
-    },
-    getRequiredOutputPaths: () => {
-      return [];
-    },
-  };
-  codeGenerator.addOutput(output, config);
-  return output;
 }
 
 function createOas3ObjectSchemaWithoutProperty(
@@ -632,7 +573,7 @@ export function applyEndpointCallerFunction(
     [...path, 'payload'],
     config
   );
-  const requestResultTypeDefinition = applyRequestResultTypeDefinition(
+  const requestResultTypeDefinition = applyRequestResult(
     codeGenerator,
     requestSchema,
     [...path, requestResultOutputPathPart],
