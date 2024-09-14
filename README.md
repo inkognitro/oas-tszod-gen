@@ -22,7 +22,7 @@ through different `RequestHandler` implementations
 > :bulb:
 > [Axios](https://axios-http.com/docs/intro) is great. It offers a lot and it works with
 > [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API) under the hood.
-> One might have PWAs and [service workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
+> But one might have PWAs and [service workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
 > in mind where XMLHttpRequest is out of scope.
 > Others just want to use `fetch` for backend stuff in their [NextJs](https://nextjs.org/docs/app/api-reference/functions/fetch)
 > app to benefit from automatic caching. There are lots of articles out there which discuss things like
