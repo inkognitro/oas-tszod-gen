@@ -1,5 +1,5 @@
 export * from './specification';
-export * from './request';
+export * from './endpoint';
 export * from './response';
 export * from './componentRef';
 export * from './schema';

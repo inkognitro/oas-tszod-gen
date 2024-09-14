@@ -62,7 +62,7 @@ export function isRequestBodyContent(
 }
 
 export type RequestBodyContentByTypeMap = {
-  [contentType: 'application/json' | string]: RequestBodyContent;
+  [contentType: string]: RequestBodyContent;
 };
 
 export function isRequestBodyContentByTypeMap(
@@ -82,9 +82,7 @@ export function isRequestBodyContentByTypeMap(
 }
 
 export type RequestBody = {
-  content?: {
-    [contentType: 'application/json' | string]: RequestBodyContent;
-  };
+  content?: RequestBodyContentByTypeMap;
 };
 
 export function isRequestBody(anyValue: unknown): anyValue is RequestBody {
@@ -144,7 +142,7 @@ export function isParameter(anyValue: unknown): anyValue is Parameter {
   return isConcreteParameter(anyValue) || isParameterComponentRef(anyValue);
 }
 
-export type Request = {
+export type Endpoint = {
   operationId: string;
   tags: string[];
   parameters?: Parameter[];
@@ -154,8 +152,8 @@ export type Request = {
   security?: null | PermissionsBySecurityNameArray;
 };
 
-export function isRequest(anyValue: unknown): anyValue is Request {
-  const value = anyValue as Request;
+export function isEndpoint(anyValue: unknown): anyValue is Endpoint {
+  const value = anyValue as Endpoint;
   if (typeof value !== 'object' || Array.isArray(value)) {
     return false;
   }

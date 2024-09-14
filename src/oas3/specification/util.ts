@@ -7,7 +7,7 @@ import {
   schemaComponentRefPrefix,
 } from './componentRef';
 import {ConcreteSchema, isConcreteSchema, Schema} from './schema';
-import {ConcreteParameter, isConcreteParameter, Parameter} from './request';
+import {ConcreteParameter, isConcreteParameter, Parameter} from './endpoint';
 import {ConcreteResponse, isConcreteResponse, Response} from './response';
 import {Specification} from './specification';
 

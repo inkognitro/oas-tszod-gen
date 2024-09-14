@@ -1,10 +1,10 @@
 import {isConcreteResponse, ConcreteResponse} from './response';
 import {isSchema, Schema} from './schema';
 import {isSecurityScheme, SecurityScheme} from './security';
-import {isParameter, isRequest, Parameter, Request} from './request';
+import {isParameter, isEndpoint, Parameter, Endpoint} from './endpoint';
 
 export type RequestByMethodMap = {
-  [requestMethod: string]: Request;
+  [requestMethod: string]: Endpoint;
 };
 
 function isRequestByMethodMap(
@@ -16,7 +16,7 @@ function isRequestByMethodMap(
   }
   for (const requestMethod in value) {
     const request = value[requestMethod];
-    if (!isRequest(request)) {
+    if (!isEndpoint(request)) {
       return false;
     }
   }
