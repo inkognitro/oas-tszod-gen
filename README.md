@@ -7,9 +7,10 @@ A code generator to convert [OpenApiV3](https://swagger.io/specification/) speci
 ## Why yet another library for this task?
 Before you consider using this library, I suggest having a look at [Zodios](https://www.zodios.org/)
 and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) first.
-This code generator serves as a standalone alternative to the two libraries.
-I coded my own solution because I wanted to:
-- have full ownership of my production code
+This code generator serves as a standalone alternative to the two libraries with the option to exchange Axios with Fetch
+under the hood, while using the same functions in your application. However, I coded my own solution because I wanted to:
+
+- have full ownership of my production code without any additional package dependency
 - have the possibility to go with other implementations under the hood than [Axios](https://axios-http.com/docs/intro)
   (e.g. with [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)) having a uniform adapter API
 - have generated [Zod](https://zod.dev) schemas as an opt-in possibility
