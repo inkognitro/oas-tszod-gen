@@ -20,7 +20,7 @@ I coded my own solution because I wanted to:
 through different `RequestHandler` implementations
 
 > :bulb:
-> [Axios](https://axios-http.com/docs/intro) is great, but it works with
+> [Axios](https://axios-http.com/docs/intro) is great. It offers a lot and it works with
 > [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API) under the hood.
 > One might have PWAs and [service workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
 > in mind where XMLHttpRequest is out of scope.
