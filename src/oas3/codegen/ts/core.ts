@@ -93,7 +93,7 @@ type GenericOutput<T extends OutputType, P extends object = {}> = P & {
 
 type DefinitionType = 'const' | 'function' | 'type' | 'interface';
 
-export type GeneratedDefinitionOutput = GenericOutput<
+export type DefinitionOutput = GenericOutput<
   OutputType.DEFINITION,
   {
     definitionType: DefinitionType;
@@ -117,9 +117,7 @@ export type TemplateDefinitionOutput = GenericOutput<
   }
 >;
 
-export type DefinitionOutput =
-  | TemplateDefinitionOutput
-  | GeneratedDefinitionOutput;
+export type AnyDefinitionOutput = TemplateDefinitionOutput | DefinitionOutput;
 
 export type ComponentRefOutput = GenericOutput<
   OutputType.COMPONENT_REF,
@@ -130,7 +128,7 @@ export type ComponentRefOutput = GenericOutput<
 >;
 
 export type Output =
-  | GeneratedDefinitionOutput
+  | DefinitionOutput
   | TemplateDefinitionOutput
   | ComponentRefOutput;
 

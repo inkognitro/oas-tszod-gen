@@ -3,9 +3,9 @@ import {
   arraySchemaItemOutputPathPart,
   capitalizeFirstLetter,
   CodeGenerator,
-  DefinitionOutput,
+  AnyDefinitionOutput,
   doesOutputPathStartWithOtherOutputPath,
-  GeneratedDefinitionOutput,
+  DefinitionOutput,
   lowerCaseFirstLetter,
   objectSchemaAdditionalPropsOutputPathPart,
   oneOfSchemaItemOutputPathPart,
@@ -83,7 +83,7 @@ type ImportAssetsByPath = {
 
 type FileOutput = {
   importAssetsByPath: ImportAssetsByPath;
-  definitions: DefinitionOutput[];
+  definitions: AnyDefinitionOutput[];
   exportPaths: string[];
 };
 
@@ -309,7 +309,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   private createDeclarationForGeneratedDefinitionOutput(
-    o: GeneratedDefinitionOutput
+    o: DefinitionOutput
   ): string {
     switch (o.definitionType) {
       case 'function':
@@ -442,7 +442,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     }
     const response = findComponentResponseByRef(this.oas3Specs, componentRef);
     if (!response) {
-      const output: DefinitionOutput = {
+      const output: AnyDefinitionOutput = {
         type: OutputType.DEFINITION,
         definitionType: 'type',
         createCode: () => {
@@ -456,7 +456,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       this.addOutput(output, config);
       return;
     }
-    const output: DefinitionOutput = {
+    const output: AnyDefinitionOutput = {
       type: OutputType.DEFINITION,
       ...applyResponse(this, response, outputPath, config, [componentRef]),
       definitionType: 'type',
@@ -483,7 +483,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     }
     const schema = findComponentParameterByRef(this.oas3Specs, componentRef);
     if (!schema) {
-      const output: DefinitionOutput = {
+      const output: AnyDefinitionOutput = {
         type: OutputType.DEFINITION,
         definitionType: 'type',
         createCode: () => {
@@ -512,7 +512,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     }
     const schema = findComponentSchemaByRef(this.oas3Specs, componentRef);
     if (!schema) {
-      const output: DefinitionOutput = {
+      const output: AnyDefinitionOutput = {
         type: OutputType.DEFINITION,
         definitionType: 'type',
         createCode: () => {
@@ -525,7 +525,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       };
       this.addOutput(output, config);
       if (config.withZod) {
-        const zodSchemaOutput: DefinitionOutput = {
+        const zodSchemaOutput: AnyDefinitionOutput = {
           type: OutputType.DEFINITION,
           definitionType: 'const',
           path: outputPathZodSchema,
@@ -540,7 +540,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       }
       return;
     }
-    const output: DefinitionOutput = {
+    const output: AnyDefinitionOutput = {
       type: OutputType.DEFINITION,
       ...applySchema(this, schema, outputPath, config, [componentRef]),
       definitionType: 'type',
@@ -549,7 +549,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     };
     this.addOutput(output, config);
     if (config.withZod) {
-      const zodSchemaOutput: DefinitionOutput = {
+      const zodSchemaOutput: AnyDefinitionOutput = {
         ...applyZodSchema(this, schema, outputPathZodSchema, config, [
           componentRef,
         ]),

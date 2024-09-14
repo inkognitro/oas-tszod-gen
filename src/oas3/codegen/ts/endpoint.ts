@@ -1,7 +1,7 @@
 import {
   CodeGenerator,
+  AnyDefinitionOutput,
   DefinitionOutput,
-  GeneratedDefinitionOutput,
   OutputPath,
   OutputType,
 } from './core';
@@ -17,7 +17,7 @@ import {
   RequestBodyContentByTypeMap,
   Schema,
 } from '@oas3/specification';
-import {applyResponseByStatusCodeMap} from './endpointResponse';
+import {applyResponseByStatusCodeMap} from './endpointResponseOld';
 import {
   templateCreateRequestFunction,
   templateRequestExecutionConfigType,
@@ -43,14 +43,14 @@ function applyRequestResultTypeDefinition(
   schema: Request,
   path: OutputPath,
   config: GenerateConfig
-): GeneratedDefinitionOutput {
+): DefinitionOutput {
   const responseType = applyResponseByStatusCodeMap(
     codeGenerator,
     schema.responses,
     [...path, responseOutputPathPart],
     config
   );
-  const typeDefinition: GeneratedDefinitionOutput = {
+  const typeDefinition: DefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'type',
     path,
@@ -244,7 +244,7 @@ function applyNullableFormDataDefinition(
   schema: Schema,
   path: OutputPath,
   config: GenerateConfig
-): null | DefinitionOutput {
+): null | AnyDefinitionOutput {
   if (!isObjectSchema(schema)) {
     return null;
   }
@@ -262,7 +262,7 @@ function applyNullableFormDataDefinition(
     }
     stringFieldNames.push(propName);
   }
-  const output: DefinitionOutput = {
+  const output: AnyDefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'interface',
     path,
@@ -324,10 +324,10 @@ function createOas3ObjectSchemaWithoutProperty(
 
 type AppliedPayloadOutputs = {
   objectSchema: ObjectSchema;
-  zodSchemaDefinition?: GeneratedDefinitionOutput;
-  typeDefinition: GeneratedDefinitionOutput;
+  zodSchemaDefinition?: DefinitionOutput;
+  typeDefinition: DefinitionOutput;
   bodyContentType: null | string;
-  bodyFormDataDefinition: null | DefinitionOutput;
+  bodyFormDataDefinition: null | AnyDefinitionOutput;
 };
 
 function applyPayloadIfRequired(
@@ -349,7 +349,7 @@ function applyPayloadIfRequired(
   }
   const oas3ObjectSchemaBodyProperty =
     payloadOas3ObjectSchema.properties?.['body'];
-  let requestBodyFormDataDefinition: null | DefinitionOutput = null;
+  let requestBodyFormDataDefinition: null | AnyDefinitionOutput = null;
   if (
     oas3ObjectSchemaBodyProperty &&
     requestBodyContentSettings?.contentType.toLowerCase() ===
@@ -362,8 +362,7 @@ function applyPayloadIfRequired(
       config
     );
   }
-  let payloadZodSchemaDefinition: undefined | GeneratedDefinitionOutput =
-    undefined;
+  let payloadZodSchemaDefinition: undefined | DefinitionOutput = undefined;
   if (config.withZod) {
     const zodPayloadSchemaPath: OutputPath = [...path, 'zodSchema'];
     payloadZodSchemaDefinition = {
@@ -397,7 +396,7 @@ function applyPayloadIfRequired(
     preventFromAddingComponentRefs,
     createAdditionalObjectPropertyCodeRows
   );
-  const payloadTypeDefinition: GeneratedDefinitionOutput = {
+  const payloadTypeDefinition: DefinitionOutput = {
     type: OutputType.DEFINITION,
     createName: referencingPath =>
       codeGenerator.createTypeName(path, referencingPath),
@@ -473,7 +472,7 @@ function createNullableSupportedSecuritySchemesCode(
 
 function createRequestCreationCode(
   path: OutputPath,
-  endpointIdDefinition: GeneratedDefinitionOutput,
+  endpointIdDefinition: DefinitionOutput,
   payloadUtils: null | AppliedPayloadOutputs,
   security?: null | PermissionsBySecurityNameArray
 ): string {
@@ -595,8 +594,8 @@ function applyEndpointIdConstDefinition(
   endpointId: EndpointId,
   path: OutputPath,
   config: GenerateConfig
-): GeneratedDefinitionOutput {
-  const definition: GeneratedDefinitionOutput = {
+): DefinitionOutput {
+  const definition: DefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'const',
     path,
