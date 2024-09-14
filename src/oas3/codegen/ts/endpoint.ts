@@ -13,6 +13,7 @@ import {
   PermissionsBySecurityNameArray,
   Endpoint,
   findConcreteParameter,
+  concreteParameterLocations,
 } from '@oas3/specification';
 import {
   templateCreateRequestFunction,
@@ -22,7 +23,6 @@ import {
   templateRequestType,
 } from './template';
 import {GenerateConfig} from './generator';
-import {applyZodSchema} from './zodSchema';
 import {applyObjectSchema} from './schema';
 import {applyEndpointResponse} from './endpointResponse';
 import {applyNullableRequestBodyTypeDefinition} from '@oas3/codegen/ts/endpointRequest';
@@ -69,10 +69,10 @@ function applyRequestResult(
   return typeDefinition;
 }
 
-function createNullableOas3ObjectSchemaFromLocationParameters(
+function createNullableObjectSchemaFromLocationParameters(
   codeGenerator: CodeGenerator,
   requestParameters: Parameter[],
-  parameterLocation: ConcreteParameterLocation
+  paramLocation: ConcreteParameterLocation
 ): null | ObjectSchema {
   const objectSchemaProps: ObjectSchemaProperties = {};
   const requiredObjectSchemaPropNames: string[] = [];
@@ -89,7 +89,7 @@ function createNullableOas3ObjectSchemaFromLocationParameters(
         )}`
       );
     }
-    if (p.in !== parameterLocation) {
+    if (p.in !== paramLocation) {
       return;
     }
     hasParametersForLocation = true;
@@ -108,97 +108,60 @@ function createNullableOas3ObjectSchemaFromLocationParameters(
   };
 }
 
-function createNullablePayloadOas3ObjectSchema(
+function findRequestParamsObjectSchema(
   codeGenerator: CodeGenerator,
   parameterSchemas: Parameter[]
 ): null | ObjectSchema {
   const objectSchemaProps: ObjectSchemaProperties = {};
   const requiredObjectSchemaPropNames: string[] = [];
-  let shouldAddPayload = false;
-
-  const headersObjectSchema =
-    createNullableOas3ObjectSchemaFromLocationParameters(
-      codeGenerator,
-      parameterSchemas ?? [],
-      'header'
-    );
-  if (headersObjectSchema) {
-    objectSchemaProps['headers'] = headersObjectSchema;
-    requiredObjectSchemaPropNames.push('headers');
-    shouldAddPayload = true;
-  }
-
-  const cookiesObjectSchema =
-    createNullableOas3ObjectSchemaFromLocationParameters(
-      codeGenerator,
-      parameterSchemas ?? [],
-      'cookie'
-    );
-  if (cookiesObjectSchema) {
-    objectSchemaProps['cookies'] = cookiesObjectSchema;
-    shouldAddPayload = true;
-  }
-
-  const pathParamsObjectSchema =
-    createNullableOas3ObjectSchemaFromLocationParameters(
-      codeGenerator,
-      parameterSchemas ?? [],
-      'path'
-    );
-  if (pathParamsObjectSchema) {
-    objectSchemaProps['pathParams'] = pathParamsObjectSchema;
-    requiredObjectSchemaPropNames.push('pathParams');
-    shouldAddPayload = true;
-  }
-
-  const queryParamsObjectSchema =
-    createNullableOas3ObjectSchemaFromLocationParameters(
-      codeGenerator,
-      parameterSchemas ?? [],
-      'query'
-    );
-  if (queryParamsObjectSchema) {
-    objectSchemaProps['queryParams'] = queryParamsObjectSchema;
-    requiredObjectSchemaPropNames.push('queryParams');
-    shouldAddPayload = true;
-  }
-
-  if (!shouldAddPayload) {
-    return null;
-  }
-
-  return {
-    type: 'object',
-    required: requiredObjectSchemaPropNames,
-    properties: objectSchemaProps,
+  let hasAnyParams = false;
+  const payloadPropNameByParamLocation: {
+    [key in ConcreteParameterLocation]: string;
+  } = {
+    header: 'headers',
+    cookie: 'cookies',
+    path: 'pathParams',
+    query: 'queryParams',
   };
+  concreteParameterLocations.forEach(paramLocation => {
+    const objectSchema = createNullableObjectSchemaFromLocationParameters(
+      codeGenerator,
+      parameterSchemas ?? [],
+      paramLocation
+    );
+    if (!objectSchema) {
+      return;
+    }
+    hasAnyParams = true;
+    const propName = payloadPropNameByParamLocation[paramLocation];
+    objectSchemaProps[propName] = objectSchema;
+    if (propName !== 'cookies') {
+      requiredObjectSchemaPropNames.push(propName);
+    }
+  });
+  return !hasAnyParams
+    ? null
+    : {
+        type: 'object',
+        required: requiredObjectSchemaPropNames,
+        properties: objectSchemaProps,
+      };
 }
 
 function applyNullablePayloadTypeDefinition(
   codeGenerator: CodeGenerator,
-  schema: Endpoint,
+  nullableRequestParamsObjectSchema: null | ObjectSchema,
+  nullableBodyTypeDefinition: null | DefinitionOutput,
   path: OutputPath,
   config: GenerateConfig
 ): null | DefinitionOutput {
-  const nullableBodyTypeDefinition = schema.requestBody
-    ? applyNullableRequestBodyTypeDefinition(
-        codeGenerator,
-        schema.requestBody,
-        [...path, 'requestBody'],
-        config
-      )
-    : null;
-  const nullablePayloadOas3ObjectSchema = createNullablePayloadOas3ObjectSchema(
-    codeGenerator,
-    schema.parameters ?? []
-  );
-  if (!nullablePayloadOas3ObjectSchema && !nullableBodyTypeDefinition) {
+  if (!nullableRequestParamsObjectSchema && !nullableBodyTypeDefinition) {
     return null;
   }
-  const payloadPropsCodeOutput = nullablePayloadOas3ObjectSchema
+  const payloadPropsCodeOutput = nullableRequestParamsObjectSchema
     ? applyObjectSchema(
         codeGenerator,
-        nullablePayloadOas3ObjectSchema,
+        nullableRequestParamsObjectSchema,
         path,
         config
       )
@@ -235,17 +198,6 @@ function applyNullablePayloadTypeDefinition(
   return payloadTypeDefinition;
 }
 
-function createNullableExplicitObjectFieldsCode(
-  objectSchema: ObjectSchema,
-  propName: string
-): null | string {
-  const codeParts = [];
-  if (objectSchema.properties?.[propName] && codeParts.length > 0) {
-    codeParts.unshift(`...payload.${propName}`);
-  }
-  return codeParts.length ? `{${codeParts.join(',\n')}}` : null;
-}
-
 function createNullableSupportedSecuritySchemesCode(
   security: PermissionsBySecurityNameArray
 ): null | string {
@@ -272,66 +224,22 @@ function createNullableSupportedSecuritySchemesCode(
 function createRequestCreationCode(
   path: OutputPath,
   endpointIdDefinition: DefinitionOutput,
-  payloadUtils: null | AppliedPayloadOutputs,
+  hasPayload: boolean,
   security?: null | PermissionsBySecurityNameArray
 ): string {
-  const parts: string[] = [];
-  parts.push(`endpointId: ${endpointIdDefinition.createName(path)}`);
-  if (!payloadUtils) {
-    return `const request = createRequest({${parts.join(',\n')}});`;
+  const codeParts: string[] = [];
+  if (hasPayload) {
+    codeParts.push('...payload');
   }
-  parts.push('...payload');
-
-  const explicitHeadersCode = createNullableExplicitObjectFieldsCode(
-    payloadUtils.objectSchema,
-    'headers'
-  );
-  if (explicitHeadersCode) {
-    parts.push(`headers: ${explicitHeadersCode}`);
-  }
-
-  const explicitCookiesCode = createNullableExplicitObjectFieldsCode(
-    payloadUtils.objectSchema,
-    'cookies'
-  );
-  if (explicitCookiesCode) {
-    // cookies should always be optional due to environment behaviour (e.g. browser set them automatically)
-    parts.push(`cookies?: ${explicitCookiesCode}`);
-  }
-
-  const explicitPathParamsCode = createNullableExplicitObjectFieldsCode(
-    payloadUtils.objectSchema,
-    'pathParams'
-  );
-  if (explicitPathParamsCode) {
-    parts.push(`pathParams: ${explicitPathParamsCode}`);
-  }
-
-  const explicitQueryParamsCode = createNullableExplicitObjectFieldsCode(
-    payloadUtils.objectSchema,
-    'queryParams'
-  );
-  if (explicitQueryParamsCode) {
-    parts.push(`queryParams: ${explicitQueryParamsCode}`);
-  }
-
-  const explicitBodyCode = createNullableExplicitObjectFieldsCode(
-    payloadUtils.objectSchema,
-    'body'
-  );
-  if (explicitBodyCode) {
-    parts.push(`body: ${explicitBodyCode}`);
-  }
-
+  codeParts.push(`endpointId: ${endpointIdDefinition.createName(path)}`);
   if (security) {
     const securitySchemesCode =
       createNullableSupportedSecuritySchemesCode(security);
     if (securitySchemesCode) {
-      parts.push(`supportedSecuritySchemes: ${securitySchemesCode}`);
+      codeParts.push(`supportedSecuritySchemes: ${securitySchemesCode}`);
     }
   }
-
-  return `const request = createRequest({${parts.join(',\n')}});`;
+  return `createRequest({${codeParts.join(',\n')}})`;
 }
 
 function applyEndpointIdConstDefinition(
@@ -359,41 +267,41 @@ function applyEndpointIdConstDefinition(
 export function applyEndpointCallerFunction(
   codeGenerator: CodeGenerator,
   endpointId: EndpointId,
-  requestSchema: Endpoint,
+  schema: Endpoint,
   config: GenerateConfig
 ) {
-  const path = codeGenerator.createOperationOutputPath(
-    requestSchema.operationId
-  );
+  const path = codeGenerator.createOperationOutputPath(schema.operationId);
   const endpointIdConstDefinition = applyEndpointIdConstDefinition(
     codeGenerator,
     endpointId,
     [...path, 'endpointId'],
     config
   );
-  const payloadUtils = applyPayloadTypeDefinition(
+  const requestParamsObjectSchema = findRequestParamsObjectSchema(
     codeGenerator,
-    requestSchema,
+    schema.parameters ?? []
+  );
+  const requestBodyTypeDefinition = schema.requestBody
+    ? applyNullableRequestBodyTypeDefinition(
+        codeGenerator,
+        schema.requestBody,
+        [...path, 'requestBody'],
+        config
+      )
+    : null;
+  const payloadTypeDefinition = applyNullablePayloadTypeDefinition(
+    codeGenerator,
+    requestParamsObjectSchema,
+    requestBodyTypeDefinition,
     [...path, 'payload'],
     config
   );
   const requestResultTypeDefinition = applyRequestResult(
     codeGenerator,
-    requestSchema,
+    schema,
     [...path, requestResultOutputPathPart],
     config
   );
-  const requiredOutputPaths: OutputPath[] = [
-    endpointIdConstDefinition.path,
-    templateRequestType.path,
-    requestResultTypeDefinition.path,
-    templateRequestHandlerType.path,
-    templateCreateRequestFunction.path,
-    templateRequestExecutionConfigType.path,
-  ];
-  if (payloadUtils?.typeDefinition) {
-    requiredOutputPaths.push(payloadUtils?.typeDefinition.path);
-  }
   codeGenerator.addOutput(
     {
       type: OutputType.DEFINITION,
@@ -403,25 +311,38 @@ export function applyEndpointCallerFunction(
       },
       createCode: () => {
         const rhTn = templateRequestHandlerType.createName(path);
-        const pTn = payloadUtils?.typeDefinition?.createName(path);
+        const pTn = payloadTypeDefinition?.createName(path);
         const payloadParamCode = pTn ? `, payload: ${pTn}` : '';
         const rrTn = requestResultTypeDefinition.createName(path);
         const cfgTn = templateRequestExecutionConfigType.createName(path);
         const bodyParts: string[] = [];
-        bodyParts.push(
-          createRequestCreationCode(
-            path,
-            endpointIdConstDefinition,
-            payloadUtils,
-            requestSchema.security
-          )
+        const requestCreationCode = createRequestCreationCode(
+          path,
+          endpointIdConstDefinition,
+          !!payloadTypeDefinition,
+          schema.security
         );
-        bodyParts.push('return requestHandler.execute(request, config);');
+        bodyParts.push(
+          `return requestHandler.execute(${requestCreationCode}, config);`
+        );
         const funcBody = bodyParts.join('\n');
         return `(requestHandler: ${rhTn}${payloadParamCode}, config?: ${cfgTn}): Promise<${rrTn}> {${funcBody}}`;
       },
       path,
-      getRequiredOutputPaths: () => requiredOutputPaths,
+      getRequiredOutputPaths: () => {
+        const outputPaths: OutputPath[] = [
+          endpointIdConstDefinition.path,
+          templateRequestType.path,
+          requestResultTypeDefinition.path,
+          templateRequestHandlerType.path,
+          templateCreateRequestFunction.path,
+          templateRequestExecutionConfigType.path,
+        ];
+        if (payloadTypeDefinition) {
+          outputPaths.push(payloadTypeDefinition.path);
+        }
+        return outputPaths;
+      },
     },
     config
   );
