@@ -34,6 +34,11 @@ import {mkdirp} from 'mkdirp';
 import {templateDefinitionOutputs, templateZOfZodLibrary} from './template';
 import {applySchema} from './schema';
 import {applyZodSchema} from '@oas3/codegen/ts/zodSchema';
+import {
+  findComponentParameterByRef,
+  findComponentResponseByRef,
+  findComponentSchemaByRef,
+} from '@oas3/specification/util';
 
 const fs = require('fs');
 const path = require('path');
@@ -174,6 +179,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.logger = logger;
     this.outputs = [];
     this.operationFolderOutputPaths = [];
+  }
+
+  public getSpecification(): Specification {
+    return this.oas3Specs;
   }
 
   generate(config: GenerateConfig) {
@@ -429,7 +438,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     if (this.findOutputByOutputPath(outputPath)) {
       return;
     }
-    const schema = this.findComponentResponseByRef(componentRef);
+    const schema = findComponentResponseByRef(this.oas3Specs, componentRef);
     if (!schema) {
       const output: DefinitionOutput = {
         type: OutputType.DEFINITION,
@@ -456,7 +465,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     if (this.findOutputByOutputPath(outputPath)) {
       return;
     }
-    const schema = this.findComponentParameterByRef(componentRef);
+    const schema = findComponentParameterByRef(this.oas3Specs, componentRef);
     if (!schema) {
       const output: DefinitionOutput = {
         type: OutputType.DEFINITION,
@@ -485,7 +494,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     if (this.findOutputByOutputPath(outputPath)) {
       return;
     }
-    const schema = this.findComponentSchemaByRef(componentRef);
+    const schema = findComponentSchemaByRef(this.oas3Specs, componentRef);
     if (!schema) {
       const output: DefinitionOutput = {
         type: OutputType.DEFINITION,
@@ -525,13 +534,13 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.addOutput(output, config);
     if (config.withZod) {
       const zodSchemaOutput: DefinitionOutput = {
+        ...applyZodSchema(this, schema, outputPathZodSchema, config, [
+          componentRef,
+        ]),
         type: OutputType.DEFINITION,
         definitionType: 'const',
         createName: referencingPath =>
           this.createComponentZodSchemaName(componentRef, referencingPath),
-        ...applyZodSchema(this, schema, outputPathZodSchema, config, [
-          componentRef,
-        ]),
       };
       this.addOutput(zodSchemaOutput, config);
     }
@@ -563,45 +572,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
     const filePath1 = this.createFilePathFromOutputPath(outputPath1);
     const filePath2 = this.createFilePathFromOutputPath(outputPath2);
     return filePath1 === filePath2;
-  }
-
-  findComponentSchemaByRef(componentRef: string): null | Schema {
-    const components = this.oas3Specs.components;
-    if (
-      componentRef.startsWith(schemaComponentRefPrefix) &&
-      components.schemas
-    ) {
-      const name = componentRef.replace(schemaComponentRefPrefix, '');
-      const schema = components.schemas[name];
-      return schema ?? null;
-    }
-    return null;
-  }
-
-  findComponentParameterByRef(componentRef: string): null | Parameter {
-    const components = this.oas3Specs.components;
-    if (
-      componentRef.startsWith(parameterComponentRefPrefix) &&
-      components.parameters
-    ) {
-      const name = componentRef.replace(parameterComponentRefPrefix, '');
-      const parameter = components.parameters[name];
-      return parameter ?? null;
-    }
-    return null;
-  }
-
-  findComponentResponseByRef(componentRef: string): null | Response {
-    const components = this.oas3Specs.components;
-    if (
-      componentRef.startsWith(responseComponentRefPrefix) &&
-      components.responses
-    ) {
-      const name = componentRef.replace(responseComponentRefPrefix, '');
-      const response = components.responses[name];
-      return response ?? null;
-    }
-    return null;
   }
 
   private generateRequestByMethodMapOutputs(

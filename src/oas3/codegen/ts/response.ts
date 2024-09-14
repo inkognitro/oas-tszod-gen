@@ -1,160 +1,187 @@
 import {
-  isResponseComponentRef,
+  ObjectSchema,
+  ObjectSchemaProperties,
+  ConcreteResponse,
   ResponseBodyContent,
-  ResponseBodyContentByContentTypeMap,
-  ResponseByStatusCodeMap,
+  ResponseHeaderByNameMap,
+  Response,
+  isResponseComponentRef,
+  isStringSchema,
 } from '@oas3/specification';
-import {
-  CodeGenerationOutput,
-  CodeGenerator,
-  OutputType,
-  OutputPath,
-  GeneratedDefinitionOutput,
-  containsOutputPath,
-} from './core';
-import {applyComponentRefSchema, applySchema} from './schema';
-import {templateResponseType} from './template';
+import {CodeGenerationOutput, CodeGenerator, OutputPath} from './core';
 import {GenerateConfig} from './generator';
+import {applyZodObjectSchema, applyZodSchema} from '@oas3/codegen/ts/zodSchema';
+import {applyObjectSchema, applySchema} from '@oas3/codegen/ts/schema';
+import {
+  templateResponseTemplateType,
+  templateResponseType,
+} from '@oas3/codegen/ts/template';
 
-function findNumericStatusCode(statusCode: string): number | null {
-  const numericStatusCode = parseInt(statusCode);
-  if (isNaN(numericStatusCode)) {
-    return null;
+function createHeadersObjectSchema(
+  headersSchema: ResponseHeaderByNameMap
+): ObjectSchema {
+  const requiredProps: string[] = [];
+  const props: ObjectSchemaProperties = {};
+  for (const headerName in headersSchema) {
+    requiredProps.push(headerName);
+    const headerSchema = headersSchema[headerName].schema;
+    const concreteHeaderSchema = getConcreteSchema(headerSchema);
+    if (isStringSchema(concreteHeaderSchema)) {
+      props[headerName] = headerSchema;
+      continue;
+    }
+    props[headerName] = {
+      type: 'string',
+    };
   }
-  return numericStatusCode;
+  return {
+    type: 'object',
+    properties: props,
+    required: requiredProps,
+  };
 }
 
-function applyStatusCodeResponseAndGetTypeDefinitionOutput(
+type ApplyResponseHeadersResult = {
+  typeCodeOutput: CodeGenerationOutput;
+  zodSchemaCodeOutput?: CodeGenerationOutput;
+};
+
+function applyResponseHeaders(
   codeGenerator: CodeGenerator,
+  headersSchema: ResponseHeaderByNameMap,
   path: OutputPath,
-  statusCode: string,
-  schema: ResponseBodyContent,
   config: GenerateConfig
-): GeneratedDefinitionOutput {
-  const requiredOutputPaths: OutputPath[] = [templateResponseType.path];
-  const statusCodeDiscriminatorValue =
-    findNumericStatusCode(statusCode) ?? 'any';
-  const responseBodySummary = applySchema(
+): ApplyResponseHeadersResult {
+  const objectSchema = createHeadersObjectSchema(headersSchema);
+  const typeCodeOutput: CodeGenerationOutput = applyObjectSchema(
     codeGenerator,
-    schema.schema,
-    [...path, 'body'],
+    objectSchema,
+    path,
     config
   );
-  const typeDefinitionOutput: GeneratedDefinitionOutput = {
-    type: OutputType.DEFINITION,
-    definitionType: 'type',
-    path,
-    createName: referencingPath => {
-      return codeGenerator.createTypeName(path, referencingPath);
-    },
-    createCode: referencingPath => {
-      const responseTypeName = templateResponseType.createName(path);
-      const bodyCode = responseBodySummary.createCode(referencingPath);
-      return `${responseTypeName}<${statusCodeDiscriminatorValue}, ${bodyCode}>`;
-    },
-    getRequiredOutputPaths: () => requiredOutputPaths,
-  };
-  codeGenerator.addOutput(typeDefinitionOutput, config);
-  return typeDefinitionOutput;
-}
-
-function findPreferredResponseBodyContent(
-  contentByContentType: ResponseBodyContentByContentTypeMap
-): null | ResponseBodyContent {
-  const jsonResponseBody = contentByContentType['application/json'];
-  if (jsonResponseBody) {
-    return jsonResponseBody;
+  let zodSchemaCodeOutput: undefined | CodeGenerationOutput;
+  if (config.withZod) {
+    zodSchemaCodeOutput = applyZodObjectSchema(
+      codeGenerator,
+      objectSchema,
+      [...path, 'zodSchema'],
+      config
+    );
   }
-  return contentByContentType[Object.keys(contentByContentType)[0]] ?? null;
+  return {
+    typeCodeOutput,
+    zodSchemaCodeOutput,
+  };
 }
 
-export function applyResponseByStatusCodeMap(
+type ApplyResponseBodyResult = {
+  typeCodeOutput: CodeGenerationOutput;
+  contentType: string;
+  zodSchemaCodeOutput?: CodeGenerationOutput;
+};
+
+function applyResponseBodyContent(
   codeGenerator: CodeGenerator,
-  schema: ResponseByStatusCodeMap,
+  contentType: string,
+  contentSchema: ResponseBodyContent,
   path: OutputPath,
   config: GenerateConfig
-): GeneratedDefinitionOutput {
-  const statusCodeResponseOutputs: CodeGenerationOutput[] = [];
-  const requiredOutputPaths: OutputPath[] = [];
-  for (const statusCode in schema) {
-    const responseOutputPath: OutputPath = [...path, statusCode];
-    const responseOrRef = schema[statusCode];
-    if (isResponseComponentRef(responseOrRef)) {
-      const responseBodyOutputPath = [...responseOutputPath, 'body'];
-      if (containsOutputPath(requiredOutputPaths, responseBodyOutputPath)) {
-        continue;
-      }
-      requiredOutputPaths.push(responseBodyOutputPath);
-      const responseBodyContent = applyComponentRefSchema(
-        codeGenerator,
-        responseOrRef,
-        responseBodyOutputPath,
-        config
-      );
-      if (!containsOutputPath(requiredOutputPaths, templateResponseType.path)) {
-        requiredOutputPaths.push(templateResponseType.path);
-      }
-      const statusCodeDiscriminatorValue =
-        findNumericStatusCode(statusCode) ?? 'any';
-      const responseOutput: CodeGenerationOutput = {
-        createCode: referencingPath => {
-          const responseType = templateResponseType.createName(path);
-          const bodyCode = responseBodyContent.createCode(referencingPath);
-          return `${responseType}<${statusCodeDiscriminatorValue}, ${bodyCode}>`;
-        },
-        path: responseOutputPath,
-        getRequiredOutputPaths: () => [],
-      };
-      statusCodeResponseOutputs.push(responseOutput);
-      continue;
-    }
-    const responseBodyContent = responseOrRef.content
-      ? findPreferredResponseBodyContent(responseOrRef.content)
-      : null;
-    if (!responseBodyContent) {
-      continue;
-    }
-    const statusCodeResponseType =
-      applyStatusCodeResponseAndGetTypeDefinitionOutput(
-        codeGenerator,
-        responseOutputPath,
-        statusCode,
-        responseBodyContent,
-        config
-      );
-    if (!containsOutputPath(requiredOutputPaths, statusCodeResponseType.path)) {
-      requiredOutputPaths.push(statusCodeResponseType.path);
-    }
-    statusCodeResponseOutputs.push({
-      createCode: referencingPath => {
-        return statusCodeResponseType.createName(referencingPath);
-      },
-      path: responseOutputPath,
-      getRequiredOutputPaths: () => [statusCodeResponseType.path],
-    });
+): ApplyResponseBodyResult {
+  // todo: generate FormData type in case of "multipart/form-data"
+  const typeCodeOutput: CodeGenerationOutput = applySchema(
+    codeGenerator,
+    contentSchema.schema,
+    path,
+    config
+  );
+  let zodSchemaCodeOutput: CodeGenerationOutput | undefined;
+  if (config.withZod) {
+    zodSchemaCodeOutput = applyZodSchema(
+      codeGenerator,
+      contentSchema.schema,
+      path,
+      config
+    );
   }
-  const responseTypeDefinition: GeneratedDefinitionOutput = {
-    type: OutputType.DEFINITION,
-    definitionType: 'type',
-    createName: referencingPath => {
-      return codeGenerator.createTypeName(path, referencingPath);
-    },
+  return {
+    contentType,
+    typeCodeOutput,
+    zodSchemaCodeOutput,
+  };
+}
+
+type ApplyConcreteResponseResult = {
+  typeCodeOutput: CodeGenerationOutput;
+  headersZodSchemaCodeOutput?: CodeGenerationOutput;
+};
+
+function applyConcreteResponse(
+  codeGenerator: CodeGenerator,
+  schema: ConcreteResponse,
+  path: OutputPath,
+  config: GenerateConfig
+): ApplyConcreteResponseResult {
+  const headersResult = schema.headers
+    ? applyResponseHeaders(
+        codeGenerator,
+        schema.headers,
+        [...path, 'headers'],
+        config
+      )
+    : null;
+  const bodyResults: ApplyResponseBodyResult[] = [];
+  for (const contentType in schema.content) {
+    const contentSchema = schema.content[contentType];
+    const contentPath = [...path, 'body', contentType];
+    bodyResults.push(
+      applyResponseBodyContent(
+        codeGenerator,
+        contentType,
+        contentSchema,
+        contentPath,
+        config
+      )
+    );
+  }
+  const typeCodeOutput: CodeGenerationOutput = {
     path,
     createCode: () => {
-      const codeParts: string[] = [];
-      statusCodeResponseOutputs.forEach(responseOutput => {
-        const codeComment = responseOutput.codeComment
-          ? ` // ${responseOutput.codeComment}`
-          : '';
-        codeParts.push(`| ${responseOutput.createCode(path)}${codeComment}`);
-      });
-      if (!codeParts.length) {
+      if (!bodyResults.length) {
         return 'any';
       }
-      return `${codeParts.join('\n')}`;
+      const headersCodePart: string = headersResult
+        ? `, ${headersResult.typeCodeOutput.createCode(path)}`
+        : '';
+      const responseDefinitionCodeParts: string[] = bodyResults.map(
+        bodyResult => {
+          return `${templateResponseTemplateType.createName(path)}<'${
+            bodyResult.contentType
+          }',${bodyResult.typeCodeOutput.createCode(path)}${headersCodePart}>`;
+        }
+      );
+      return `${responseDefinitionCodeParts.join(' | ')}`;
     },
-    getRequiredOutputPaths: () => requiredOutputPaths,
+    getRequiredOutputPaths: () => {
+      const outputPaths: OutputPath[] = bodyResults.reduce<OutputPath[]>(
+        (current, bodyResult) => {
+          const next = [...current];
+          bodyResult.typeCodeOutput.getRequiredOutputPaths().forEach(path => {
+            if (!current.includes(path)) {
+              next.push(path);
+            }
+          });
+          return next;
+        },
+        []
+      );
+      return [...outputPaths, templateResponseType.path];
+    },
   };
-  codeGenerator.addOutput(responseTypeDefinition, config);
-  return responseTypeDefinition;
+
+  return {
+    typeCodeOutput,
+    headersZodSchemaCodeOutput: headersResult?.zodSchemaCodeOutput,
+  };
 }
+
+// todo: add applyResponse function if required

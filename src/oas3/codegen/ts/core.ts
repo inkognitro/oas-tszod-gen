@@ -1,7 +1,9 @@
-import {Parameter, Response, Schema} from '@oas3/specification';
+import {Parameter, Response, Schema, Specification} from '@oas3/specification';
 import {GenerateConfig} from '@oas3/codegen/ts/generator';
 
 export interface CodeGenerator {
+  getSpecification(): Specification;
+
   createComponentTypeName(
     componentRef: string,
     referencingPath: OutputPath
@@ -25,9 +27,6 @@ export interface CodeGenerator {
     config: GenerateConfig,
     preventFromAddingComponentRefs?: string[]
   ): void;
-  findComponentSchemaByRef(componentRef: string): null | Schema;
-  findComponentParameterByRef(componentRef: string): null | Parameter;
-  findComponentResponseByRef(componentRef: string): null | Response;
   hasSameFileContext(outputPath1: OutputPath, outputPath2: OutputPath): boolean;
 }
 

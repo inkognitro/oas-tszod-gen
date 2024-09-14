@@ -17,7 +17,7 @@ import {
   RequestBodyContentByTypeMap,
   Schema,
 } from '@oas3/specification';
-import {applyResponseByStatusCodeMap} from './response';
+import {applyResponseByStatusCodeMap} from './endpointResponse';
 import {
   templateCreateRequestFunction,
   templateRequestExecutionConfigType,
@@ -28,7 +28,7 @@ import {
 import {GenerateConfig} from './generator';
 import {applyZodSchema} from '@oas3/codegen/ts/zodSchema';
 import {applyObjectSchema} from '@oas3/codegen/ts/schema';
-import {getConcreteParameter} from '@oas3/codegen/ts/parameter';
+import {findConcreteParameter} from '@oas3/specification/util';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -81,7 +81,17 @@ function createNullableOas3ObjectSchemaFromLocationParameters(
   const requiredObjectSchemaPropNames: string[] = [];
   let hasParametersForLocation = false;
   requestParameters.forEach(paramOrRef => {
-    const p = getConcreteParameter(paramOrRef, codeGenerator);
+    const p = findConcreteParameter(
+      codeGenerator.getSpecification(),
+      paramOrRef
+    );
+    if (!p) {
+      throw new Error(
+        `could not find concreteParameter for parameter: ${JSON.stringify(
+          paramOrRef
+        )}`
+      );
+    }
     if (p.in !== parameterLocation) {
       return;
     }
