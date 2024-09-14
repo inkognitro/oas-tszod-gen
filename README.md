@@ -20,11 +20,12 @@ I coded my own solution because I wanted to:
 through different `RequestHandler` implementations
 
 > :bulb:
-> It seems insane to challenge the usage of the [Axios](https://axios-http.com/docs/intro) library despite all its advantages.
-> But one might have PWAs and [service workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
-> in mind where [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API) is out of scope.
-> Others just want to use `fetch` for backend stuff of their [NextJs](https://nextjs.org/docs/app/api-reference/functions/fetch)
-> app and profit from optimized caching. There are lots of articles out there which discuss things like
+> [Axios](https://axios-http.com/docs/intro) is great, but it works with
+> [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API) under the hood.
+> One might have PWAs and [service workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
+> in mind where XMLHttpRequest is out of scope.
+> Others just want to use `fetch` for backend stuff in their [NextJs](https://nextjs.org/docs/app/api-reference/functions/fetch)
+> app to benefit from automatic caching. There are lots of articles out there which discuss things like
 > [Axios Vs Fetch](https://blog.logrocket.com/axios-vs-fetch-best-http-requests/).
 
 # Generator: Setup and usage
