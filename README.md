@@ -109,7 +109,7 @@ After generating endpoint caller functions from an OAS3 specification into your 
 it's time to understand how the generated code can be used. The following sections should bring some clarity.
 
 ## Usage of the generated code by example
-Following example demonstrates how a `RequestHandler` instance is created with two different implementations.
+Following example demonstrates how a `RequestHandler` instance is created by composing together two different implementations.
 In order to process a login, a request is triggered by calling the generated `authenticate` endpoint caller function.
 The previously created requestHandler instance is now passed as a first argument to the `authenticate` function.
 After receiving the `RequestResult` followed by the check of the according response status 200, TypeScript automatically 
