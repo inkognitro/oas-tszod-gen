@@ -98,6 +98,7 @@ export type DefinitionOutput = GenericOutput<
   {
     definitionType: DefinitionType;
     createCode: CreateCodeFunc;
+    createTypeDeclarationCode?: () => string;
     codeComment?: string;
     getRequiredOutputPaths: () => OutputPath[];
   }

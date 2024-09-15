@@ -310,7 +310,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
       case 'function':
         return `export function ${o.createName(o.path)}${o.createCode(o.path)}`;
       case 'const':
-        return `export const ${o.createName(o.path)} = ${o.createCode(o.path)}`;
+        const typeDeclaration = o.createTypeDeclarationCode
+          ? `: {${o.createTypeDeclarationCode}}`
+          : '';
+        return `export const ${o.createName(
+          o.path
+        )}${typeDeclaration} = ${o.createCode(o.path)}`;
       case 'type':
         return `export type ${o.createName(o.path)} = ${o.createCode(o.path)}`;
       case 'interface':
@@ -592,8 +597,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
   ) {
     for (const method in requestByMethodMap) {
       const requestSchema = requestByMethodMap[method];
-      const endpointId = {path, method};
-      applyEndpointCallerFunction(this, endpointId, requestSchema, config);
+      applyEndpointCallerFunction(this, path, method, requestSchema, config);
     }
   }
 

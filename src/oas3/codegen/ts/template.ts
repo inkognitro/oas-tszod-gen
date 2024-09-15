@@ -376,7 +376,7 @@ const templateEndpointSecuritySchemaType: TemplateDefinitionOutput = {
 };
 
 const templateEndpointSchemaTypePath = ['core', 'core', 'endpointSchema'];
-const templateEndpointSchemaType: TemplateDefinitionOutput = {
+export const templateEndpointSchemaType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'type',
   path: templateEndpointSchemaTypePath,

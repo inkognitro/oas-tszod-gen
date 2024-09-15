@@ -1,16 +1,9 @@
-import {
-  CodeGenerator,
-  AnyDefinitionOutput,
-  DefinitionOutput,
-  OutputPath,
-  OutputType,
-} from './core';
+import {CodeGenerator, DefinitionOutput, OutputPath, OutputType} from './core';
 import {
   ConcreteParameterLocation,
   ObjectSchema,
   ObjectSchemaProperties,
   Parameter,
-  PermissionsBySecurityNameArray,
   Endpoint,
   findConcreteParameter,
   concreteParameterLocations,
@@ -26,14 +19,10 @@ import {GenerateConfig} from './generator';
 import {applyObjectSchema} from './schema';
 import {applyEndpointResponse} from './endpointResponse';
 import {applyNullableRequestBodyTypeDefinition} from './endpointRequest';
+import {applyEndpointSchemaConstDefinition} from './endpointSchema';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
-
-type EndpointId = {
-  method: string;
-  path: string;
-};
 
 function applyRequestResult(
   codeGenerator: CodeGenerator,
@@ -198,83 +187,35 @@ function applyNullablePayloadTypeDefinition(
   return payloadTypeDefinition;
 }
 
-function createNullableSupportedSecuritySchemesCode(
-  security: PermissionsBySecurityNameArray
-): null | string {
-  const codeParts: string[] = [];
-  security.forEach(permissionsBySecurityName => {
-    for (const securityName in permissionsBySecurityName) {
-      const permissions = permissionsBySecurityName[securityName];
-      if (!permissions.length) {
-        codeParts.push(`{ name: '${securityName}', requiredPermissions: [] }`);
-        continue;
-      }
-      const permissionsCode = `['${permissions.join(', ')}']`;
-      codeParts.push(
-        `{ name: '${securityName}', permissions: ${permissionsCode} }`
-      );
-    }
-  });
-  if (!codeParts.length) {
-    return null;
-  }
-  return `[${codeParts.join(',\n')}]`;
-}
-
 function createRequestCreationCode(
   path: OutputPath,
-  endpointIdDefinition: DefinitionOutput,
-  hasPayload: boolean,
-  security?: null | PermissionsBySecurityNameArray
+  endpointSchemaDefinition: DefinitionOutput,
+  hasPayload: boolean
 ): string {
   const codeParts: string[] = [];
   if (hasPayload) {
     codeParts.push('...payload');
   }
-  codeParts.push(`endpointId: ${endpointIdDefinition.createName(path)}`);
-  if (security) {
-    const securitySchemesCode =
-      createNullableSupportedSecuritySchemesCode(security);
-    if (securitySchemesCode) {
-      codeParts.push(`supportedSecuritySchemes: ${securitySchemesCode}`);
-    }
-  }
+  codeParts.push(
+    `endpointSchema: ${endpointSchemaDefinition.createName(path)}`
+  );
   return `createRequest({${codeParts.join(',\n')}})`;
-}
-
-function applyEndpointIdConstDefinition(
-  codeGenerator: CodeGenerator,
-  endpointId: EndpointId,
-  path: OutputPath,
-  config: GenerateConfig
-): DefinitionOutput {
-  const definition: DefinitionOutput = {
-    type: OutputType.DEFINITION,
-    definitionType: 'const',
-    path,
-    createName: referencingPath => {
-      return codeGenerator.createConstName(path, referencingPath);
-    },
-    createCode: () => {
-      return `{method:'${endpointId.method}', path:'${endpointId.path}'}`;
-    },
-    getRequiredOutputPaths: () => [],
-  };
-  codeGenerator.addOutput(definition, config);
-  return definition;
 }
 
 export function applyEndpointCallerFunction(
   codeGenerator: CodeGenerator,
-  endpointId: EndpointId,
+  urlPath: string,
+  requestMethod: string,
   schema: Endpoint,
   config: GenerateConfig
 ) {
   const path = codeGenerator.createOperationOutputPath(schema.operationId);
-  const endpointIdConstDefinition = applyEndpointIdConstDefinition(
+  const endpointSchemaConstDefinition = applyEndpointSchemaConstDefinition(
     codeGenerator,
-    endpointId,
-    [...path, 'endpointId'],
+    urlPath,
+    requestMethod,
+    schema,
+    [...path, 'endpointSchema'],
     config
   );
   const requestParamsObjectSchema = findRequestParamsObjectSchema(
@@ -319,9 +260,8 @@ export function applyEndpointCallerFunction(
         const bodyParts: string[] = [];
         const requestCreationCode = createRequestCreationCode(
           path,
-          endpointIdConstDefinition,
-          !!payloadTypeDefinition,
-          schema.security
+          endpointSchemaConstDefinition,
+          !!payloadTypeDefinition
         );
         bodyParts.push(
           `return requestHandler.execute(${requestCreationCode}, config);`
@@ -332,7 +272,7 @@ export function applyEndpointCallerFunction(
       path,
       getRequiredOutputPaths: () => {
         const outputPaths: OutputPath[] = [
-          endpointIdConstDefinition.path,
+          endpointSchemaConstDefinition.path,
           templateRequestType.path,
           requestResultTypeDefinition.path,
           templateRequestHandlerType.path,
