@@ -2,7 +2,7 @@
 ![Total](./badges/jest/coverage-total.svg)
 
 # oas-to-code
-A code generator to convert [OpenApi v3 (OAS3)](https://swagger.io/specification/) specifications into endpoint caller functions for [TS](https://www.typescriptlang.org/) and [Zod](https://zod.dev).
+A code generator to convert [OpenApi version 3 (OAS3)](https://swagger.io/specification/) specifications into endpoint caller functions for [TS](https://www.typescriptlang.org/) and [Zod](https://zod.dev).
 
 ## Why yet another library for this task?
 Before you consider using this library, I suggest having a look at [Zodios](https://www.zodios.org/)
