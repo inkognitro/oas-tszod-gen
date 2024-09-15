@@ -188,7 +188,7 @@ export class FetchApiRequestHandler implements RequestHandler {
   ): RequestInit {
     const requestInit: RequestInit = {
       ...(this.generalRequestInit ? this.generalRequestInit : {}),
-      method: request.endpointId.method,
+      method: request.endpointSchema.method,
     };
     let requestHeaders = {};
     if (request.headers) {

@@ -27,15 +27,13 @@ export type JsonValue =
   | JsonValue[];
 
 export type RequestCreationSettings = {
-  endpointId: EndpointId;
-  supportedSecuritySchemes?: SecurityScheme[];
   headers?: Headers;
   cookies?: RequestCookies;
   pathParams?: PathParams;
   queryParams?: QueryParams;
-  contentType: string | null;
+  contentType?: string;
   body?: RequestBody;
-  schema: RequestSchema;
+  endpointSchema: EndpointSchema;
 };
 
 export function createRequestUrl(
@@ -66,21 +64,21 @@ export function createRequestUrl(
   return url;
 }
 
-export type EndpointId = {
-  method: string;
-  path: string;
-};
-
-export type SecurityScheme = {
+export type EndpointSecuritySchema = {
   name: string;
   requiredPermissions: string[];
 };
 
-export type RequestSchema = {
-  bodyVariants: {
-    contentType: string; // case-sensitive, according to oas3 specs
-    zodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  }[];
+export type EndpointSchema = {
+  path: string;
+  method: string;
+  supportedSecuritySchemas: EndpointSecuritySchema[];
+  bodyByContentType: {
+    [contentType: string]: {
+      contentType: string; // case-sensitive, according to oas3 specs
+      zodSchema: ZodSchema; // only defined by the generator when "withZod: true"
+    };
+  };
   headersZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
   cookiesZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
   pathParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
@@ -96,17 +94,13 @@ export function createRequest(settings: RequestCreationSettings): Request {
     requestId += chars[Math.floor(Math.random() * chars.length)];
   }
   return {
+    ...settings,
     id: requestId,
-    endpointId: settings.endpointId,
-    supportedSecuritySchemes: settings.supportedSecuritySchemes ?? [],
-    url: createRequestUrl(settings.endpointId.path, settings.pathParams ?? {}),
-    headers: settings.headers,
-    cookies: settings.cookies,
-    pathParams: settings.pathParams,
-    queryParams: settings.queryParams,
-    contentType: settings.contentType,
-    body: settings.body,
-    schema: settings.schema,
+    url: createRequestUrl(
+      settings.endpointSchema.path,
+      settings.pathParams ?? {}
+    ),
+    contentType: settings.contentType ?? null,
   };
 }
 
@@ -116,25 +110,25 @@ export type Request<
   B extends RequestBody | undefined = any,
 > = {
   id: string;
-  endpointId: EndpointId;
   url: string;
-  supportedSecuritySchemes: SecurityScheme[];
   headers?: Headers;
   cookies?: RequestCookies;
-  pathParams: P;
-  queryParams: Q;
+  pathParams?: P;
+  queryParams?: Q;
   contentType: string | null; // case-sensitive, according to oas3 specs; used as default "content-type" request header
-  body: B;
-  schema: RequestSchema;
+  body?: B;
+  endpointSchema: EndpointSchema;
 };
 
 export type ResponseSchema = {
   status: number | 'any'; // "any" is used for unexpected status codes
-  bodyVariants: {
-    contentType: string; // case-sensitive, according to oas3 specs
-    zodSchema?: ZodSchema;
-  }[];
-  headersZodSchema?: ZodSchema;
+  bodyByContentType: {
+    [contentType: string]: {
+      contentType: string; // case-sensitive, according to oas3 specs
+      zodSchema: ZodSchema; // only defined by the generator when "withZod: true"
+    };
+  };
+  headersZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
 };
 
 export type ResponseSetCookies = {

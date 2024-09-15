@@ -157,11 +157,11 @@ const axiosRequestHandler = new AxiosRequestHandler(myAxiosInstance, {
 
 const requestHandler = new AuthRequestHandler(
   [myJwtAuthenticationProvider],
-  // In case of multiple authentication providers, the order does matter:
-  // The first found token by the "findToken" method of a supported authentication provider is
-  // added to the request header section.
-  // The endpoint caller function passes the information about supported security schemes
-  // in the composed request's "schema" property.
+  // In case of multiple authentication providers, the order does NOT matter here.
+  // The order of prioritized authentication providers is taken from the "request.endpointSchema.supportedSecuritySchemas"
+  // array, which has the same order as the defined security schemes in the OAS3 specification of that endpoint.
+  // The first found token received from the "findToken" method of a supported authentication provider is
+  // then added to the request headers.
   
   axiosRequestHandler
 );

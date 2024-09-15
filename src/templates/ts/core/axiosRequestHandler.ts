@@ -183,7 +183,7 @@ export class AxiosRequestHandler implements RequestHandler {
   ): AxiosRequestConfig {
     const requestConfig: AxiosRequestConfig = {
       ...this.generalRequestConfig,
-      method: request.endpointId.method as Method,
+      method: request.endpointSchema.method as Method,
       url: request.url,
     };
     if (request.headers) {

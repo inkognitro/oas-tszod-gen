@@ -66,25 +66,19 @@ export const templateRequestType: TemplateDefinitionOutput = {
     ];
     return genericCodeParts.join(',\n');
   },
-  createCode: config => {
+  createCode: () => {
     const bodyCodeParts: string[] = [
       'id: string;',
-      `endpointId: ${templateEndpointIdType.createName(
-        templateRequestTypePath
-      )};`,
       'url: string;',
-      `supportedSecuritySchemes: ${templateSecuritySchemeType.createName(
-        templateRequestTypePath
-      )}[];`,
       `headers?: ${templateHeadersType.createName(templateRequestTypePath)};`,
       `cookies?: ${templateRequestCookiesType.createName(
         templateRequestTypePath
       )};`,
-      'pathParams: P;',
-      'queryParams: Q;',
+      'pathParams?: P;',
+      'queryParams?: Q;',
       'contentType: string | null; // case-sensitive, according to oas3 specs; used as default "content-type" request header',
-      'body: B;',
-      `schema: ${templateRequestSchemaType.createName(
+      'body?: B;',
+      `endpointSchema: ${templateEndpointSchemaType.createName(
         templateRequestTypePath
       )};`,
     ];
@@ -95,12 +89,10 @@ export const templateRequestType: TemplateDefinitionOutput = {
       templatePathParamsType.path,
       templateQueryParamsType.path,
       templateRequestBodyType.path,
-      templateEndpointIdType.path,
-      templateSecuritySchemeType.path,
+      templateEndpointSchemaType.path,
       templateHeadersType.path,
       templateRequestCookiesType.path,
       templateResponseSchemaType.path,
-      templateRequestSchemaType.path,
     ];
     if (config.withZod) {
       requiredOutputPaths.push(templateZodSchemaOfZodLibrary.path);
@@ -336,15 +328,17 @@ const templateResponseSchemaType: TemplateDefinitionOutput = {
     return 'ResponseSchema';
   },
   createCode: config => {
-    const bodyVariantsCodeParts: string[] = [
+    const bodyTypeCodeParts: string[] = [
       'contentType: string;' + '// case-sensitive, according to oas3 specs',
     ];
     if (config.withZod) {
-      bodyVariantsCodeParts.push('zodSchema?: ZodSchema;');
+      bodyTypeCodeParts.push('zodSchema: ZodSchema;');
     }
     const codeParts: string[] = [
       'status: number | \'any\'; // "any" is used for unexpected status codes',
-      `bodyVariants: {\n${bodyVariantsCodeParts.join('\n')}\n}[];`,
+      `bodyByContentType: {\n[contentType: string]: {\n${bodyTypeCodeParts.join(
+        '\n'
+      )}\n}\n};`,
     ];
     if (config.withZod) {
       codeParts.push('headersZodSchema?: ZodSchema;');
@@ -359,24 +353,55 @@ const templateResponseSchemaType: TemplateDefinitionOutput = {
   },
 };
 
-const templateRequestSchemaTypePath = ['core', 'core', 'requestSchema'];
-const templateRequestSchemaType: TemplateDefinitionOutput = {
+const templateEndpointSecuritySchemaType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'type',
-  path: ['core', 'core', 'requestSchema'],
+  path: ['core', 'core', 'endpointSecuritySchema'],
   createName: () => {
-    return 'RequestSchema';
+    return 'EndpointSecuritySchema';
+  },
+  createCode: () => {
+    const codeParts: string[] = [
+      'name: string;',
+      'requiredPermissions: string[];',
+    ];
+    return `{\n${codeParts.join('\n')}\n}`;
+  },
+  getRequiredOutputPaths: config => {
+    if (config.withZod) {
+      return [templateZodSchemaOfZodLibrary.path];
+    }
+    return [];
+  },
+};
+
+const templateEndpointSchemaTypePath = ['core', 'core', 'endpointSchema'];
+const templateEndpointSchemaType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: templateEndpointSchemaTypePath,
+  createName: () => {
+    return 'EndpointSchema';
   },
   createCode: config => {
-    const bodyVariantsCodeParts: string[] = [
+    const bodyTypeCodeParts: string[] = [
       'contentType: string;' + '// case-sensitive, according to oas3 specs',
     ];
     if (config.withZod) {
-      bodyVariantsCodeParts.push('zodSchema?: ZodSchema;');
+      bodyTypeCodeParts.push('zodSchema: ZodSchema;');
     }
     const codeParts: string[] = [
-      `bodyVariants: {\n${bodyVariantsCodeParts.join('\n')}\n}[];`,
+      'path: string;',
+      'method: string;',
+      `supportedSecuritySchemas: ${templateEndpointSecuritySchemaType.createName(
+        templateEndpointSchemaTypePath
+      )}[];`,
     ];
+    codeParts.push(
+      `bodyByContentType: {\n[contentType: string]: {\n${bodyTypeCodeParts.join(
+        '\n'
+      )}\n}\n};`
+    );
     if (config.withZod) {
       codeParts.push('headersZodSchema?: ZodSchema;');
       codeParts.push('cookiesZodSchema?: ZodSchema;');
@@ -385,31 +410,21 @@ const templateRequestSchemaType: TemplateDefinitionOutput = {
     }
     codeParts.push(
       `responses: ${templateResponseSchemaType.createName(
-        templateRequestSchemaTypePath
+        templateEndpointSchemaTypePath
       )}[];`
     );
     return `{\n${codeParts.join('\n')}\n}`;
   },
   getRequiredOutputPaths: config => {
-    const outputPaths = [templateResponseSchemaType.path];
+    const outputPaths = [
+      templateResponseSchemaType.path,
+      templateEndpointSecuritySchemaType.path,
+    ];
     if (config.withZod) {
       return [...outputPaths, templateZodSchemaOfZodLibrary.path];
     }
     return outputPaths;
   },
-};
-
-const templateSecuritySchemeType: TemplateDefinitionOutput = {
-  type: OutputType.TEMPLATE_DEFINITION,
-  definitionType: 'type',
-  path: ['core', 'core', 'securityScheme'],
-  createName: () => {
-    return 'SecurityScheme';
-  },
-  createCode: () => {
-    return '{\nname: string;\nrequiredPermissions: string[];\n}';
-  },
-  getRequiredOutputPaths: () => [],
 };
 
 const templateHeadersType: TemplateDefinitionOutput = {
@@ -467,19 +482,6 @@ export const templateRequestHandlerExecutionConfigType: TemplateDefinitionOutput
     getRequiredOutputPaths: () => [],
   };
 
-const templateEndpointIdType: TemplateDefinitionOutput = {
-  type: OutputType.TEMPLATE_DEFINITION,
-  definitionType: 'type',
-  path: ['core', 'core', 'endpointId'],
-  createName: () => {
-    return 'EndpointId';
-  },
-  createCode: () => {
-    return '{\nmethod: string;\npath: string;\n}';
-  },
-  getRequiredOutputPaths: () => [],
-};
-
 const templateRequestCreationSettingsTypePath = [
   'core',
   'core',
@@ -493,60 +495,37 @@ const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
   createName: () => {
     return 'RequestCreationSettings';
   },
-  createCode: config => {
-    const codeParts: string[] = [];
-    codeParts.push(
-      `endpointId: ${templateEndpointIdType.createName(
-        templateRequestCreationSettingsTypePath
-      )};`
-    );
-    codeParts.push(
-      `supportedSecuritySchemes?: ${templateSecuritySchemeType.createName(
-        templateRequestCreationSettingsTypePath
-      )}[];`
-    );
-    codeParts.push(
+  createCode: () => {
+    const codeParts: string[] = [
       `headers?: ${templateHeadersType.createName(
         templateRequestCreationSettingsTypePath
-      )};`
-    );
-    codeParts.push(
+      )};`,
       `cookies?: ${templateRequestCookiesType.createName(
         templateRequestCreationSettingsTypePath
-      )};`
-    );
-    codeParts.push(
+      )};`,
       `pathParams?: ${templatePathParamsType.createName(
         templateRequestCreationSettingsTypePath
-      )};`
-    );
-    codeParts.push(
+      )};`,
       `queryParams?: ${templateQueryParamsType.createName(
         templateRequestCreationSettingsTypePath
-      )};`
-    );
-    codeParts.push('contentType: string | null;');
-    codeParts.push(
+      )};`,
+      'contentType?: string;',
       `body?: ${templateRequestBodyType.createName(
         templateRequestCreationSettingsTypePath
-      )};`
-    );
-    codeParts.push(
-      `schema: ${templateRequestSchemaType.createName(
+      )};`,
+      `endpointSchema: ${templateEndpointSchemaType.createName(
         templateRequestCreationSettingsTypePath
-      )};`
-    );
+      )};`,
+    ];
     return `{\n${codeParts.join('\n')}\n}`;
   },
   getRequiredOutputPaths: () => [
-    templateEndpointIdType.path,
-    templateSecuritySchemeType.path,
     templateHeadersType.path,
     templateRequestCookiesType.path,
     templatePathParamsType.path,
     templateQueryParamsType.path,
     templateResponseSchemaType.path,
-    templateRequestSchemaType.path,
+    templateEndpointSchemaType.path,
   ],
 };
 
@@ -567,19 +546,12 @@ export const templateCreateRequestFunction: TemplateDefinitionOutput = {
       '}',
     ];
     const objectCodeParts: string[] = [
+      '...settings',
       'id: requestId',
-      'endpointId: settings.endpointId',
-      'supportedSecuritySchemes: settings.supportedSecuritySchemes ?? []',
       `url: ${templateCreateRequestUrlFunction.createName(
         templateCreateRequestFunctionPath
-      )}(settings.endpointId.path, settings.pathParams ?? {})`,
-      'headers: settings.headers',
-      'cookies: settings.cookies',
-      'pathParams: settings.pathParams',
-      'queryParams: settings.queryParams',
-      'contentType: settings.contentType',
-      'body: settings.body',
-      'schema: settings.schema',
+      )}(settings.endpointSchema.path, settings.pathParams ?? {})`,
+      'contentType: settings.contentType ?? null',
     ];
     return `(settings: ${templateRequestCreationSettingsType.createName(
       templateCreateRequestFunctionPath
@@ -634,9 +606,8 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateJsonValueType,
   templateRequestCreationSettingsType,
   templateCreateRequestUrlFunction,
-  templateEndpointIdType,
-  templateSecuritySchemeType,
-  templateRequestSchemaType,
+  templateEndpointSecuritySchemaType,
+  templateEndpointSchemaType,
   templateZOfZodLibrary,
   templateZodSchemaOfZodLibrary,
   templateCreateRequestFunction,
