@@ -112,9 +112,9 @@ it's time to understand how the generated code can be used. The following sectio
 The following example shows how to create a `RequestHandler` instance by composing two different `RequestHandler` implementations.
 In order to process a login, a request is triggered by calling the generated `authenticate` endpoint caller function.
 The previously created requestHandler instance is now passed as a first argument to the `authenticate` function.
-After receiving the `RequestResult` followed by the check of the according response status 200, TypeScript automatically 
-recognizes of what format the delivered response body looks like and the received access token can be stored in
-the `exampleAuthAccessToken` variable.
+After receiving the `RequestResult` followed by the check of the according response status 200, TypeScript recognizes
+what format the delivered response body looks like.
+Finally, the received access token is stored in the `exampleAuthAccessToken` variable.
 
 ```typescript
 import {
