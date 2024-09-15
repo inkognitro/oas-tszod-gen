@@ -133,11 +133,11 @@ declare global {
 
 let myJwtAuthAccessToken: null | string = null;
 
-const jwtAuthenticationProvider: HttpBearerAuthenticationProvider = {
+const myJwtAuthenticationProvider: HttpBearerAuthenticationProvider = {
   type: 'httpBearer',
   
   findToken: (): string | null => {
-    return exampleAuthAccessToken;
+    return myJwtAuthAccessToken;
   },
   
   securitySchemeName: 'myJwtAuth',
@@ -156,10 +156,12 @@ const axiosRequestHandler = new AxiosRequestHandler(myAxiosInstance, {
 });
 
 const requestHandler = new AuthRequestHandler(
-  [exampleAuthenticationProvider],
+  [myJwtAuthenticationProvider],
   // In case of multiple authentication providers, the order does matter:
-  // The first found token by the "findToken" method of a supported security scheme of the called endpoint
-  // will be added to the request header section.
+  // The first found token by the "findToken" method of a supported authentication provider is
+  // added to the request header section.
+  // The endpoint caller function passes the information about supported security schemes
+  // in the composed request's "schema" property.
   
   axiosRequestHandler
 );
