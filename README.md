@@ -202,7 +202,7 @@ async function login() {
   console.log('Successfully logged in!');
 }
 
-login();
+await login();
 ```
 
 ## RequestHandler implementations
