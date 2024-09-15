@@ -56,17 +56,17 @@ export class AuthRequestHandler implements RequestHandler {
     }
     for (const index in request.supportedSecuritySchemes) {
       const securitySchemeName = request.supportedSecuritySchemes[index].name;
-      const securityScheme = this.authenticationProviders.find(
+      const authProvider = this.authenticationProviders.find(
         p => p.securitySchemeName === securitySchemeName
       );
-      if (!securityScheme) {
+      if (!authProvider) {
         continue;
       }
-      const accessToken = securityScheme.findToken();
+      const accessToken = authProvider.findToken();
       if (!accessToken) {
         return request;
       }
-      switch (securityScheme.type) {
+      switch (authProvider.type) {
         case 'httpBasic':
           return {
             ...request,
