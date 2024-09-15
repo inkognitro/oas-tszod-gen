@@ -113,7 +113,7 @@ The following example shows how to create a `RequestHandler` instance by composi
 In order to process a login, a request is triggered by calling the generated `authenticate` endpoint caller function.
 The previously created requestHandler instance is now passed as a first argument to the `authenticate` function.
 After receiving the `RequestResult` followed by the check of the according response status 200, TypeScript recognizes
-the type of the received response body. Finally, the received access token is stored in the `exampleAuthAccessToken` variable.
+the type of the received response body. Finally, the received access token is stored in the `myJwtAuthAccessToken` variable.
 
 ```typescript
 import {
@@ -131,34 +131,36 @@ declare global {
       AuthRequestHandlerExecutionConfig {}
 }
 
-const exampleAuthAccessToken: null | string = null;
+let myJwtAuthAccessToken: null | string = null;
 
-const exampleAuthenticationProvider: HttpBearerAuthenticationProvider = {
+const jwtAuthenticationProvider: HttpBearerAuthenticationProvider = {
   type: 'httpBearer',
   
   findToken: (): string | null => {
     return exampleAuthAccessToken;
   },
   
-  securitySchemeName: 'example',
-  // The name of one of your security definitions in your OAS3 specification
+  securitySchemeName: 'myJwtAuth',
+  // This is the name of one of your security definition in your OAS3 specification
 };
 
 const myAxiosInstance = axios.create();
+
+const axiosRequestHandler = new AxiosRequestHandler(myAxiosInstance, {
+  baseURL: 'https://api.acme.com',
+  
+  withCredentials: true,
+  // In case of browsers:
+  // Allow cookies to be passed along with the request for a different api (sub-)domain (CORS)
+  // Source: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
+});
 
 const requestHandler = new AuthRequestHandler(
   [exampleAuthenticationProvider],
   // In case of multiple authentication providers, the order does matter:
   // The first found token by the "findToken" method is added to the request header.
   
-  new AxiosRequestHandler(myAxiosInstance, {
-    baseURL: 'https://api.acme.com',
-    
-    withCredentials: true,
-    // In case of browsers:
-    // Allow cookies to be passed along with the request for a different api (sub-)domain (CORS)
-    // Source: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
-  });
+  axiosRequestHandler
 );
 
 async function login() {
@@ -195,7 +197,7 @@ async function login() {
   }
 
   const body = await requestResult.response.revealBody();
-  exampleAuthAccessToken = body.accessToken;
+  myJwtAuthAccessToken = body.accessToken;
   
   console.log('Successfully logged in!');
 }
