@@ -158,7 +158,8 @@ const axiosRequestHandler = new AxiosRequestHandler(myAxiosInstance, {
 const requestHandler = new AuthRequestHandler(
   [exampleAuthenticationProvider],
   // In case of multiple authentication providers, the order does matter:
-  // The first found token by the "findToken" method is added to the request header.
+  // The first found token by the "findToken" method of a supported security scheme of the called endpoint
+  // will be added to the request header section.
   
   axiosRequestHandler
 );
