@@ -30,7 +30,7 @@ through different `RequestHandler` implementations
 > app to benefit from automatic caching. There are lots of articles out there which discuss things like
 > [Axios Vs Fetch](https://blog.logrocket.com/axios-vs-fetch-best-http-requests/).
 
-# Generator: Setup and usage
+## Generator: Setup and usage
 First install the package as a dev dependency:
 ```
 npm install oas-to-code --save-dev
@@ -104,22 +104,10 @@ Let's consider some example endpoints which might be defined in your OAS3 specif
 
 The same principles that apply to dots `.` also apply to slashes `/`.
 
-## Out of scope
-Linting is out of scope of this package. The generator is responsible to generate valid TypeScript definitions.
-That's what it does. Your code setup should be responsible for linting your code, so it might make sense for you to run
-Eslint right after the `generateOas3ToTs` function was executed, e.g. with a script in your `package.json` like so:
-```json
-"scripts": {
-  "api:generate": "node api.generate.js && eslint --fix ./generated-api"
-}
-```
+After generating endpoint caller functions from an OAS3 specification into your codebase,
+it's time to understand how the generated code can be used. The following sections should bring some clarity.
 
-# Usage of generated code
-After generating endpoint caller functions out of your OAS3 specification into your codebase,
-you should also be able to understand how to apply the generated code.
-The following sections should serve as an API documentation.
-
-## A simple login example
+## Usage of the generated code by example
 Following example demonstrates how a `RequestHandler` instance is created with two different implementations.
 In order to process a login, a request is triggered by calling the generated `authenticate` endpoint caller function.
 The previously created requestHandler instance is passed as a first argument to the `authenticate` function.
@@ -200,7 +188,7 @@ async function login() {
 
   // The following check is only required if the response with
   // the status code 200 can have arbitrary content types,
-  // according to the given oas3 specification
+  // according to the given OAS3 specification
   if (rr.response.contentType !== 'multipart/form-data') {
     console.log('unsupported response body content of type FormData');
     return;
@@ -302,3 +290,13 @@ of an application then.
 **Worried about different code generation outputs after updating this library?**
 As long as the API contract on the backend side was not violated through breaking changes,
 you don't have to worry about breaking changes in generated code output when upgrading to the next **minor** version.
+
+## Out of scope
+Linting is out of scope of this package. The generator is responsible to generate valid TypeScript definitions.
+That's what it does. Your code setup should be responsible for linting your code, so it might make sense for you to run
+Eslint right after the `generateOas3ToTs` function was executed, e.g. with a script in your `package.json` like so:
+```json
+"scripts": {
+  "api:generate": "node api.generate.js && eslint --fix ./generated-api"
+}
+```
