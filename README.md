@@ -111,10 +111,10 @@ it's time to understand how the generated code can be used. The following sectio
 ## Usage of the generated code by example
 Following example demonstrates how a `RequestHandler` instance is created with two different implementations.
 In order to process a login, a request is triggered by calling the generated `authenticate` endpoint caller function.
-The previously created requestHandler instance is passed as a first argument to the `authenticate` function.
-After receiving the `RequestResult` and the check of the according response status 200, TypeScript automatically 
-knows how the delivered response body looks like.
-Now the received access token can be stored in the `exampleAuthAccessToken` variable.
+The previously created requestHandler instance is now passed as a first argument to the `authenticate` function.
+After receiving the `RequestResult` followed by the check of the according response status 200, TypeScript automatically 
+recognizes of what format the delivered response body looks like and the received access token can be stored in
+the `exampleAuthAccessToken` variable.
 
 ```typescript
 import {
