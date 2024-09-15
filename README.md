@@ -36,8 +36,9 @@ First, install the package as a dev dependency:
 npm install oas-to-code --save-dev
 ```
 
-Now create a new file `api.specs.json` in your project's root folder and paste your OpenApi specification into it.
-As a next step, create a `api.generate.js` file in the root folder of your project and paste the following content:
+Now create a new file `api.specs.json` in the root folder of your project and paste your OAS3 specification into it.
+The next step is to create a file `api.generate.js` - also in the root folder of your project - and paste the following
+code into it:
 
 ```typescript
 // api.generate.js
