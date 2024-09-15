@@ -77,7 +77,6 @@ export type SecurityScheme = {
 };
 
 export type RequestSchema = {
-  status: number | 'any'; // "any" is used for unexpected status codes
   bodyVariants: {
     contentType: string; // case-sensitive, according to oas3 specs
     zodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
@@ -178,12 +177,12 @@ export interface RequestResult<
   error?: Error; // must only be set when the RequestResult Promise was rejected
 }
 
-export interface RequestExecutionConfig {}
+export interface RequestHandlerExecutionConfig {}
 
 export interface RequestHandler {
   execute(
     request: Request,
-    config?: RequestExecutionConfig
+    config?: RequestHandlerExecutionConfig
   ): Promise<RequestResult>;
   cancelRequestById(requestId: string): void;
   cancelAllRequests(): void;

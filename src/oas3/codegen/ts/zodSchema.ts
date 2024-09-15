@@ -31,7 +31,7 @@ import {
   StringSchema,
 } from '@oas3/specification';
 import {templateZOfZodLibrary} from './template';
-import {GenerateConfig} from '@oas3/codegen/ts/generator';
+import {GenerateConfig} from './generator';
 
 export function applyZodSchema(
   codeGenerator: CodeGenerator,

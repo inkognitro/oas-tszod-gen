@@ -17,7 +17,7 @@ import {
 } from '@oas3/specification';
 import {
   templateCreateRequestFunction,
-  templateRequestExecutionConfigType,
+  templateRequestHandlerExecutionConfigType,
   templateRequestHandlerType,
   templateRequestResultType,
   templateRequestType,
@@ -25,7 +25,7 @@ import {
 import {GenerateConfig} from './generator';
 import {applyObjectSchema} from './schema';
 import {applyEndpointResponse} from './endpointResponse';
-import {applyNullableRequestBodyTypeDefinition} from '@oas3/codegen/ts/endpointRequest';
+import {applyNullableRequestBodyTypeDefinition} from './endpointRequest';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -314,7 +314,8 @@ export function applyEndpointCallerFunction(
         const pTn = payloadTypeDefinition?.createName(path);
         const payloadParamCode = pTn ? `, payload: ${pTn}` : '';
         const rrTn = requestResultTypeDefinition.createName(path);
-        const cfgTn = templateRequestExecutionConfigType.createName(path);
+        const cfgTn =
+          templateRequestHandlerExecutionConfigType.createName(path);
         const bodyParts: string[] = [];
         const requestCreationCode = createRequestCreationCode(
           path,
@@ -336,7 +337,7 @@ export function applyEndpointCallerFunction(
           requestResultTypeDefinition.path,
           templateRequestHandlerType.path,
           templateCreateRequestFunction.path,
-          templateRequestExecutionConfigType.path,
+          templateRequestHandlerExecutionConfigType.path,
         ];
         if (payloadTypeDefinition) {
           outputPaths.push(payloadTypeDefinition.path);

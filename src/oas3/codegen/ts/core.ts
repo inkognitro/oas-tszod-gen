@@ -1,5 +1,5 @@
 import {Parameter, Response, Schema, Specification} from '@oas3/specification';
-import {GenerateConfig} from '@oas3/codegen/ts/generator';
+import {GenerateConfig} from './generator';
 
 export interface CodeGenerator {
   getSpecification(): Specification;

@@ -1,4 +1,4 @@
-import {OutputType, TemplateDefinitionOutput} from '@oas3/codegen/ts/core';
+import {OutputType, TemplateDefinitionOutput} from './core';
 
 const templateCreateRequestUrlFunctionPath = [
   'core',
@@ -195,7 +195,7 @@ export const templateRequestHandlerType: TemplateDefinitionOutput = {
   createCode: () => {
     return `{\nexecute(request: ${templateRequestType.createName(
       templateRequestHandlerTypePath
-    )}, config?: ${templateRequestExecutionConfigType.createName(
+    )}, config?: ${templateRequestHandlerExecutionConfigType.createName(
       templateRequestHandlerTypePath
     )}): Promise<${templateRequestResultType.createName(
       templateRequestHandlerTypePath
@@ -203,7 +203,7 @@ export const templateRequestHandlerType: TemplateDefinitionOutput = {
   },
   getRequiredOutputPaths: () => [
     templateRequestType.path,
-    templateRequestExecutionConfigType.path,
+    templateRequestHandlerExecutionConfigType.path,
     templateRequestResultType.path,
   ],
 };
@@ -375,7 +375,6 @@ const templateRequestSchemaType: TemplateDefinitionOutput = {
       bodyVariantsCodeParts.push('zodSchema?: ZodSchema;');
     }
     const codeParts: string[] = [
-      'status: number | \'any\'; // "any" is used for unexpected status codes',
       `bodyVariants: {\n${bodyVariantsCodeParts.join('\n')}\n}[];`,
     ];
     if (config.withZod) {
@@ -454,18 +453,19 @@ const templateRequestCookiesType: TemplateDefinitionOutput = {
   getRequiredOutputPaths: () => [],
 };
 
-export const templateRequestExecutionConfigType: TemplateDefinitionOutput = {
-  type: OutputType.TEMPLATE_DEFINITION,
-  definitionType: 'interface',
-  path: ['core', 'core', 'requestExecutionConfig'],
-  createName: () => {
-    return 'RequestExecutionConfig';
-  },
-  createCode: () => {
-    return '{}';
-  },
-  getRequiredOutputPaths: () => [],
-};
+export const templateRequestHandlerExecutionConfigType: TemplateDefinitionOutput =
+  {
+    type: OutputType.TEMPLATE_DEFINITION,
+    definitionType: 'interface',
+    path: ['core', 'core', 'requestHandlerExecutionConfig,'],
+    createName: () => {
+      return 'RequestHandlerExecutionConfig';
+    },
+    createCode: () => {
+      return '{}';
+    },
+    getRequiredOutputPaths: () => [],
+  };
 
 const templateEndpointIdType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
@@ -648,6 +648,6 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateResponseDataType,
   templateResponseType,
   templateRequestResultType,
-  templateRequestExecutionConfigType,
+  templateRequestHandlerExecutionConfigType,
   templateRequestHandlerType,
 ];

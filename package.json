@@ -18,7 +18,7 @@
     "build": "tspc && npm run copyTemplateFiles",
     "copyTemplateFiles": "copyfiles -u 1 src/templates/** dist",
     "lint": "gts lint",
-    "lint:fix": "tsc && gts fix",
+    "lint:fix": "tsc --noEmit && gts fix",
     "start": "npm run copyTemplateFiles && tspc -w",
     "test": "jest",
     "test-ci": "gts lint && jest --ci --coverage",

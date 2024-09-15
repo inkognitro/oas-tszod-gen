@@ -20,12 +20,12 @@ import {
   OutputType,
 } from './core';
 import {GenerateConfig} from './generator';
-import {applyObjectSchema, applySchema} from '@oas3/codegen/ts/schema';
+import {applyObjectSchema, applySchema} from './schema';
 import {
   templateResponseBodyDataType,
   templateResponseDataType,
-} from '@oas3/codegen/ts/template';
-import {applyNullableFormDataDefinition} from '@oas3/codegen/ts/formData';
+} from './template';
+import {applyNullableFormDataDefinition} from './formData';
 
 function createHeadersObjectSchema(
   codeGenerator: CodeGenerator,

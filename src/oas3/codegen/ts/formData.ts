@@ -4,9 +4,9 @@ import {
   DefinitionOutput,
   OutputPath,
   OutputType,
-} from '@oas3/codegen/ts/core';
+} from './core';
 import {isObjectSchema, isStringSchema, Schema} from '@oas3/specification';
-import {GenerateConfig} from '@oas3/codegen/ts/generator';
+import {GenerateConfig} from './generator';
 
 export function applyNullableFormDataDefinition(
   codeGenerator: CodeGenerator,

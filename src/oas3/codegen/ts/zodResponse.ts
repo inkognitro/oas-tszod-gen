@@ -4,8 +4,8 @@ import {
   Response,
   ResponseHeaderByNameMap,
 } from '@oas3/specification';
-import {CodeGenerator, OutputPath} from '@oas3/codegen/ts/core';
-import {GenerateConfig} from '@oas3/codegen/ts/generator';
+import {CodeGenerator, OutputPath} from './core';
+import {GenerateConfig} from './generator';
 
 // todo: use or remove
 function createObjectSchemaForHeadersZodSchema(
