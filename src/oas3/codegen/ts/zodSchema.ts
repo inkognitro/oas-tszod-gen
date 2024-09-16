@@ -30,7 +30,7 @@ import {
   OneOfSchema,
   Schema,
   StringSchema,
-} from '@oas3/specification';
+} from '@/oas3/specification';
 import {templateZOfZodLibrary} from './template';
 import {GenerateConfig} from './generator';
 

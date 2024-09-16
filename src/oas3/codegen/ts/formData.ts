@@ -5,7 +5,7 @@ import {
   OutputPath,
   OutputType,
 } from './core';
-import {isObjectSchema, isStringSchema, Schema} from '@oas3/specification';
+import {isObjectSchema, isStringSchema, Schema} from '@/oas3/specification';
 import {GenerateConfig} from './generator';
 
 export function applyNullableFormDataDefinition(

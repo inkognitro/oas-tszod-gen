@@ -5,7 +5,8 @@
     "outDir": "dist",
     "baseUrl": "./src",
     "paths": {
-      "@oas3/*": ["./oas3/*"]
+      "@/*": ["./*"],
+      "@generation-outputs/*": ["../generation-outputs/*"]
     },
     "lib": [
       "ES2021.String",

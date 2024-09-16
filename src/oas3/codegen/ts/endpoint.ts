@@ -7,7 +7,7 @@ import {
   ObjectSchemaProperties,
   ConcreteParameterLocation,
   concreteParameterLocations,
-} from '@oas3/specification';
+} from '@/oas3/specification';
 import {
   templateCreateRequestFunction,
   templateRequestHandlerExecutionConfigType,

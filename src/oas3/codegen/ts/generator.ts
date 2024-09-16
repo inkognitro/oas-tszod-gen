@@ -24,7 +24,7 @@ import {
   findComponentParameterByRef,
   findComponentResponseByRef,
   findComponentSchemaByRef,
-} from '@oas3/specification';
+} from '@/oas3/specification';
 import {
   applyEndpointCallerFunction,
   requestResultOutputPathPart,

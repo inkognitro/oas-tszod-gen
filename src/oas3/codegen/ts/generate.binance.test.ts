@@ -9,10 +9,11 @@ test('can generate files from binance api specification', () => {
           resolve(binanceApiSpecification);
         });
       },
-      outputFolderPath: './generated-files-binance',
+      outputFolderPath: './generation-outputs/binance',
       logger: {
         log: () => {},
       },
+      importRootAlias: '@generation-outputs/binance',
     });
   }).not.toThrow();
 });
@@ -25,11 +26,12 @@ test('can generate files from binance api specification with Zod', () => {
           resolve(binanceApiSpecification);
         });
       },
-      outputFolderPath: './generated-files-binance',
+      outputFolderPath: './generation-outputs/binance',
       logger: {
         log: () => {},
       },
       withZod: true,
+      importRootAlias: '@generation-outputs/binance',
     });
   }).not.toThrow();
 });

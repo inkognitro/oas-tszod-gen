@@ -1,10 +1,7 @@
 .idea
 dist
 node_modules
-generated-files-petstore1
-generated-files-petstore2
-generated-files-binance
-generated-files-other
+generation-outputs
 src/oas3/codegen/ts/generate.other.test.endpoint.ts
 src/oas3/codegen/ts/generate.other.test.specs.json
 src/oas3/codegen/ts/generate.other.test.ts

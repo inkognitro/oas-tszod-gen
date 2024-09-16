@@ -1,4 +1,4 @@
-import {Endpoint, Specification} from '@oas3/specification';
+import {Specification} from '@/oas3/specification';
 import {GenerateConfig} from './generator';
 
 export interface CodeGenerator {

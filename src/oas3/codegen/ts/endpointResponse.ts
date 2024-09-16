@@ -6,7 +6,7 @@ import {
   OutputPath,
   OutputType,
 } from './core';
-import {ResponseByStatusCodeMap} from '@oas3/specification';
+import {ResponseByStatusCodeMap} from '@/oas3/specification';
 import {GenerateConfig} from './generator';
 import {applyResponse} from './response';
 import {templateResponseType} from './template';

@@ -1,7 +1,7 @@
 import {
   RequestBodyContentByTypeMap,
   ResponseBodyContent,
-} from '@oas3/specification';
+} from '@/oas3/specification';
 import {
   CodeGenerationOutput,
   CodeGenerator,

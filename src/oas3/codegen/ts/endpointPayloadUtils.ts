@@ -5,7 +5,7 @@ import {
   ObjectSchema,
   ObjectSchemaProperties,
   Parameter,
-} from '@oas3/specification';
+} from '@/oas3/specification';
 
 export function findObjectSchemaFromLocationParameters(
   codeGenerator: CodeGenerator,

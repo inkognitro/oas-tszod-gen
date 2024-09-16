@@ -10,7 +10,7 @@ import {
   isResponseComponentRef,
   isConcreteResponse,
   findConcreteSchema,
-} from '@oas3/specification';
+} from '@/oas3/specification';
 import {
   CodeGenerationOutput,
   CodeGenerator,

@@ -9,7 +9,7 @@ import {
   Response,
   ResponseBodyContentByContentTypeMap,
   ResponseHeaderByNameMap,
-} from '@oas3/specification';
+} from '@/oas3/specification';
 import {
   CodeGenerationOutput,
   CodeGenerator,

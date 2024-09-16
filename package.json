@@ -8,8 +8,8 @@
     "./README.md"
   ],
   "paths": {
-    "@oas3/*": [
-      "./dist/oas3/*"
+    "@/*": [
+      "./dist/*"
     ]
   },
   "main": "dist/index.js",

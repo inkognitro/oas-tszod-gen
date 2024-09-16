@@ -3,8 +3,7 @@ module.exports = {
   coveragePathIgnorePatterns: [
     '<rootDir>/dist/',
     '<rootDir>/src/templates',
-    '<rootDir>/generated-files-petstore1',
-    '<rootDir>/generated-files-petstore2',
+    '<rootDir>/generation-outputs',
   ],
   roots: ['<rootDir>/src'],
   testMatch: [
@@ -15,6 +14,6 @@ module.exports = {
     '^.+\\.(ts)$': 'ts-jest',
   },
   moduleNameMapper: {
-    '@oas3/(.*)': '<rootDir>/src/oas3/$1',
+    '@/(.*)': '<rootDir>/src/$1',
   },
 };

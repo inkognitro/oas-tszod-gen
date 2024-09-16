@@ -15,7 +15,7 @@ import {
   RequestBodyContent,
   RequestBodyContentByTypeMap,
   ResponseByStatusCodeMap,
-} from '@oas3/specification';
+} from '@/oas3/specification';
 import {applyZodSchema} from './zodSchema';
 import {applyResponseSchema} from './responseSchema';
 import {findObjectSchemaFromLocationParameters} from './endpointPayloadUtils';
