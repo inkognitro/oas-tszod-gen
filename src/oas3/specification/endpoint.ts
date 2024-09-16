@@ -143,7 +143,7 @@ export function isParameter(anyValue: unknown): anyValue is Parameter {
 }
 
 export type Endpoint = {
-  operationId: string;
+  operationId?: string;
   tags: string[];
   parameters?: Parameter[];
   requestBody?: RequestBody;
@@ -157,7 +157,7 @@ export function isEndpoint(anyValue: unknown): anyValue is Endpoint {
   if (typeof value !== 'object' || Array.isArray(value)) {
     return false;
   }
-  if (typeof value.operationId !== 'string') {
+  if (value.operationId && typeof value.operationId !== 'string') {
     return false;
   }
   if (!Array.isArray(value.tags)) {

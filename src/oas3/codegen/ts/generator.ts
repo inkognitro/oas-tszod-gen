@@ -160,6 +160,7 @@ export type GenerateConfig = {
   predefinedFolderOutputPaths?: OutputPath[];
   withZod: boolean;
   requestHandlers?: RequestHandlersGenerateConfig;
+  ignoreEndpointsWithoutOperationId?: boolean;
 };
 
 export class DefaultCodeGenerator implements CodeGenerator {
@@ -206,7 +207,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
       const requestByMethodMap = this.oas3Specs.paths[path];
       for (const method in requestByMethodMap) {
         const request = requestByMethodMap[method];
-        const outputPath = this.createOperationOutputPath(request.operationId);
+        if (!request.operationId && config.ignoreEndpointsWithoutOperationId) {
+          continue;
+        }
+        const operationId =
+          request.operationId ?? this.generateEndpointOperationId(method, path);
+        const outputPath = this.createOperationOutputPath(operationId);
         if (outputPath.length < 2) {
           continue;
         }
@@ -214,6 +220,17 @@ export class DefaultCodeGenerator implements CodeGenerator {
         this.operationFolderOutputPaths.push(folderOutputPath);
       }
     }
+  }
+
+  generateEndpointOperationId(method: string, path: string): string {
+    const pathPart = path
+      .split('-')
+      .join('/')
+      .split('/')
+      .filter(p => !!p.length)
+      .map(p => capitalizeFirstLetter(p.toLowerCase()))
+      .join('');
+    return `${method.toLowerCase()}${pathPart}`;
   }
 
   private getTemplateFileInfosToGenerate(
@@ -616,7 +633,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       const targetFileNameParts = targetFileName.split('.ts');
       return `./${targetFileNameParts[0]}`;
     }
-    let relativePath = '../';
+    let relativePath = refFolderPath ? '../' : '.';
     let commonIndex = refFolderPathParts.length - 1;
     for (let index = refFolderPathParts.length - 1; index >= 0; index--) {
       const refPathPrefixParts = refFolderPathParts.slice(0, index);

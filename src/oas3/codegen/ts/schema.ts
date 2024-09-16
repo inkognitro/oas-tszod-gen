@@ -16,6 +16,7 @@ import {
   ComponentRef,
   IntegerSchema,
   isAllOfSchema,
+  isAnyOfSchema,
   isArraySchema,
   isBooleanSchema,
   isIntegerSchema,
@@ -84,6 +85,14 @@ export function applySchema(
       schema,
       path,
       config,
+      preventFromAddingComponentRefs
+    );
+  }
+  if (isAnyOfSchema(schema)) {
+    return applyAnyOfSchema(
+      codeGenerator,
+      schema,
+      path,
       preventFromAddingComponentRefs
     );
   }
@@ -347,12 +356,28 @@ function applyOneOfSchema(
   };
 }
 
+function applyAnyOfSchema(
+  _codeGenerator: CodeGenerator,
+  _schema: AllOfSchema,
+  path: OutputPath,
+  _preventFromAddingComponentRefs: string[] = []
+): CodeGenerationOutput {
+  // todo: implement
+  const requiredOutputPaths: OutputPath[] = [];
+  return {
+    createCode: () => 'any',
+    path,
+    getRequiredOutputPaths: () => requiredOutputPaths,
+  };
+}
+
 function applyAllOfSchema(
   _codeGenerator: CodeGenerator,
   _schema: AllOfSchema,
   path: OutputPath,
   _preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
+  // todo: implement
   const requiredOutputPaths: OutputPath[] = [];
   return {
     createCode: () => 'any',

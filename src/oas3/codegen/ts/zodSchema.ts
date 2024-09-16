@@ -16,6 +16,7 @@ import {
   ComponentRef,
   IntegerSchema,
   isAllOfSchema,
+  isAnyOfSchema,
   isArraySchema,
   isBooleanSchema,
   isIntegerSchema,
@@ -85,6 +86,14 @@ export function applyZodSchema(
       schema,
       path,
       config,
+      preventFromAddingComponentRefs
+    );
+  }
+  if (isAnyOfSchema(schema)) {
+    return applyZodAnyOfSchema(
+      codeGenerator,
+      schema,
+      path,
       preventFromAddingComponentRefs
     );
   }
@@ -383,12 +392,29 @@ function applyZodOneOfSchema(
   };
 }
 
+function applyZodAnyOfSchema(
+  _codeGenerator: CodeGenerator,
+  _schema: AllOfSchema,
+  path: OutputPath,
+  _preventFromAddingComponentRefs: string[] = []
+): CodeGenerationOutput {
+  // todo: implement
+  return {
+    createCode: () => {
+      return 'z.any()';
+    },
+    path,
+    getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
+  };
+}
+
 function applyZodAllOfSchema(
   _codeGenerator: CodeGenerator,
   _schema: AllOfSchema,
   path: OutputPath,
   _preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
+  // todo: implement
   return {
     createCode: () => {
       return 'z.any()';

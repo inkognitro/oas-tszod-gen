@@ -197,7 +197,13 @@ export function applyEndpointCallerFunction(
   schema: Endpoint,
   config: GenerateConfig
 ) {
-  const path = codeGenerator.createOperationOutputPath(schema.operationId);
+  if (!schema.operationId && config.ignoreEndpointsWithoutOperationId) {
+    return;
+  }
+  const operationId =
+    schema.operationId ??
+    codeGenerator.generateEndpointOperationId(requestMethod, urlPath);
+  const path = codeGenerator.createOperationOutputPath(operationId);
   const endpointSchemaConstDefinition = applyEndpointSchemaConstDefinition(
     codeGenerator,
     urlPath,

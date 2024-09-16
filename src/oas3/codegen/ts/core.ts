@@ -1,4 +1,4 @@
-import {Specification} from '@oas3/specification';
+import {Endpoint, Specification} from '@oas3/specification';
 import {GenerateConfig} from './generator';
 
 export interface CodeGenerator {
@@ -15,6 +15,7 @@ export interface CodeGenerator {
     componentRef: string,
     referencingPath: OutputPath
   ): string;
+  generateEndpointOperationId(method: string, path: string): string;
   createEnumName(outputPath: OutputPath, referencingPath: OutputPath): string;
   createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string;
   createConstName(outputPath: OutputPath, referencingPath: OutputPath): string;
