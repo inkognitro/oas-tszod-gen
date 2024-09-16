@@ -336,9 +336,9 @@ const templateResponseSchemaType: TemplateDefinitionOutput = {
     }
     const codeParts: string[] = [
       'status: number | \'any\'; // "any" is used for unexpected status codes',
-      `bodyByContentType: {\n[contentType: string]: {\n${bodyTypeCodeParts.join(
+      `bodyByContentType: Record<string, {\n${bodyTypeCodeParts.join(
         '\n'
-      )}\n}\n};`,
+      )}\n}>;`,
     ];
     if (config.withZod) {
       codeParts.push('headersZodSchema?: ZodSchema;');
@@ -398,9 +398,9 @@ export const templateEndpointSchemaType: TemplateDefinitionOutput = {
       )}[];`,
     ];
     codeParts.push(
-      `bodyByContentType: {\n[contentType: string]: {\n${bodyTypeCodeParts.join(
+      `bodyByContentType: Record<string, {\n${bodyTypeCodeParts.join(
         '\n'
-      )}\n}\n};`
+      )}\n}>;`
     );
     if (config.withZod) {
       codeParts.push('headersZodSchema?: ZodSchema;');
@@ -409,9 +409,9 @@ export const templateEndpointSchemaType: TemplateDefinitionOutput = {
       codeParts.push('queryParamsZodSchema?: ZodSchema;');
     }
     codeParts.push(
-      `responses: ${templateResponseSchemaType.createName(
+      `responseByStatus: Partial<Record<number | 'any', ${templateResponseSchemaType.createName(
         templateEndpointSchemaTypePath
-      )}[];`
+      )}>>;`
     );
     return `{\n${codeParts.join('\n')}\n}`;
   },

@@ -73,17 +73,18 @@ export type EndpointSchema = {
   path: string;
   method: string;
   supportedSecuritySchemas: EndpointSecuritySchema[];
-  bodyByContentType: {
-    [contentType: string]: {
+  bodyByContentType: Record<
+    string,
+    {
       contentType: string; // case-sensitive, according to oas3 specs
       zodSchema: ZodSchema; // only defined by the generator when "withZod: true"
-    };
-  };
+    }
+  >;
   headersZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
   cookiesZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
   pathParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
   queryParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  responses: ResponseSchema[];
+  responseByStatus: Partial<Record<number | 'any', ResponseSchema>>;
 };
 
 export function createRequest(settings: RequestCreationSettings): Request {
@@ -122,12 +123,13 @@ export type Request<
 
 export type ResponseSchema = {
   status: number | 'any'; // "any" is used for unexpected status codes
-  bodyByContentType: {
-    [contentType: string]: {
+  bodyByContentType: Record<
+    string,
+    {
       contentType: string; // case-sensitive, according to oas3 specs
       zodSchema: ZodSchema; // only defined by the generator when "withZod: true"
-    };
-  };
+    }
+  >;
   headersZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
 };
 
