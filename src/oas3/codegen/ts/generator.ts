@@ -1068,7 +1068,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       fileNameOutputPathPart = componentParametersFileNameOutputPathPart;
     } else if (componentRef.startsWith(responseComponentRefPrefix)) {
       fileNameOutputPathPart = componentResponsesFileNameOutputPathPart;
-      typeNamePathParts.push('responsePayload');
+      typeNamePathParts.push('response');
     } else if (componentRef.startsWith(schemaComponentRefPrefix)) {
       fileNameOutputPathPart = componentSchemasFileNameOutputPathPart;
     }
