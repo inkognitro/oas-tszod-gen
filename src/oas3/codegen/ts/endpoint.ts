@@ -7,6 +7,7 @@ import {
   Endpoint,
   findConcreteParameter,
   concreteParameterLocations,
+  RequestBody,
 } from '@oas3/specification';
 import {
   templateCreateRequestFunction,
@@ -18,8 +19,8 @@ import {
 import {GenerateConfig} from './generator';
 import {applyObjectSchema} from './schema';
 import {applyEndpointResponse} from './endpointResponse';
-import {applyNullableRequestBodyTypeDefinition} from './endpointRequest';
 import {applyEndpointSchemaConstDefinition} from './endpointSchema';
+import {applyRequestBodyByContentTypeMap} from './request';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -200,6 +201,32 @@ function createRequestCreationCode(
     `endpointSchema: ${endpointSchemaDefinition.createName(path)}`
   );
   return `createRequest({${codeParts.join(',\n')}})`;
+}
+
+function applyNullableRequestBodyTypeDefinition(
+  codeGenerator: CodeGenerator,
+  schema: RequestBody,
+  path: OutputPath,
+  config: GenerateConfig
+): null | DefinitionOutput {
+  if (!schema.content) {
+    return null;
+  }
+  const definitionOutput: DefinitionOutput = {
+    ...applyRequestBodyByContentTypeMap(
+      codeGenerator,
+      schema.content,
+      path,
+      config
+    ),
+    type: OutputType.DEFINITION,
+    definitionType: 'type',
+    path,
+    createName: referencingPath =>
+      codeGenerator.createTypeName(path, referencingPath),
+  };
+  codeGenerator.addOutput(definitionOutput, config);
+  return definitionOutput;
 }
 
 export function applyEndpointCallerFunction(

@@ -74,20 +74,21 @@ function applyResponseBodyContent(
   codeGenerator: CodeGenerator,
   contentType: string,
   contentSchema: ResponseBodyContent,
-  path: OutputPath,
+  parentPath: OutputPath,
   config: GenerateConfig
 ): ApplyResponseBodyResult {
   if (contentType.toLowerCase() === 'multipart/form-data') {
+    const pathForFormData = [...parentPath, 'FormData'];
     const typedFormData = applyNullableFormDataDefinition(
       codeGenerator,
       contentSchema.schema,
-      path,
+      pathForFormData,
       config
     );
     return {
       contentType,
       codeOutput: {
-        path,
+        path: pathForFormData,
         createCode: referencingPath => {
           if (typedFormData) {
             return typedFormData.createName(referencingPath);
@@ -105,7 +106,12 @@ function applyResponseBodyContent(
   }
   return {
     contentType,
-    codeOutput: applySchema(codeGenerator, contentSchema.schema, path, config),
+    codeOutput: applySchema(
+      codeGenerator,
+      contentSchema.schema,
+      [...parentPath, contentType],
+      config
+    ),
   };
 }
 
@@ -126,13 +132,13 @@ function applyConcreteResponse(
   const bodyResults: ApplyResponseBodyResult[] = [];
   for (const contentType in schema.content) {
     const contentSchema = schema.content[contentType];
-    const contentPath = [...path, 'body', contentType];
+    const bodyPath = [...path, 'body'];
     bodyResults.push(
       applyResponseBodyContent(
         codeGenerator,
         contentType,
         contentSchema,
-        contentPath,
+        bodyPath,
         config
       )
     );

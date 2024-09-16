@@ -21,20 +21,21 @@ function applyRequestBodyContent(
   codeGenerator: CodeGenerator,
   contentType: string,
   contentSchema: ResponseBodyContent,
-  path: OutputPath,
+  parentPath: OutputPath,
   config: GenerateConfig
 ): ApplyRequestBodyResult {
   if (contentType.toLowerCase() === 'multipart/form-data') {
+    const pathForFormData = [...parentPath, 'FormData'];
     const typedFormData = applyNullableFormDataDefinition(
       codeGenerator,
       contentSchema.schema,
-      path,
+      pathForFormData,
       config
     );
     return {
       contentType,
       codeOutput: {
-        path,
+        path: pathForFormData,
         createCode: referencingPath => {
           if (typedFormData) {
             return typedFormData.createName(referencingPath);
@@ -52,7 +53,12 @@ function applyRequestBodyContent(
   }
   return {
     contentType,
-    codeOutput: applySchema(codeGenerator, contentSchema.schema, path, config),
+    codeOutput: applySchema(
+      codeGenerator,
+      contentSchema.schema,
+      [...parentPath, contentType],
+      config
+    ),
   };
 }
 
@@ -65,13 +71,12 @@ export function applyRequestBodyByContentTypeMap(
   const bodyResults: ApplyRequestBodyResult[] = [];
   for (const contentType in schema) {
     const contentSchema = schema[contentType];
-    const contentPath = [...path, 'body', contentType];
     bodyResults.push(
       applyRequestBodyContent(
         codeGenerator,
         contentType,
         contentSchema,
-        contentPath,
+        path,
         config
       )
     );
