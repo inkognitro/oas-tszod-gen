@@ -244,7 +244,7 @@ export function applyZodComponentRefSchema(
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
     createName: referencingPath => {
-      return codeGenerator.createComponentZodSchemaName(
+      return codeGenerator.createComponentConstNameForZodSchema(
         schema.$ref,
         referencingPath
       );
@@ -252,14 +252,19 @@ export function applyZodComponentRefSchema(
     componentRef: schema.$ref,
     path,
     getRequiredOutputPaths: () => [
-      codeGenerator.createOutputPathByComponentRefForZodSchema(schema.$ref),
+      codeGenerator.createOutputPathByComponentRefForZodSchemaConst(
+        schema.$ref
+      ),
     ],
   };
   codeGenerator.addOutput(output, config, preventFromAddingComponentRefs);
   return {
     ...output,
     createCode: referencingPath =>
-      codeGenerator.createComponentZodSchemaName(schema.$ref, referencingPath),
+      codeGenerator.createComponentConstNameForZodSchema(
+        schema.$ref,
+        referencingPath
+      ),
   };
 }
 

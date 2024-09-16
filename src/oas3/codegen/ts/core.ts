@@ -1,14 +1,17 @@
-import {Parameter, Response, Schema, Specification} from '@oas3/specification';
+import {Specification} from '@oas3/specification';
 import {GenerateConfig} from './generator';
 
 export interface CodeGenerator {
   getSpecification(): Specification;
-
-  createComponentTypeName(
+  createComponentNameForType(
     componentRef: string,
     referencingPath: OutputPath
   ): string;
-  createComponentZodSchemaName(
+  createComponentNameForConst(
+    componentRef: string,
+    referencingPath: OutputPath
+  ): string;
+  createComponentConstNameForZodSchema(
     componentRef: string,
     referencingPath: OutputPath
   ): string;
@@ -20,8 +23,11 @@ export interface CodeGenerator {
     referencingPath: OutputPath
   ): string;
   createOperationOutputPath(operationId: string): OutputPath;
-  createOutputPathByComponentRef(componentRef: string): OutputPath;
-  createOutputPathByComponentRefForZodSchema(componentRef: string): OutputPath;
+  createOutputPathByComponentRefForType(componentRef: string): OutputPath;
+  createOutputPathByComponentRefForConst(componentRef: string): OutputPath;
+  createOutputPathByComponentRefForZodSchemaConst(
+    componentRef: string
+  ): OutputPath;
   addOutput(
     output: Output,
     config: GenerateConfig,

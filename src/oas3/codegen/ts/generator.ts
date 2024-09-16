@@ -35,7 +35,7 @@ import {templateDefinitionOutputs, templateZOfZodLibrary} from './template';
 import {applySchema} from './schema';
 import {applyZodSchema} from './zodSchema';
 import {applyResponse} from './response';
-import {addZodResponseOutputs} from './zodResponse';
+import {applyResponseSchema} from './responseSchema';
 
 const fs = require('fs');
 const path = require('path');
@@ -436,65 +436,49 @@ export class DefaultCodeGenerator implements CodeGenerator {
     componentRef: string,
     config: GenerateConfig
   ) {
-    const outputPath = this.createOutputPathByComponentRef(componentRef);
-    if (this.findOutputByOutputPath(outputPath)) {
-      return;
-    }
     const response = findComponentResponseByRef(this.oas3Specs, componentRef);
     if (!response) {
-      const output: AnyDefinitionOutput = {
-        type: OutputType.DEFINITION,
-        definitionType: 'type',
-        createCode: () => {
-          return 'any';
-        },
-        path: outputPath,
-        createName: referencingPath =>
-          this.createComponentTypeName(componentRef, referencingPath),
-        getRequiredOutputPaths: () => [],
-      };
-      this.addOutput(output, config);
+      throw new Error(`could not find component "${componentRef}" in specs`);
+    }
+    const typeOutputPath =
+      this.createOutputPathByComponentRefForType(componentRef);
+    if (this.findOutputByOutputPath(typeOutputPath)) {
       return;
     }
-    const output: AnyDefinitionOutput = {
+    const typeOutput: AnyDefinitionOutput = {
       type: OutputType.DEFINITION,
-      ...applyResponse(this, response, outputPath, config, [componentRef]),
+      ...applyResponse(this, response, typeOutputPath, config, [componentRef]),
       definitionType: 'type',
       createName: referencingPath =>
-        this.createComponentTypeName(componentRef, referencingPath),
+        this.createComponentNameForType(componentRef, referencingPath),
     };
-    this.addOutput(output, config);
-    if (config.withZod) {
-      const outputPathZodSchema =
-        this.createOutputPathByComponentRefForZodSchema(componentRef);
-      addZodResponseOutputs(this, response, outputPathZodSchema, config, [
+    this.addOutput(typeOutput, config);
+
+    const constOutputPath =
+      this.createOutputPathByComponentRefForConst(componentRef);
+    const constOutput: AnyDefinitionOutput = {
+      type: OutputType.DEFINITION,
+      ...applyResponseSchema(this, response, constOutputPath, config, [
         componentRef,
-      ]);
-    }
+      ]),
+      definitionType: 'const',
+      createName: referencingPath =>
+        this.createComponentNameForConst(componentRef, referencingPath),
+    };
+    this.addOutput(constOutput, config);
   }
 
   private addOutputByParameterComponentRef(
     componentRef: string,
     config: GenerateConfig
   ) {
-    const outputPath = this.createOutputPathByComponentRef(componentRef);
-    if (this.findOutputByOutputPath(outputPath)) {
-      return;
+    const parameter = findComponentParameterByRef(this.oas3Specs, componentRef);
+    if (!parameter) {
+      throw new Error(`could not find component "${componentRef}" in specs`);
     }
-    const schema = findComponentParameterByRef(this.oas3Specs, componentRef);
-    if (!schema) {
-      const output: AnyDefinitionOutput = {
-        type: OutputType.DEFINITION,
-        definitionType: 'type',
-        createCode: () => {
-          return 'any';
-        },
-        path: outputPath,
-        createName: referencingPath =>
-          this.createComponentTypeName(componentRef, referencingPath),
-        getRequiredOutputPaths: () => [],
-      };
-      this.addOutput(output, config);
+    const typeOutputPath =
+      this.createOutputPathByComponentRefForType(componentRef);
+    if (this.findOutputByOutputPath(typeOutputPath)) {
       return;
     }
     // todo: implement
@@ -504,59 +488,37 @@ export class DefaultCodeGenerator implements CodeGenerator {
     componentRef: string,
     config: GenerateConfig
   ) {
-    const outputPath = this.createOutputPathByComponentRef(componentRef);
-    const outputPathZodSchema =
-      this.createOutputPathByComponentRefForZodSchema(componentRef);
-    if (this.findOutputByOutputPath(outputPath)) {
-      return;
-    }
     const schema = findComponentSchemaByRef(this.oas3Specs, componentRef);
     if (!schema) {
-      const output: AnyDefinitionOutput = {
-        type: OutputType.DEFINITION,
-        definitionType: 'type',
-        createCode: () => {
-          return 'any';
-        },
-        path: outputPath,
-        createName: referencingPath =>
-          this.createComponentTypeName(componentRef, referencingPath),
-        getRequiredOutputPaths: () => [],
-      };
-      this.addOutput(output, config);
-      if (config.withZod) {
-        const zodSchemaOutput: AnyDefinitionOutput = {
-          type: OutputType.DEFINITION,
-          definitionType: 'const',
-          path: outputPathZodSchema,
-          createName: referencingPath =>
-            this.createComponentZodSchemaName(componentRef, referencingPath),
-          createCode: () => {
-            return 'z.any()';
-          },
-          getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
-        };
-        this.addOutput(zodSchemaOutput, config);
-      }
+      throw new Error(`could not find component "${componentRef}" in specs`);
+    }
+    const typeOutputPath =
+      this.createOutputPathByComponentRefForType(componentRef);
+    if (this.findOutputByOutputPath(typeOutputPath)) {
       return;
     }
     const output: AnyDefinitionOutput = {
       type: OutputType.DEFINITION,
-      ...applySchema(this, schema, outputPath, config, [componentRef]),
+      ...applySchema(this, schema, typeOutputPath, config, [componentRef]),
       definitionType: 'type',
       createName: referencingPath =>
-        this.createComponentTypeName(componentRef, referencingPath),
+        this.createComponentNameForType(componentRef, referencingPath),
     };
     this.addOutput(output, config);
     if (config.withZod) {
+      const zodSchemaOutputPath =
+        this.createOutputPathByComponentRefForZodSchemaConst(componentRef);
       const zodSchemaOutput: AnyDefinitionOutput = {
-        ...applyZodSchema(this, schema, outputPathZodSchema, config, [
+        ...applyZodSchema(this, schema, zodSchemaOutputPath, config, [
           componentRef,
         ]),
         type: OutputType.DEFINITION,
         definitionType: 'const',
         createName: referencingPath =>
-          this.createComponentZodSchemaName(componentRef, referencingPath),
+          this.createComponentConstNameForZodSchema(
+            componentRef,
+            referencingPath
+          ),
       };
       this.addOutput(zodSchemaOutput, config);
     }
@@ -724,9 +686,8 @@ export class DefaultCodeGenerator implements CodeGenerator {
         }
 
         if (output.type === OutputType.COMPONENT_REF) {
-          const componentOutputPath = this.createOutputPathByComponentRef(
-            output.componentRef
-          );
+          const componentOutputPath =
+            this.createOutputPathByComponentRefForType(output.componentRef);
           requiredOutput = availableOutputs.find(o =>
             areOutputPathsEqual(o.path, componentOutputPath)
           );
@@ -895,13 +856,14 @@ export class DefaultCodeGenerator implements CodeGenerator {
         const outputWithSamePath = this.outputs.find(
           o =>
             o.type !== OutputType.COMPONENT_REF &&
-            areOutputPathsEqual(o.path, output.path)
+            areOutputPathsEqual(o.path, output.path) &&
+            o.definitionType === output.definitionType
         );
         if (outputWithSamePath) {
           throw new Error(
-            `ambiguous definitions for outputPath: ${JSON.stringify(
-              output.path
-            )}"`
+            `ambiguous definitions for outputPath [${output.path.join(
+              ', '
+            )}] having same definitionType "${output.definitionType}"`
           );
         }
         this.outputs.push(output);
@@ -1083,7 +1045,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return mostAccurateFolderOutputPath;
   }
 
-  createOutputPathByComponentRef(componentRef: string): OutputPath {
+  createOutputPathByComponentRefForType(componentRef: string): OutputPath {
     const outputPathParts: OutputPath = componentRef
       .replace(parameterComponentRefPrefix, '')
       .replace(responseComponentRefPrefix, '')
@@ -1121,23 +1083,42 @@ export class DefaultCodeGenerator implements CodeGenerator {
     ];
   }
 
-  createOutputPathByComponentRefForZodSchema(componentRef: string): OutputPath {
-    return [...this.createOutputPathByComponentRef(componentRef), 'zodSchema'];
+  createOutputPathByComponentRefForConst(componentRef: string): OutputPath {
+    return this.createOutputPathByComponentRefForType(componentRef);
   }
 
-  createComponentTypeName(
+  createOutputPathByComponentRefForZodSchemaConst(
+    componentRef: string
+  ): OutputPath {
+    return [
+      ...this.createOutputPathByComponentRefForConst(componentRef),
+      'zodSchema',
+    ];
+  }
+
+  createComponentNameForType(
     componentRef: string,
     referencingPath: OutputPath
   ): string {
-    const outputPath = this.createOutputPathByComponentRef(componentRef);
+    const outputPath = this.createOutputPathByComponentRefForType(componentRef);
     return this.createTypeName(outputPath, referencingPath);
   }
 
-  createComponentZodSchemaName(
+  createComponentNameForConst(
     componentRef: string,
     referencingPath: OutputPath
   ): string {
-    const outputPath = this.createOutputPathByComponentRef(componentRef);
-    return `${this.createConstName(outputPath, referencingPath)}ZodSchema`;
+    const outputPath =
+      this.createOutputPathByComponentRefForConst(componentRef);
+    return `${this.createConstName(outputPath, referencingPath)}`;
+  }
+
+  createComponentConstNameForZodSchema(
+    componentRef: string,
+    referencingPath: OutputPath
+  ): string {
+    const outputPath =
+      this.createOutputPathByComponentRefForZodSchemaConst(componentRef);
+    return `${this.createConstName(outputPath, referencingPath)}`;
   }
 }

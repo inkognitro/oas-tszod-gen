@@ -328,14 +328,11 @@ const templateResponseSchemaType: TemplateDefinitionOutput = {
     return 'ResponseSchema';
   },
   createCode: config => {
-    const bodyTypeCodeParts: string[] = [
-      'contentType: string;' + '// case-sensitive, according to oas3 specs',
-    ];
+    const bodyTypeCodeParts: string[] = [];
     if (config.withZod) {
       bodyTypeCodeParts.push('zodSchema: ZodSchema;');
     }
     const codeParts: string[] = [
-      'status: number | \'any\'; // "any" is used for unexpected status codes',
       `bodyByContentType: Record<string, {\n${bodyTypeCodeParts.join(
         '\n'
       )}\n}>;`,
@@ -384,9 +381,7 @@ export const templateEndpointSchemaType: TemplateDefinitionOutput = {
     return 'EndpointSchema';
   },
   createCode: config => {
-    const bodyTypeCodeParts: string[] = [
-      'contentType: string;' + '// case-sensitive, according to oas3 specs',
-    ];
+    const bodyTypeCodeParts: string[] = [];
     if (config.withZod) {
       bodyTypeCodeParts.push('zodSchema: ZodSchema;');
     }

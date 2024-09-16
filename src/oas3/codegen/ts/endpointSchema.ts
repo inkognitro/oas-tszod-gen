@@ -7,14 +7,14 @@ import {
   OutputType,
 } from './core';
 import {GenerateConfig} from './generator';
-import {templateEndpointSchemaType, templateZOfZodLibrary} from './template';
 import {
   Endpoint,
+  RequestBodyContent,
   RequestBodyContentByTypeMap,
-  ResponseBodyContent,
   ResponseByStatusCodeMap,
 } from '@oas3/specification';
 import {applyZodSchema} from './zodSchema';
+import {applyResponseSchema} from '@oas3/codegen/ts/responseSchema';
 
 type ApplyRequestBodyResult = {
   contentType: string;
@@ -24,7 +24,7 @@ type ApplyRequestBodyResult = {
 function applyRequestBodyContent(
   codeGenerator: CodeGenerator,
   contentType: string,
-  bodyContent: ResponseBodyContent,
+  bodyContent: RequestBodyContent,
   path: OutputPath,
   config: GenerateConfig
 ): ApplyRequestBodyResult {
@@ -42,7 +42,6 @@ function applyRequestBodyContent(
     path,
     createCode: referencingPath => {
       const resultCodeParts: string[] = [];
-      resultCodeParts.push(`\ncontentType: '${contentType}'`);
       if (zodSchemaCode) {
         resultCodeParts.push(
           `zodSchema: ${zodSchemaCode.createCode(referencingPath)}`
@@ -52,10 +51,7 @@ function applyRequestBodyContent(
     },
     getRequiredOutputPaths: () => {
       if (zodSchemaCode) {
-        return [
-          ...zodSchemaCode.getRequiredOutputPaths(),
-          templateZOfZodLibrary.path,
-        ];
+        return zodSchemaCode.getRequiredOutputPaths();
       }
       return [];
     },
@@ -66,7 +62,7 @@ function applyRequestBodyContent(
   };
 }
 
-export function applyRequestBodyByContentTypeMap(
+function applyRequestBodyByContentTypeMap(
   codeGenerator: CodeGenerator,
   schema: RequestBodyContentByTypeMap,
   path: OutputPath,
@@ -111,24 +107,55 @@ export function applyRequestBodyByContentTypeMap(
           }
         });
       });
-      return [...outputPaths];
+      return outputPaths;
     },
   };
 }
 
-export function applyResponseByStatusCodeMap(
+function applyResponseByStatusCodeMap(
   codeGenerator: CodeGenerator,
   schema: ResponseByStatusCodeMap,
   path: OutputPath,
   config: GenerateConfig
 ): CodeGenerationOutput {
+  type ResponseResult = {status: string; codeOutput: CodeGenerationOutput};
+  const responseResults: ResponseResult[] = [];
+  for (const status in schema) {
+    const response = schema[status];
+    responseResults.push({
+      status,
+      codeOutput: applyResponseSchema(
+        codeGenerator,
+        response,
+        [...path, status],
+        config
+      ),
+    });
+  }
   return {
     path,
     createCode: referencingPath => {
-      return '{}';
+      if (!Object.keys(schema).length) {
+        return '{}';
+      }
+      const codeParts: string[] = [];
+      responseResults.map(result => {
+        codeParts.push(
+          `'${result.status}': ${result.codeOutput.createCode(referencingPath)}`
+        );
+      });
+      return `{\n${codeParts.join(',\n')}\n}`;
     },
     getRequiredOutputPaths: () => {
-      return [];
+      const outputPaths: OutputPath[] = [];
+      responseResults.forEach(result => {
+        result.codeOutput.getRequiredOutputPaths().forEach(outputPath => {
+          if (!containsOutputPath(outputPaths, outputPath)) {
+            outputPaths.push(outputPath);
+          }
+        });
+      });
+      return outputPaths;
     },
   };
 }
@@ -193,13 +220,32 @@ export function applyEndpointSchemaConstDefinition(
         codeParts.push('bodyByContentType: {}');
       }
       codeParts.push(
-        `bodyByContentType: ${responseByStatusCodeMapOutput.createCode(
+        `responseByStatus: ${responseByStatusCodeMapOutput.createCode(
           outputPath
         )}`
       );
       return `{\n${codeParts.join(', \n')}\n}`;
     },
-    getRequiredOutputPaths: () => [templateEndpointSchemaType.path],
+    getRequiredOutputPaths: () => {
+      const outputPaths: OutputPath[] = [];
+      if (bodyByContentTypeMapCodeOutput) {
+        bodyByContentTypeMapCodeOutput
+          .getRequiredOutputPaths()
+          .forEach(outputPath => {
+            if (!containsOutputPath(outputPaths, outputPath)) {
+              outputPaths.push(outputPath);
+            }
+          });
+      }
+      responseByStatusCodeMapOutput
+        .getRequiredOutputPaths()
+        .forEach(outputPath => {
+          if (!containsOutputPath(outputPaths, outputPath)) {
+            outputPaths.push(outputPath);
+          }
+        });
+      return outputPaths;
+    },
   };
   codeGenerator.addOutput(definition, config);
   return definition;

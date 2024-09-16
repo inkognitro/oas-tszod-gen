@@ -76,7 +76,6 @@ export type EndpointSchema = {
   bodyByContentType: Record<
     string,
     {
-      contentType: string; // case-sensitive, according to oas3 specs
       zodSchema: ZodSchema; // only defined by the generator when "withZod: true"
     }
   >;
@@ -122,11 +121,9 @@ export type Request<
 };
 
 export type ResponseSchema = {
-  status: number | 'any'; // "any" is used for unexpected status codes
   bodyByContentType: Record<
     string,
     {
-      contentType: string; // case-sensitive, according to oas3 specs
       zodSchema: ZodSchema; // only defined by the generator when "withZod: true"
     }
   >;

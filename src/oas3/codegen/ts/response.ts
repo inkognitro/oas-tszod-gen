@@ -191,7 +191,7 @@ function applyComponentRefResponse(
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
     createName: referencingPath => {
-      return codeGenerator.createComponentTypeName(
+      return codeGenerator.createComponentNameForType(
         schema.$ref,
         referencingPath
       );
@@ -199,14 +199,14 @@ function applyComponentRefResponse(
     componentRef: schema.$ref,
     path,
     getRequiredOutputPaths: () => [
-      codeGenerator.createOutputPathByComponentRef(schema.$ref),
+      codeGenerator.createOutputPathByComponentRefForType(schema.$ref),
     ],
   };
   codeGenerator.addOutput(output, config, preventFromAddingComponentRefs);
   return {
     ...output,
     createCode: referencingPath =>
-      codeGenerator.createComponentTypeName(schema.$ref, referencingPath),
+      codeGenerator.createComponentNameForType(schema.$ref, referencingPath),
   };
 }
 
