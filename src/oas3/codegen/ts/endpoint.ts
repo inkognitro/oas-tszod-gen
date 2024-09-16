@@ -1,13 +1,12 @@
 import {CodeGenerator, DefinitionOutput, OutputPath, OutputType} from './core';
 import {
-  ConcreteParameterLocation,
   ObjectSchema,
-  ObjectSchemaProperties,
-  Parameter,
   Endpoint,
-  findConcreteParameter,
-  concreteParameterLocations,
   RequestBody,
+  Parameter,
+  ObjectSchemaProperties,
+  ConcreteParameterLocation,
+  concreteParameterLocations,
 } from '@oas3/specification';
 import {
   templateCreateRequestFunction,
@@ -21,6 +20,7 @@ import {applyObjectSchema} from './schema';
 import {applyEndpointResponse} from './endpointResponse';
 import {applyEndpointSchemaConstDefinition} from './endpointSchema';
 import {applyRequestBodyByContentTypeMap} from './request';
+import {findObjectSchemaFromLocationParameters} from './endpointPayloadUtils';
 
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
@@ -57,85 +57,6 @@ function applyRequestResult(
   };
   codeGenerator.addOutput(typeDefinition, config);
   return typeDefinition;
-}
-
-function createNullableObjectSchemaFromLocationParameters(
-  codeGenerator: CodeGenerator,
-  requestParameters: Parameter[],
-  paramLocation: ConcreteParameterLocation
-): null | ObjectSchema {
-  const objectSchemaProps: ObjectSchemaProperties = {};
-  const requiredObjectSchemaPropNames: string[] = [];
-  let hasParametersForLocation = false;
-  requestParameters.forEach(paramOrRef => {
-    const p = findConcreteParameter(
-      codeGenerator.getSpecification(),
-      paramOrRef
-    );
-    if (!p) {
-      throw new Error(
-        `could not find concreteParameter for parameter: ${JSON.stringify(
-          paramOrRef
-        )}`
-      );
-    }
-    if (p.in !== paramLocation) {
-      return;
-    }
-    hasParametersForLocation = true;
-    objectSchemaProps[p.name] = p.schema;
-    if (p.required) {
-      requiredObjectSchemaPropNames.push(p.name);
-    }
-  }, []);
-  if (!hasParametersForLocation) {
-    return null;
-  }
-  return {
-    type: 'object',
-    required: requiredObjectSchemaPropNames,
-    properties: objectSchemaProps,
-  };
-}
-
-function findRequestParamsObjectSchema(
-  codeGenerator: CodeGenerator,
-  parameterSchemas: Parameter[]
-): null | ObjectSchema {
-  const objectSchemaProps: ObjectSchemaProperties = {};
-  const requiredObjectSchemaPropNames: string[] = [];
-  let hasAnyParams = false;
-  const payloadPropNameByParamLocation: {
-    [key in ConcreteParameterLocation]: string;
-  } = {
-    header: 'headers',
-    cookie: 'cookies',
-    path: 'pathParams',
-    query: 'queryParams',
-  };
-  concreteParameterLocations.forEach(paramLocation => {
-    const objectSchema = createNullableObjectSchemaFromLocationParameters(
-      codeGenerator,
-      parameterSchemas ?? [],
-      paramLocation
-    );
-    if (!objectSchema) {
-      return;
-    }
-    hasAnyParams = true;
-    const propName = payloadPropNameByParamLocation[paramLocation];
-    objectSchemaProps[propName] = objectSchema;
-    if (propName !== 'cookies') {
-      requiredObjectSchemaPropNames.push(propName);
-    }
-  });
-  return !hasAnyParams
-    ? null
-    : {
-        type: 'object',
-        required: requiredObjectSchemaPropNames,
-        properties: objectSchemaProps,
-      };
 }
 
 function applyNullablePayloadTypeDefinition(
@@ -227,6 +148,46 @@ function applyNullableRequestBodyTypeDefinition(
   };
   codeGenerator.addOutput(definitionOutput, config);
   return definitionOutput;
+}
+
+function findRequestParamsObjectSchema(
+  codeGenerator: CodeGenerator,
+  parameterSchemas: Parameter[]
+): null | ObjectSchema {
+  const objectSchemaProps: ObjectSchemaProperties = {};
+  const requiredObjectSchemaPropNames: string[] = [];
+  let hasAnyParams = false;
+  const payloadPropNameByParamLocation: {
+    [key in ConcreteParameterLocation]: string;
+  } = {
+    header: 'headers',
+    cookie: 'cookies',
+    path: 'pathParams',
+    query: 'queryParams',
+  };
+  concreteParameterLocations.forEach(paramLocation => {
+    const objectSchema = findObjectSchemaFromLocationParameters(
+      codeGenerator,
+      parameterSchemas ?? [],
+      paramLocation
+    );
+    if (!objectSchema) {
+      return;
+    }
+    hasAnyParams = true;
+    const propName = payloadPropNameByParamLocation[paramLocation];
+    objectSchemaProps[propName] = objectSchema;
+    if (propName !== 'cookies') {
+      requiredObjectSchemaPropNames.push(propName);
+    }
+  });
+  return !hasAnyParams
+    ? null
+    : {
+        type: 'object',
+        required: requiredObjectSchemaPropNames,
+        properties: objectSchemaProps,
+      };
 }
 
 export function applyEndpointCallerFunction(

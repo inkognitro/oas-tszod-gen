@@ -31,7 +31,7 @@ import {
   responseOutputPathPart,
 } from './endpoint';
 import {mkdirp} from 'mkdirp';
-import {templateDefinitionOutputs, templateZOfZodLibrary} from './template';
+import {templateDefinitionOutputs} from './template';
 import {applySchema} from './schema';
 import {applyZodSchema} from './zodSchema';
 import {applyResponse} from './response';
@@ -468,10 +468,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.addOutput(constOutput, config);
   }
 
-  private addOutputByParameterComponentRef(
-    componentRef: string,
-    config: GenerateConfig
-  ) {
+  private addOutputByParameterComponentRef(componentRef: string) {
     const parameter = findComponentParameterByRef(this.oas3Specs, componentRef);
     if (!parameter) {
       throw new Error(`could not find component "${componentRef}" in specs`);
@@ -481,7 +478,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
     if (this.findOutputByOutputPath(typeOutputPath)) {
       return;
     }
-    // todo: implement
+    throw new Error(
+      `adding component parameters is not supported: "${componentRef}"`
+    );
   }
 
   private addOutputBySchemaComponentRef(
@@ -533,7 +532,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       return;
     }
     if (componentRef.startsWith(parameterComponentRefPrefix)) {
-      this.addOutputByParameterComponentRef(componentRef, config);
+      this.addOutputByParameterComponentRef(componentRef);
       return;
     }
     if (componentRef.startsWith(schemaComponentRefPrefix)) {

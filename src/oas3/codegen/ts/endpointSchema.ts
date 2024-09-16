@@ -8,13 +8,17 @@ import {
 } from './core';
 import {GenerateConfig} from './generator';
 import {
+  ConcreteParameterLocation,
+  concreteParameterLocations,
   Endpoint,
+  Parameter,
   RequestBodyContent,
   RequestBodyContentByTypeMap,
   ResponseByStatusCodeMap,
 } from '@oas3/specification';
 import {applyZodSchema} from './zodSchema';
-import {applyResponseSchema} from '@oas3/codegen/ts/responseSchema';
+import {applyResponseSchema} from './responseSchema';
+import {findObjectSchemaFromLocationParameters} from './endpointPayloadUtils';
 
 type ApplyRequestBodyResult = {
   contentType: string;
@@ -160,6 +164,52 @@ function applyResponseByStatusCodeMap(
   };
 }
 
+type ParameterZodSchemaResult = {
+  payloadPropName: string;
+  codeOutput: CodeGenerationOutput;
+};
+
+function applyParameterZodSchemas(
+  codeGenerator: CodeGenerator,
+  parameterSchemas: Parameter[],
+  path: OutputPath,
+  config: GenerateConfig
+): ParameterZodSchemaResult[] {
+  const results: ParameterZodSchemaResult[] = [];
+  const payloadPropNameByParamLocation: {
+    [key in ConcreteParameterLocation]: string;
+  } = {
+    header: 'headersZodSchema',
+    cookie: 'cookiesZodSchema',
+    path: 'pathParamsZodSchema',
+    query: 'queryParamsZodSchema',
+  };
+  concreteParameterLocations.forEach(paramLocation => {
+    const objectSchema = findObjectSchemaFromLocationParameters(
+      codeGenerator,
+      parameterSchemas ?? [],
+      paramLocation
+    );
+    if (!objectSchema) {
+      return;
+    }
+    const payloadPropName = payloadPropNameByParamLocation[paramLocation];
+    if (!payloadPropName) {
+      return;
+    }
+    results.push({
+      payloadPropName,
+      codeOutput: applyZodSchema(
+        codeGenerator,
+        objectSchema,
+        [...path, payloadPropName],
+        config
+      ),
+    });
+  });
+  return results;
+}
+
 export function applyEndpointSchemaConstDefinition(
   codeGenerator: CodeGenerator,
   urlPath: string,
@@ -183,6 +233,15 @@ export function applyEndpointSchemaConstDefinition(
     [...outputPath, 'response'],
     config
   );
+  let parameterZodSchemaResults: undefined | ParameterZodSchemaResult[];
+  if (config.withZod && schema.parameters) {
+    parameterZodSchemaResults = applyParameterZodSchemas(
+      codeGenerator,
+      schema.parameters,
+      outputPath,
+      config
+    );
+  }
   const definition: DefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'const',
@@ -206,10 +265,19 @@ export function applyEndpointSchemaConstDefinition(
         });
       }
       const codeParts: string[] = [
-        `method:'${requestMethod}'`,
-        `path:'${urlPath}'`,
+        `path: '${urlPath}'`,
+        `method: '${requestMethod}'`,
         `supportedSecuritySchemas: [${securitySchemasCodeParts.join(', ')}]`,
       ];
+      if (parameterZodSchemaResults) {
+        parameterZodSchemaResults.forEach(result => {
+          codeParts.push(
+            `${result.payloadPropName}: ${result.codeOutput.createCode(
+              outputPath
+            )}`
+          );
+        });
+      }
       if (bodyByContentTypeMapCodeOutput) {
         codeParts.push(
           `bodyByContentType: ${bodyByContentTypeMapCodeOutput.createCode(
@@ -228,6 +296,15 @@ export function applyEndpointSchemaConstDefinition(
     },
     getRequiredOutputPaths: () => {
       const outputPaths: OutputPath[] = [];
+      if (parameterZodSchemaResults) {
+        parameterZodSchemaResults.forEach(result => {
+          result.codeOutput.getRequiredOutputPaths().forEach(outputPath => {
+            if (!containsOutputPath(outputPaths, outputPath)) {
+              outputPaths.push(outputPath);
+            }
+          });
+        });
+      }
       if (bodyByContentTypeMapCodeOutput) {
         bodyByContentTypeMapCodeOutput
           .getRequiredOutputPaths()
