@@ -16,8 +16,14 @@ jobs:
       - name: Install modules
         run: npm install
 
+      - name: Check linting
+        run: gts lint
+
       - name: Run tests
-        run: npm run test-ci
+        run: jest --ci --coverage
+
+      - name: Type checks of generated code outputs
+        run: npm run tsc
 
       - name: Generating coverage badges
         uses: jpb06/coverage-badges-action@latest

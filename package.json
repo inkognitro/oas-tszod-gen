@@ -1,6 +1,9 @@
 {
   "name": "@inkognitro/oas-to-code",
   "version": "0.0.21",
+  "engines" : {
+    "node" : ">=10.0.0"
+  },
   "files": [
     "./dist",
     "./LICENSE",
@@ -21,7 +24,6 @@
     "lint:fix": "tsc --noEmit && gts fix",
     "start": "npm run copyTemplateFiles && tspc -w",
     "test": "jest",
-    "test-ci": "gts lint && jest --ci --coverage",
     "tsc": "tsc --noEmit"
   },
   "repository": {
