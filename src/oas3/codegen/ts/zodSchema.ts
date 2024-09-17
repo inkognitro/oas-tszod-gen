@@ -348,12 +348,18 @@ export function applyZodObjectSchema(
           )}${optional},${propComment}`
         );
       }
-      let zodAdditionalPropsExtension = '';
+      let zodAdditionalPropsRecordCode = '';
       if (additionalPropertiesDirectOutput) {
-        zodAdditionalPropsExtension = `.extend(z.record(z.string(), ${additionalPropertiesDirectOutput.createCode(
+        zodAdditionalPropsRecordCode = `z.record(${additionalPropertiesDirectOutput.createCode(
           path
-        )}))`;
+        )})`;
       }
+      if (!codeRows.length) {
+        return zodAdditionalPropsRecordCode;
+      }
+      const zodAdditionalPropsExtension = zodAdditionalPropsRecordCode
+        ? `.catchall(${zodAdditionalPropsRecordCode}.optional())`
+        : '';
       return `z.object({\n${codeRows.join(
         '\n'
       )}\n})${zodAdditionalPropsExtension}`;
