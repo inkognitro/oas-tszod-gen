@@ -10,11 +10,11 @@ test('can generate files from pet store one specification', () => {
           resolve(petStore1Specification);
         });
       },
-      outputFolderPath: './generation-outputs/petstore1',
+      outputFolderPath: './src/test-outputs/petstore1',
       logger: {
         log: () => {},
       },
-      importRootAlias: '@generation-outputs/petstore1',
+      importRootAlias: '@/src/test-outputs/petstore1',
     });
   }).not.toThrow();
 });
@@ -27,12 +27,12 @@ test('can generate files from pet store one specification with Zod', () => {
           resolve(petStore1Specification);
         });
       },
-      outputFolderPath: './generation-outputs/petstore1',
+      outputFolderPath: './src/test-outputs/petstore1-with-zod',
       logger: {
         log: () => {},
       },
       withZod: true,
-      importRootAlias: '@generation-outputs/petstore1',
+      importRootAlias: '@/src/test-outputs/petstore1-with-zod',
     });
   }).not.toThrow();
 });
@@ -45,11 +45,11 @@ test('can generate files from pet store two specification', () => {
           resolve(petStore2Specification);
         });
       },
-      outputFolderPath: './generation-outputs/petstore2',
+      outputFolderPath: './src/test-outputs/petstore2',
       logger: {
         log: () => {},
       },
-      importRootAlias: '@generation-outputs/petstore2',
+      importRootAlias: '@/src/test-outputs/petstore2',
     });
   }).not.toThrow();
 });
@@ -62,12 +62,12 @@ test('can generate files from pet store two specification with Zod', () => {
           resolve(petStore2Specification);
         });
       },
-      outputFolderPath: './generation-outputs/petstore2',
+      outputFolderPath: './src/test-outputs/petstore2-with-zod',
       logger: {
         log: () => {},
       },
       withZod: true,
-      importRootAlias: '@generation-outputs/petstore2',
+      importRootAlias: '@/src/test-outputs/petstore2-with-zod',
     });
   }).not.toThrow();
 });

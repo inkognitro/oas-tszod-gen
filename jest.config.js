@@ -3,7 +3,7 @@ module.exports = {
   coveragePathIgnorePatterns: [
     '<rootDir>/dist/',
     '<rootDir>/src/templates',
-    '<rootDir>/generation-outputs',
+    '<rootDir>/src/test-outputs',
   ],
   roots: ['<rootDir>/src'],
   testMatch: [
