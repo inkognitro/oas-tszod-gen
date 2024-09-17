@@ -267,13 +267,26 @@ export function applyZodComponentRefSchema(
     ],
   };
   codeGenerator.addOutput(output, config, preventFromAddingComponentRefs);
+  const isRecursive = preventFromAddingComponentRefs.includes(schema.$ref);
   return {
     ...output,
-    createCode: referencingPath =>
-      codeGenerator.createComponentConstNameForZodSchema(
+    createCode: referencingPath => {
+      const constName = codeGenerator.createComponentConstNameForZodSchema(
         schema.$ref,
         referencingPath
-      ),
+      );
+      if (isRecursive) {
+        return `z.lazy(() => ${constName})`;
+      }
+      return constName;
+    },
+    getRequiredOutputPaths: () => {
+      const outputPaths = [...output.getRequiredOutputPaths()];
+      if (isRecursive) {
+        outputPaths.push(templateZOfZodLibrary.path);
+      }
+      return outputPaths;
+    },
   };
 }
 
