@@ -24,6 +24,7 @@
     "lint:fix": "tsc --noEmit && gts fix",
     "start": "npm run copyTemplateFiles && tspc -w",
     "test": "jest",
+    "test:withCoverage": "jest --ci --coverage",
     "tsc": "tsc --noEmit"
   },
   "repository": {

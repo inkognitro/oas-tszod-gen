@@ -20,7 +20,7 @@ jobs:
         run: npm run lint
 
       - name: Run tests
-        run: jest --ci --coverage
+        run: npm run test:withCoverage
 
       - name: Type checks of generated code outputs
         run: npm run tsc
