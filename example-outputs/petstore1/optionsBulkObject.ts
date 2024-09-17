@@ -1,0 +1,36 @@
+import {$200OkBulkAuthorizationsResponse, authorizationsNotSupportedResponse, $400BadRequestResponse, $404NotFoundDrsObjectResponse, $413RequestTooLargeResponse, $500InternalServerErrorResponse, AuthorizationsNotSupportedResponse, BulkObjectId} from '@/test-outputs/petstore1';
+import {Response, RequestResult, Request, RequestHandler, createRequest, RequestHandlerExecutionConfig} from '@/test-outputs/petstore1/core';
+
+export const optionsBulkObjectEndpointSchema = {
+path: '/objects', 
+method: 'options', 
+supportedSecuritySchemas: [], 
+bodyByContentType: {
+'application/json': {
+
+}
+}, 
+responseByStatus: {
+'200': $200OkBulkAuthorizationsResponse,
+'204': authorizationsNotSupportedResponse,
+'400': $400BadRequestResponse,
+'404': $404NotFoundDrsObjectResponse,
+'405': authorizationsNotSupportedResponse,
+'413': $413RequestTooLargeResponse,
+'500': $500InternalServerErrorResponse
+}
+}
+
+export type OptionsBulkObjectRequestBody = {
+contentType: 'application/json',
+body: BulkObjectId
+}
+
+export type OptionsBulkObjectPayload = OptionsBulkObjectRequestBody
+
+export type OptionsBulkObjectResponse = Response<200, $200OkBulkAuthorizationsResponse> | Response<204, AuthorizationsNotSupportedResponse> | Response<400, $400BadRequestResponse> | Response<404, $404NotFoundDrsObjectResponse> | Response<405, AuthorizationsNotSupportedResponse> | Response<413, $413RequestTooLargeResponse> | Response<500, $500InternalServerErrorResponse>
+
+export type OptionsBulkObjectRequestResult = RequestResult<Request, OptionsBulkObjectResponse>
+
+export function optionsBulkObject(requestHandler: RequestHandler, payload: OptionsBulkObjectPayload, config?: RequestHandlerExecutionConfig): Promise<OptionsBulkObjectRequestResult> {return requestHandler.execute(createRequest({...payload,
+endpointSchema: optionsBulkObjectEndpointSchema}), config);}

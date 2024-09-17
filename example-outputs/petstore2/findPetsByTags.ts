@@ -1,0 +1,37 @@
+import {Pet} from '@/test-outputs/petstore2';
+import {ResponseBodyData, ResponseData, Response, RequestResult, Request, RequestHandler, createRequest, RequestHandlerExecutionConfig} from '@/test-outputs/petstore2/core';
+
+export const findPetsByTagsEndpointSchema = {
+path: '/pet/findByTags', 
+method: 'get', 
+supportedSecuritySchemas: [{ name: 'petstore_auth', requiredPermissions: ['write:pets', 'read:pets']}], 
+bodyByContentType: {}, 
+responseByStatus: {
+'200': {
+bodyByContentType: {
+'application/xml': {
+
+},
+'application/json': {
+
+}
+}
+},
+'400': {
+bodyByContentType: {}
+}
+}
+}
+
+export type FindPetsByTagsPayload = {
+'queryParams': {
+'tags'?: (string)[];
+};
+}
+
+export type FindPetsByTagsResponse = Response<200, ResponseData<ResponseBodyData<'application/xml', (Pet)[]> | ResponseBodyData<'application/json', (Pet)[]>>> | Response<400, any>
+
+export type FindPetsByTagsRequestResult = RequestResult<Request, FindPetsByTagsResponse>
+
+export function findPetsByTags(requestHandler: RequestHandler, payload: FindPetsByTagsPayload, config?: RequestHandlerExecutionConfig): Promise<FindPetsByTagsRequestResult> {return requestHandler.execute(createRequest({...payload,
+endpointSchema: findPetsByTagsEndpointSchema}), config);}
