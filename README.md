@@ -272,7 +272,7 @@ const fetchApiRequestHandler = new FetchApiRequestHandler({
 
 ### AuthRequestHandler
 This implementation can be taken for automatic `Authorization` request header enrichment.
-As of the time of writing this, only `httpBearer` and `httpBasic` authentication headers are supported.
+As of time of writing this, only `httpBearer` and `httpBasic` authentication headers are supported.
 
 ### ScopedRequestHandler
 With this implementation you are able to make sure that the methods `cancelRequestById` and `cancelAllRequests` do only
