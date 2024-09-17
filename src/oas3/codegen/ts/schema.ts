@@ -291,7 +291,7 @@ export function applyObjectSchema(
           ? ` // ${directOutput.codeComment}`
           : '';
         codeRows.push(
-          `${propName}${questionMark}: ${directOutput.createCode(
+          `'${propName}'${questionMark}: ${directOutput.createCode(
             path
           )};${propComment}`
         );
@@ -349,7 +349,7 @@ function applyOneOfSchema(
           `${directOutput.createCode(referencingContext)}${itemComment}`
         );
       });
-      return `${codeRows.join(' |\n')}`;
+      return `${codeRows.join('\n|')}`;
     },
     path,
     getRequiredOutputPaths: () => requiredOutputPaths,

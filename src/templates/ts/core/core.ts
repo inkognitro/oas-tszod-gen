@@ -1,6 +1,10 @@
 import {ZodSchema} from 'zod';
 
-export type Headers = {
+export type RequestHeaders = {
+  [headerName: string]: string | number;
+};
+
+export type ResponseHeaders = {
   [headerName: string]: string;
 };
 
@@ -16,18 +20,42 @@ export type RequestCookies = {
   [cookieName: string]: string;
 };
 
-export type RequestBody = Blob | FormData | JsonValue | string;
+export type RequestBody =
+  | ReadableStream
+  | Blob
+  | BufferSource
+  | FormData
+  | URLSearchParams
+  | JsonValue
+  | string;
 
-export type JsonValue =
+export type JsonContentValue =
   | null
   | string
   | number
   | boolean
-  | {[propName: string]: JsonValue}
-  | JsonValue[];
+  | {[propName: string]: JsonContentValue}
+  | JsonContentValue[];
+
+export type JsonValue =
+  | null
+  | {[propName: string]: JsonContentValue}
+  | JsonContentValue[];
+
+export function isJsonValue(value: unknown): value is JsonValue {
+  if (typeof value !== 'object') {
+    return false;
+  }
+  try {
+    JSON.stringify(value);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 export type RequestCreationSettings = {
-  headers?: Headers;
+  headers?: RequestHeaders;
   cookies?: RequestCookies;
   pathParams?: PathParams;
   queryParams?: QueryParams;
@@ -104,19 +132,16 @@ export function createRequest(settings: RequestCreationSettings): Request {
   };
 }
 
-export type Request<
-  P extends PathParams | undefined = any,
-  Q extends QueryParams | undefined = any,
-  B extends RequestBody | undefined = any,
-> = {
+export type Request = {
   id: string;
   url: string;
-  headers?: Headers;
+  headers?: RequestHeaders;
   cookies?: RequestCookies;
-  pathParams?: P;
-  queryParams?: Q;
-  contentType: string | null; // case-sensitive, according to oas3 specs; used as default "content-type" request header
-  body?: B;
+  pathParams?: PathParams;
+  queryParams?: QueryParams;
+  // according to oas3 specs; used as default for the "content-type" request header
+  contentType: string | null;
+  body?: RequestBody;
   endpointSchema: EndpointSchema;
 };
 
@@ -140,13 +165,14 @@ export type ResponseBodyData<
   ContentType extends string = any,
   B extends ResponseBody = any,
 > = {
-  contentType: ContentType | null; // case-sensitive, according to oas3 specs; NULL if the real "content-type" response header is not defined in specs (case-insensitive check)
+  // according to oas3 specs; NULL if the real "content-type" response header does not match with one defined in the specs (case in-sensitive check)
+  contentType: ContentType | null;
   revealBody: () => Promise<B>;
 };
 
 export type ResponseData<
   B extends ResponseBodyData = any,
-  H extends Headers = any,
+  H extends ResponseHeaders = any,
   C extends ResponseSetCookies = any,
 > = B & {
   headers: H;
@@ -167,7 +193,7 @@ export interface RequestResult<
   request: Req;
   response: null | Res;
   hasRequestBeenCancelled: boolean;
-  error?: Error; // must only be set when the RequestResult Promise was rejected
+  error?: Error;
 }
 
 export interface RequestHandlerExecutionConfig {}

@@ -75,12 +75,13 @@ function applyResponseBodyByContentTypeMap(
 ): CodeGenerationOutput {
   const bodyResults: ApplyResponseBodyResult[] = [];
   for (const contentType in schema) {
-    const contentTypeBodyPath = [...path, contentType];
+    const lowercaseContentType = contentType.toLowerCase();
+    const contentTypeBodyPath = [...path, lowercaseContentType];
     const contentSchema = schema[contentType];
     bodyResults.push(
       applyResponseBodyContent(
         codeGenerator,
-        contentType,
+        lowercaseContentType,
         contentSchema,
         contentTypeBodyPath,
         config

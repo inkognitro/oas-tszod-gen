@@ -74,12 +74,13 @@ function applyRequestBodyByContentTypeMap(
 ): CodeGenerationOutput {
   const bodyResults: ApplyRequestBodyResult[] = [];
   for (const contentType in schema) {
-    const contentTypeBodyPath = [...path, contentType];
+    const lowercaseContentType = contentType.toLowerCase();
+    const contentTypeBodyPath = [...path, lowercaseContentType];
     const contentSchema = schema[contentType];
     bodyResults.push(
       applyRequestBodyContent(
         codeGenerator,
-        contentType,
+        lowercaseContentType,
         contentSchema,
         contentTypeBodyPath,
         config
@@ -256,7 +257,7 @@ export function applyEndpointSchemaConstDefinition(
           for (const securityName in permissionsBySecurityName) {
             const permissions = permissionsBySecurityName[securityName];
             const permissionsCodePart = permissions.length
-              ? `['${permissions.join("'")}']`
+              ? `['${permissions.join("', '")}']`
               : '[]';
             securitySchemasCodeParts.push(
               `{ name: '${securityName}', requiredPermissions: ${permissionsCodePart}}`

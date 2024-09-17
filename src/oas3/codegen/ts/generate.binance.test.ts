@@ -13,7 +13,7 @@ test('can generate files from binance api specification', () => {
       logger: {
         log: () => {},
       },
-      importRootAlias: '@/src/test-outputs/binance',
+      importRootAlias: '@/test-outputs/binance',
     });
   }).not.toThrow();
 });
@@ -31,7 +31,7 @@ test('can generate files from binance api specification with Zod', () => {
         log: () => {},
       },
       withZod: true,
-      importRootAlias: '@/src/test-outputs/binance-with-zod',
+      importRootAlias: '@/test-outputs/binance-with-zod',
     });
   }).not.toThrow();
 });

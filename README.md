@@ -30,6 +30,10 @@ through different `RequestHandler` implementations
 > app to benefit from automatic caching. There are lots of articles out there which discuss things like
 > [Axios Vs Fetch](https://blog.logrocket.com/axios-vs-fetch-best-http-requests/).
 
+## System requirements
+In case of using the code output of this generator on the backend side, please make sure to run your app
+with `node >= 10.0.0` to include `URLSearchParams` support.
+
 ## Generator: Setup and usage
 First, install the package as a dev dependency:
 ```

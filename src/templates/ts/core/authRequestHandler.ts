@@ -54,10 +54,11 @@ export class AuthRequestHandler implements RequestHandler {
     if (config?.preventAuthentication) {
       return request;
     }
-    for (const index in request.supportedSecuritySchemes) {
-      const securitySchemeName = request.supportedSecuritySchemes[index].name;
+    for (const index in request.endpointSchema.supportedSecuritySchemas) {
+      const securitySchemaName =
+        request.endpointSchema.supportedSecuritySchemas[index].name;
       const authProvider = this.authenticationProviders.find(
-        p => p.securitySchemeName === securitySchemeName
+        p => p.securitySchemeName === securitySchemaName
       );
       if (!authProvider) {
         continue;
@@ -73,7 +74,7 @@ export class AuthRequestHandler implements RequestHandler {
             headers: {
               ...request.headers,
               Authorization: accessToken,
-              securityScheme: securitySchemeName,
+              securityScheme: securitySchemaName,
             },
           };
         case 'httpBearer':
@@ -82,7 +83,7 @@ export class AuthRequestHandler implements RequestHandler {
             headers: {
               ...request.headers,
               Authorization: `Bearer ${accessToken}`,
-              securityScheme: securitySchemeName,
+              securityScheme: securitySchemaName,
             },
           };
       }

@@ -1,5 +1,5 @@
 import {
-  Headers,
+  ResponseHeaders,
   QueryParams,
   Request,
   RequestHandler,
@@ -7,18 +7,22 @@ import {
   Response as CoreResponse,
   ResponseBody,
   ResponseSetCookies,
+  RequestHeaders,
+  isJsonValue,
 } from './core';
-import {stringify} from 'qs';
 
 function getTransferFormatByContentType(
   contentType: string
-): 'text' | 'json' | 'formData' | 'blob' {
+): 'text' | 'json' | 'formData' | 'urlSearchParams' | 'blob' {
   const ct = contentType.trim().toLowerCase();
-  if (ct.startsWith('text/') || ct === 'application/x-www-form-urlencoded') {
+  if (ct.startsWith('text/')) {
     return 'text';
   }
   if (ct.match(/application\/[^+]*[+]?(json);?.*/)) {
     return 'json';
+  }
+  if (ct === 'application/x-www-form-urlencoded') {
+    return 'urlSearchParams';
   }
   if (ct === 'multipart/form-data') {
     return 'formData';
@@ -31,20 +35,21 @@ class ResultResponse implements CoreResponse {
 
   public readonly status: number;
   public readonly contentType: null | string;
-  public readonly headers: Headers;
+  public readonly headers: ResponseHeaders;
   public readonly cookies: ResponseSetCookies;
 
   constructor(response: Response) {
     this.response = response;
     this.status = response.status;
-    this.contentType = null; // todo: support this from response schema
     this.headers = this.createPlainHeaders(response);
+    this.contentType =
+      this.response.headers.get('content-type')?.toLowerCase() ?? null;
     this.cookies = this.createPlainCookies(response);
     this.revealBody = this.revealBody.bind(this);
   }
 
-  private createPlainHeaders(response: Response): Headers {
-    const plainHeaders: Headers = {};
+  private createPlainHeaders(response: Response): ResponseHeaders {
+    const plainHeaders: ResponseHeaders = {};
     response.headers.forEach((header, headerKey) => {
       if (typeof header === 'string') {
         plainHeaders[headerKey] = header;
@@ -73,6 +78,8 @@ class ResultResponse implements CoreResponse {
     }
     const format = getTransferFormatByContentType(contentType);
     switch (format) {
+      case 'urlSearchParams':
+        throw new Error('URLSearchParams is not supported for responses');
       case 'json':
         return this.response.json();
       case 'text':
@@ -205,28 +212,62 @@ export class FetchApiRequestHandler implements RequestHandler {
   }
 
   private createRequestInitBody(
-    headers: Headers,
+    headers: RequestHeaders,
     request: Request
-  ): string | FormData | Blob {
+  ): BodyInit | null {
     const contentTypeHeaderKey = Object.keys(headers).find(
       key => key.toLowerCase() === 'content-type'
     );
-    if (!contentTypeHeaderKey) {
-      return request.body; // treat as Blob
-    }
-    const contentType = headers[contentTypeHeaderKey];
+    const contentType = contentTypeHeaderKey
+      ? headers[contentTypeHeaderKey]
+      : undefined;
     if (!contentType) {
-      return request.body; // treat as Blob
+      if (isJsonValue(request.body)) {
+        return JSON.stringify(request.body);
+      }
+      return request.body ?? null;
     }
-    const format = getTransferFormatByContentType(contentType);
+    const format = getTransferFormatByContentType(`${contentType}`);
     switch (format) {
       case 'json':
+        if (!isJsonValue(request.body)) {
+          throw new Error(
+            `JsonValue expected but received request.body of type: ${typeof request.body}`
+          );
+        }
         return JSON.stringify(request.body);
-      case 'formData':
-      case 'blob':
-      case 'text':
-      default:
+      case 'urlSearchParams':
+        if (!(request.body instanceof URLSearchParams)) {
+          throw new Error(
+            `URLSearchParams expected but received request.body of type: ${typeof request.body}`
+          );
+        }
         return request.body;
+      case 'formData':
+        if (!(request.body instanceof FormData)) {
+          throw new Error(
+            `FormData expected but received request.body of type: ${typeof request.body}`
+          );
+        }
+        return request.body;
+      case 'text':
+        if (typeof request.body !== 'string') {
+          throw new Error(
+            `string expected but received request.body of type: ${typeof request.body}`
+          );
+        }
+        return request.body;
+      case 'blob':
+      default:
+        if (!request.body) {
+          return null;
+        }
+        if (isJsonValue(request.body)) {
+          throw new Error(
+            'Blob expected but received request.body of type: JsonValue'
+          );
+        }
+        return request.body ?? null;
     }
   }
 
@@ -237,9 +278,13 @@ export class FetchApiRequestHandler implements RequestHandler {
     const cookieHeaders = request.cookies
       ? this.findRequestInitCookieHeaders(request)
       : {};
+    const headers: Record<string, string> = {};
+    for (const key in request.headers) {
+      headers[key] = `${request.headers[key]}`;
+    }
     return {
       ...(requestConfig.headers ?? {}),
-      ...(request.headers ?? {}),
+      ...headers,
       ...cookieHeaders,
     };
   }
@@ -247,7 +292,7 @@ export class FetchApiRequestHandler implements RequestHandler {
   private findRequestInitCookieHeaders(request: Request): null | HeadersInit {
     const currentCookieDefinition = request.headers?.['Cookie'];
     const cookieDefinitions: string[] = currentCookieDefinition
-      ? [currentCookieDefinition]
+      ? [`${currentCookieDefinition}`]
       : [];
     if (request.cookies) {
       for (const cookieName in request.cookies) {

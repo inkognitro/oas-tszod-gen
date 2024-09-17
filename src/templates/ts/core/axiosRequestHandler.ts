@@ -8,7 +8,7 @@ import axios, {
   AxiosInstance,
 } from 'axios';
 import {
-  Headers,
+  ResponseHeaders,
   RequestHandler,
   RequestResult,
   Request,
@@ -17,22 +17,25 @@ import {
   ResponseBody,
 } from './core';
 
-// todo: solve "responseType" property misconception, which has e.g. to be set to "blob" BEFORE a response is received:
-//  https://stackoverflow.com/questions/56286368/how-can-i-read-http-errors-when-responsetype-is-blob-in-axios-with-vuejs
-
 class ResultResponse implements CoreResponse {
   private readonly response: AxiosResponse;
 
   public readonly status: number;
   public readonly contentType: null | string;
-  public readonly headers: Headers;
+  public readonly headers: ResponseHeaders;
   public readonly cookies: ResponseSetCookies;
 
   constructor(response: AxiosResponse) {
     this.response = response;
     this.status = response.status;
-    this.contentType = null; // todo: support this from response schema
-    this.headers = this.createPlainHeaders(response);
+    const plainHeaders = this.createPlainHeaders(response);
+    this.headers = plainHeaders;
+    const contentTypeKey = Object.keys(plainHeaders).find(
+      key => key.toLowerCase() === 'content-type'
+    );
+    this.contentType = contentTypeKey
+      ? plainHeaders[contentTypeKey].toLowerCase()
+      : null;
     this.cookies = this.createPlainCookies(response);
     this.revealBody = this.revealBody.bind(this);
   }
@@ -41,12 +44,12 @@ class ResultResponse implements CoreResponse {
     return new Promise(resolve => resolve(this.response.data));
   }
 
-  private createPlainHeaders(axiosResponse: AxiosResponse): Headers {
+  private createPlainHeaders(axiosResponse: AxiosResponse): ResponseHeaders {
     const stringHeaders =
       axiosResponse.headers instanceof AxiosHeaders
         ? axiosResponse.headers.toJSON(true)
         : axiosResponse.headers;
-    const plainHeaders: Headers = {};
+    const plainHeaders: ResponseHeaders = {};
     for (const headerName in stringHeaders) {
       const headerValue = stringHeaders[headerName];
       if (typeof headerValue === 'string') {
@@ -227,7 +230,7 @@ export class AxiosRequestHandler implements RequestHandler {
   ): null | RawAxiosRequestHeaders {
     const currentCookieDefinition = request.headers?.['Cookie'];
     const cookieDefinitions: string[] = currentCookieDefinition
-      ? [currentCookieDefinition]
+      ? [`${currentCookieDefinition}`]
       : [];
     if (request.cookies) {
       for (const cookieName in request.cookies) {

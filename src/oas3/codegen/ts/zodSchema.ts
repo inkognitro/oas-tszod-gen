@@ -325,7 +325,7 @@ export function applyZodObjectSchema(
           ? ` // ${directOutput.codeComment}`
           : '';
         codeRows.push(
-          `${propName}: ${directOutput.createCode(
+          `'${propName}': ${directOutput.createCode(
             path
           )}${optional},${propComment}`
         );

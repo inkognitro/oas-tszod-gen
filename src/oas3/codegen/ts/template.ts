@@ -52,32 +52,25 @@ export const templateRequestType: TemplateDefinitionOutput = {
   createName: () => {
     return 'Request';
   },
-  createGenericsDeclarationCode: () => {
-    const genericCodeParts: string[] = [
-      `P extends ${templatePathParamsType.createName(
-        templateRequestTypePath
-      )} | undefined = any`,
-      `Q extends ${templateQueryParamsType.createName(
-        templateRequestTypePath
-      )} | undefined = any`,
-      `B extends ${templateRequestBodyType.createName(
-        templateRequestTypePath
-      )} | undefined = any`,
-    ];
-    return genericCodeParts.join(',\n');
-  },
   createCode: () => {
     const bodyCodeParts: string[] = [
       'id: string;',
       'url: string;',
-      `headers?: ${templateHeadersType.createName(templateRequestTypePath)};`,
+      `headers?: ${templateRequestHeadersType.createName(
+        templateRequestTypePath
+      )};`,
       `cookies?: ${templateRequestCookiesType.createName(
         templateRequestTypePath
       )};`,
-      'pathParams?: P;',
-      'queryParams?: Q;',
-      'contentType: string | null; // case-sensitive, according to oas3 specs; used as default "content-type" request header',
-      'body?: B;',
+      `pathParams?: ${templatePathParamsType.createName(
+        templateRequestTypePath
+      )};`,
+      `queryParams?: ${templateQueryParamsType.createName(
+        templateRequestTypePath
+      )};`,
+      '// according to oas3 specs; used as default for the "content-type" request header',
+      'contentType: string | null;',
+      `body?: ${templateRequestBodyType.createName(templateRequestTypePath)};`,
       `endpointSchema: ${templateEndpointSchemaType.createName(
         templateRequestTypePath
       )};`,
@@ -90,7 +83,7 @@ export const templateRequestType: TemplateDefinitionOutput = {
       templateQueryParamsType.path,
       templateRequestBodyType.path,
       templateEndpointSchemaType.path,
-      templateHeadersType.path,
+      templateRequestHeadersType.path,
       templateRequestCookiesType.path,
       templateResponseSchemaType.path,
     ];
@@ -101,12 +94,12 @@ export const templateRequestType: TemplateDefinitionOutput = {
   },
 };
 
-const templateJsonValueType: TemplateDefinitionOutput = {
+const templateJsonContentValueType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'type',
-  path: ['core', 'core', 'JsonValue'],
+  path: ['core', 'core', 'jsonContentValue'],
   createName: () => {
-    return 'JsonValue';
+    return 'JsonContentValue';
   },
   createCode: () => {
     const validTypes = [
@@ -114,12 +107,61 @@ const templateJsonValueType: TemplateDefinitionOutput = {
       'string',
       'number',
       'boolean',
-      '{[propName: string]: JsonValue}',
-      'JsonValue[]',
+      '{[propName: string]: JsonContentValue}',
+      'JsonContentValue[]',
     ];
     return `${validTypes.join('\n|')}`;
   },
   getRequiredOutputPaths: () => [],
+};
+
+const templateJsonValueTypePath = ['core', 'core', 'jsonValue'];
+const templateJsonValueType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: templateJsonValueTypePath,
+  createName: () => {
+    return 'JsonValue';
+  },
+  createCode: () => {
+    const validTypes = [
+      'null',
+      `{[propName: string]: ${templateJsonContentValueType.createName(
+        templateJsonValueTypePath
+      )}}`,
+      `${templateJsonContentValueType.createName(templateJsonValueTypePath)}[]`,
+    ];
+    return `${validTypes.join('\n|')}`;
+  },
+  getRequiredOutputPaths: () => [templateJsonContentValueType.path],
+};
+
+const templateIsJsonValueTypePath = ['core', 'core', 'isJsonValue'];
+const templateIsJsonValueType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'function',
+  path: templateIsJsonValueTypePath,
+  createName: () => {
+    return 'isJsonValue';
+  },
+  createCode: () => {
+    const codeParts = [
+      "if (typeof value !== 'object') {",
+      'return false;',
+      '}',
+      'try {',
+      'JSON.stringify(value);',
+      'return true;',
+      '} catch (e) {',
+      'JSON.stringify(value);',
+      'return false;',
+      '}',
+    ];
+    return `(value: unknown): value is ${templateJsonValueType.createName(
+      templateIsJsonValueTypePath
+    )}{\n${codeParts.join('\n')}\n}`;
+  },
+  getRequiredOutputPaths: () => [templateJsonValueType.path],
 };
 
 const templateResponseTypePath = ['core', 'core', 'response'];
@@ -169,7 +211,7 @@ export const templateRequestResultType: TemplateDefinitionOutput = {
       'request: Req;',
       'response: null | Res;',
       'hasRequestBeenCancelled: boolean;',
-      'error?: Error; // must only be set when the RequestResult Promise was rejected',
+      'error?: Error;',
     ];
     return `{\n${bodyCodeParts.join('\n')}\n}`;
   },
@@ -212,8 +254,11 @@ const templateQueryParamsType: TemplateDefinitionOutput = {
       'QueryParams',
       'QueryParams[]',
       'string',
+      'string[]',
       'number',
+      'number[]',
       'boolean',
+      'boolean[]',
     ];
     return `{\n[paramName: string]: ${propTypes.join('\n|')};\n}`;
   },
@@ -270,7 +315,8 @@ export const templateResponseBodyDataType: TemplateDefinitionOutput = {
   },
   createCode: () => {
     const codeParts: string[] = [
-      'contentType: ContentType | null; // case-sensitive, according to oas3 specs; NULL if the real "content-type" response header is not defined in specs (case-insensitive check)',
+      '// according to oas3 specs; NULL if the real "content-type" response header does not match with one defined in the specs (case in-sensitive check)',
+      'contentType: ContentType | null;',
       'revealBody: () => Promise<B>;',
     ];
     return `{\n${codeParts.join('\n')}\n}`;
@@ -291,8 +337,12 @@ export const templateResponseDataType: TemplateDefinitionOutput = {
       `B extends ${templateResponseBodyDataType.createName(
         templateResponseDataTypePath
       )} = any`,
-      'H extends Headers = any',
-      'C extends ResponseSetCookies = any',
+      `H extends ${templateResponseHeadersType.createName(
+        templateResponseDataTypePath
+      )} = any`,
+      `C extends ${templateResponseSetCookiesType.createName(
+        templateResponseDataTypePath
+      )} = any`,
     ];
     return `${codeParts.join(',\n')}`;
   },
@@ -302,7 +352,7 @@ export const templateResponseDataType: TemplateDefinitionOutput = {
   },
   getRequiredOutputPaths: () => [
     templateResponseBodyDataType.path,
-    templateHeadersType.path,
+    templateResponseHeadersType.path,
     templateResponseSetCookiesType.path,
   ],
 };
@@ -422,12 +472,25 @@ export const templateEndpointSchemaType: TemplateDefinitionOutput = {
   },
 };
 
-const templateHeadersType: TemplateDefinitionOutput = {
+const templateRequestHeadersType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'type',
-  path: ['core', 'core', 'headers'],
+  path: ['core', 'core', 'requestHeaders'],
   createName: () => {
-    return 'Headers';
+    return 'RequestHeaders';
+  },
+  createCode: () => {
+    return '{\n[headerName: string]: string | number;\n}';
+  },
+  getRequiredOutputPaths: () => [],
+};
+
+const templateResponseHeadersType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: ['core', 'core', 'responseHeaders'],
+  createName: () => {
+    return 'ResponseHeaders';
   },
   createCode: () => {
     return '{\n[headerName: string]: string;\n}';
@@ -492,7 +555,7 @@ const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
   },
   createCode: () => {
     const codeParts: string[] = [
-      `headers?: ${templateHeadersType.createName(
+      `headers?: ${templateRequestHeadersType.createName(
         templateRequestCreationSettingsTypePath
       )};`,
       `cookies?: ${templateRequestCookiesType.createName(
@@ -515,7 +578,7 @@ const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
     return `{\n${codeParts.join('\n')}\n}`;
   },
   getRequiredOutputPaths: () => [
-    templateHeadersType.path,
+    templateRequestHeadersType.path,
     templateRequestCookiesType.path,
     templatePathParamsType.path,
     templateQueryParamsType.path,
@@ -593,12 +656,15 @@ export const templateZodSchemaOfZodLibrary: TemplateDefinitionOutput = {
 };
 
 export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
-  templateHeadersType,
+  templateRequestHeadersType,
+  templateResponseHeadersType,
   templatePathParamsType,
   templateQueryParamsType,
   templateRequestCookiesType,
   templateRequestBodyType,
+  templateJsonContentValueType,
   templateJsonValueType,
+  templateIsJsonValueType,
   templateRequestCreationSettingsType,
   templateCreateRequestUrlFunction,
   templateEndpointSecuritySchemaType,
