@@ -168,6 +168,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
   private readonly logger: Logger;
   private outputs: Output[];
   private operationFolderOutputPaths: OutputPath[];
+  private outputPathsWithZodSchemaRecursion: OutputPath[];
 
   constructor(oas3Specs: object, logger: Logger) {
     if (!isSpecification(oas3Specs)) {
@@ -177,6 +178,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.logger = logger;
     this.outputs = [];
     this.operationFolderOutputPaths = [];
+    this.outputPathsWithZodSchemaRecursion = [];
   }
 
   public getSpecification(): Specification {
@@ -195,6 +197,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   private reset(config: GenerateConfig) {
     this.outputs = [...templateDefinitionOutputs];
+    this.outputPathsWithZodSchemaRecursion = [];
     this.resetOperationFolderOutputPaths(config);
   }
 
@@ -330,9 +333,20 @@ export class DefaultCodeGenerator implements CodeGenerator {
         const typeDeclaration = o.createTypeDeclarationCode
           ? `: {${o.createTypeDeclarationCode}}`
           : '';
-        return `export const ${o.createName(
-          o.path
-        )}${typeDeclaration} = ${o.createCode(o.path)}`;
+        const isRecursiveZodSchema =
+          this.outputPathsWithZodSchemaRecursion.find(p =>
+            areOutputPathsEqual(p, o.path)
+          );
+        const codeParts = [];
+        if (isRecursiveZodSchema) {
+          codeParts.push('// @ts-ignore - due to schema recursion');
+        }
+        codeParts.push(
+          `export const ${o.createName(
+            o.path
+          )}${typeDeclaration} = ${o.createCode(o.path)}`
+        );
+        return codeParts.join('\n');
       case 'type':
         return `export type ${o.createName(o.path)} = ${o.createCode(o.path)}`;
       case 'interface':
@@ -853,6 +867,16 @@ export class DefaultCodeGenerator implements CodeGenerator {
       definitions: [],
       exportPaths,
     };
+  }
+
+  public addOutputPathWithZodSchemaRecursion(outputPath: OutputPath) {
+    if (
+      !this.outputPathsWithZodSchemaRecursion.find(p =>
+        areOutputPathsEqual(p, outputPath)
+      )
+    ) {
+      this.outputPathsWithZodSchemaRecursion.push(outputPath);
+    }
   }
 
   addOutput(

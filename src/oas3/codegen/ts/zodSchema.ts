@@ -268,6 +268,11 @@ export function applyZodComponentRefSchema(
   };
   codeGenerator.addOutput(output, config, preventFromAddingComponentRefs);
   const isRecursive = preventFromAddingComponentRefs.includes(schema.$ref);
+  if (isRecursive) {
+    codeGenerator.addOutputPathWithZodSchemaRecursion(
+      codeGenerator.createOutputPathByComponentRefForZodSchemaConst(schema.$ref)
+    );
+  }
   return {
     ...output,
     createCode: referencingPath => {

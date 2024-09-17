@@ -34,6 +34,7 @@ export interface CodeGenerator {
     config: GenerateConfig,
     preventFromAddingComponentRefs?: string[]
   ): void;
+  addOutputPathWithZodSchemaRecursion(outputPath: OutputPath): void;
   hasSameFileContext(outputPath1: OutputPath, outputPath2: OutputPath): boolean;
 }
 
@@ -105,6 +106,7 @@ export type DefinitionOutput = GenericOutput<
   {
     definitionType: DefinitionType;
     createCode: CreateCodeFunc;
+    createLineBeforeDeclaration?: () => boolean;
     createTypeDeclarationCode?: () => string;
     codeComment?: string;
     getRequiredOutputPaths: () => OutputPath[];
