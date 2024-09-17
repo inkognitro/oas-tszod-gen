@@ -17,7 +17,7 @@ jobs:
         run: npm install
 
       - name: Check linting
-        run: gts lint
+        run: npm run lint
 
       - name: Run tests
         run: jest --ci --coverage
