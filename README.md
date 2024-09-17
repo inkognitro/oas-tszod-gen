@@ -303,7 +303,7 @@ As long as the API contract on the backend side was not violated through breakin
 you don't have to worry about breaking changes in generated code output when upgrading to the next **minor** version.
 
 ## Out of scope
-Linting is out of scope of this package. The generator is responsible to generate valid TypeScript definitions.
+Linting is out of scope of this package. The generator is responsible to generate valid TypeScript (and Zod) definitions.
 That's what it does. Your code setup should be responsible for linting your code, so it might make sense for you to run
 Eslint right after the `generateOas3ToTs` function was executed, e.g. with a script in your `package.json` like so:
 ```json
