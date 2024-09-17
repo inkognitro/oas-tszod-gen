@@ -81,6 +81,9 @@ generateOas3ToTs({
   // This will add only the defined RequestHandler implementations.
   // An empty array results in no added implementations.
   // By default, all available RequestHandler implementations are added.
+
+  ignoreEndpointsWithoutOperationId: false,
+  // This one is false by default
 });
 ```
 
