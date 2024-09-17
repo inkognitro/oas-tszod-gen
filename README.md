@@ -5,11 +5,10 @@
 A code generator to convert [OpenApi version 3 (OAS3)](https://swagger.io/specification/) specifications into endpoint caller functions for [TS](https://www.typescriptlang.org/) and [Zod](https://zod.dev).
 
 ## Why yet another library for this task?
-Before you consider using this library, I suggest having a look at [Zodios](https://www.zodios.org/)
-and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client).
-This code generator serves as a standalone alternative to these two libraries with the additional possibility to
-exchange Axios with Fetch under the hood. This can be done without having to adjust any code in your codebase,
-except where the `RequestHandler` is created. However, I coded my own solution because I wanted to:
+Before you consider using this library, I suggest having a look the combination of [Zodios](https://www.zodios.org/)
+and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) or [OpenApi Typescript](https://openapi-ts.dev/),
+if you are OK with Typescript only. This code generator serves as a standalone alternative to these mentioned libraries.
+However, I coded my own solution because I wanted to:
 
 - have full ownership of my production code without any additional package dependency
 - have the possibility to go with other implementations under the hood than [Axios](https://axios-http.com/docs/intro)
