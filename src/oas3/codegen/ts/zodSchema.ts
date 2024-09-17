@@ -354,7 +354,7 @@ export function applyZodObjectSchema(
           path
         )})`;
       }
-      if (!codeRows.length) {
+      if (!codeRows.length && additionalPropertiesDirectOutput) {
         return zodAdditionalPropsRecordCode;
       }
       const zodAdditionalPropsExtension = zodAdditionalPropsRecordCode
