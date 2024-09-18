@@ -1,5 +1,5 @@
 const express = require('express');
-import {Application, Request, Response} from 'express';
+import {Request, Response} from 'express';
 import {EndpointSchema, ResponseBody} from './core';
 
 function createExpressPath(endpointSchemaPath: string): string {
@@ -35,14 +35,17 @@ export function createEndpointSchema(
   };
 }
 
-export type MockServer = Application & {
-  start: (port: number) => MockServer;
-  stop: () => void;
+export type RunningServer = {
+  stop: () => Promise<undefined>;
 };
 
-export function createMockServer(
+export type MockServerApp = {
+  start: (port: number) => Promise<RunningServer>;
+};
+
+export function createMockServerApp(
   endpointSchemas: MockServerEndpointSchema[]
-): MockServer {
+): MockServerApp {
   const app = express();
   endpointSchemas.forEach(s => {
     app[s.method](createExpressPath(s.path), (_: Request, res: Response) => {
@@ -54,14 +57,23 @@ export function createMockServer(
   });
   app.stop = () => {};
   app.start = (port: number) => {
-    const startedApp = app.listen(port, () => {
-      console.log(`[TestServer] listening on localhost:${port}`);
+    return new Promise(resolve => {
+      const runningServer = app.listen(port, () => {
+        console.log(`[TestServer] listening on localhost:${port}`);
+      });
+      resolve({
+        stop: () => {
+          return new Promise(resolve => {
+            runningServer.close(() => {
+              console.log(
+                `[TestServer] running server on localhost:${port} was stopped`
+              );
+              resolve(undefined);
+            });
+          });
+        },
+      });
     });
-    startedApp.stop = () => {
-      console.log(`[TestServer] on localhost:${port} was stopped`);
-      app.close();
-    };
-    return app;
   };
   return app;
 }

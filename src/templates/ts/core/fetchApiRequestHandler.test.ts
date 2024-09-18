@@ -4,13 +4,14 @@ import {createRequest} from './core';
 import {jsonEndpointSchema} from './httpMockServerSchemas';
 import {
   createEndpointSchema,
-  createMockServer,
-  MockServer,
+  createMockServerApp,
+  MockServerApp,
+  RunningServer,
 } from './httpMockServer';
 
 const port = 3010;
-const server: MockServer = createMockServer([jsonEndpointSchema]);
-let runningServer: MockServer | undefined;
+const mockServerApp: MockServerApp = createMockServerApp([jsonEndpointSchema]);
+let runningServer: RunningServer | undefined;
 
 const requestHandler = new FetchApiRequestHandler({
   stringifyQueryParams: queryParams => stringify(queryParams),
@@ -18,12 +19,12 @@ const requestHandler = new FetchApiRequestHandler({
 });
 
 beforeAll(async () => {
-  runningServer = server.start(port);
+  runningServer = await mockServerApp.start(port);
 });
 
-afterAll(() => {
+afterAll(async () => {
   if (runningServer) {
-    runningServer.stop();
+    await runningServer.stop();
   }
 });
 
