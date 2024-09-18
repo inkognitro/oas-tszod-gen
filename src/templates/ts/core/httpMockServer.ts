@@ -1,6 +1,7 @@
+const {log, error} = require('console');
 const express = require('express');
 import {Request, Response} from 'express';
-import {EndpointSchema, ResponseBody} from './core';
+import {EndpointSchema, JsonValue, ResponseBody} from './core';
 
 function createExpressPath(endpointSchemaPath: string): string {
   const pathParamNames = endpointSchemaPath.match(/[^{}]+(?=})/g) ?? [];
@@ -14,13 +15,62 @@ function createExpressPath(endpointSchemaPath: string): string {
 }
 
 const validMethods = ['get', 'post', 'put', 'delete'];
-const validResponseContentTypes = ['application/json', 'multipart/form-data'];
+
+type ExpectedJsonRequest = {
+  type: 'json';
+  content: JsonValue;
+};
+
+type ExpectedFormDataRequestBody = {
+  type: 'formData';
+  content: FormData;
+};
+
+type ExpectedBlobRequestBody = {
+  type: 'blob';
+  content: FormData;
+};
+
+export type ExpectedRequestBody =
+  | ExpectedJsonRequest
+  | ExpectedFormDataRequestBody
+  | ExpectedBlobRequestBody;
+
+function validateExpectedRequestContentType(
+  s: MockServerEndpointSchema,
+  request: Request
+) {
+  if (!s.expectedRequestContentType) {
+    return;
+  }
+  const actualValue = request.headers['content-type'];
+  if (actualValue === s.expectedRequestContentType) {
+    return;
+  }
+  error(
+    'WRONG REQUEST HEADER "content-type":',
+    '\nexpected:',
+    s.expectedRequestContentType,
+    '\nactual:',
+    request.headers['content-type']
+  );
+  throw new Error('WRONG REQUEST HEADER');
+}
+
+function validateExpectedRequestBody(
+  s: MockServerEndpointSchema,
+  request: Request
+) {
+  // todo: implement
+}
 
 export type MockServerEndpointSchema = {
   method: (typeof validMethods)[number];
   path: string;
-  responseContentType: (typeof validResponseContentTypes)[number];
-  responseBody: ResponseBody;
+  expectedRequestContentType?: string;
+  expectedRequestBody?: ExpectedRequestBody;
+  responseContentType?: string;
+  responseBody?: ResponseBody;
 };
 
 export function createEndpointSchema(
@@ -48,24 +98,29 @@ export function createMockServerApp(
 ): MockServerApp {
   const app = express();
   endpointSchemas.forEach(s => {
-    app[s.method](createExpressPath(s.path), (_: Request, res: Response) => {
-      // todo: validate response contents somehow
-
-      res.setHeader('Content-Type', s.responseContentType);
-      res.send(s.responseBody);
-    });
+    app[s.method](
+      createExpressPath(s.path),
+      (request: Request, res: Response) => {
+        validateExpectedRequestContentType(s, request);
+        validateExpectedRequestBody(s, request);
+        if (s.responseContentType !== undefined) {
+          res.setHeader('content-type', s.responseContentType);
+        }
+        res.send(s.responseBody);
+      }
+    );
   });
   app.stop = () => {};
   app.start = (port: number) => {
     return new Promise(resolve => {
       const runningServer = app.listen(port, () => {
-        console.log(`[TestServer] listening on localhost:${port}`);
+        log(`[TestServer] listening on localhost:${port}`);
       });
       resolve({
         stop: () => {
           return new Promise(resolve => {
             runningServer.close(() => {
-              console.log(
+              log(
                 `[TestServer] running server on localhost:${port} was stopped`
               );
               resolve(undefined);

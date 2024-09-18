@@ -28,14 +28,14 @@ afterAll(async () => {
   }
 });
 
-describe('FetchApiRequestHandler tests', () => {
+describe('FetchApiRequestHandler', () => {
   it('can send and receive json data', async () => {
     const rr = await requestHandler.execute(
       createRequest({
         endpointSchema: createEndpointSchema(jsonEndpointSchema),
       })
     );
-    expect(rr.response?.status).toEqual(200);
+    expect(rr.response?.status).toBe(200);
     expect(rr.response.contentType).toContain('application/json');
     const body = await rr.response.revealBody();
     expect(body).toEqual(body);
