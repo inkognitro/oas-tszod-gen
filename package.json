@@ -1,9 +1,6 @@
 {
   "name": "@inkognitro/oas-to-code",
   "version": "0.0.21",
-  "engines": {
-    "node": ">=10.0.0"
-  },
   "files": [
     "./dist",
     "./LICENSE",
