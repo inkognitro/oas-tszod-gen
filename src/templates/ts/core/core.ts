@@ -20,7 +20,6 @@ export type RequestCookies = {
   [cookieName: string]: string;
 };
 
-// todo: implement support for ReadableStream, BufferSource, URLSearchParams
 export type RequestBody = Blob | FormData | JsonValue | string;
 
 export type JsonContentValue =
