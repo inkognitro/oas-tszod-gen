@@ -88,6 +88,9 @@ export function isResponseByStatusCodeMap(
   }
   const value = anyValue as ResponseByStatusCodeMap;
   for (const statusCode in value) {
+    if (isNaN(parseInt(statusCode)) && statusCode !== 'default') {
+      return false;
+    }
     const responseOrRef = value[statusCode];
     if (!isResponse(responseOrRef)) {
       return false;

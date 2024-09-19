@@ -3,6 +3,7 @@ import {MockServerEndpointSchema} from './httpMockServer';
 export const getJsonEndpointSchema: MockServerEndpointSchema = {
   path: '/json',
   method: 'get',
+  responseStatus: 200,
   responseContentType: 'application/json',
   responseBody: {foo: 'bar'},
 };
@@ -15,6 +16,7 @@ export const postJsonEndpointSchema: MockServerEndpointSchema = {
     type: 'json',
     content: {foo: 'bar'},
   },
+  responseStatus: 200,
   responseContentType: 'application/json',
   responseBody: {foo: 'bar'},
 };
@@ -28,6 +30,7 @@ export const mockFormData = formData;
 export const getFormDataEndpointSchema: MockServerEndpointSchema = {
   path: '/formData',
   method: 'get',
+  responseStatus: 200,
   responseContentType: 'multipart/form-data',
   responseBody: formData,
 };
@@ -39,6 +42,7 @@ export const postFormDataEndpointSchema: MockServerEndpointSchema = {
   expectedRequestBody: {
     type: 'formData',
   },
+  responseStatus: 200,
   responseContentType: 'application/json',
   responseBody: {success: true},
 };

@@ -1,5 +1,4 @@
 import {ZodSchema} from 'zod';
-import {response} from 'express';
 
 export type RequestHeaders = {
   [headerName: string]: string | number;
@@ -60,14 +59,20 @@ export function findMatchingSchemaContentType(
   actualContentType: string,
   endpointSchema: EndpointSchema
 ): string | null {
-  const responseSchema = endpointSchema.responseByStatus[actualStatus];
+  const responseSchema =
+    endpointSchema.responseByStatus[actualStatus] ??
+    endpointSchema.responseByStatus['default'];
   if (!responseSchema) {
     return null;
   }
   const actualLowercaseContentType = actualContentType.toLowerCase();
   const schemaContentTypes = Object.keys(responseSchema.bodyByContentType);
   return schemaContentTypes.reduce<null | string>((currentCt, schemaCt) => {
-    if (!schemaCt.toLowerCase().includes(actualLowercaseContentType)) {
+    const lowercaseSchemaCt = schemaCt.toLowerCase();
+    if (
+      !lowercaseSchemaCt.includes(actualLowercaseContentType) &&
+      !actualLowercaseContentType.includes(lowercaseSchemaCt)
+    ) {
       return currentCt;
     }
     if (!currentCt) {
@@ -137,7 +142,7 @@ export type EndpointSchema = {
   cookiesZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
   pathParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
   queryParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  responseByStatus: Partial<Record<number | 'any', ResponseSchema>>;
+  responseByStatus: Partial<Record<number | 'default', ResponseSchema>>;
 };
 
 export function createRequest(settings: RequestCreationSettings): Request {

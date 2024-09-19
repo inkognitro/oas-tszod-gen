@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 import {Request, Response, NextFunction} from 'express';
 import {EndpointSchema, isJsonValue, JsonValue, ResponseBody} from './core';
+import {z, ZodSchema} from 'zod';
 
 function createExpressPath(endpointSchemaPath: string): string {
   const pathParamNames = endpointSchemaPath.match(/[^{}]+(?=})/g) ?? [];
@@ -119,19 +120,30 @@ export type MockServerEndpointSchema = {
   path: string;
   expectedRequestContentType?: string;
   expectedRequestBody?: ExpectedRequestBody;
+  responseStatus: number;
   responseContentType?: string;
   responseBody?: ResponseBody;
 };
 
 export function createEndpointSchema(
-  schema: MockServerEndpointSchema
+  s: MockServerEndpointSchema
 ): EndpointSchema {
+  const responseBodyContentTypeMap: Record<string, {zodSchema: ZodSchema}> = {};
+  if (s.responseContentType) {
+    responseBodyContentTypeMap[s.responseContentType] = {
+      zodSchema: z.any(),
+    };
+  }
   return {
-    path: schema.path,
-    method: schema.method,
+    path: s.path,
+    method: s.method,
     supportedSecuritySchemas: [],
     bodyByContentType: {},
-    responseByStatus: {},
+    responseByStatus: {
+      [s.responseStatus]: {
+        bodyByContentType: responseBodyContentTypeMap,
+      },
+    },
   };
 }
 
@@ -152,6 +164,7 @@ export function createMockServerApp(
       createExpressPath(s.path),
       createBodyParserByEndpointSchema(s),
       (request: Request, res: Response) => {
+        res.status(s.responseStatus);
         validateExpectedContentTypeRequestHeader(s, request);
         validateExpectedRequestBody(s, request);
         if (s.responseContentType !== undefined) {

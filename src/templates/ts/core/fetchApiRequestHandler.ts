@@ -8,7 +8,6 @@ import {
   ResponseBody,
   ResponseSetCookies,
   isJsonValue,
-  ResponseSchema,
   EndpointSchema,
   findMatchingSchemaContentType,
 } from './core';

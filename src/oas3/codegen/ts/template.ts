@@ -454,7 +454,7 @@ export const templateEndpointSchemaType: TemplateDefinitionOutput = {
       codeParts.push('queryParamsZodSchema?: ZodSchema;');
     }
     codeParts.push(
-      `responseByStatus: Partial<Record<number | 'any', ${templateResponseSchemaType.createName(
+      `responseByStatus: Partial<Record<number | 'default', ${templateResponseSchemaType.createName(
         templateEndpointSchemaTypePath
       )}>>;`
     );
@@ -602,14 +602,19 @@ const templateFindMatchingSchemaContentTypeFunction: TemplateDefinitionOutput =
     },
     createCode: () => {
       const bodyCodeLines: string[] = [
-        'const responseSchema = endpointSchema.responseByStatus[actualStatus];',
+        'const responseSchema = endpointSchema.responseByStatus[actualStatus] ??',
+        "endpointSchema.responseByStatus['default'];",
         'if (!responseSchema) {',
         'return null;',
         '}',
         'const actualLowercaseContentType = actualContentType.toLowerCase();',
         'const schemaContentTypes = Object.keys(responseSchema.bodyByContentType);',
         'return schemaContentTypes.reduce<null | string>((currentCt, schemaCt) => {',
-        'if (!schemaCt.toLowerCase().includes(actualLowercaseContentType)) {',
+        'const lowercaseSchemaCt = schemaCt.toLowerCase();',
+        'if (',
+        '!lowercaseSchemaCt.includes(actualLowercaseContentType) &&',
+        '!actualLowercaseContentType.includes(lowercaseSchemaCt)',
+        ') {',
         'return currentCt;',
         '}',
         'if (!currentCt) {',
