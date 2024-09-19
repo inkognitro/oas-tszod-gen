@@ -1,9 +1,7 @@
-import {NextHandleFunction} from 'connect';
-
 const {log, error} = require('console');
 const express = require('express');
 const bodyParser = require('body-parser');
-import {Request, Response} from 'express';
+import {Request, Response, NextFunction} from 'express';
 import {EndpointSchema, isJsonValue, JsonValue, ResponseBody} from './core';
 
 function createExpressPath(endpointSchemaPath: string): string {
@@ -26,12 +24,10 @@ type ExpectedJsonRequest = {
 
 type ExpectedFormDataRequestBody = {
   type: 'formData';
-  content: FormData;
 };
 
 type ExpectedBlobRequestBody = {
   type: 'blob';
-  content: FormData;
 };
 
 export type ExpectedRequestBody =
@@ -58,7 +54,7 @@ function validateExpectedContentTypeRequestHeader(
 
 function createBodyParserByEndpointSchema(
   s: MockServerEndpointSchema
-): NextHandleFunction {
+): NextFunction {
   if (!s.expectedRequestBody?.type) {
     return bodyParser.raw();
   }
@@ -97,7 +93,7 @@ function validateExpectedRequestBody(
   const actualBodyType = findActualBodyType(actualBody);
   const isValidJsonBody =
     actualBodyType === s.expectedRequestBody.type &&
-    actualBodyType === 'json' &&
+    s.expectedRequestBody.type === 'json' &&
     JSON.stringify(actualBody) ===
       JSON.stringify(s.expectedRequestBody.content);
   if (isValidJsonBody) {

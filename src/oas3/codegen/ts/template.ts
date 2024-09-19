@@ -587,6 +587,47 @@ const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
   ],
 };
 
+const templateFindMatchingSchemaContentTypeFunctionPath = [
+  'core',
+  'core',
+  'findMatchingSchemaContentType',
+];
+const templateFindMatchingSchemaContentTypeFunction: TemplateDefinitionOutput =
+  {
+    type: OutputType.TEMPLATE_DEFINITION,
+    definitionType: 'function',
+    path: templateFindMatchingSchemaContentTypeFunctionPath,
+    createName: () => {
+      return 'findMatchingSchemaContentType';
+    },
+    createCode: () => {
+      const bodyCodeLines: string[] = [
+        'const responseSchema = endpointSchema.responseByStatus[actualStatus];',
+        'if (!responseSchema) {',
+        'return null;',
+        '}',
+        'const actualLowercaseContentType = actualContentType.toLowerCase();',
+        'const schemaContentTypes = Object.keys(responseSchema.bodyByContentType);',
+        'return schemaContentTypes.reduce<null | string>((currentCt, schemaCt) => {',
+        'if (!schemaCt.toLowerCase().includes(actualLowercaseContentType)) {',
+        'return currentCt;',
+        '}',
+        'if (!currentCt) {',
+        'return schemaCt;',
+        '}',
+        'if (currentCt.length < schemaCt.length) {',
+        'return schemaCt;',
+        '}',
+        'return currentCt;',
+        '}, null);',
+      ];
+      return `(actualStatus: number, actualContentType: string, endpointSchema: ${templateEndpointSchemaType.createName(
+        templateFindMatchingSchemaContentTypeFunctionPath
+      )}): string | null {\n${bodyCodeLines.join('\n')}\n}`;
+    },
+    getRequiredOutputPaths: () => [templateEndpointSchemaType.path],
+  };
+
 const templateCreateRequestFunctionPath = ['core', 'core', 'createRequest'];
 export const templateCreateRequestFunction: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
@@ -665,6 +706,7 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateJsonContentValueType,
   templateJsonValueType,
   templateIsJsonValueType,
+  templateFindMatchingSchemaContentTypeFunction,
   templateRequestCreationSettingsType,
   templateCreateRequestUrlFunction,
   templateEndpointSecuritySchemaType,

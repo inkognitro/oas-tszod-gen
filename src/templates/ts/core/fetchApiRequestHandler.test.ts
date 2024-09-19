@@ -2,6 +2,7 @@ import {FetchApiRequestHandler} from './fetchApiRequestHandler';
 import {stringify} from 'qs';
 import {createRequest} from './core';
 import {
+  getFormDataEndpointSchema,
   getJsonEndpointSchema,
   postJsonEndpointSchema,
 } from './httpMockServerSchemas';
@@ -17,6 +18,7 @@ const port = 3010;
 const mockServerApp: MockServerApp = createMockServerApp([
   getJsonEndpointSchema,
   postJsonEndpointSchema,
+  getFormDataEndpointSchema,
 ]);
 
 let runningServer: RunningServer | undefined;
@@ -48,6 +50,7 @@ describe('FetchApiRequestHandler', () => {
     const body = await rr.response.revealBody();
     expect(body).toEqual(body);
   });
+
   it('can send and receive json data', async () => {
     const rr = await requestHandler.execute(
       createRequest({
@@ -60,5 +63,17 @@ describe('FetchApiRequestHandler', () => {
     expect(rr.response.contentType).toContain('application/json');
     const body = await rr.response.revealBody();
     expect(body).toEqual(body);
+  });
+
+  it('can receive form data', async () => {
+    const rr = await requestHandler.execute(
+      createRequest({
+        endpointSchema: createEndpointSchema(getFormDataEndpointSchema),
+      })
+    );
+    expect(rr.response?.status).toBe(200);
+    expect(rr.response.contentType).toContain('multipart/form-data');
+    const body = await rr.response.revealBody();
+    expect(body).toBeInstanceOf(FormData);
   });
 });

@@ -1,4 +1,5 @@
 import {ZodSchema} from 'zod';
+import {response} from 'express';
 
 export type RequestHeaders = {
   [headerName: string]: string | number;
@@ -52,6 +53,31 @@ export function isJsonValue(value: unknown): value is JsonValue {
   } catch (e) {
     return false;
   }
+}
+
+export function findMatchingSchemaContentType(
+  actualStatus: number,
+  actualContentType: string,
+  endpointSchema: EndpointSchema
+): string | null {
+  const responseSchema = endpointSchema.responseByStatus[actualStatus];
+  if (!responseSchema) {
+    return null;
+  }
+  const actualLowercaseContentType = actualContentType.toLowerCase();
+  const schemaContentTypes = Object.keys(responseSchema.bodyByContentType);
+  return schemaContentTypes.reduce<null | string>((currentCt, schemaCt) => {
+    if (!schemaCt.toLowerCase().includes(actualLowercaseContentType)) {
+      return currentCt;
+    }
+    if (!currentCt) {
+      return schemaCt;
+    }
+    if (currentCt.length < schemaCt.length) {
+      return schemaCt;
+    }
+    return currentCt;
+  }, null);
 }
 
 export type RequestCreationSettings = {

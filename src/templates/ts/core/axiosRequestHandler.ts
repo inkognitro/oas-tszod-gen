@@ -15,6 +15,8 @@ import {
   Response as CoreResponse,
   ResponseSetCookies,
   ResponseBody,
+  EndpointSchema,
+  findMatchingSchemaContentType,
 } from './core';
 
 class ResultResponse implements CoreResponse {
@@ -25,18 +27,17 @@ class ResultResponse implements CoreResponse {
   public readonly headers: ResponseHeaders;
   public readonly cookies: ResponseSetCookies;
 
-  constructor(response: AxiosResponse) {
+  constructor(response: AxiosResponse, endpointSchema: EndpointSchema) {
     this.response = response;
     this.status = response.status;
-    const plainHeaders = this.createPlainHeaders(response);
+    const plainHeaders = ResultResponse.createPlainHeaders(response);
     this.headers = plainHeaders;
-    const contentTypeKey = Object.keys(plainHeaders).find(
-      key => key.toLowerCase() === 'content-type'
+    this.contentType = ResultResponse.findMatchingSchemaContentType(
+      response.status,
+      plainHeaders,
+      endpointSchema
     );
-    this.contentType = contentTypeKey
-      ? plainHeaders[contentTypeKey].toLowerCase()
-      : null;
-    this.cookies = this.createPlainCookies(response);
+    this.cookies = ResultResponse.createPlainCookies(response);
     this.revealBody = this.revealBody.bind(this);
   }
 
@@ -44,7 +45,28 @@ class ResultResponse implements CoreResponse {
     return new Promise(resolve => resolve(this.response.data));
   }
 
-  private createPlainHeaders(axiosResponse: AxiosResponse): ResponseHeaders {
+  private static findMatchingSchemaContentType(
+    actualStatus: number,
+    plainHeaders: Record<string, string>,
+    endpointSchema: EndpointSchema
+  ): string | null {
+    const actualContentTypeKey = Object.keys(plainHeaders).find(
+      key => key.toLowerCase() === 'content-type'
+    );
+    if (!actualContentTypeKey) {
+      return null;
+    }
+    const actualContentType = plainHeaders[actualContentTypeKey];
+    return findMatchingSchemaContentType(
+      actualStatus,
+      actualContentType,
+      endpointSchema
+    );
+  }
+
+  private static createPlainHeaders(
+    axiosResponse: AxiosResponse
+  ): ResponseHeaders {
     const stringHeaders =
       axiosResponse.headers instanceof AxiosHeaders
         ? axiosResponse.headers.toJSON(true)
@@ -59,7 +81,9 @@ class ResultResponse implements CoreResponse {
     return plainHeaders;
   }
 
-  private createPlainCookies(axiosResponse: AxiosResponse): ResponseSetCookies {
+  private static createPlainCookies(
+    axiosResponse: AxiosResponse
+  ): ResponseSetCookies {
     const setCookieHeaders = axiosResponse.headers['set-cookie'];
     if (!setCookieHeaders) {
       return {};
@@ -124,7 +148,7 @@ export class AxiosRequestHandler implements RequestHandler {
           resolve({
             hasRequestBeenCancelled: false,
             request,
-            response: new ResultResponse(response),
+            response: new ResultResponse(response, request.endpointSchema),
           });
         })
         .catch((error): void => {
@@ -141,7 +165,7 @@ export class AxiosRequestHandler implements RequestHandler {
               hasRequestBeenCancelled: false,
               request,
               response: error.response
-                ? new ResultResponse(error.response)
+                ? new ResultResponse(error.response, request.endpointSchema)
                 : null,
               error: error,
             });
@@ -151,7 +175,7 @@ export class AxiosRequestHandler implements RequestHandler {
             hasRequestBeenCancelled: false,
             request,
             response: error.response
-              ? new ResultResponse(error.response)
+              ? new ResultResponse(error.response, request.endpointSchema)
               : null,
             error: error,
           });

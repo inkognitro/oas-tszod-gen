@@ -8,6 +8,9 @@ import {
   ResponseBody,
   ResponseSetCookies,
   isJsonValue,
+  ResponseSchema,
+  EndpointSchema,
+  findMatchingSchemaContentType,
 } from './core';
 
 function getTransferFormatByContentType(
@@ -20,11 +23,11 @@ function getTransferFormatByContentType(
   if (ct.match(/application\/[^+]*[+]?(json);?.*/)) {
     return 'json';
   }
-  if (ct === 'application/x-www-form-urlencoded') {
-    return 'urlSearchParams';
-  }
-  if (ct === 'multipart/form-data') {
+  if (ct.match(/multipart\/form-data;?.*/)) {
     return 'formData';
+  }
+  if (ct.match(/application\/x-www-form-urlencoded;?.*/)) {
+    return 'urlSearchParams';
   }
   return 'blob';
 }
@@ -37,17 +40,34 @@ class ResultResponse implements CoreResponse {
   public readonly headers: ResponseHeaders;
   public readonly cookies: ResponseSetCookies;
 
-  constructor(response: Response) {
+  constructor(response: Response, endpointSchema: EndpointSchema) {
     this.response = response;
     this.status = response.status;
-    this.headers = this.createPlainHeaders(response);
-    this.contentType =
-      this.response.headers.get('content-type')?.toLowerCase() ?? null;
-    this.cookies = this.createPlainCookies(response);
+    this.headers = ResultResponse.createPlainHeaders(response);
+    this.contentType = ResultResponse.findMatchingSchemaContentType(
+      response,
+      endpointSchema
+    );
+    this.cookies = ResultResponse.createPlainCookies(response);
     this.revealBody = this.revealBody.bind(this);
   }
 
-  private createPlainHeaders(response: Response): ResponseHeaders {
+  private static findMatchingSchemaContentType(
+    response: Response,
+    endpointSchema: EndpointSchema
+  ): string | null {
+    const actualContentType = response.headers.get('content-type');
+    if (!actualContentType) {
+      return null;
+    }
+    return findMatchingSchemaContentType(
+      response.status,
+      actualContentType,
+      endpointSchema
+    );
+  }
+
+  private static createPlainHeaders(response: Response): ResponseHeaders {
     const plainHeaders: ResponseHeaders = {};
     response.headers.forEach((header, headerKey) => {
       if (typeof header === 'string') {
@@ -57,7 +77,7 @@ class ResultResponse implements CoreResponse {
     return plainHeaders;
   }
 
-  private createPlainCookies(response: Response): ResponseSetCookies {
+  private static createPlainCookies(response: Response): ResponseSetCookies {
     const setCookieHeaders = response.headers.getSetCookie();
     if (!setCookieHeaders) {
       return {};
@@ -152,7 +172,7 @@ export class FetchApiRequestHandler implements RequestHandler {
         .then(response => {
           resolve({
             request: request,
-            response: new ResultResponse(response),
+            response: new ResultResponse(response, request.endpointSchema),
             hasRequestBeenCancelled: abortController.signal.aborted,
           });
         })
@@ -160,7 +180,7 @@ export class FetchApiRequestHandler implements RequestHandler {
           resolve({
             request: request,
             response: error.response
-              ? new ResultResponse(error.response)
+              ? new ResultResponse(error.response, request.endpointSchema)
               : null,
             hasRequestBeenCancelled: abortController.signal.aborted,
             error: abortController.signal.aborted ? undefined : error,
