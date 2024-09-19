@@ -47,9 +47,6 @@ function applyRequestBodyContent(
       ...schemaCodeOutput,
       createCode: referencingPath => {
         const codeParts: string[] = [];
-        if (contentType.toLowerCase() === 'application/x-www-form-urlencoded') {
-          codeParts.push('URLSearchParams');
-        }
         if (formDataTypeDefinitionOutput) {
           codeParts.push(
             formDataTypeDefinitionOutput.createName(referencingPath)
