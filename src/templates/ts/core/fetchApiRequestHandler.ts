@@ -14,7 +14,7 @@ import {
 
 function getTransferFormatByContentType(
   contentType: string
-): 'text' | 'json' | 'formData' | 'urlSearchParams' | 'blob' {
+): 'text' | 'json' | 'formData' | 'blob' {
   const ct = contentType.trim().toLowerCase();
   if (ct.startsWith('text/')) {
     return 'text';
@@ -22,11 +22,11 @@ function getTransferFormatByContentType(
   if (ct.match(/application\/[^+]*[+]?(json);?.*/)) {
     return 'json';
   }
-  if (ct.match(/multipart\/form-data;?.*/)) {
+  if (
+    ct.match(/multipart\/form-data;?.*/) ||
+    ct.match(/application\/x-www-form-urlencoded;?.*/)
+  ) {
     return 'formData';
-  }
-  if (ct.match(/application\/x-www-form-urlencoded;?.*/)) {
-    return 'urlSearchParams';
   }
   return 'blob';
 }
@@ -96,8 +96,6 @@ class ResultResponse implements CoreResponse {
     }
     const format = getTransferFormatByContentType(contentType);
     switch (format) {
-      case 'urlSearchParams':
-        throw new Error('URLSearchParams is not supported for responses');
       case 'json':
         return this.response.json();
       case 'text':
@@ -258,13 +256,6 @@ export class FetchApiRequestHandler implements RequestHandler {
           );
         }
         return JSON.stringify(request.body);
-      case 'urlSearchParams':
-        if (!(request.body instanceof URLSearchParams)) {
-          throw new Error(
-            `URLSearchParams expected but received request.body of type: ${typeof request.body}`
-          );
-        }
-        return request.body;
       case 'formData':
         if (!(request.body instanceof FormData)) {
           throw new Error(

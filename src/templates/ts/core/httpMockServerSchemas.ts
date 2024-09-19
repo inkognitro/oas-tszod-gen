@@ -11,14 +11,13 @@ export const getJsonEndpointSchema: MockServerEndpointSchema = {
 export const postJsonEndpointSchema: MockServerEndpointSchema = {
   path: '/json',
   method: 'post',
-  expectedRequestContentType: 'application/json',
-  expectedRequestBody: {
-    type: 'json',
-    content: {foo: 'bar'},
-  },
   responseStatus: 200,
   responseContentType: 'application/json',
   responseBody: {foo: 'bar'},
+  expectedRequestBody: {
+    contentType: 'application/json',
+    content: {foo: 'bar'},
+  },
 };
 
 const formData = new FormData();
@@ -31,18 +30,18 @@ export const getFormDataEndpointSchema: MockServerEndpointSchema = {
   path: '/formData',
   method: 'get',
   responseStatus: 200,
-  responseContentType: 'multipart/form-data',
-  responseBody: formData,
+  responseContentType: 'application/x-www-form-urlencoded',
+  responseBody: mockFormData,
 };
 
 export const postFormDataEndpointSchema: MockServerEndpointSchema = {
   path: '/json',
   method: 'post',
-  expectedRequestContentType: 'multipart/form-data',
-  expectedRequestBody: {
-    type: 'formData',
-  },
   responseStatus: 200,
-  responseContentType: 'application/json',
-  responseBody: {success: true},
+  responseContentType: 'application/x-www-form-urlencoded',
+  responseBody: mockFormData,
+  expectedRequestBody: {
+    contentType: 'multipart/form-data',
+    content: mockFormData,
+  },
 };

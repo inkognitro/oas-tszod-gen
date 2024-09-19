@@ -46,7 +46,9 @@ describe('FetchApiRequestHandler', () => {
       })
     );
     expect(rr.response?.status).toBe(200);
-    expect(rr.response.contentType).toContain('application/json');
+    expect(rr.response.contentType).toContain(
+      getJsonEndpointSchema.responseContentType
+    );
     const body = await rr.response.revealBody();
     expect(body).toEqual(body);
   });
@@ -60,7 +62,9 @@ describe('FetchApiRequestHandler', () => {
       })
     );
     expect(rr.response?.status).toBe(200);
-    expect(rr.response.contentType).toContain('application/json');
+    expect(rr.response.contentType).toContain(
+      postJsonEndpointSchema.responseContentType
+    );
     const body = await rr.response.revealBody();
     expect(body).toEqual(body);
   });
@@ -72,7 +76,9 @@ describe('FetchApiRequestHandler', () => {
       })
     );
     expect(rr.response?.status).toBe(200);
-    expect(rr.response.contentType).toContain('multipart/form-data');
+    expect(rr.response.contentType).toContain(
+      getFormDataEndpointSchema.responseContentType
+    );
     const body = await rr.response.revealBody();
     expect(body).toBeInstanceOf(FormData);
   });

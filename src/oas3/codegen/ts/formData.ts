@@ -8,7 +8,7 @@ import {
 import {isObjectSchema, isStringSchema, Schema} from '@/oas3/specification';
 import {GenerateConfig} from './generator';
 
-export function applyNullableFormDataDefinition(
+export function applyNullableFormDataTypeDefinition(
   codeGenerator: CodeGenerator,
   schema: Schema,
   path: OutputPath,

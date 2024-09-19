@@ -6,11 +6,12 @@ import {
   CodeGenerationOutput,
   CodeGenerator,
   containsOutputPath,
+  DefinitionOutput,
   OutputPath,
 } from './core';
 import {GenerateConfig} from './generator';
 import {applySchema} from './schema';
-import {applyNullableFormDataDefinition} from './formData';
+import {applyNullableFormDataTypeDefinition} from './formData';
 
 type ApplyRequestBodyResult = {
   contentType: string;
@@ -24,41 +25,47 @@ function applyRequestBodyContent(
   parentPath: OutputPath,
   config: GenerateConfig
 ): ApplyRequestBodyResult {
+  const schemaCodeOutput = applySchema(
+    codeGenerator,
+    contentSchema.schema,
+    [...parentPath, contentType],
+    config
+  );
+  let formDataTypeDefinitionOutput: null | DefinitionOutput = null;
   if (contentType.toLowerCase() === 'multipart/form-data') {
     const pathForFormData = [...parentPath, 'FormData'];
-    const typedFormData = applyNullableFormDataDefinition(
+    formDataTypeDefinitionOutput = applyNullableFormDataTypeDefinition(
       codeGenerator,
       contentSchema.schema,
       pathForFormData,
       config
     );
-    return {
-      contentType,
-      codeOutput: {
-        path: pathForFormData,
-        createCode: referencingPath => {
-          if (typedFormData) {
-            return typedFormData.createName(referencingPath);
-          }
-          return 'FormData';
-        },
-        getRequiredOutputPaths: () => {
-          if (typedFormData) {
-            return [typedFormData.path];
-          }
-          return [];
-        },
-      },
-    };
   }
   return {
     contentType,
-    codeOutput: applySchema(
-      codeGenerator,
-      contentSchema.schema,
-      [...parentPath, contentType],
-      config
-    ),
+    codeOutput: {
+      ...schemaCodeOutput,
+      createCode: referencingPath => {
+        const codeParts: string[] = [];
+        if (contentType.toLowerCase() === 'application/x-www-form-urlencoded') {
+          codeParts.push('URLSearchParams');
+        }
+        if (formDataTypeDefinitionOutput) {
+          codeParts.push(
+            formDataTypeDefinitionOutput.createName(referencingPath)
+          );
+        }
+        codeParts.push(schemaCodeOutput.createCode(referencingPath));
+        return codeParts.join('\n| ');
+      },
+      getRequiredOutputPaths: () => {
+        const paths = [...schemaCodeOutput.getRequiredOutputPaths()];
+        if (formDataTypeDefinitionOutput) {
+          paths.push(formDataTypeDefinitionOutput.path);
+        }
+        return paths;
+      },
+    },
   };
 }
 

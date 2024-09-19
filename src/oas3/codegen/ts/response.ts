@@ -25,7 +25,7 @@ import {
   templateResponseBodyDataType,
   templateResponseDataType,
 } from './template';
-import {applyNullableFormDataDefinition} from './formData';
+import {applyNullableFormDataTypeDefinition} from './formData';
 
 function createHeadersObjectSchema(
   codeGenerator: CodeGenerator,
@@ -77,9 +77,13 @@ function applyResponseBodyContent(
   parentPath: OutputPath,
   config: GenerateConfig
 ): ApplyResponseBodyResult {
-  if (contentType.toLowerCase() === 'multipart/form-data') {
+  const formDataContentTypes = [
+    'application/x-www-form-urlencoded',
+    'multipart/form-data',
+  ];
+  if (formDataContentTypes.includes(contentType.toLowerCase())) {
     const pathForFormData = [...parentPath, 'FormData'];
-    const typedFormData = applyNullableFormDataDefinition(
+    const typedFormData = applyNullableFormDataTypeDefinition(
       codeGenerator,
       contentSchema.schema,
       pathForFormData,

@@ -2,7 +2,7 @@ const {log, error} = require('console');
 const express = require('express');
 const bodyParser = require('body-parser');
 import {Request, Response, NextFunction} from 'express';
-import {EndpointSchema, isJsonValue, JsonValue, ResponseBody} from './core';
+import {EndpointSchema, ResponseBody} from './core';
 import {z, ZodSchema} from 'zod';
 
 function createExpressPath(endpointSchemaPath: string): string {
@@ -18,37 +18,25 @@ function createExpressPath(endpointSchemaPath: string): string {
 
 const validMethods = ['get', 'post', 'put', 'delete'];
 
-type ExpectedJsonRequest = {
-  type: 'json';
-  content: JsonValue;
+type ExpectedRequestBody = {
+  contentType: string;
+  content?: any;
 };
 
-type ExpectedFormDataRequestBody = {
-  type: 'formData';
-};
-
-type ExpectedBlobRequestBody = {
-  type: 'blob';
-};
-
-export type ExpectedRequestBody =
-  | ExpectedJsonRequest
-  | ExpectedFormDataRequestBody
-  | ExpectedBlobRequestBody;
-
-function validateExpectedContentTypeRequestHeader(
+function validateExpectedRequestContentType(
   s: MockServerEndpointSchema,
   request: Request
 ) {
-  if (!s.expectedRequestContentType) {
+  const expectedContentType = s.expectedRequestBody?.contentType;
+  if (!expectedContentType) {
     return;
   }
   const actualValue = request.headers['content-type'];
-  if (actualValue === s.expectedRequestContentType) {
+  if (actualValue === expectedContentType) {
     return;
   }
   error('WRONG REQUEST HEADER "content-type":');
-  error('expected:', s.expectedRequestContentType);
+  error('expected:', expectedContentType);
   error('actual:', request.headers['content-type']);
   throw new Error('WRONG REQUEST HEADER');
 }
@@ -56,73 +44,49 @@ function validateExpectedContentTypeRequestHeader(
 function createBodyParserByEndpointSchema(
   s: MockServerEndpointSchema
 ): NextFunction {
-  if (!s.expectedRequestBody?.type) {
+  const contentType = s.expectedRequestBody?.contentType;
+  if (!contentType) {
     return bodyParser.raw();
   }
-  if (s.expectedRequestBody?.type === 'json') {
+  if (contentType === 'application/json') {
     return bodyParser.json();
   }
-  if (s.expectedRequestBody?.type === 'blob') {
-    return bodyParser.raw();
-  }
-  throw new Error(`case for "${s.expectedRequestBody.type}" is not supported`);
-}
-
-function findActualBodyType(
-  content: unknown
-): 'json' | 'formData' | 'blob' | 'unknown' | null {
-  if (!content) {
-    return null;
-  }
-  if (content instanceof FormData) {
-    return 'formData';
-  }
-  if (isJsonValue(content)) {
-    return 'json';
-  }
-  return 'unknown';
+  const message = `MockServer case for contentType "${contentType}" is not supported`;
+  error(message);
+  throw new Error(message);
 }
 
 function validateExpectedRequestBody(
   s: MockServerEndpointSchema,
   request: Request
 ) {
-  if (!s.expectedRequestBody) {
+  const expectedContentType = s.expectedRequestBody?.contentType;
+  const expectedContent = s.expectedRequestBody?.content;
+  if (!expectedContentType || !expectedContent) {
     return;
   }
-  const actualBody = request.body;
-  const actualBodyType = findActualBodyType(actualBody);
   const isValidJsonBody =
-    actualBodyType === s.expectedRequestBody.type &&
-    s.expectedRequestBody.type === 'json' &&
-    JSON.stringify(actualBody) ===
-      JSON.stringify(s.expectedRequestBody.content);
+    expectedContentType === 'application/json' &&
+    JSON.stringify(request.body) === JSON.stringify(expectedContent);
   if (isValidJsonBody) {
     return;
   }
-  const isValidNonJsonBody =
-    actualBodyType === s.expectedRequestBody.type && actualBodyType !== 'json';
-  if (isValidNonJsonBody) {
-    return;
-  }
   error('WRONG REQUEST BODY:');
-  error('expected body type:', s.expectedRequestBody.type);
-  if (s.expectedRequestBody.type === 'json') {
-    error('expected body:', s.expectedRequestBody.content);
+  error('expected body type:', expectedContentType);
+  if (expectedContentType === 'application/json') {
+    error('expected body:', expectedContent);
+    error('actual body:', request.body);
   }
-  error('actual body type:', actualBodyType);
-  error('actual body:', request.body);
   throw new Error('WRONG REQUEST BODY');
 }
 
 export type MockServerEndpointSchema = {
   method: (typeof validMethods)[number];
   path: string;
-  expectedRequestContentType?: string;
   expectedRequestBody?: ExpectedRequestBody;
   responseStatus: number;
-  responseContentType?: string;
-  responseBody?: ResponseBody;
+  responseContentType: null | string;
+  responseBody: null | ResponseBody;
 };
 
 export function createEndpointSchema(
@@ -165,9 +129,9 @@ export function createMockServerApp(
       createBodyParserByEndpointSchema(s),
       (request: Request, res: Response) => {
         res.status(s.responseStatus);
-        validateExpectedContentTypeRequestHeader(s, request);
+        validateExpectedRequestContentType(s, request);
         validateExpectedRequestBody(s, request);
-        if (s.responseContentType !== undefined) {
+        if (s.responseContentType !== null) {
           res.setHeader('content-type', s.responseContentType);
         }
         res.send(s.responseBody);
