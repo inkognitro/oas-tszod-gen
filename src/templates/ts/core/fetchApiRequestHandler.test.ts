@@ -4,7 +4,11 @@ import {createRequest} from './core';
 import {
   getFormDataEndpointSchema,
   getJsonEndpointSchema,
+  getPlainTextEndpointSchema,
+  mockFormData,
+  postFormDataEndpointSchema,
   postJsonEndpointSchema,
+  postPlainTextEndpointSchema,
 } from './httpMockServerSchemas';
 import {
   createEndpointSchema,
@@ -16,9 +20,12 @@ import {
 const port = 3010;
 
 const mockServerApp: MockServerApp = createMockServerApp([
+  getPlainTextEndpointSchema,
+  postPlainTextEndpointSchema,
   getJsonEndpointSchema,
   postJsonEndpointSchema,
   getFormDataEndpointSchema,
+  postFormDataEndpointSchema,
 ]);
 
 let runningServer: RunningServer | undefined;
@@ -39,6 +46,36 @@ afterAll(async () => {
 });
 
 describe('FetchApiRequestHandler', () => {
+  it('can receive plain text data', async () => {
+    const rr = await requestHandler.execute(
+      createRequest({
+        endpointSchema: createEndpointSchema(getPlainTextEndpointSchema),
+      })
+    );
+    expect(rr.response?.status).toBe(200);
+    expect(rr.response.contentType).toContain(
+      getPlainTextEndpointSchema.responseContentType
+    );
+    const body = await rr.response.revealBody();
+    expect(body).toEqual('pong');
+  });
+
+  it('can send and receive plain text data', async () => {
+    const rr = await requestHandler.execute(
+      createRequest({
+        contentType: 'text/plain',
+        body: 'ping',
+        endpointSchema: createEndpointSchema(postPlainTextEndpointSchema),
+      })
+    );
+    expect(rr.response?.status).toBe(200);
+    expect(rr.response.contentType).toContain(
+      postPlainTextEndpointSchema.responseContentType
+    );
+    const body = await rr.response.revealBody();
+    expect(body).toEqual('pong');
+  });
+
   it('can receive json data', async () => {
     const rr = await requestHandler.execute(
       createRequest({
@@ -81,5 +118,21 @@ describe('FetchApiRequestHandler', () => {
     );
     const body = await rr.response.revealBody();
     expect(body).toBeInstanceOf(FormData);
+  });
+
+  it('can send and receive form data', async () => {
+    const rr = await requestHandler.execute(
+      createRequest({
+        contentType: 'multipart/form-data',
+        body: mockFormData,
+        endpointSchema: createEndpointSchema(postFormDataEndpointSchema),
+      })
+    );
+    expect(rr.response?.status).toBe(200);
+    expect(rr.response.contentType).toContain(
+      postFormDataEndpointSchema.responseContentType
+    );
+    const body = await rr.response.revealBody();
+    expect(body).toEqual(body);
   });
 });

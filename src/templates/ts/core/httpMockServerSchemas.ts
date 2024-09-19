@@ -1,5 +1,25 @@
 import {MockServerEndpointSchema} from './httpMockServer';
 
+export const getPlainTextEndpointSchema: MockServerEndpointSchema = {
+  path: '/plain-text',
+  method: 'get',
+  responseStatus: 200,
+  responseContentType: 'text/plain',
+  responseBody: 'pong',
+};
+
+export const postPlainTextEndpointSchema: MockServerEndpointSchema = {
+  path: '/plain-text',
+  method: 'post',
+  responseStatus: 200,
+  responseContentType: 'text/plain',
+  responseBody: 'pong',
+  expectedRequestBody: {
+    contentType: 'text/plain',
+    content: 'ping',
+  },
+};
+
 export const getJsonEndpointSchema: MockServerEndpointSchema = {
   path: '/json',
   method: 'get',
@@ -35,7 +55,7 @@ export const getFormDataEndpointSchema: MockServerEndpointSchema = {
 };
 
 export const postFormDataEndpointSchema: MockServerEndpointSchema = {
-  path: '/json',
+  path: '/formData',
   method: 'post',
   responseStatus: 200,
   responseContentType: 'application/x-www-form-urlencoded',

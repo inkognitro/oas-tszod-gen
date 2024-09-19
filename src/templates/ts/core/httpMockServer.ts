@@ -31,13 +31,13 @@ function validateExpectedRequestContentType(
   if (!expectedContentType) {
     return;
   }
-  const actualValue = request.headers['content-type'];
-  if (actualValue === expectedContentType) {
+  const actualContentType = request.headers['content-type'];
+  if (actualContentType === expectedContentType) {
     return;
   }
   error('WRONG REQUEST HEADER "content-type":');
   error('expected:', expectedContentType);
-  error('actual:', request.headers['content-type']);
+  error('actual:', actualContentType);
   throw new Error('WRONG REQUEST HEADER');
 }
 
@@ -48,12 +48,30 @@ function createBodyParserByEndpointSchema(
   if (!contentType) {
     return bodyParser.raw();
   }
-  if (contentType === 'application/json') {
+  if (contentType.includes('text/plain')) {
+    return bodyParser.text();
+  }
+  if (contentType.includes('application/json')) {
     return bodyParser.json();
+  }
+  if (contentType.includes('multipart/form-data')) {
+    return bodyParser.raw();
   }
   const message = `MockServer case for contentType "${contentType}" is not supported`;
   error(message);
   throw new Error(message);
+}
+
+function invalidateRequestBody(
+  expectedContentType: string,
+  expectedBody: any,
+  actualBody: any
+) {
+  error('WRONG REQUEST BODY:');
+  error('expected body content type:', expectedContentType);
+  error('expected body:', expectedBody);
+  error('actual body:', actualBody);
+  throw new Error('WRONG REQUEST BODY');
 }
 
 function validateExpectedRequestBody(
@@ -65,19 +83,31 @@ function validateExpectedRequestBody(
   if (!expectedContentType || !expectedContent) {
     return;
   }
-  const isValidJsonBody =
-    expectedContentType === 'application/json' &&
-    JSON.stringify(request.body) === JSON.stringify(expectedContent);
-  if (isValidJsonBody) {
-    return;
+  switch (expectedContentType) {
+    case 'text/plain':
+      if (request.body !== expectedContent) {
+        invalidateRequestBody(
+          expectedContentType,
+          expectedContent,
+          request.body
+        );
+      }
+      break;
+    case 'application/json':
+      if (JSON.stringify(request.body) !== JSON.stringify(expectedContent)) {
+        invalidateRequestBody(
+          expectedContentType,
+          expectedContent,
+          request.body
+        );
+      }
+      break;
+    case 'multipart/form-data':
+      // todo: invalidate FormData somehow
+      break;
+    default:
+      throw new Error('WRONG REQUEST BODY');
   }
-  error('WRONG REQUEST BODY:');
-  error('expected body type:', expectedContentType);
-  if (expectedContentType === 'application/json') {
-    error('expected body:', expectedContent);
-    error('actual body:', request.body);
-  }
-  throw new Error('WRONG REQUEST BODY');
 }
 
 export type MockServerEndpointSchema = {
