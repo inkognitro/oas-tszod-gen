@@ -14,7 +14,6 @@ However, I coded my own solution because I wanted to:
 - have the possibility to go with other implementations under the hood than [Axios](https://axios-http.com/docs/intro)
   (e.g. with [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)) having a uniform adapter API
 - have generated [Zod](https://zod.dev) schemas as an opt-in possibility, with runtime validation of requests and responses
-- have the possibility to explicitly set cookies
 - have separated functions and type definitions for each endpoint in a single file, located in its context folder
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
 - have a uniform way as an alternative to [Axios' interceptors](https://axios-http.com/docs/interceptors)
