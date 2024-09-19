@@ -12,23 +12,31 @@ import {
   findMatchingSchemaContentType,
 } from './core';
 
-function getTransferFormatByContentType(
-  contentType: string
-): 'text' | 'json' | 'formData' | 'blob' {
-  const ct = contentType.trim().toLowerCase();
-  if (ct.startsWith('text/')) {
-    return 'text';
+function convertObjectToFormData(obj: Record<string, any>): FormData {
+  const formData = new FormData();
+  for (const key in obj) {
+    const value = obj[key];
+    if (typeof value === 'string') {
+      formData.append(key, value);
+      continue;
+    }
+    if (typeof value === 'number') {
+      formData.append(key, `${value}`);
+      continue;
+    }
+    if (value instanceof Blob) {
+      formData.append(key, value);
+      continue;
+    }
+    if (typeof value === 'boolean') {
+      formData.append(key, value ? '1' : '0');
+      continue;
+    }
+    if (typeof value === 'object' && isJsonValue(value)) {
+      formData.append(key, JSON.stringify(value));
+    }
   }
-  if (ct.match(/application\/[^+]*[+]?(json);?.*/)) {
-    return 'json';
-  }
-  if (
-    ct.match(/multipart\/form-data;?.*/) ||
-    ct.match(/application\/x-www-form-urlencoded;?.*/)
-  ) {
-    return 'formData';
-  }
-  return 'blob';
+  return formData;
 }
 
 class ResultResponse implements CoreResponse {
@@ -94,18 +102,20 @@ class ResultResponse implements CoreResponse {
     if (!contentType) {
       return this.response.blob();
     }
-    const format = getTransferFormatByContentType(contentType);
-    switch (format) {
-      case 'json':
-        return this.response.json();
-      case 'text':
-        return this.response.text();
-      case 'formData':
-        return this.response.formData();
-      case 'blob':
-      default:
-        return this.response.blob();
+    const ct = contentType.trim().toLowerCase();
+    if (ct.startsWith('text/')) {
+      return this.response.text();
     }
+    if (ct.match(/application\/[^+]*[+]?(json);?.*/)) {
+      return this.response.json();
+    }
+    if (
+      ct.match(/multipart\/form-data;?.*/) ||
+      ct.match(/application\/x-www-form-urlencoded;?.*/)
+    ) {
+      return this.response.formData();
+    }
+    return this.response.blob();
   }
 }
 
@@ -216,8 +226,7 @@ export class FetchApiRequestHandler implements RequestHandler {
     const plainHeaders = this.createPlainRequestHeaders(requestInit, request);
     requestInit.headers = plainHeaders;
     if (request.body) {
-      const contentType = this.findContentTypeFromPlainHeaders(plainHeaders);
-      requestInit.body = this.createRequestBodyInit(contentType, request);
+      requestInit.body = this.createRequestBodyInit(plainHeaders, request);
     }
     if (!config?.refineFetchApiRequestInit) {
       return requestInit;
@@ -237,17 +246,38 @@ export class FetchApiRequestHandler implements RequestHandler {
     return plainHeaders[key] ?? null;
   }
 
+  private getRequestBodyTransferFormat(
+    plainHeaders: Record<string, string>,
+    request: Request
+  ): string | null {
+    let ct = this.findContentTypeFromPlainHeaders(plainHeaders);
+    if (!ct && this.isFormDataRequestContentType(request)) {
+      return 'formData';
+    }
+    if (!ct) {
+      return 'blob';
+    }
+    ct = ct.trim().toLowerCase();
+    if (ct.startsWith('text/')) {
+      return 'text';
+    }
+    if (ct.match(/application\/[^+]*[+]?(json);?.*/)) {
+      return 'json';
+    }
+    if (
+      ct.match(/multipart\/form-data;?.*/) ||
+      ct.match(/application\/x-www-form-urlencoded;?.*/)
+    ) {
+      return 'formData';
+    }
+    return 'blob';
+  }
+
   private createRequestBodyInit(
-    contentTypeHeaderValue: null | string,
+    plainHeaders: Record<string, string>,
     request: Request
   ): BodyInit | null {
-    if (!contentTypeHeaderValue) {
-      if (isJsonValue(request.body)) {
-        return JSON.stringify(request.body);
-      }
-      return request.body ?? null;
-    }
-    const format = getTransferFormatByContentType(contentTypeHeaderValue);
+    const format = this.getRequestBodyTransferFormat(plainHeaders, request);
     switch (format) {
       case 'json':
         if (!isJsonValue(request.body)) {
@@ -257,12 +287,15 @@ export class FetchApiRequestHandler implements RequestHandler {
         }
         return JSON.stringify(request.body);
       case 'formData':
-        if (!(request.body instanceof FormData)) {
-          throw new Error(
-            `FormData expected but received request.body of type: ${typeof request.body}`
-          );
+        if (request.body instanceof FormData) {
+          return request.body;
         }
-        return request.body;
+        if (request.body && typeof request.body === 'object') {
+          return convertObjectToFormData(request.body);
+        }
+        throw new Error(
+          `FormData or Object was expected but received request.body of type: ${typeof request.body}`
+        );
       case 'text':
         if (typeof request.body !== 'string') {
           throw new Error(
@@ -329,23 +362,15 @@ export class FetchApiRequestHandler implements RequestHandler {
       ...cookieHeaders,
     };
     if (
-      this.fetchApiShouldSetRequestHeaderByItselfToBeAbleToMakeItWork(request)
-    ) {
-      return mergedHeaders;
-    }
-    if (
       request.contentType &&
-      // fetch will set the according header (otherwise it won't work)
-      request.contentType.toLowerCase() !== 'multipart/form-data'
+      !this.isFormDataRequestContentType(request) // this must be handled by fetch itself to succeed
     ) {
       mergedHeaders['content-type'] = request.contentType;
     }
     return mergedHeaders;
   }
 
-  private fetchApiShouldSetRequestHeaderByItselfToBeAbleToMakeItWork(
-    request: Request
-  ): boolean {
+  private isFormDataRequestContentType(request: Request): boolean {
     const ct = request.contentType?.toLowerCase();
     if (!ct) {
       return false;

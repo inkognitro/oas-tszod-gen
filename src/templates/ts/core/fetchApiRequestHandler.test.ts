@@ -141,6 +141,24 @@ describe('FetchApiRequestHandler', () => {
     expect(body).toBeInstanceOf(FormData);
   });
 
+  it('can send from object converted form data', async () => {
+    const rr = await requestHandler.execute(
+      createRequest({
+        contentType: 'multipart/form-data',
+        body: {
+          foo: 'bar',
+        },
+        endpointSchema: createEndpointSchema(postFormDataEndpointSchema),
+      })
+    );
+    expect(rr.response?.status).toBe(200);
+    expect(rr.response.contentType).toContain(
+      postFormDataEndpointSchema.responseContentType
+    );
+    const body = await rr.response.revealBody();
+    expect(body).toBeInstanceOf(FormData);
+  });
+
   it('can receive blob data', async () => {
     const rr = await requestHandler.execute(
       createRequest({
