@@ -60,6 +60,9 @@ function createBodyParserByEndpointSchema(
   if (contentType.includes('application/x-www-form-urlencoded')) {
     return express.urlencoded({extended: true});
   }
+  if (contentType.includes('application/')) {
+    return express.raw({type: '*/*'});
+  }
   const message = `MockServer case for contentType "${contentType}" is not supported`;
   error(message);
   throw new Error(message);
@@ -83,7 +86,7 @@ function validateExpectedRequestBody(
 ) {
   const expectedContentType = s.expectedRequestBody?.contentType;
   const expectedContent = s.expectedRequestBody?.content;
-  if (!expectedContentType || !expectedContent) {
+  if (!expectedContentType) {
     return;
   }
   switch (expectedContentType) {
@@ -113,6 +116,14 @@ function validateExpectedRequestBody(
           request.body
         );
       }
+      break;
+    case 'application/pdf':
+      const buffer = request.body;
+      const blob = new Blob([buffer], {type: 'application/pdf'});
+      if (blob.size > 0) {
+        return;
+      }
+      invalidateRequestBody(expectedContentType, expectedContent, request.body);
       break;
     default:
       throw new Error('WRONG REQUEST BODY');

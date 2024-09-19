@@ -2,10 +2,13 @@ import {FetchApiRequestHandler} from './fetchApiRequestHandler';
 import {stringify} from 'qs';
 import {createRequest} from './core';
 import {
+  getBlobEndpointSchema,
   getFormDataEndpointSchema,
   getJsonEndpointSchema,
   getPlainTextEndpointSchema,
   mockFormData,
+  mockPdfBlob,
+  postBlobEndpointSchema,
   postFormDataEndpointSchema,
   postJsonEndpointSchema,
   postPlainTextEndpointSchema,
@@ -26,6 +29,8 @@ const mockServerApp: MockServerApp = createMockServerApp([
   postJsonEndpointSchema,
   getFormDataEndpointSchema,
   postFormDataEndpointSchema,
+  getBlobEndpointSchema,
+  postBlobEndpointSchema,
 ]);
 
 let runningServer: RunningServer | undefined;
@@ -134,5 +139,35 @@ describe('FetchApiRequestHandler', () => {
     );
     const body = await rr.response.revealBody();
     expect(body).toBeInstanceOf(FormData);
+  });
+
+  it('can receive blob data', async () => {
+    const rr = await requestHandler.execute(
+      createRequest({
+        endpointSchema: createEndpointSchema(getBlobEndpointSchema),
+      })
+    );
+    expect(rr.response?.status).toBe(200);
+    expect(rr.response.contentType).toContain(
+      getBlobEndpointSchema.responseContentType
+    );
+    const body = await rr.response.revealBody();
+    expect(body).toBeInstanceOf(Blob);
+  });
+
+  it('can send and receive blob data', async () => {
+    const rr = await requestHandler.execute(
+      createRequest({
+        contentType: 'application/pdf',
+        body: mockPdfBlob,
+        endpointSchema: createEndpointSchema(postBlobEndpointSchema),
+      })
+    );
+    expect(rr.response?.status).toBe(200);
+    expect(rr.response.contentType).toContain(
+      postBlobEndpointSchema.responseContentType
+    );
+    const body = await rr.response.revealBody();
+    expect(body).toBeInstanceOf(Blob);
   });
 });
