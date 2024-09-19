@@ -7,7 +7,6 @@ import {
   Response as CoreResponse,
   ResponseBody,
   ResponseSetCookies,
-  RequestHeaders,
   isJsonValue,
 } from './core';
 
@@ -123,10 +122,10 @@ export class FetchApiRequestHandler implements RequestHandler {
     this.cancelRequestById = this.cancelRequestById.bind(this);
     this.cancelAllRequests = this.cancelAllRequests.bind(this);
     this.createRequestInit = this.createRequestInit.bind(this);
-    this.createRequestInitHeaders = this.createRequestInitHeaders.bind(this);
+    this.createPlainRequestHeaders = this.createPlainRequestHeaders.bind(this);
     this.findRequestInitCookieHeaders =
       this.findRequestInitCookieHeaders.bind(this);
-    this.createRequestInitBody = this.createRequestInitBody.bind(this);
+    this.createRequestBodyInit = this.createRequestBodyInit.bind(this);
   }
 
   public execute(
@@ -197,13 +196,11 @@ export class FetchApiRequestHandler implements RequestHandler {
       ...(this.generalRequestInit ? this.generalRequestInit : {}),
       method: request.endpointSchema.method,
     };
-    let requestHeaders = {};
-    if (request.headers) {
-      requestHeaders = this.createRequestInitHeaders(requestInit, request);
-      requestInit.headers = requestHeaders;
-    }
+    const plainHeaders = this.createPlainRequestHeaders(requestInit, request);
+    requestInit.headers = plainHeaders;
     if (request.body) {
-      requestInit.body = this.createRequestInitBody(requestHeaders, request);
+      const contentType = this.findContentTypeFromPlainHeaders(plainHeaders);
+      requestInit.body = this.createRequestBodyInit(contentType, request);
     }
     if (!config?.refineFetchApiRequestInit) {
       return requestInit;
@@ -211,23 +208,29 @@ export class FetchApiRequestHandler implements RequestHandler {
     return config.refineFetchApiRequestInit(requestInit);
   }
 
-  private createRequestInitBody(
-    headers: RequestHeaders,
-    request: Request
-  ): BodyInit | null {
-    const contentTypeHeaderKey = Object.keys(headers).find(
+  private findContentTypeFromPlainHeaders(
+    plainHeaders: Record<string, string>
+  ): string | null {
+    const key = Object.keys(plainHeaders).find(
       key => key.toLowerCase() === 'content-type'
     );
-    const contentType = contentTypeHeaderKey
-      ? headers[contentTypeHeaderKey]
-      : undefined;
-    if (!contentType) {
+    if (!key) {
+      return null;
+    }
+    return plainHeaders[key] ?? null;
+  }
+
+  private createRequestBodyInit(
+    contentTypeHeaderValue: null | string,
+    request: Request
+  ): BodyInit | null {
+    if (!contentTypeHeaderValue) {
       if (isJsonValue(request.body)) {
         return JSON.stringify(request.body);
       }
       return request.body ?? null;
     }
-    const format = getTransferFormatByContentType(`${contentType}`);
+    const format = getTransferFormatByContentType(contentTypeHeaderValue);
     switch (format) {
       case 'json':
         if (!isJsonValue(request.body)) {
@@ -271,25 +274,59 @@ export class FetchApiRequestHandler implements RequestHandler {
     }
   }
 
-  private createRequestInitHeaders(
-    requestConfig: RequestInit,
+  private createStringRequestHeaders(
+    headersInit: HeadersInit
+  ): Record<string, string> {
+    const headers: Record<string, string> = {};
+    if (Array.isArray(headersInit)) {
+      throw new Error('headersInit array case is not supported');
+    }
+    if (headersInit.forEach) {
+      Object.keys(headersInit).forEach((value, key) => {
+        if (typeof value === 'string' || typeof value === 'number') {
+          headers[key] = `${value}`;
+        }
+      });
+      return headers;
+    }
+    Object.keys(headersInit).forEach((key: string) => {
+      // @ts-ignore
+      const value = headersInit[key];
+      if (typeof value === 'string' || typeof value === 'number') {
+        headers[key] = `${value}`;
+      }
+    });
+    return headers;
+  }
+
+  private createPlainRequestHeaders(
+    requestInit: RequestInit,
     request: Request
-  ): HeadersInit {
+  ): Record<string, string> {
     const cookieHeaders = request.cookies
       ? this.findRequestInitCookieHeaders(request)
       : {};
-    const headers: Record<string, string> = {};
+    const requestInitHeaders = requestInit.headers
+      ? this.createStringRequestHeaders(requestInit.headers)
+      : {};
+    const requestHeaders: Record<string, string> = {};
     for (const key in request.headers) {
-      headers[key] = `${request.headers[key]}`;
+      requestHeaders[key] = `${request.headers[key]}`;
     }
-    return {
-      ...(requestConfig.headers ?? {}),
-      ...headers,
+    const mergedHeaders: Record<string, string> = {
+      ...requestInitHeaders,
+      ...requestHeaders,
       ...cookieHeaders,
     };
+    if (request.contentType) {
+      mergedHeaders['content-type'] = request.contentType;
+    }
+    return mergedHeaders;
   }
 
-  private findRequestInitCookieHeaders(request: Request): null | HeadersInit {
+  private findRequestInitCookieHeaders(
+    request: Request
+  ): null | Record<string, string> {
     const currentCookieDefinition = request.headers?.['Cookie'];
     const cookieDefinitions: string[] = currentCookieDefinition
       ? [`${currentCookieDefinition}`]

@@ -1,7 +1,10 @@
+import {NextHandleFunction} from 'connect';
+
 const {log, error} = require('console');
 const express = require('express');
+const bodyParser = require('body-parser');
 import {Request, Response} from 'express';
-import {EndpointSchema, JsonValue, ResponseBody} from './core';
+import {EndpointSchema, isJsonValue, JsonValue, ResponseBody} from './core';
 
 function createExpressPath(endpointSchemaPath: string): string {
   const pathParamNames = endpointSchemaPath.match(/[^{}]+(?=})/g) ?? [];
@@ -36,7 +39,7 @@ export type ExpectedRequestBody =
   | ExpectedFormDataRequestBody
   | ExpectedBlobRequestBody;
 
-function validateExpectedRequestContentType(
+function validateExpectedContentTypeRequestHeader(
   s: MockServerEndpointSchema,
   request: Request
 ) {
@@ -47,21 +50,72 @@ function validateExpectedRequestContentType(
   if (actualValue === s.expectedRequestContentType) {
     return;
   }
-  error(
-    'WRONG REQUEST HEADER "content-type":',
-    '\nexpected:',
-    s.expectedRequestContentType,
-    '\nactual:',
-    request.headers['content-type']
-  );
+  error('WRONG REQUEST HEADER "content-type":');
+  error('expected:', s.expectedRequestContentType);
+  error('actual:', request.headers['content-type']);
   throw new Error('WRONG REQUEST HEADER');
+}
+
+function createBodyParserByEndpointSchema(
+  s: MockServerEndpointSchema
+): NextHandleFunction {
+  if (!s.expectedRequestBody?.type) {
+    return bodyParser.raw();
+  }
+  if (s.expectedRequestBody?.type === 'json') {
+    return bodyParser.json();
+  }
+  if (s.expectedRequestBody?.type === 'blob') {
+    return bodyParser.raw();
+  }
+  throw new Error(`case for "${s.expectedRequestBody.type}" is not supported`);
+}
+
+function findActualBodyType(
+  content: unknown
+): 'json' | 'formData' | 'blob' | 'unknown' | null {
+  if (!content) {
+    return null;
+  }
+  if (content instanceof FormData) {
+    return 'formData';
+  }
+  if (isJsonValue(content)) {
+    return 'json';
+  }
+  return 'unknown';
 }
 
 function validateExpectedRequestBody(
   s: MockServerEndpointSchema,
   request: Request
 ) {
-  // todo: implement
+  if (!s.expectedRequestBody) {
+    return;
+  }
+  const actualBody = request.body;
+  const actualBodyType = findActualBodyType(actualBody);
+  const isValidJsonBody =
+    actualBodyType === s.expectedRequestBody.type &&
+    actualBodyType === 'json' &&
+    JSON.stringify(actualBody) ===
+      JSON.stringify(s.expectedRequestBody.content);
+  if (isValidJsonBody) {
+    return;
+  }
+  const isValidNonJsonBody =
+    actualBodyType === s.expectedRequestBody.type && actualBodyType !== 'json';
+  if (isValidNonJsonBody) {
+    return;
+  }
+  error('WRONG REQUEST BODY:');
+  error('expected body type:', s.expectedRequestBody.type);
+  if (s.expectedRequestBody.type === 'json') {
+    error('expected body:', s.expectedRequestBody.content);
+  }
+  error('actual body type:', actualBodyType);
+  error('actual body:', request.body);
+  throw new Error('WRONG REQUEST BODY');
 }
 
 export type MockServerEndpointSchema = {
@@ -100,8 +154,9 @@ export function createMockServerApp(
   endpointSchemas.forEach(s => {
     app[s.method](
       createExpressPath(s.path),
+      createBodyParserByEndpointSchema(s),
       (request: Request, res: Response) => {
-        validateExpectedRequestContentType(s, request);
+        validateExpectedContentTypeRequestHeader(s, request);
         validateExpectedRequestBody(s, request);
         if (s.responseContentType !== undefined) {
           res.setHeader('content-type', s.responseContentType);
@@ -114,15 +169,13 @@ export function createMockServerApp(
   app.start = (port: number) => {
     return new Promise(resolve => {
       const runningServer = app.listen(port, () => {
-        log(`[TestServer] listening on localhost:${port}`);
+        log(`[TestServer localhost:${port}] started`);
       });
       resolve({
         stop: () => {
           return new Promise(resolve => {
             runningServer.close(() => {
-              log(
-                `[TestServer] running server on localhost:${port} was stopped`
-              );
+              log(`[TestServer localhost:${port}] stopped`);
               resolve(undefined);
             });
           });
