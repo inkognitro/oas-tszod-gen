@@ -42,12 +42,11 @@ export const postJsonEndpointSchema: MockServerEndpointSchema = {
 
 const formData = new FormData();
 formData.append('foo', 'bar');
-formData.append('file', 'pseudoBLOB');
 
 export const mockFormData = formData;
 
 export const getFormDataEndpointSchema: MockServerEndpointSchema = {
-  path: '/formData',
+  path: '/form-data',
   method: 'get',
   responseStatus: 200,
   responseContentType: 'application/x-www-form-urlencoded',
@@ -55,13 +54,13 @@ export const getFormDataEndpointSchema: MockServerEndpointSchema = {
 };
 
 export const postFormDataEndpointSchema: MockServerEndpointSchema = {
-  path: '/formData',
+  path: '/form-data',
   method: 'post',
   responseStatus: 200,
   responseContentType: 'application/x-www-form-urlencoded',
   responseBody: mockFormData,
   expectedRequestBody: {
     contentType: 'multipart/form-data',
-    content: mockFormData,
+    content: {foo: 'bar'},
   },
 };

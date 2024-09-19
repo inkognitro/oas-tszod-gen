@@ -146,16 +146,24 @@ const templateIsJsonValueType: TemplateDefinitionOutput = {
   },
   createCode: () => {
     const codeParts = [
+      'if (value === null) {',
+      'return true;',
+      '}',
+      "if (isSubValue && ['string', 'boolean', 'number'].includes(typeof value)) {",
+      'return true;',
+      '}',
       "if (typeof value !== 'object') {",
       'return false;',
       '}',
-      'try {',
-      'JSON.stringify(value);',
-      'return true;',
-      '} catch (e) {',
-      'JSON.stringify(value);',
+      'for (const key in value) {',
+      "if (typeof key !== 'string' && typeof key !== 'number') {",
       'return false;',
       '}',
+      'if (!isJsonValue(value[key], true)) {',
+      'return false;',
+      '}',
+      '}',
+      'return true;',
     ];
     return `(value: unknown): value is ${templateJsonValueType.createName(
       templateIsJsonValueTypePath

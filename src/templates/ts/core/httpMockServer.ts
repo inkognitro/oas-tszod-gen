@@ -1,6 +1,6 @@
 const {log, error} = require('console');
 const express = require('express');
-const bodyParser = require('body-parser');
+const multer = require('multer');
 import {Request, Response, NextFunction} from 'express';
 import {EndpointSchema, ResponseBody} from './core';
 import {z, ZodSchema} from 'zod';
@@ -32,7 +32,7 @@ function validateExpectedRequestContentType(
     return;
   }
   const actualContentType = request.headers['content-type'];
-  if (actualContentType === expectedContentType) {
+  if (actualContentType?.includes(expectedContentType)) {
     return;
   }
   error('WRONG REQUEST HEADER "content-type":');
@@ -46,16 +46,19 @@ function createBodyParserByEndpointSchema(
 ): NextFunction {
   const contentType = s.expectedRequestBody?.contentType;
   if (!contentType) {
-    return bodyParser.raw();
+    return express.raw();
   }
   if (contentType.includes('text/plain')) {
-    return bodyParser.text();
+    return express.text();
   }
   if (contentType.includes('application/json')) {
-    return bodyParser.json();
+    return express.json();
   }
   if (contentType.includes('multipart/form-data')) {
-    return bodyParser.raw();
+    return multer().none();
+  }
+  if (contentType.includes('application/x-www-form-urlencoded')) {
+    return express.urlencoded({extended: true});
   }
   const message = `MockServer case for contentType "${contentType}" is not supported`;
   error(message);
@@ -103,7 +106,13 @@ function validateExpectedRequestBody(
       }
       break;
     case 'multipart/form-data':
-      // todo: invalidate FormData somehow
+      if (JSON.stringify(request.body) !== JSON.stringify(expectedContent)) {
+        invalidateRequestBody(
+          expectedContentType,
+          expectedContent,
+          request.body
+        );
+      }
       break;
     default:
       throw new Error('WRONG REQUEST BODY');

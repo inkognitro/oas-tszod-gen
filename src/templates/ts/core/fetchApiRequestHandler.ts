@@ -328,10 +328,29 @@ export class FetchApiRequestHandler implements RequestHandler {
       ...requestHeaders,
       ...cookieHeaders,
     };
-    if (request.contentType) {
+    if (
+      this.fetchApiShouldSetRequestHeaderByItselfToBeAbleToMakeItWork(request)
+    ) {
+      return mergedHeaders;
+    }
+    if (
+      request.contentType &&
+      // fetch will set the according header (otherwise it won't work)
+      request.contentType.toLowerCase() !== 'multipart/form-data'
+    ) {
       mergedHeaders['content-type'] = request.contentType;
     }
     return mergedHeaders;
+  }
+
+  private fetchApiShouldSetRequestHeaderByItselfToBeAbleToMakeItWork(
+    request: Request
+  ): boolean {
+    const ct = request.contentType?.toLowerCase();
+    if (!ct) {
+      return false;
+    }
+    return !!ct.match(/multipart\/form-data;?.*/);
   }
 
   private findRequestInitCookieHeaders(

@@ -133,6 +133,6 @@ describe('FetchApiRequestHandler', () => {
       postFormDataEndpointSchema.responseContentType
     );
     const body = await rr.response.revealBody();
-    expect(body).toEqual(body);
+    expect(body).toBeInstanceOf(FormData);
   });
 });

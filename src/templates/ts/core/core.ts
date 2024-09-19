@@ -36,16 +36,28 @@ export type JsonValue =
   | {[propName: string]: JsonContentValue}
   | JsonContentValue[];
 
-export function isJsonValue(value: unknown): value is JsonValue {
+export function isJsonValue(
+  value: any,
+  isSubValue = false
+): value is JsonValue {
+  if (value === null) {
+    return true;
+  }
+  if (isSubValue && ['string', 'boolean', 'number'].includes(typeof value)) {
+    return true;
+  }
   if (typeof value !== 'object') {
     return false;
   }
-  try {
-    JSON.stringify(value);
-    return true;
-  } catch (e) {
-    return false;
+  for (const key in value) {
+    if (typeof key !== 'string' && typeof key !== 'number') {
+      return false;
+    }
+    if (!isJsonValue(value[key], true)) {
+      return false;
+    }
   }
+  return true;
 }
 
 export function findMatchingSchemaContentType(
