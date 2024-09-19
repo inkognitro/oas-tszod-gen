@@ -165,7 +165,7 @@ const templateIsJsonValueType: TemplateDefinitionOutput = {
       '}',
       'return true;',
     ];
-    return `(value: unknown): value is ${templateJsonValueType.createName(
+    return `(value: any, isSubValue = false): value is ${templateJsonValueType.createName(
       templateIsJsonValueTypePath
     )}{\n${codeParts.join('\n')}\n}`;
   },
