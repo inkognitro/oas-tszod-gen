@@ -34,6 +34,12 @@ First, install the package as a dev dependency:
 npm install oas-to-code --save-dev
 ```
 
+If you also want to use [Zod](https://zod.dev) (see `withZod: true` configuration below) and it is not yet installed
+as a dependency of your project:
+```
+npm install zod --save
+```
+
 Now create a new file `api.specs.json` in the root folder of your project and paste your OAS3 specification into it.
 The next step is to create a file `api.generate.js` - also in the root folder of your project - and paste the following
 code into it:
@@ -145,16 +151,16 @@ const myJwtAuthenticationProvider: HttpBearerAuthenticationProvider = {
   // This is the name of one of your security definition in your OAS3 specification
 };
 
-const myAxiosInstance = axios.create();
-
-const axiosRequestHandler = new AxiosRequestHandler(myAxiosInstance, {
+const myAxiosInstance = axios.create({
   baseURL: 'https://api.acme.com',
-  
+
   withCredentials: true,
   // In case of browsers:
   // Allow cookies to be passed along with the request for a different api (sub-)domain (CORS)
   // Source: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
 });
+
+const axiosRequestHandler = new AxiosRequestHandler(myAxiosInstance);
 
 const requestHandler = new AuthRequestHandler(
   [myJwtAuthenticationProvider],
