@@ -94,6 +94,19 @@ export const templateRequestType: TemplateDefinitionOutput = {
   },
 };
 
+const templateFormDataObjectType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: ['core', 'core', 'formDataObject'],
+  createName: () => {
+    return 'FormDataObject';
+  },
+  createCode: () => {
+    return '{[key: string]: undefined | string | number | boolean | Blob}';
+  },
+  getRequiredOutputPaths: () => [],
+};
+
 const templatePlainObjectTypePath = ['core', 'core', 'plainObject'];
 const templatePlainObjectType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
@@ -103,18 +116,12 @@ const templatePlainObjectType: TemplateDefinitionOutput = {
     return 'PlainObject';
   },
   createCode: () => {
-    const validPropValueTypes = [
-      'undefined',
-      'string',
-      'string[]',
-      'number',
-      'number[]',
-      'boolean',
-      'boolean[]',
-      'PlainObject',
-      'PlainObject[]',
+    const parts = [
+      'null',
+      '(null | boolean | number | string | PlainObject)[]',
+      '{[key: string]: undefined | string | number | boolean | PlainObject}',
     ];
-    return `null | {[key: string]: ${validPropValueTypes.join('\n|')}}`;
+    return parts.join('\n|');
   },
   getRequiredOutputPaths: () => [],
 };
@@ -133,7 +140,7 @@ const templateIsPlainObjectType: TemplateDefinitionOutput = {
       'if (value === null) {',
       'return true;',
       '}',
-      "if (typeof value !== 'object' || Array.isArray(value)) {",
+      "if (typeof value !== 'object') {",
       'return false;',
       '}',
       'for (const key in value) {',
@@ -277,11 +284,16 @@ const templateRequestBodyType: TemplateDefinitionOutput = {
     return 'RequestBody';
   },
   createCode: () => {
-    return `Blob | FormData | ${templatePlainObjectType.createName(
+    return `Blob | FormData | ${templateFormDataObjectType.createName(
+      templateRequestBodyTypePath
+    )} | ${templatePlainObjectType.createName(
       templateRequestBodyTypePath
     )} | string`;
   },
-  getRequiredOutputPaths: () => [],
+  getRequiredOutputPaths: () => [
+    templateFormDataObjectType.path,
+    templatePlainObjectType.path,
+  ],
 };
 
 const templateResponseBodyTypePath = ['core', 'core', 'responseBody'];
@@ -293,12 +305,17 @@ const templateResponseBodyType: TemplateDefinitionOutput = {
     return 'ResponseBody';
   },
   createCode: () => {
-    return `Blob | FormData | ${templatePlainObjectType.createName(
+    return `Blob | FormData | ${templateFormDataObjectType.createName(
+      templateRequestBodyTypePath
+    )} | ${templatePlainObjectType.createName(
       templateRequestBodyTypePath
     )} | string`;
   },
   codeComment: 'ArrayBuffer is ignored because it can be created from Blob',
-  getRequiredOutputPaths: () => [],
+  getRequiredOutputPaths: () => [
+    templateFormDataObjectType.path,
+    templatePlainObjectType.path,
+  ],
 };
 
 const templateResponseBodyDataTypePath = ['core', 'core', 'responseBodyData'];
@@ -712,6 +729,7 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateRequestCookiesType,
   templateRequestBodyType,
   templatePlainObjectType,
+  templateFormDataObjectType,
   templateIsPlainObjectType,
   templateFindMatchingSchemaContentTypeFunction,
   templateRequestCreationSettingsType,

@@ -302,7 +302,7 @@ export class FetchApiRequestHandler implements RequestHandler {
       if (request.body instanceof URLSearchParams) {
         return request.body;
       }
-      if (request.body && typeof request.body === 'object') {
+      if (request.body && isPlainObject(request.body)) {
         return this.config.urlEncodeQueryString(request.body);
       }
       throw new Error(
@@ -320,8 +320,8 @@ export class FetchApiRequestHandler implements RequestHandler {
         `FormData or plain object was expected but received request.body of type: ${typeof request.body}`
       );
     }
-    if (isPlainObject(request.body)) {
-      throw new Error('wrong content type header for plain object');
+    if (!(request.body instanceof Blob)) {
+      throw new Error('request.body is not supported');
     }
     return request.body;
   }

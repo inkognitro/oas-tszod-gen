@@ -20,20 +20,21 @@ export type RequestCookies = {
   [cookieName: string]: string;
 };
 
-export type RequestBody = Blob | FormData | PlainObject | string;
+export type RequestBody =
+  | Blob
+  | FormData
+  | FormDataObject
+  | PlainObject
+  | string;
 
-export type PlainObject = null | {
-  [key: string]:
-    | undefined
-    | string
-    | string[]
-    | number
-    | number[]
-    | boolean
-    | boolean[]
-    | PlainObject
-    | PlainObject[];
+export type FormDataObject = {
+  [key: string]: undefined | string | number | boolean | Blob;
 };
+
+export type PlainObject =
+  | null
+  | (null | boolean | number | string | PlainObject)[]
+  | {[key: string]: undefined | string | number | boolean | PlainObject};
 
 export function isPlainObject(
   value: any,
@@ -43,7 +44,7 @@ export function isPlainObject(
     if (value === null) {
       return true;
     }
-    if (typeof value !== 'object' || Array.isArray(value)) {
+    if (typeof value !== 'object') {
       return false;
     }
     for (const key in value) {
@@ -207,7 +208,12 @@ export type ResponseSetCookies = {
   [cookieName: string]: string; // string format: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
 };
 
-export type ResponseBody = Blob | FormData | PlainObject | string;
+export type ResponseBody =
+  | Blob
+  | FormData
+  | FormDataObject
+  | PlainObject
+  | string;
 
 export type ResponseBodyData<
   ContentType extends string = any,

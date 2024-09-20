@@ -409,6 +409,12 @@ function applyZodOneOfSchema(
       if (schema.discriminator?.propertyName) {
         `z.discriminatedUnion('${discriminatorName}', [${codeRows.join(',')}])`;
       }
+      if (!codeRows.length) {
+        return 'z.any()';
+      }
+      if (codeRows.length === 1) {
+        return codeRows[0];
+      }
       return `z.union([${codeRows.join(',')}])`;
     },
     path,
