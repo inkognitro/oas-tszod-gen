@@ -241,11 +241,10 @@ This implementation is responsible for executing your requests through the http(
 It is usually the most inner implementation of an onion bootstrapped request handler object
 and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 
-This request handler implementation requires a custom `stringifyQueryParams` function to convert an object
-of type `QueryParams` into a `string`.
-At time of writing this, the [qs](https://www.npmjs.com/package/qs) package is the most commonly used library
-for such tasks and therefore recommended.
-Creating a FetchApiRequestHandler instance comes with the following two steps.
+This request handler implementation requires custom functions for `decoding` and `encoding` data from and to
+query string format. At time of writing this, the [qs](https://www.npmjs.com/package/qs) package is the
+most commonly used library for such tasks and therefore recommended.
+Creating a FetchApiRequestHandler instance comes with the following two steps:
 
 Install the [qs](https://www.npmjs.com/package/qs) library like so:
 ```
@@ -260,9 +259,10 @@ import { FetchApiRequestHandler } from './generated-api/core';
 import { stringify } from 'qs';
 
 const fetchApiRequestHandler = new FetchApiRequestHandler({
-  // This one is required
-  stringifyQueryParams: queryParams => {
-    return stringify(queryParams);
+  // These two functions are required
+  urlEncodeQueryString: plainObject => stringify(queryParams),
+  urlDecodeQueryString: (queryString: string) => {
+    return parse(queryString);
   },
 
   // Following is optional stuff

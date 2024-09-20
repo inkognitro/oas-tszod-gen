@@ -1,4 +1,5 @@
 import {MockServerEndpointSchema} from './httpMockServer';
+import {stringify} from 'qs';
 
 export const getPlainTextEndpointSchema: MockServerEndpointSchema = {
   path: '/plain-text',
@@ -40,16 +41,56 @@ export const postJsonEndpointSchema: MockServerEndpointSchema = {
   responseBody: {foo: 'bar'},
 };
 
-const formData = new FormData();
-formData.append('foo', 'bar');
-export const mockFormData = formData;
+export const getFormUrlEncodedDataEndpointSchema: MockServerEndpointSchema = {
+  path: '/form-urlencoded',
+  method: 'get',
+  responseStatus: 200,
+  responseContentType: 'application/x-www-form-urlencoded',
+  responseBody: stringify({foo: 'bar'}),
+};
+
+export const postFormUrlEncodedDataEndpointSchema: MockServerEndpointSchema = {
+  path: '/form-urlencoded',
+  method: 'post',
+  expectedRequestBody: {
+    contentType: 'application/x-www-form-urlencoded',
+    content: {foo: 'bar'},
+  },
+  responseStatus: 200,
+  responseContentType: 'application/x-www-form-urlencoded',
+  responseBody: stringify({foo: 'bar'}),
+};
+
+const formDataBoundary = 'SomeRandomBullshit';
+
+function createFormDataContentTypeHeader(): string {
+  return `multipart/form-data; boundary=${formDataBoundary}`;
+}
+
+function createFormDataString(values: Record<string, string>) {
+  const allFields: string[] = [];
+  const newLine = '\r\n';
+  for (const key in values) {
+    const parts: string[] = [];
+    parts.push(`Content-Disposition: form-data; name="${key}"`);
+    parts.push(''); // new line
+    parts.push(values[key]);
+    allFields.push(`${parts.join(newLine)}`);
+  }
+  const parts: string[] = [
+    `--${formDataBoundary}`,
+    `${allFields.join(`${newLine}--${formDataBoundary}`)}`,
+    `--${formDataBoundary}--`,
+  ];
+  return parts.join(newLine);
+}
 
 export const getFormDataEndpointSchema: MockServerEndpointSchema = {
   path: '/form-data',
   method: 'get',
   responseStatus: 200,
-  responseContentType: 'application/x-www-form-urlencoded',
-  responseBody: mockFormData,
+  responseContentType: createFormDataContentTypeHeader(),
+  responseBody: createFormDataString({foo: 'bar'}),
 };
 
 export const postFormDataEndpointSchema: MockServerEndpointSchema = {
@@ -60,8 +101,8 @@ export const postFormDataEndpointSchema: MockServerEndpointSchema = {
     content: {foo: 'bar'},
   },
   responseStatus: 200,
-  responseContentType: 'application/x-www-form-urlencoded',
-  responseBody: mockFormData,
+  responseContentType: createFormDataContentTypeHeader(),
+  responseBody: createFormDataString({foo: 'bar'}),
 };
 
 type MockBlob = Blob & {

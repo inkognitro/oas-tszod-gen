@@ -94,82 +94,76 @@ export const templateRequestType: TemplateDefinitionOutput = {
   },
 };
 
-const templateJsonContentValueType: TemplateDefinitionOutput = {
+const templatePlainObjectTypePath = ['core', 'core', 'plainObject'];
+const templatePlainObjectType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'type',
-  path: ['core', 'core', 'jsonContentValue'],
+  path: templatePlainObjectTypePath,
   createName: () => {
-    return 'JsonContentValue';
+    return 'PlainObject';
   },
   createCode: () => {
-    const validTypes = [
-      'null',
+    const validPropValueTypes = [
+      'undefined',
       'string',
+      'string[]',
       'number',
+      'number[]',
       'boolean',
-      '{[propName: string]: JsonContentValue}',
-      'JsonContentValue[]',
+      'boolean[]',
+      'PlainObject',
+      'PlainObject[]',
     ];
-    return `${validTypes.join('\n|')}`;
+    return `null | {[key: string]: ${validPropValueTypes.join('\n|')}}`;
   },
   getRequiredOutputPaths: () => [],
 };
 
-const templateJsonValueTypePath = ['core', 'core', 'jsonValue'];
-const templateJsonValueType: TemplateDefinitionOutput = {
-  type: OutputType.TEMPLATE_DEFINITION,
-  definitionType: 'type',
-  path: templateJsonValueTypePath,
-  createName: () => {
-    return 'JsonValue';
-  },
-  createCode: () => {
-    const validTypes = [
-      'null',
-      `{[propName: string]: ${templateJsonContentValueType.createName(
-        templateJsonValueTypePath
-      )}}`,
-      `${templateJsonContentValueType.createName(templateJsonValueTypePath)}[]`,
-    ];
-    return `${validTypes.join('\n|')}`;
-  },
-  getRequiredOutputPaths: () => [templateJsonContentValueType.path],
-};
-
-const templateIsJsonValueTypePath = ['core', 'core', 'isJsonValue'];
-const templateIsJsonValueType: TemplateDefinitionOutput = {
+const templateIsPlainObjectTypePath = ['core', 'core', 'isPlainObject'];
+const templateIsPlainObjectType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
   definitionType: 'function',
-  path: templateIsJsonValueTypePath,
+  path: templateIsPlainObjectTypePath,
   createName: () => {
-    return 'isJsonValue';
+    return 'isPlainObject';
   },
   createCode: () => {
     const codeParts = [
+      'if (!isSubValue) {',
       'if (value === null) {',
       'return true;',
       '}',
-      "if (isSubValue && ['string', 'boolean', 'number'].includes(typeof value)) {",
+      "if (typeof value !== 'object' || Array.isArray(value)) {",
+      'return false;',
+      '}',
+      'for (const key in value) {',
+      'if (!isPlainObject(value[key], true)) {',
+      'return false;',
+      '}',
+      '}',
+      'return true;',
+      '}',
+      "if (['string', 'boolean', 'number', 'undefined'].includes(typeof value)) {",
       'return true;',
       '}',
       "if (typeof value !== 'object') {",
       'return false;',
       '}',
       'for (const key in value) {',
-      "if (typeof key !== 'string' && typeof key !== 'number') {",
+      "if (isArray && typeof key === 'number' && value[key] === undefined) {",
       'return false;',
       '}',
-      'if (!isJsonValue(value[key], true)) {',
+      'if (!isPlainObject(value[key], true)) {',
       'return false;',
       '}',
       '}',
       'return true;',
     ];
-    return `(value: any, isSubValue = false): value is ${templateJsonValueType.createName(
-      templateIsJsonValueTypePath
+    return `(value: any, isSubValue = false): value is ${templatePlainObjectType.createName(
+      templateIsPlainObjectTypePath
     )}{\n${codeParts.join('\n')}\n}`;
   },
-  getRequiredOutputPaths: () => [templateJsonValueType.path],
+  getRequiredOutputPaths: () => [templatePlainObjectType.path],
 };
 
 const templateResponseTypePath = ['core', 'core', 'response'];
@@ -282,7 +276,7 @@ const templateRequestBodyType: TemplateDefinitionOutput = {
     return 'RequestBody';
   },
   createCode: () => {
-    return `Blob | FormData | ${templateJsonValueType.createName(
+    return `Blob | FormData | ${templatePlainObjectType.createName(
       templateRequestBodyTypePath
     )} | string`;
   },
@@ -298,7 +292,7 @@ const templateResponseBodyType: TemplateDefinitionOutput = {
     return 'ResponseBody';
   },
   createCode: () => {
-    return `Blob | FormData | ${templateJsonValueType.createName(
+    return `Blob | FormData | ${templatePlainObjectType.createName(
       templateRequestBodyTypePath
     )} | string`;
   },
@@ -716,9 +710,8 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateQueryParamsType,
   templateRequestCookiesType,
   templateRequestBodyType,
-  templateJsonContentValueType,
-  templateJsonValueType,
-  templateIsJsonValueType,
+  templatePlainObjectType,
+  templateIsPlainObjectType,
   templateFindMatchingSchemaContentTypeFunction,
   templateRequestCreationSettingsType,
   templateCreateRequestUrlFunction,

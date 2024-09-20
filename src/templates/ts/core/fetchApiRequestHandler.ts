@@ -1,16 +1,18 @@
 import {
   ResponseHeaders,
-  QueryParams,
   Request,
   RequestHandler,
   RequestResult,
   Response as CoreResponse,
   ResponseBody,
   ResponseSetCookies,
-  isJsonValue,
+  isPlainObject,
   EndpointSchema,
   findMatchingSchemaContentType,
+  PlainObject,
 } from './core';
+import {stringify} from 'qs';
+import {query} from 'express';
 
 function convertObjectToFormData(obj: Record<string, any>): FormData {
   const formData = new FormData();
@@ -37,14 +39,21 @@ function convertObjectToFormData(obj: Record<string, any>): FormData {
 
 class ResultResponse implements CoreResponse {
   private readonly response: Response;
+  private readonly urlDecodeQueryString: (queryString: string) => PlainObject;
 
   public readonly status: number;
   public readonly contentType: null | string;
   public readonly headers: ResponseHeaders;
   public readonly cookies: ResponseSetCookies;
 
-  constructor(response: Response, endpointSchema: EndpointSchema) {
+  constructor(
+    response: Response,
+    urlDecodeQueryString: (queryString: string) => PlainObject,
+    endpointSchema: EndpointSchema
+  ) {
     this.response = response;
+    this.urlDecodeQueryString = urlDecodeQueryString;
+    this.urlDecodeQueryString = this.urlDecodeQueryString.bind(this);
     this.status = response.status;
     this.headers = ResultResponse.createPlainHeaders(response);
     this.contentType = ResultResponse.findMatchingSchemaContentType(
@@ -96,27 +105,35 @@ class ResultResponse implements CoreResponse {
   revealBody(): Promise<ResponseBody> {
     const contentType = this.response.headers.get('content-type');
     if (!contentType) {
-      return this.response.blob();
+      return this.response.clone().blob();
     }
     const ct = contentType.trim().toLowerCase();
     if (ct.startsWith('text/')) {
-      return this.response.text();
+      return this.response.clone().text();
     }
     if (ct.match(/application\/[^+]*[+]?(json);?.*/)) {
-      return this.response.json();
+      return this.response.clone().json();
     }
-    if (
-      ct.match(/multipart\/form-data;?.*/) ||
-      ct.match(/application\/x-www-form-urlencoded;?.*/)
-    ) {
-      return this.response.formData();
+    if (ct.match(/application\/x-www-form-urlencoded;?.*/)) {
+      return new Promise(resolve => {
+        this.response
+          .clone()
+          .text()
+          .then(text => {
+            resolve(this.urlDecodeQueryString(text));
+          });
+      });
     }
-    return this.response.blob();
+    if (ct.match(/multipart\/form-data;?.*/)) {
+      return this.response.clone().formData();
+    }
+    return this.response.clone().blob();
   }
 }
 
 type FetchApiRequestHandlerConfig = {
-  stringifyQueryParams: (queryParams: QueryParams) => string;
+  urlEncodeQueryString: (plainObject: PlainObject) => string;
+  urlDecodeQueryString: (queryString: string) => PlainObject;
   baseUrl?: string;
   generalRequestInit?: RequestInit;
 };
@@ -160,7 +177,7 @@ export class FetchApiRequestHandler implements RequestHandler {
     return new Promise(resolve => {
       const queryStrUrlPart =
         request.queryParams && Object.keys(request.queryParams).length
-          ? `?${this.config.stringifyQueryParams(request.queryParams)}`
+          ? `?${this.config.urlEncodeQueryString(request.queryParams)}`
           : '';
       const abortController = new AbortController();
       abortControllerByPendingRequestIds[request.id] = abortController;
@@ -175,7 +192,11 @@ export class FetchApiRequestHandler implements RequestHandler {
         .then(response => {
           resolve({
             request: request,
-            response: new ResultResponse(response, request.endpointSchema),
+            response: new ResultResponse(
+              response,
+              this.config.urlDecodeQueryString,
+              request.endpointSchema
+            ),
             hasRequestBeenCancelled: abortController.signal.aborted,
           });
         })
@@ -183,7 +204,11 @@ export class FetchApiRequestHandler implements RequestHandler {
           resolve({
             request: request,
             response: error.response
-              ? new ResultResponse(error.response, request.endpointSchema)
+              ? new ResultResponse(
+                  error.response,
+                  this.config.urlDecodeQueryString,
+                  request.endpointSchema
+                )
               : null,
             hasRequestBeenCancelled: abortController.signal.aborted,
             error: abortController.signal.aborted ? undefined : error,
@@ -242,75 +267,63 @@ export class FetchApiRequestHandler implements RequestHandler {
     return plainHeaders[key] ?? null;
   }
 
-  private getRequestBodyTransferFormat(
-    plainHeaders: Record<string, string>,
-    request: Request
-  ): string | null {
-    let ct = this.findContentTypeFromPlainHeaders(plainHeaders);
-    if (!ct && this.isFormDataRequestContentType(request)) {
-      return 'formData';
-    }
-    if (!ct) {
-      return 'blob';
-    }
-    ct = ct.trim().toLowerCase();
-    if (ct.startsWith('text/')) {
-      return 'text';
-    }
-    if (ct.match(/application\/[^+]*[+]?(json);?.*/)) {
-      return 'json';
-    }
-    if (
-      ct.match(/multipart\/form-data;?.*/) ||
-      ct.match(/application\/x-www-form-urlencoded;?.*/)
-    ) {
-      return 'formData';
-    }
-    return 'blob';
-  }
-
   private createRequestBodyInit(
     plainHeaders: Record<string, string>,
     request: Request
   ): BodyInit | null {
-    const format = this.getRequestBodyTransferFormat(plainHeaders, request);
-    switch (format) {
-      case 'json':
-        if (!isJsonValue(request.body)) {
-          throw new Error(
-            `JsonValue expected but received request.body of type: ${typeof request.body}`
-          );
-        }
-        return JSON.stringify(request.body);
-      case 'formData':
-        if (request.body instanceof FormData) {
-          return request.body;
-        }
-        if (request.body && typeof request.body === 'object') {
-          return convertObjectToFormData(request.body);
-        }
-        throw new Error(
-          `FormData or Object was expected but received request.body of type: ${typeof request.body}`
-        );
-      case 'text':
-        if (typeof request.body !== 'string') {
-          throw new Error(
-            `string expected but received request.body of type: ${typeof request.body}`
-          );
-        }
-        return request.body;
-      case 'blob':
-      default:
-        if (!request.body) {
-          return null;
-        }
-        if (isJsonValue(request.body)) {
-          throw new Error(
-            'Blob expected but received request.body of type: JsonValue'
-          );
-        }
-        return request.body ?? null;
+    if (!request.body) {
+      return null;
     }
+    let ct = this.findContentTypeFromPlainHeaders(plainHeaders) ?? '';
+    if (!ct && this.isFormDataRequestContentType(request)) {
+      ct = 'multipart/form-data';
+    }
+    ct = ct.trim().toLowerCase();
+    if (ct.startsWith('text/')) {
+      if (typeof request.body !== 'string') {
+        throw new Error(
+          `string expected but received request.body of type: ${typeof request.body}`
+        );
+      }
+      return request.body;
+    }
+    if (ct.match(/application\/[^+]*[+]?(json);?.*/)) {
+      if (!isPlainObject(request.body)) {
+        throw new Error(
+          `Plain object expected but received request.body of type: ${typeof request.body}`
+        );
+      }
+      return JSON.stringify(request.body);
+    }
+    if (ct.match(/application\/x-www-form-urlencoded;?.*/)) {
+      if (request.body instanceof FormData) {
+        return request.body;
+      }
+      if (request.body instanceof URLSearchParams) {
+        return request.body;
+      }
+      if (request.body && typeof request.body === 'object') {
+        return this.config.urlEncodeQueryString(request.body);
+      }
+      throw new Error(
+        `FormData, URLSearchParams or plain object was expected but received request.body of type: ${typeof request.body}`
+      );
+    }
+    if (ct.match(/multipart\/form-data;?.*/)) {
+      if (request.body instanceof FormData) {
+        return request.body;
+      }
+      if (request.body && typeof request.body === 'object') {
+        return convertObjectToFormData(request.body);
+      }
+      throw new Error(
+        `FormData or plain object was expected but received request.body of type: ${typeof request.body}`
+      );
+    }
+    if (isPlainObject(request.body)) {
+      throw new Error('wrong content type header for plain object');
+    }
+    return request.body;
   }
 
   private createStringRequestHeaders(

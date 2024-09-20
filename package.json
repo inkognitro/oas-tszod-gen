@@ -12,6 +12,9 @@
       "./dist/*"
     ]
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "main": "dist/index.js",
   "description": "A tool to convert OpenApi specifications into callable endpoint functions in TS.",
   "scripts": {

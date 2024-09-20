@@ -2,7 +2,7 @@ const {log, error} = require('console');
 const express = require('express');
 const multer = require('multer');
 import {Request, Response, NextFunction} from 'express';
-import {EndpointSchema, ResponseBody} from './core';
+import {EndpointSchema} from './core';
 import {z, ZodSchema} from 'zod';
 
 function createExpressPath(endpointSchemaPath: string): string {
@@ -41,7 +41,7 @@ function validateExpectedRequestContentType(
   throw new Error('WRONG REQUEST HEADER');
 }
 
-function createBodyParserByEndpointSchema(
+function getRequestBodyParserByEndpointSchema(
   s: MockServerEndpointSchema
 ): NextFunction {
   const contentType = s.expectedRequestBody?.contentType;
@@ -54,11 +54,11 @@ function createBodyParserByEndpointSchema(
   if (contentType.includes('application/json')) {
     return express.json();
   }
-  if (contentType.includes('multipart/form-data')) {
-    return multer().none();
-  }
   if (contentType.includes('application/x-www-form-urlencoded')) {
     return express.urlencoded({extended: true});
+  }
+  if (contentType.includes('multipart/form-data')) {
+    return multer().none();
   }
   if (contentType.includes('application/')) {
     return express.raw({type: '*/*'});
@@ -100,6 +100,7 @@ function validateExpectedRequestBody(
       }
       break;
     case 'application/json':
+    case 'application/x-www-form-urlencoded':
       if (JSON.stringify(request.body) !== JSON.stringify(expectedContent)) {
         invalidateRequestBody(
           expectedContentType,
@@ -136,7 +137,7 @@ export type MockServerEndpointSchema = {
   expectedRequestBody?: ExpectedRequestBody;
   responseStatus: number;
   responseContentType: null | string;
-  responseBody: null | ResponseBody;
+  responseBody: any;
 };
 
 export function createEndpointSchema(
@@ -176,11 +177,11 @@ export function createMockServerApp(
   endpointSchemas.forEach(s => {
     app[s.method](
       createExpressPath(s.path),
-      createBodyParserByEndpointSchema(s),
+      getRequestBodyParserByEndpointSchema(s),
       (request: Request, res: Response) => {
-        res.status(s.responseStatus);
         validateExpectedRequestContentType(s, request);
         validateExpectedRequestBody(s, request);
+        res.status(s.responseStatus);
         if (s.responseContentType !== null) {
           res.setHeader('content-type', s.responseContentType);
         }

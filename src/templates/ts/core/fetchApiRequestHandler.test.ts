@@ -1,15 +1,16 @@
 import {FetchApiRequestHandler} from './fetchApiRequestHandler';
-import {stringify} from 'qs';
+import {stringify, parse} from 'qs';
 import {createRequest} from './core';
 import {
   getBlobEndpointSchema,
   getFormDataEndpointSchema,
+  getFormUrlEncodedDataEndpointSchema,
   getJsonEndpointSchema,
   getPlainTextEndpointSchema,
-  mockFormData,
   mockPdfBlob,
   postBlobEndpointSchema,
   postFormDataEndpointSchema,
+  postFormUrlEncodedDataEndpointSchema,
   postJsonEndpointSchema,
   postPlainTextEndpointSchema,
 } from './httpMockServerSchemas';
@@ -27,6 +28,8 @@ const mockServerApp: MockServerApp = createMockServerApp([
   postPlainTextEndpointSchema,
   getJsonEndpointSchema,
   postJsonEndpointSchema,
+  getFormUrlEncodedDataEndpointSchema,
+  postFormUrlEncodedDataEndpointSchema,
   getFormDataEndpointSchema,
   postFormDataEndpointSchema,
   getBlobEndpointSchema,
@@ -36,7 +39,10 @@ const mockServerApp: MockServerApp = createMockServerApp([
 let runningServer: RunningServer | undefined;
 
 const requestHandler = new FetchApiRequestHandler({
-  stringifyQueryParams: queryParams => stringify(queryParams),
+  urlEncodeQueryString: plainObject => stringify(plainObject),
+  urlDecodeQueryString: (queryString: string) => {
+    return parse(queryString);
+  },
   baseUrl: `http://localhost:${port}`,
 });
 
@@ -92,7 +98,7 @@ describe('FetchApiRequestHandler', () => {
       getJsonEndpointSchema.responseContentType
     );
     const body = await rr.response.revealBody();
-    expect(body).toEqual(body);
+    expect(body).toEqual({foo: 'bar'});
   });
 
   it('can send and receive json data', async () => {
@@ -108,10 +114,44 @@ describe('FetchApiRequestHandler', () => {
       postJsonEndpointSchema.responseContentType
     );
     const body = await rr.response.revealBody();
-    expect(body).toEqual(body);
+    expect(body).toEqual({foo: 'bar'});
   });
 
-  it('can receive form data', async () => {
+  it('can receive urlencoded form data', async () => {
+    const rr = await requestHandler.execute(
+      createRequest({
+        endpointSchema: createEndpointSchema(
+          getFormUrlEncodedDataEndpointSchema
+        ),
+      })
+    );
+    expect(rr.response?.status).toBe(200);
+    expect(rr.response.contentType).toContain(
+      getFormUrlEncodedDataEndpointSchema.responseContentType
+    );
+    const body = await rr.response.revealBody();
+    expect(body).toEqual({foo: 'bar'});
+  });
+
+  it('can send and receive urlencoded form data', async () => {
+    const rr = await requestHandler.execute(
+      createRequest({
+        contentType: 'application/x-www-form-urlencoded',
+        body: {foo: 'bar'},
+        endpointSchema: createEndpointSchema(
+          postFormUrlEncodedDataEndpointSchema
+        ),
+      })
+    );
+    expect(rr.response?.status).toBe(200);
+    expect(rr.response.contentType).toContain(
+      postFormUrlEncodedDataEndpointSchema.responseContentType
+    );
+    const body = await rr.response.revealBody();
+    expect(body).toEqual({foo: 'bar'});
+  });
+
+  it('can receive multipart form data', async () => {
     const rr = await requestHandler.execute(
       createRequest({
         endpointSchema: createEndpointSchema(getFormDataEndpointSchema),
@@ -125,11 +165,13 @@ describe('FetchApiRequestHandler', () => {
     expect(body).toBeInstanceOf(FormData);
   });
 
-  it('can send and receive form data', async () => {
+  it('can send and receive multipart form data', async () => {
+    const formData = new FormData();
+    formData.append('foo', 'bar');
     const rr = await requestHandler.execute(
       createRequest({
         contentType: 'multipart/form-data',
-        body: mockFormData,
+        body: formData,
         endpointSchema: createEndpointSchema(postFormDataEndpointSchema),
       })
     );

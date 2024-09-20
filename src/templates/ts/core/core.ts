@@ -20,39 +20,51 @@ export type RequestCookies = {
   [cookieName: string]: string;
 };
 
-export type RequestBody = Blob | FormData | JsonValue | string;
+export type RequestBody = Blob | FormData | PlainObject | string;
 
-export type JsonContentValue =
-  | null
-  | string
-  | number
-  | boolean
-  | {[propName: string]: JsonContentValue}
-  | JsonContentValue[];
+export type PlainObject = null | {
+  [key: string]:
+    | undefined
+    | string
+    | string[]
+    | number
+    | number[]
+    | boolean
+    | boolean[]
+    | PlainObject
+    | PlainObject[];
+};
 
-export type JsonValue =
-  | null
-  | {[propName: string]: JsonContentValue}
-  | JsonContentValue[];
-
-export function isJsonValue(
+export function isPlainObject(
   value: any,
   isSubValue = false
-): value is JsonValue {
-  if (value === null) {
+): value is PlainObject {
+  if (!isSubValue) {
+    if (value === null) {
+      return true;
+    }
+    if (typeof value !== 'object' || Array.isArray(value)) {
+      return false;
+    }
+    for (const key in value) {
+      if (!isPlainObject(value[key], true)) {
+        return false;
+      }
+    }
     return true;
   }
-  if (isSubValue && ['string', 'boolean', 'number'].includes(typeof value)) {
+  if (['string', 'boolean', 'number', 'undefined'].includes(typeof value)) {
     return true;
   }
   if (typeof value !== 'object') {
     return false;
   }
+  const isArray = Array.isArray(value);
   for (const key in value) {
-    if (typeof key !== 'string' && typeof key !== 'number') {
+    if (isArray && typeof key === 'number' && value[key] === undefined) {
       return false;
     }
-    if (!isJsonValue(value[key], true)) {
+    if (!isPlainObject(value[key], true)) {
       return false;
     }
   }
@@ -195,7 +207,7 @@ export type ResponseSetCookies = {
   [cookieName: string]: string; // string format: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
 };
 
-export type ResponseBody = Blob | FormData | JsonValue | string;
+export type ResponseBody = Blob | FormData | PlainObject | string;
 
 export type ResponseBodyData<
   ContentType extends string = any,
