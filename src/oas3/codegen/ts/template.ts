@@ -149,6 +149,7 @@ const templateIsPlainObjectType: TemplateDefinitionOutput = {
       "if (typeof value !== 'object') {",
       'return false;',
       '}',
+      'const isArray = Array.isArray(value);',
       'for (const key in value) {',
       "if (isArray && typeof key === 'number' && value[key] === undefined) {",
       'return false;',
