@@ -16,24 +16,20 @@ function convertObjectToFormData(obj: Record<string, any>): FormData {
   const formData = new FormData();
   for (const key in obj) {
     const value = obj[key];
-    if (typeof value === 'string') {
-      formData.append(key, value);
-      continue;
-    }
-    if (typeof value === 'number') {
-      formData.append(key, `${value}`);
-      continue;
-    }
     if (value instanceof Blob) {
       formData.append(key, value);
       continue;
     }
-    if (typeof value === 'boolean') {
-      formData.append(key, value ? '1' : '0');
-      continue;
-    }
-    if (typeof value === 'object' && isJsonValue(value)) {
-      formData.append(key, JSON.stringify(value));
+    switch (typeof value) {
+      case 'string':
+        formData.append(key, value);
+        break;
+      case 'number':
+        formData.append(key, `${value}`);
+        break;
+      case 'boolean':
+        formData.append(key, value ? '1' : '');
+        break;
     }
   }
   return formData;
