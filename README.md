@@ -19,8 +19,7 @@ However, I coded my own solution because I wanted to:
 - have a uniform way as an alternative to [Axios' interceptors](https://axios-http.com/docs/interceptors)
 through different `RequestHandler` implementations
 
-> :bulb: - **Thoughts**  
-> [Axios](https://axios-http.com/docs/intro) is great. It offers a lot and it works with
+> :bulb: [Axios](https://axios-http.com/docs/intro) is great. It offers a lot and it works with
 > [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API) under the hood.
 > But one might have PWAs and [service workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
 > in mind where XMLHttpRequest is out of scope.
@@ -98,8 +97,7 @@ It is recommended to add your output folder in the `.gitignore` file and to rege
 On every call of the `generateOas3ToTs` function, the output folder is going to be deleted and the code will be rebuilt
 from scratch.
 
-> :warning: - **Requirement**  
-> Node version `>= 18.0.0` is required to support
+> :warning: Node version `>= 18.0.0` is required to support
 > the [Blob](https://nodejs.org/docs/v20.17.0/api/globals.html#class-blob) class
 > if you want to use the generated code output on the backend side.
 
