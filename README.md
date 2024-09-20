@@ -20,6 +20,7 @@ However, I coded my own solution because I wanted to:
 through different `RequestHandler` implementations
 
 > :bulb:
+> 
 > [Axios](https://axios-http.com/docs/intro) is great. It offers a lot and it works with
 > [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API) under the hood.
 > But one might have PWAs and [service workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
@@ -98,7 +99,9 @@ It is recommended to add your output folder in the `.gitignore` file and to rege
 On every call of the `generateOas3ToTs` function, the output folder is going to be deleted and the code will be rebuilt
 from scratch.
 
-> :warning: If you want to use the generated code output on the backend side `node >= 18.0.0` is required
+> :warning:
+> 
+> If you want to use the generated code output on the backend side `node >= 18.0.0` is required
 > to support [Blob](https://nodejs.org/docs/v20.17.0/api/globals.html#class-blob) class.
 
 ## What is an OutputPath?
