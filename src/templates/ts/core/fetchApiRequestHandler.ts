@@ -11,8 +11,6 @@ import {
   findMatchingSchemaContentType,
   PlainObject,
 } from './core';
-import {stringify} from 'qs';
-import {query} from 'express';
 
 function convertObjectToFormData(obj: Record<string, any>): FormData {
   const formData = new FormData();
