@@ -2,6 +2,6 @@
 dist
 node_modules
 src/test-outputs
-src/oas3/codegen/ts/generate.other.test.oas3.json
-src/oas3/codegen/ts/generate.other.test.ts
+src/oas3/codegen/generate.other.test.oas3.json
+src/oas3/codegen/generate.other.test.ts
 /coverage
