@@ -265,7 +265,8 @@ const requestHandler = new AxiosRequestHandler({
 ```
 
 > :bulb: The AxiosRequestHandler forces Axios to always receive response bodies in form of an `ArrayBuffer`.
-> This is achieved by setting `responseType: 'arraybuffer'` inside [AxiosRequestConfig](https://axios-http.com/docs/req_config)
+> This is achieved through setting `responseType: 'arraybuffer'` inside
+> the [AxiosRequestConfig](https://axios-http.com/docs/req_config).
 > A preconfigured `responseType` property is therefore always overwritten by the request handler.
 > The same applies to `cancelToken`.
 
