@@ -275,12 +275,8 @@ This implementation is responsible for executing your requests through the http(
 It is usually the most inner implementation of an onion bootstrapped request handler object
 and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 
-This request handler implementation requires custom functions for `decoding` and `encoding` data from and to
-query string format. The [qs](https://www.npmjs.com/package/qs) library is currently is the most commonly used library
-for such tasks and therefore recommended. Creating a FetchApiRequestHandler instance comes with the following steps:
-
 To support `application/x-www-form-urlencoded` request and response bodies, this request handler implementation requires
-a custom `decoding` and `encoding` function to convert data from and to query string format.
+custom `decoding` and `encoding` functions to convert data from and to query string format.
 The [qs](https://www.npmjs.com/package/qs) library currently is the most commonly used library
 for such tasks and therefore recommended:
 ```
