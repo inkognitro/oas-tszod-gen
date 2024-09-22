@@ -181,7 +181,6 @@ type CancelTokenSourceByRequestIdMap = {
 type AxiosRequestHandlerConfig = {
   axios: AxiosInstance;
   urlDecodeQueryString: (queryString: string) => PlainObject;
-  // urlEncodeQueryString: (plainObject: PlainObject) => string; // todo: remove?
 };
 
 export class AxiosRequestHandler implements RequestHandler {
@@ -209,8 +208,6 @@ export class AxiosRequestHandler implements RequestHandler {
       this.cancelTokenSourceByPendingRequestId;
     const axiosRequestCfg: AxiosRequestConfig = {
       ...this.createRequestConfig(request, config),
-
-      // todo: mention overwritten configs in documentation
       cancelToken: cancelTokenSource.token,
       responseType: 'arraybuffer',
     };

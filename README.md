@@ -96,7 +96,7 @@ It is recommended to add your output folder in the `.gitignore` file and to rege
 On every call of the `generateOas3ToTs` function, the output folder is going to be deleted and the code will be rebuilt
 from scratch.
 
-> :warning: Node version `>= 18.0.0` is required to support
+> :bulb: Node version `>= 18.0.0` is required to support
 > the [Blob](https://nodejs.org/docs/v20.17.0/api/globals.html#class-blob) class
 > if you want to use the generated code on the backend side.
 
@@ -162,7 +162,12 @@ const myAxiosInstance = axios.create({
   // Source: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
 });
 
-const axiosRequestHandler = new AxiosRequestHandler(myAxiosInstance);
+const axiosRequestHandler = new AxiosRequestHandler({
+  axios: myAxiosInstance,
+  urlDecodeQueryString: (queryString: string) => {
+    return parse(queryString);
+  },
+});
 
 const requestHandler = new AuthRequestHandler(
   [myJwtAuthenticationProvider],
@@ -227,13 +232,42 @@ The `RequestHandler` interface for custom implementations can be found
 ### AxiosRequestHandler
 This implementation is responsible for executing your requests through the http(s) protocol.
 It is usually the most inner implementation of an onion bootstrapped request handler object.
-It requires the installation of the [Axios](https://axios-http.com/docs/intro) library in your code base
-and serves as a more widely supported alternative to the `FetchApiRequestHandler`.
-Some dependencies need to be installed for this type of request handler.
-For the recommended version have a look at the `peerDependencies` in the `package.json` of this project.
+It requires the installation of the [Axios](https://axios-http.com/docs/intro) library in your code base.
+For the recommended Axios version have a look at the `peerDependencies` in the `package.json` of this project.
+Creating a AxiosRequestHandler instance comes with the following steps:
+
 ```
 npm install axios --save
 ```
+
+To support `application/x-www-form-urlencoded` response bodies, this request handler implementation requires
+a custom `decoding` function to decode url encoded data.
+The [qs](https://www.npmjs.com/package/qs) library currently is the most commonly used library
+for such tasks and therefore recommended:
+
+```
+npm install qs --save
+
+npm install @types/qs --save-dev
+```
+
+And finally:
+
+```typescript
+const requestHandler = new AxiosRequestHandler({
+  axios: axios.create({
+    baseURL: `http://localhost:${port}`,
+  }),
+  urlDecodeQueryString: (queryString: string) => {
+    return parse(queryString);
+  },
+});
+```
+
+> :bulb: The AxiosRequestHandler forces Axios to always receive response bodies in form of an `ArrayBuffer`.
+> This is achieved by setting `responseType: 'arraybuffer'` inside [AxiosRequestConfig](https://axios-http.com/docs/req_config)
+> A preconfigured `responseType` property is therefore always overwritten by the request handler.
+> The same applies to `cancelToken`.
 
 ### FetchApiRequestHandler
 This implementation is responsible for executing your requests through the http(s) protocol.
@@ -241,11 +275,13 @@ It is usually the most inner implementation of an onion bootstrapped request han
 and uses the built-in [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 
 This request handler implementation requires custom functions for `decoding` and `encoding` data from and to
-query string format. At time of writing this, the [qs](https://www.npmjs.com/package/qs) package is the
-most commonly used library for such tasks and therefore recommended.
-Creating a FetchApiRequestHandler instance comes with the following two steps:
+query string format. The [qs](https://www.npmjs.com/package/qs) library is currently is the most commonly used library
+for such tasks and therefore recommended. Creating a FetchApiRequestHandler instance comes with the following steps:
 
-Install the [qs](https://www.npmjs.com/package/qs) library like so:
+To support `application/x-www-form-urlencoded` request and response bodies, this request handler implementation requires
+a custom `decoding` and `encoding` function to convert data from and to query string format.
+The [qs](https://www.npmjs.com/package/qs) library currently is the most commonly used library
+for such tasks and therefore recommended:
 ```
 npm install qs --save
 
