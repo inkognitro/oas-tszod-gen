@@ -1,7 +1,7 @@
-[![CI](https://github.com/inkognitro/oas-to-code/actions/workflows/ci.yml/badge.svg)](https://github.com/inkognitro/oas-to-code/actions?query=workflow%3Aci)
+[![CI](https://github.com/inkognitro/oas-gen-tszod/actions/workflows/ci.yml/badge.svg)](https://github.com/inkognitro/oas-gen-tszod/actions?query=workflow%3Aci)
 ![Total](./badges/jest/coverage-total.svg)
 
-# oas-to-code
+# oas-gen-tszod
 A code generator to convert [OpenApi version 3 (OAS3)](https://swagger.io/specification/) specifications into endpoint caller functions for [TS](https://www.typescriptlang.org/) and [Zod](https://zod.dev).
 
 ## Why yet another library for this task?
@@ -29,7 +29,7 @@ through different `RequestHandler` implementations
 ## Generator: Setup and usage
 First, install the package as a dev dependency:
 ```
-npm install oas-to-code --save-dev
+npm install oas-gen-tszod --save-dev
 ```
 
 If you also want to use [Zod](https://zod.dev) (see `withZod: true` configuration below) and it is not yet installed
@@ -45,7 +45,7 @@ code into it:
 ```typescript
 // api.generate.js
 
-import { generateOas3ToTs } from 'oas-to-code';
+import { generateOas3ToTs } from 'oas-gen-tszod';
 const oas3Specification = require('./api.specs.json');
 
 generateOas3ToTs({
@@ -227,7 +227,7 @@ The decision of having a `RequestHandler` interface with granular implementation
 in mind: `server` vs `client` | `prod` vs `test` | custom "middleware" behaviour.
 You can write your own implementations or just combine some of the existing ones below, according to your needs.
 The `RequestHandler` interface for custom implementations can be found
-[here](https://github.com/inkognitro/oas-to-code/blob/main/src/templates/ts/core/core.ts#L176).
+[here](https://github.com/inkognitro/oas-gen-tszod/blob/main/src/templates/ts/core/core.ts#L176).
 
 ### AxiosRequestHandler
 This implementation is responsible for executing your requests through the http(s) protocol.
