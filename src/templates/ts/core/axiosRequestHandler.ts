@@ -4,7 +4,6 @@ import axios, {
   Method,
   AxiosResponse,
   AxiosHeaders,
-  RawAxiosRequestHeaders,
   AxiosInstance,
 } from 'axios';
 import {
@@ -17,18 +16,25 @@ import {
   ResponseBody,
   EndpointSchema,
   findMatchingSchemaContentType,
+  PlainObject,
 } from './core';
 
 class ResultResponse implements CoreResponse {
   private readonly response: AxiosResponse;
+  private readonly urlDecodeQueryString: (queryString: string) => PlainObject;
 
   public readonly status: number;
   public readonly contentType: null | string;
   public readonly headers: ResponseHeaders;
   public readonly cookies: ResponseSetCookies;
 
-  constructor(response: AxiosResponse, endpointSchema: EndpointSchema) {
+  constructor(
+    response: AxiosResponse,
+    urlDecodeQueryString: (queryString: string) => PlainObject,
+    endpointSchema: EndpointSchema
+  ) {
     this.response = response;
+    this.urlDecodeQueryString = urlDecodeQueryString;
     this.status = response.status;
     const plainHeaders = ResultResponse.createPlainHeaders(response);
     this.headers = plainHeaders;
@@ -39,10 +45,75 @@ class ResultResponse implements CoreResponse {
     );
     this.cookies = ResultResponse.createPlainCookies(response);
     this.revealBody = this.revealBody.bind(this);
+    this.findHeaderValue = this.findHeaderValue.bind(this);
   }
 
   revealBody(): Promise<ResponseBody> {
-    return new Promise(resolve => resolve(this.response.data));
+    // this.response.data is always an ArrayBuffer since, Axios' RequestInit.responseType was set to "arraybuffer"
+    const contentType = this.findHeaderValue('content-type');
+    if (!contentType) {
+      return new Promise(resolve => {
+        resolve(new Blob([this.response.data]));
+      });
+    }
+    const ct = contentType.trim().toLowerCase();
+    if (ct.startsWith('text/')) {
+      return new Promise(resolve => {
+        const str = new TextDecoder(this.getContentTypeCharset()).decode(
+          this.response.data
+        );
+        return resolve(str);
+      });
+    }
+    if (ct.match(/application\/[^+]*[+]?(json);?.*/)) {
+      return new Promise(resolve => {
+        const str = new TextDecoder(this.getContentTypeCharset()).decode(
+          this.response.data
+        );
+        const jsonObj = JSON.parse(str);
+        return resolve(jsonObj);
+      });
+    }
+    if (ct.match(/application\/x-www-form-urlencoded;?.*/)) {
+      return new Promise(resolve => {
+        const str = new TextDecoder(this.getContentTypeCharset()).decode(
+          this.response.data
+        );
+        return resolve(this.urlDecodeQueryString(str));
+      });
+    }
+    if (ct.match(/multipart\/form-data;?.*/)) {
+      return new Promise(resolve => {
+        const nativeResponse = new Response(this.response.data, {
+          headers: this.headers,
+          status: this.response.status,
+          statusText: this.response.statusText,
+        });
+        return resolve(nativeResponse.formData());
+      });
+    }
+    return new Promise(resolve => {
+      resolve(new Blob([this.response.data]));
+    });
+  }
+
+  private getContentTypeCharset(): string {
+    const ctHeaderValue = this.findHeaderValue('content-type');
+    if (!ctHeaderValue) {
+      return 'utf-8';
+    }
+    const charsetRegex = /charset=([^()<>@,;:"/[\]?.=\s]*)/i;
+    return charsetRegex.exec(ctHeaderValue)?.[1] ?? 'utf-8';
+  }
+
+  private findHeaderValue(name: string): null | string {
+    const key = Object.keys(this.headers).find(
+      k => k.toLowerCase() === name.toLowerCase()
+    );
+    if (!key) {
+      return null;
+    }
+    return this.headers[key];
   }
 
   private static findMatchingSchemaContentType(
@@ -107,23 +178,23 @@ type CancelTokenSourceByRequestIdMap = {
   [requestId: string]: CancelTokenSource;
 };
 
+type AxiosRequestHandlerConfig = {
+  axios: AxiosInstance;
+  urlDecodeQueryString: (queryString: string) => PlainObject;
+  // urlEncodeQueryString: (plainObject: PlainObject) => string; // todo: remove?
+};
+
 export class AxiosRequestHandler implements RequestHandler {
-  private readonly axiosInstance: AxiosInstance;
-  private readonly generalRequestConfig: AxiosRequestConfig;
+  private readonly config: AxiosRequestHandlerConfig;
   private readonly cancelTokenSourceByPendingRequestId: CancelTokenSourceByRequestIdMap;
 
-  constructor(
-    axiosInstance: AxiosInstance,
-    generalRequestConfig: AxiosRequestConfig = {}
-  ) {
-    this.axiosInstance = axiosInstance;
-    this.generalRequestConfig = generalRequestConfig;
+  constructor(config: AxiosRequestHandlerConfig) {
+    this.config = config;
     this.cancelTokenSourceByPendingRequestId = {};
     this.execute = this.execute.bind(this);
-    this.findRequestConfigCookieHeaders =
-      this.findRequestConfigCookieHeaders.bind(this);
-    this.createRequestConfigHeaders =
-      this.createRequestConfigHeaders.bind(this);
+    this.getRequestConfigCookieHeaders =
+      this.getRequestConfigCookieHeaders.bind(this);
+    this.createPlainRequestHeaders = this.createPlainRequestHeaders.bind(this);
     this.createRequestConfig = this.createRequestConfig.bind(this);
     this.cancelRequestById = this.cancelRequestById.bind(this);
     this.cancelAllRequests = this.cancelAllRequests.bind(this);
@@ -138,44 +209,51 @@ export class AxiosRequestHandler implements RequestHandler {
       this.cancelTokenSourceByPendingRequestId;
     const axiosRequestCfg: AxiosRequestConfig = {
       ...this.createRequestConfig(request, config),
+
+      // todo: mention overwritten configs in documentation
       cancelToken: cancelTokenSource.token,
+      responseType: 'arraybuffer',
     };
     cancelTokenSourceByPendingRequestId[request.id] = cancelTokenSource;
     return new Promise((resolve, reject) => {
-      this.axiosInstance
+      this.config.axios
         .request(axiosRequestCfg)
         .then((response): void => {
           resolve({
             hasRequestBeenCancelled: false,
             request,
-            response: new ResultResponse(response, request.endpointSchema),
+            response: new ResultResponse(
+              response,
+              this.config.urlDecodeQueryString,
+              request.endpointSchema
+            ),
           });
         })
         .catch((error): void => {
-          if (axios.isCancel(error)) {
-            resolve({
-              hasRequestBeenCancelled: true,
-              request,
-              response: null,
-            });
-            return;
-          }
           if (!error.request) {
             reject({
               hasRequestBeenCancelled: false,
               request,
               response: error.response
-                ? new ResultResponse(error.response, request.endpointSchema)
+                ? new ResultResponse(
+                    error.response,
+                    this.config.urlDecodeQueryString,
+                    request.endpointSchema
+                  )
                 : null,
               error: error,
             });
             return;
           }
           resolve({
-            hasRequestBeenCancelled: false,
+            hasRequestBeenCancelled: axios.isCancel(error),
             request,
             response: error.response
-              ? new ResultResponse(error.response, request.endpointSchema)
+              ? new ResultResponse(
+                  error.response,
+                  this.config.urlDecodeQueryString,
+                  request.endpointSchema
+                )
               : null,
             error: error,
           });
@@ -208,50 +286,48 @@ export class AxiosRequestHandler implements RequestHandler {
     request: Request,
     config?: AxiosRequestHandlerExecutionConfig
   ): AxiosRequestConfig {
-    const requestConfig: AxiosRequestConfig = {
-      ...this.generalRequestConfig,
+    const requestCfg: AxiosRequestConfig = {
       method: request.endpointSchema.method as Method,
       url: request.url,
     };
-    if (request.headers) {
-      requestConfig.headers = this.createRequestConfigHeaders(
-        requestConfig,
-        request
-      );
-    }
+    requestCfg.headers = this.createPlainRequestHeaders(request);
     if (request.body) {
-      requestConfig.data = request.body;
+      requestCfg.data = request.body;
     }
     if (request.queryParams) {
-      requestConfig.params = request.queryParams;
+      requestCfg.params = request.queryParams;
     }
     if (!config?.refineAxiosRequestConfig) {
-      return requestConfig;
+      return requestCfg;
     }
-    return config.refineAxiosRequestConfig(requestConfig);
+    return config.refineAxiosRequestConfig(requestCfg);
   }
 
-  private createRequestConfigHeaders(
-    requestConfig: AxiosRequestConfig,
-    request: Request
-  ): RawAxiosRequestHeaders {
-    const currentHeaders: RawAxiosRequestHeaders | undefined =
-      requestConfig.headers instanceof AxiosHeaders
-        ? requestConfig.headers.toJSON()
-        : request.headers;
+  private createPlainRequestHeaders(request: Request): Record<string, string> {
+    const requestHeaders: Record<string, string> = {};
+    if (request.headers) {
+      Object.keys(request.headers).forEach((value, key) => {
+        if (typeof value === 'string' || typeof value === 'number') {
+          requestHeaders[key] = `${value}`;
+        }
+      });
+    }
     const cookieHeaders = request.cookies
-      ? this.findRequestConfigCookieHeaders(request)
+      ? this.getRequestConfigCookieHeaders(request)
       : {};
-    return {
-      ...(currentHeaders ?? {}),
-      ...(request.headers ?? {}),
+    const mergedHeaders: Record<string, string> = {
+      ...requestHeaders,
       ...cookieHeaders,
     };
+    if (request.contentType) {
+      mergedHeaders['content-type'] = request.contentType;
+    }
+    return mergedHeaders;
   }
 
-  private findRequestConfigCookieHeaders(
+  private getRequestConfigCookieHeaders(
     request: Request
-  ): null | RawAxiosRequestHeaders {
+  ): Record<string, string> {
     const currentCookieDefinition = request.headers?.['Cookie'];
     const cookieDefinitions: string[] = currentCookieDefinition
       ? [`${currentCookieDefinition}`]
@@ -263,7 +339,7 @@ export class AxiosRequestHandler implements RequestHandler {
       }
     }
     if (!cookieDefinitions.length) {
-      return null;
+      return {};
     }
     return {
       Cookie: cookieDefinitions.join('; '),
