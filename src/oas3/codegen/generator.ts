@@ -280,7 +280,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       fs.cpSync(
         path.resolve(
           __dirname,
-          '../../../templates/ts',
+          '../../templates/ts',
           cleanUpFolderPath(fileInfo.folderPath),
           fileInfo.fileName
         ),
