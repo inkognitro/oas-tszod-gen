@@ -1,5 +1,5 @@
 {
-  "name": "@inkognitro/oas-gen-tszod",
+  "name": "@inkognitro/oas-tszod-gen",
   "version": "0.0.1",
   "files": [
     "./dist",
@@ -29,10 +29,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/inkognitro/oas-gen-tszod.git"
+    "url": "git+https://github.com/inkognitro/oas-tszod-gen.git"
   },
   "keywords": [
-    "oas-gen-tszod",
+    "oas-tszod-gen",
     "open api",
     "swagger code generator",
     "oas3",
@@ -44,9 +44,9 @@
   "author": "Marcel Fischer",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/inkognitro/oas-gen-tszod/issues"
+    "url": "https://github.com/inkognitro/oas-tszod-gen/issues"
   },
-  "homepage": "https://github.com/inkognitro/oas-gen-tszod#readme",
+  "homepage": "https://github.com/inkognitro/oas-tszod-gen#readme",
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
