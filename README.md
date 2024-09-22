@@ -234,7 +234,7 @@ This implementation is responsible for executing your requests through the http(
 It is usually the most inner implementation of an onion bootstrapped request handler object.
 It requires the installation of the [Axios](https://axios-http.com/docs/intro) library in your code base.
 For the recommended Axios version have a look at the `peerDependencies` in the `package.json` of this project.
-Creating a AxiosRequestHandler instance comes with the following steps:
+Creating an AxiosRequestHandler instance comes with the following steps:
 
 ```
 npm install axios --save
