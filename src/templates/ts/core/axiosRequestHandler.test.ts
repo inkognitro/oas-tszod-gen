@@ -22,7 +22,7 @@ import {AxiosRequestHandler} from './axiosRequestHandler';
 import axios from 'axios';
 import {parse} from 'qs';
 
-const port = 3010;
+const port = 3011;
 
 const mockServerApp: MockServerApp = createMockServerApp([
   getPlainTextEndpointSchema,
