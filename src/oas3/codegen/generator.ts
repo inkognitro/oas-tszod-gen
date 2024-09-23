@@ -8,7 +8,6 @@ import {
   DefinitionOutput,
   lowerCaseFirstLetter,
   objectSchemaAdditionalPropsOutputPathPart,
-  oneOfSchemaItemOutputPathPart,
   Output,
   OutputPath,
   OutputType,
@@ -987,8 +986,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       p =>
         p !== componentSchemasFileNameOutputPathPart &&
         p !== componentParametersFileNameOutputPathPart &&
-        p !== componentResponsesFileNameOutputPathPart &&
-        p !== oneOfSchemaItemOutputPathPart
+        p !== componentResponsesFileNameOutputPathPart
     );
     parts = parts.map(p => {
       if (p === arraySchemaItemOutputPathPart) {

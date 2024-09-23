@@ -7,7 +7,9 @@ export type ConcreteSchema =
   | IntegerSchema
   | ArraySchema
   | ObjectSchema
-  | OneOfSchema;
+  | OneOfSchema
+  | AllOfSchema
+  | AnyOfSchema;
 
 export function isConcreteSchema(
   anyValue: unknown
@@ -20,8 +22,8 @@ export function isConcreteSchema(
     isArraySchema(anyValue) ||
     isObjectSchema(anyValue) ||
     isOneOfSchema(anyValue) ||
-    isAnyOfSchema(anyValue) ||
-    isAllOfSchema(anyValue)
+    isAllOfSchema(anyValue) ||
+    isAnyOfSchema(anyValue)
   );
 }
 

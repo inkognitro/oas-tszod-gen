@@ -5,12 +5,12 @@ import {
   ComponentRefOutput,
   CreateCodeFunc,
   objectSchemaAdditionalPropsOutputPathPart,
-  oneOfSchemaItemOutputPathPart,
   OutputPath,
   OutputType,
 } from './core';
 import {
   AllOfSchema,
+  AnyOfSchema,
   ArraySchema,
   BooleanSchema,
   ComponentRef,
@@ -22,7 +22,7 @@ import {
   isIntegerSchema,
   isNumberSchema,
   isObjectSchema,
-  isOneOfSchema,
+  isOneOfSchema, isSchema,
   isSchemaComponentRef,
   isStringSchema,
   NumberSchema,
@@ -88,19 +88,21 @@ export function applySchema(
       preventFromAddingComponentRefs
     );
   }
-  if (isAnyOfSchema(schema)) {
-    return applyAnyOfSchema(
-      codeGenerator,
-      schema,
-      path,
-      preventFromAddingComponentRefs
-    );
-  }
   if (isAllOfSchema(schema)) {
     return applyAllOfSchema(
       codeGenerator,
       schema,
       path,
+      config,
+      preventFromAddingComponentRefs
+    );
+  }
+  if (isAnyOfSchema(schema)) {
+    return applyAnyOfSchema(
+      codeGenerator,
+      schema,
+      path,
+      config,
       preventFromAddingComponentRefs
     );
   }
@@ -323,11 +325,7 @@ function applyOneOfSchema(
   const oneOfItemDirectOutputs: CodeGenerationOutput[] = [];
   const requiredOutputPaths: OutputPath[] = [];
   schema.oneOf.forEach((itemSchema, index) => {
-    const itemPath: OutputPath = [
-      ...path,
-      oneOfSchemaItemOutputPathPart,
-      `${index}`,
-    ];
+    const itemPath: OutputPath = [...path, `${index}`];
     requiredOutputPaths.push(itemPath);
     const itemOutput = applySchema(
       codeGenerator,
@@ -356,25 +354,53 @@ function applyOneOfSchema(
   };
 }
 
-function applyAnyOfSchema(
-  _codeGenerator: CodeGenerator,
-  _schema: AllOfSchema,
+function applyAllOfSchema(
+  codeGenerator: CodeGenerator,
+  schema: AllOfSchema,
   path: OutputPath,
-  _preventFromAddingComponentRefs: string[] = []
+  config: GenerateConfig,
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  // todo: implement
+  const itemCodeOutputs: CodeGenerationOutput[] = [];
   const requiredOutputPaths: OutputPath[] = [];
+  schema.allOf.forEach((itemSchema, index) => {
+    if (!isSchema(itemSchema)) {
+      return;
+    }
+    const itemPath: OutputPath = [...path, `${index}`];
+    requiredOutputPaths.push(itemPath);
+    const itemOutput = applySchema(
+      codeGenerator,
+      itemSchema,
+      itemPath,
+      config,
+      preventFromAddingComponentRefs
+    );
+    itemCodeOutputs.push(itemOutput);
+  });
   return {
-    createCode: () => 'any',
+    createCode: referencingContext => {
+      const codeRows: string[] = [];
+      itemCodeOutputs.forEach(directOutput => {
+        const itemComment = directOutput.codeComment
+          ? ` // ${directOutput.codeComment}`
+          : '';
+        codeRows.push(
+          `${directOutput.createCode(referencingContext)}${itemComment}`
+        );
+      });
+      return `${codeRows.join('\n&')}`;
+    },
     path,
     getRequiredOutputPaths: () => requiredOutputPaths,
   };
 }
 
-function applyAllOfSchema(
+function applyAnyOfSchema(
   _codeGenerator: CodeGenerator,
-  _schema: AllOfSchema,
+  _schema: AnyOfSchema,
   path: OutputPath,
+  _config: GenerateConfig,
   _preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   // todo: implement

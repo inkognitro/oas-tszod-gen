@@ -5,12 +5,12 @@ import {
   ComponentRefOutput,
   CreateCodeFunc,
   objectSchemaAdditionalPropsOutputPathPart,
-  oneOfSchemaItemOutputPathPart,
   OutputPath,
   OutputType,
 } from './core';
 import {
   AllOfSchema,
+  AnyOfSchema,
   ArraySchema,
   BooleanSchema,
   ComponentRef,
@@ -23,6 +23,7 @@ import {
   isNumberSchema,
   isObjectSchema,
   isOneOfSchema,
+  isSchema,
   isSchemaComponentRef,
   isStringSchema,
   NumberSchema,
@@ -89,19 +90,21 @@ export function applyZodSchema(
       preventFromAddingComponentRefs
     );
   }
-  if (isAnyOfSchema(schema)) {
-    return applyZodAnyOfSchema(
-      codeGenerator,
-      schema,
-      path,
-      preventFromAddingComponentRefs
-    );
-  }
   if (isAllOfSchema(schema)) {
     return applyZodAllOfSchema(
       codeGenerator,
       schema,
       path,
+      config,
+      preventFromAddingComponentRefs
+    );
+  }
+  if (isAnyOfSchema(schema)) {
+    return applyZodAnyOfSchema(
+      codeGenerator,
+      schema,
+      path,
+      config,
       preventFromAddingComponentRefs
     );
   }
@@ -348,21 +351,16 @@ export function applyZodObjectSchema(
           )}${optional},${propComment}`
         );
       }
-      let zodAdditionalPropsRecordCode = '';
-      if (additionalPropertiesDirectOutput) {
-        zodAdditionalPropsRecordCode = `z.record(${additionalPropertiesDirectOutput.createCode(
+      if (!codeRows.length && additionalPropertiesDirectOutput) {
+        return `z.record(${additionalPropertiesDirectOutput.createCode(
           path
         )})`;
       }
-      if (!codeRows.length && additionalPropertiesDirectOutput) {
-        return zodAdditionalPropsRecordCode;
+      let zodAdditionalPropsCode = '';
+      if (additionalPropertiesDirectOutput) {
+        zodAdditionalPropsCode = `.catchall(${additionalPropertiesDirectOutput.createCode(path)})`;
       }
-      const zodAdditionalPropsExtension = zodAdditionalPropsRecordCode
-        ? `.catchall(${zodAdditionalPropsRecordCode}.optional())`
-        : '';
-      return `z.object({\n${codeRows.join(
-        '\n'
-      )}\n})${zodAdditionalPropsExtension}`;
+      return `z.object({\n${codeRows.join('\n')}\n})${zodAdditionalPropsCode}`;
     },
     path,
     getRequiredOutputPaths: () => requiredOutputPaths,
@@ -376,14 +374,10 @@ function applyZodOneOfSchema(
   config: GenerateConfig,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  const oneOfItemDirectOutputs: CodeGenerationOutput[] = [];
+  const itemCodeOutputs: CodeGenerationOutput[] = [];
   const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
   schema.oneOf.forEach((itemSchema, index) => {
-    const itemPath: OutputPath = [
-      ...path,
-      oneOfSchemaItemOutputPathPart,
-      `${index}`,
-    ];
+    const itemPath: OutputPath = [...path, `${index}`];
     requiredOutputPaths.push(itemPath);
     const itemOutput = applyZodSchema(
       codeGenerator,
@@ -392,12 +386,12 @@ function applyZodOneOfSchema(
       config,
       preventFromAddingComponentRefs
     );
-    oneOfItemDirectOutputs.push(itemOutput);
+    itemCodeOutputs.push(itemOutput);
   });
   return {
     createCode: referencingContext => {
       const codeRows: string[] = [];
-      oneOfItemDirectOutputs.forEach(directOutput => {
+      itemCodeOutputs.forEach(directOutput => {
         const itemComment = directOutput.codeComment
           ? ` // ${directOutput.codeComment}`
           : '';
@@ -405,12 +399,12 @@ function applyZodOneOfSchema(
           `${directOutput.createCode(referencingContext)}${itemComment}`
         );
       });
+      if (!codeRows.length) {
+        return 'z.any()';
+      }
       const discriminatorName = schema.discriminator?.propertyName;
       if (schema.discriminator?.propertyName) {
         `z.discriminatedUnion('${discriminatorName}', [${codeRows.join(',')}])`;
-      }
-      if (!codeRows.length) {
-        return 'z.any()';
       }
       if (codeRows.length === 1) {
         return codeRows[0];
@@ -422,26 +416,59 @@ function applyZodOneOfSchema(
   };
 }
 
-function applyZodAnyOfSchema(
-  _codeGenerator: CodeGenerator,
-  _schema: AllOfSchema,
+function applyZodAllOfSchema(
+  codeGenerator: CodeGenerator,
+  schema: AllOfSchema,
   path: OutputPath,
-  _preventFromAddingComponentRefs: string[] = []
+  config: GenerateConfig,
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  // todo: implement
+  const itemCodeOutputs: CodeGenerationOutput[] = [];
+  const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
+  schema.allOf.forEach((itemSchema, index) => {
+    if (!isSchema(itemSchema)) {
+      return;
+    }
+    const itemPath: OutputPath = [...path, `${index}`];
+    requiredOutputPaths.push(itemPath);
+    const itemOutput = applyZodSchema(
+      codeGenerator,
+      itemSchema,
+      itemPath,
+      config,
+      preventFromAddingComponentRefs
+    );
+    itemCodeOutputs.push(itemOutput);
+  });
   return {
-    createCode: () => {
-      return 'z.any()';
+    createCode: referencingContext => {
+      const codeRows: string[] = [];
+      itemCodeOutputs.forEach(directOutput => {
+        const itemComment = directOutput.codeComment
+          ? ` // ${directOutput.codeComment}`
+          : '';
+        codeRows.push(
+          `${directOutput.createCode(referencingContext)}${itemComment}`
+        );
+      });
+      if (!codeRows.length) {
+        return 'z.any()';
+      }
+      if (codeRows.length === 1) {
+        return codeRows[0];
+      }
+      return `z.intersection([${codeRows.join(',')}])`;
     },
     path,
-    getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
+    getRequiredOutputPaths: () => requiredOutputPaths,
   };
 }
 
-function applyZodAllOfSchema(
+function applyZodAnyOfSchema(
   _codeGenerator: CodeGenerator,
-  _schema: AllOfSchema,
+  _schema: AnyOfSchema,
   path: OutputPath,
+  _config: GenerateConfig,
   _preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   // todo: implement

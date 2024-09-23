@@ -45,7 +45,6 @@ export enum OutputType {
 }
 
 export const arraySchemaItemOutputPathPart = 'array-schema-item-5acf7fae';
-export const oneOfSchemaItemOutputPathPart = 'oneOf-schema-item-5acf7fae';
 export const objectSchemaAdditionalPropsOutputPathPart =
   'object-schema-additionalProps-5acf7fae';
 
