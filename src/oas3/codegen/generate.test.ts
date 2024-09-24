@@ -1,7 +1,7 @@
 import {generateOas3ToTs} from './generate';
-const petStore1Specs = require('./generate.test.petstore1.oas3.json');
-const petStore2Specs = require('./generate.test.petstore2.oas3.json');
-const binanceSpecs = require('./generate.test.binance.oas3.json');
+const petStore1Specs = require('../../../example-specs/petstore1.oas3.json');
+const petStore2Specs = require('../../../example-specs/petstore2.oas3.json');
+const binanceSpecs = require('../../../example-specs/binance.oas3.json');
 
 describe('Generator', () => {
   it('can generate files from PetStore1 specs', () => {

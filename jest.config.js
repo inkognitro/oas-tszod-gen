@@ -2,8 +2,8 @@ module.exports = {
   coverageReporters: ['json-summary'],
   coveragePathIgnorePatterns: [
     '<rootDir>/dist/',
-    '<rootDir>/src/templates',
-    '<rootDir>/src/test-outputs',
+    '<rootDir>/example-specs',
+    '<rootDir>/example-outputs',
   ],
   roots: ['<rootDir>/src'],
   testMatch: [

@@ -1,8 +1,8 @@
 .idea
 dist
 node_modules
+example-specs/other.oas3.json
 example-outputs/other
 example-outputs/other-with-zod
-src/oas3/codegen/generate.other.test.oas3.json
 src/oas3/codegen/generate.other.test.ts
 coverage

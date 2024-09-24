@@ -1,13 +1,13 @@
 import {isSpecification} from './specification';
-const petStore1Specification = require('./specification.test.petstore1.json');
-const petStore2Specification = require('./specification.test.petstore2.json');
+const petStore1Specs = require('../../../example-specs/petstore1.oas3.json');
+const petStore2Specs = require('../../../example-specs/petstore2.oas3.json');
 
 test('isSpecification validates pet store one specification as correct input', () => {
-  expect(isSpecification(petStore1Specification)).toBe(true);
+  expect(isSpecification(petStore1Specs)).toBe(true);
 });
 
 test('isSpecification validates pet store two specification as correct input', () => {
-  expect(isSpecification(petStore2Specification)).toBe(true);
+  expect(isSpecification(petStore2Specs)).toBe(true);
 });
 
 test('isSpecification invalidates incorrect input', () => {
