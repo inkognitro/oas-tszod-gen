@@ -19,7 +19,7 @@
   "description": "A code generator to convert OpenApi version 3 (OAS3) specifications into endpoint caller functions for TS and Zod.",
   "scripts": {
     "build": "tspc && npm run copyTemplateFiles",
-    "copyTemplateFiles": "node ./scripts/copy-template-files.js",
+    "copyTemplateFiles": "node ./copy-template-files.js",
     "lint": "gts lint",
     "lint:fix": "tsc --noEmit && gts fix",
     "start": "npm run copyTemplateFiles && tspc -w",
