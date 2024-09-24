@@ -35,7 +35,6 @@ import {
 } from '@/oas3/specification';
 import {templateZOfZodLibrary} from './template';
 import {GenerateConfig} from './generator';
-import {applySchema} from '@/oas3/codegen/schema';
 
 export function applyZodSchema(
   codeGenerator: CodeGenerator,
@@ -480,7 +479,7 @@ function applyZodAnyOfSchema(
   const itemCodeOutputs: CodeGenerationOutput[] = [];
   schema.anyOf.forEach((itemSchema, index) => {
     const itemPath: OutputPath = [...path, `${index}`];
-    const itemOutput = applySchema(
+    const itemOutput = applyZodSchema(
       codeGenerator,
       itemSchema,
       itemPath,
@@ -498,12 +497,12 @@ function applyZodAnyOfSchema(
       }
       itemCodeOutputs.forEach(itemCodeOutput => {
         const itemCode = itemCodeOutput.createCode(referencingContext);
-        partialUnionCodeRows.push(`Partial<${itemCode}>`);
-        unionCodeRows.push(`${itemCode}$`);
+        partialUnionCodeRows.push(`${itemCode}.partial()`);
+        unionCodeRows.push(`${itemCode}`);
       });
       const partialUnionCode = `z.union([${partialUnionCodeRows.join(',')}])`;
       const unionCode = `z.union([${unionCodeRows.join(',')}])`;
-      return `z.intersection([${partialUnionCode}, ${unionCode}]);`;
+      return `z.intersection(${partialUnionCode}, ${unionCode})`;
     },
     path,
     getRequiredOutputPaths: () => {
