@@ -12,11 +12,11 @@ describe('Generator', () => {
             resolve(petStore1Specs);
           });
         },
-        outputFolderPath: './src/test-outputs/petstore1',
+        outputFolderPath: './example-outputs/petstore1',
         logger: {
           log: () => {},
         },
-        importRootAlias: '@/test-outputs/petstore1',
+        importRootAlias: '@example-outputs/petstore1',
       });
     }).not.toThrow();
   });
@@ -29,12 +29,12 @@ describe('Generator', () => {
             resolve(petStore1Specs);
           });
         },
-        outputFolderPath: './src/test-outputs/petstore1-with-zod',
+        outputFolderPath: './example-outputs/petstore1-with-zod',
         logger: {
           log: () => {},
         },
         withZod: true,
-        importRootAlias: '@/test-outputs/petstore1-with-zod',
+        importRootAlias: '@example-outputs/petstore1-with-zod',
       });
     }).not.toThrow();
   });
@@ -47,11 +47,11 @@ describe('Generator', () => {
             resolve(petStore2Specs);
           });
         },
-        outputFolderPath: './src/test-outputs/petstore2',
+        outputFolderPath: './example-outputs/petstore2',
         logger: {
           log: () => {},
         },
-        importRootAlias: '@/test-outputs/petstore2',
+        importRootAlias: '@example-outputs/petstore2',
       });
     }).not.toThrow();
   });
@@ -64,12 +64,12 @@ describe('Generator', () => {
             resolve(petStore2Specs);
           });
         },
-        outputFolderPath: './src/test-outputs/petstore2-with-zod',
+        outputFolderPath: './example-outputs/petstore2-with-zod',
         logger: {
           log: () => {},
         },
         withZod: true,
-        importRootAlias: '@/test-outputs/petstore2-with-zod',
+        importRootAlias: '@example-outputs/petstore2-with-zod',
       });
     }).not.toThrow();
   });
@@ -82,11 +82,11 @@ describe('Generator', () => {
             resolve(binanceSpecs);
           });
         },
-        outputFolderPath: './src/test-outputs/binance',
+        outputFolderPath: './example-outputs/binance',
         logger: {
           log: () => {},
         },
-        importRootAlias: '@/test-outputs/binance',
+        importRootAlias: '@example-outputs/binance',
       });
     }).not.toThrow();
   });
@@ -99,12 +99,12 @@ describe('Generator', () => {
             resolve(binanceSpecs);
           });
         },
-        outputFolderPath: './src/test-outputs/binance-with-zod',
+        outputFolderPath: './example-outputs/binance-with-zod',
         logger: {
           log: () => {},
         },
         withZod: true,
-        importRootAlias: '@/test-outputs/binance-with-zod',
+        importRootAlias: '@example-outputs/binance-with-zod',
       });
     }).not.toThrow();
   });

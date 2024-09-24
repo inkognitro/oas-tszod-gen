@@ -23,6 +23,7 @@
   "exclude": [
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
-    "src/templates/**"
+    "src/templates/**",
+    "example-outputs/**"
   ]
 }
