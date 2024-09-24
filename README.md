@@ -340,7 +340,7 @@ you don't have to worry about breaking changes in generated code output when upg
 
 ## Unsupported OAS3 features
 - The ["not" keyword](https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/#not) is currently not supported
-- Relative Urls or a Link to another domain for ComponentRefs is not supported.
+- Currently only "Local References" are supported for [$ref syntax](https://swagger.io/docs/specification/using-ref/)
 
 ## Out of scope
 Linting is out of scope of this package. The generator is responsible to generate valid TypeScript (and Zod) definitions.
