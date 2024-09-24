@@ -355,11 +355,7 @@ Eslint right after the `generateOas3ToTs` function was executed, e.g. with a scr
 - Relative Urls or a Link to another domain for ComponentRefs is not supported.
 
 ## Pull request policy
-If you feel the need to have a not supported feature to be implemented,
-please open a new pull request which meets the following criteria:
-- add a corresponding OAS3 specification in the `./example-specs` folder
-- add a corresponding test in `./src/oas3/specification/specification.test.ts` file
-- add a corresponding test in `./src/oas3/codegen/generate.test.ts` file
-- fix the failed tests by providing a solution
+If you feel the need to have a not supported feature to be implemented, feel free to open a new pull request.
+Please become aware of the existing pull request criteria which is defined [here](.github/pull_request_template.md).
 
 
