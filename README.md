@@ -339,6 +339,8 @@ As long as the API contract on the backend side was not violated through breakin
 you don't have to worry about breaking changes in generated code output when upgrading to the next **minor** version.
 
 ## Out of scope
+
+### Linting
 Linting is out of scope of this package. The generator is responsible to generate valid TypeScript (and Zod) definitions.
 That's what it does. Your code setup should be responsible for linting your code, so it might make sense for you to run
 Eslint right after the `generateOas3ToTs` function was executed, e.g. with a script in your `package.json` like so:
@@ -347,3 +349,12 @@ Eslint right after the `generateOas3ToTs` function was executed, e.g. with a scr
   "api:generate": "node api.generate.js && eslint --fix ./generated-api"
 }
 ```
+
+### OAS3 "not" keyword
+The [OAS3 "not" keyword](https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/#not) is currently not supported. 
+If you wish to have this feature implemented, feel free to open a new issue with the corresponding OAS3 specification
+in the "example-specs" folder.
+The reason for this is that with TS and Zod it is more to describe what's wanted instead of something like
+"any but this".
+
+
