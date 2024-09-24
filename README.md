@@ -352,6 +352,6 @@ Eslint right after the `generateOas3ToTs` function was executed, e.g. with a scr
 }
 ```
 
-## Pull request policy
+## Pull request
 If you think an unsupported feature needs to be implemented, feel free to open a new pull request.
 Please refer to the existing pull request criteria defined [here](.github/pull_request_template.md).
