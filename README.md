@@ -354,7 +354,5 @@ Eslint right after the `generateOas3ToTs` function was executed, e.g. with a scr
 The [OAS3 "not" keyword](https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/#not) is currently not supported. 
 If you wish to have this feature implemented, feel free to open a new issue with the corresponding OAS3 specification
 in the "example-specs" folder.
-The reason for this is that with TS and Zod it is more to describe what's wanted instead of something like
-"any but this".
 
 
