@@ -3,6 +3,7 @@ import {
   CodeGenerationOutput,
   CodeGenerator,
   ComponentRefOutput,
+  containsOutputPath,
   CreateCodeFunc,
   objectSchemaAdditionalPropsOutputPathPart,
   OutputPath,
@@ -34,6 +35,7 @@ import {
 } from '@/oas3/specification';
 import {templateZOfZodLibrary} from './template';
 import {GenerateConfig} from './generator';
+import {applySchema} from '@/oas3/codegen/schema';
 
 export function applyZodSchema(
   codeGenerator: CodeGenerator,
@@ -352,9 +354,7 @@ export function applyZodObjectSchema(
         );
       }
       if (!codeRows.length && additionalPropertiesDirectOutput) {
-        return `z.record(${additionalPropertiesDirectOutput.createCode(
-          path
-        )})`;
+        return `z.record(${additionalPropertiesDirectOutput.createCode(path)})`;
       }
       let zodAdditionalPropsCode = '';
       if (additionalPropertiesDirectOutput) {
@@ -375,10 +375,8 @@ function applyZodOneOfSchema(
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const itemCodeOutputs: CodeGenerationOutput[] = [];
-  const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
   schema.oneOf.forEach((itemSchema, index) => {
     const itemPath: OutputPath = [...path, `${index}`];
-    requiredOutputPaths.push(itemPath);
     const itemOutput = applyZodSchema(
       codeGenerator,
       itemSchema,
@@ -392,12 +390,7 @@ function applyZodOneOfSchema(
     createCode: referencingContext => {
       const codeRows: string[] = [];
       itemCodeOutputs.forEach(directOutput => {
-        const itemComment = directOutput.codeComment
-          ? ` // ${directOutput.codeComment}`
-          : '';
-        codeRows.push(
-          `${directOutput.createCode(referencingContext)}${itemComment}`
-        );
+        codeRows.push(`${directOutput.createCode(referencingContext)}`);
       });
       if (!codeRows.length) {
         return 'z.any()';
@@ -412,7 +405,17 @@ function applyZodOneOfSchema(
       return `z.union([${codeRows.join(',')}])`;
     },
     path,
-    getRequiredOutputPaths: () => requiredOutputPaths,
+    getRequiredOutputPaths: () => {
+      const outputPaths: OutputPath[] = [templateZOfZodLibrary.path];
+      itemCodeOutputs.forEach(itemCodeOutput => {
+        itemCodeOutput.getRequiredOutputPaths().forEach(outputPath => {
+          if (!containsOutputPath(outputPaths, outputPath)) {
+            outputPaths.push(outputPath);
+          }
+        });
+      });
+      return outputPaths;
+    },
   };
 }
 
@@ -424,13 +427,11 @@ function applyZodAllOfSchema(
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const itemCodeOutputs: CodeGenerationOutput[] = [];
-  const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
   schema.allOf.forEach((itemSchema, index) => {
     if (!isSchema(itemSchema)) {
       return;
     }
     const itemPath: OutputPath = [...path, `${index}`];
-    requiredOutputPaths.push(itemPath);
     const itemOutput = applyZodSchema(
       codeGenerator,
       itemSchema,
@@ -444,12 +445,7 @@ function applyZodAllOfSchema(
     createCode: referencingContext => {
       const codeRows: string[] = [];
       itemCodeOutputs.forEach(directOutput => {
-        const itemComment = directOutput.codeComment
-          ? ` // ${directOutput.codeComment}`
-          : '';
-        codeRows.push(
-          `${directOutput.createCode(referencingContext)}${itemComment}`
-        );
+        codeRows.push(`${directOutput.createCode(referencingContext)}`);
       });
       if (!codeRows.length) {
         return 'z.any()';
@@ -460,23 +456,66 @@ function applyZodAllOfSchema(
       return `z.intersection([${codeRows.join(',')}])`;
     },
     path,
-    getRequiredOutputPaths: () => requiredOutputPaths,
+    getRequiredOutputPaths: () => {
+      const outputPaths: OutputPath[] = [templateZOfZodLibrary.path];
+      itemCodeOutputs.forEach(itemCodeOutput => {
+        itemCodeOutput.getRequiredOutputPaths().forEach(outputPath => {
+          if (!containsOutputPath(outputPaths, outputPath)) {
+            outputPaths.push(outputPath);
+          }
+        });
+      });
+      return outputPaths;
+    },
   };
 }
 
 function applyZodAnyOfSchema(
-  _codeGenerator: CodeGenerator,
-  _schema: AnyOfSchema,
+  codeGenerator: CodeGenerator,
+  schema: AnyOfSchema,
   path: OutputPath,
-  _config: GenerateConfig,
-  _preventFromAddingComponentRefs: string[] = []
+  config: GenerateConfig,
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  // todo: implement
+  const itemCodeOutputs: CodeGenerationOutput[] = [];
+  schema.anyOf.forEach((itemSchema, index) => {
+    const itemPath: OutputPath = [...path, `${index}`];
+    const itemOutput = applySchema(
+      codeGenerator,
+      itemSchema,
+      itemPath,
+      config,
+      preventFromAddingComponentRefs
+    );
+    itemCodeOutputs.push(itemOutput);
+  });
   return {
-    createCode: () => {
-      return 'z.any()';
+    createCode: referencingContext => {
+      const partialUnionCodeRows: string[] = [];
+      const unionCodeRows: string[] = [];
+      if (!itemCodeOutputs.length) {
+        return 'any';
+      }
+      itemCodeOutputs.forEach(itemCodeOutput => {
+        const itemCode = itemCodeOutput.createCode(referencingContext);
+        partialUnionCodeRows.push(`Partial<${itemCode}>`);
+        unionCodeRows.push(`${itemCode}$`);
+      });
+      const partialUnionCode = `z.union([${partialUnionCodeRows.join(',')}])`;
+      const unionCode = `z.union([${unionCodeRows.join(',')}])`;
+      return `z.intersection([${partialUnionCode}, ${unionCode}]);`;
     },
     path,
-    getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
+    getRequiredOutputPaths: () => {
+      const outputPaths: OutputPath[] = [templateZOfZodLibrary.path];
+      itemCodeOutputs.forEach(itemCodeOutput => {
+        itemCodeOutput.getRequiredOutputPaths().forEach(outputPath => {
+          if (!containsOutputPath(outputPaths, outputPath)) {
+            outputPaths.push(outputPath);
+          }
+        });
+      });
+      return outputPaths;
+    },
   };
 }

@@ -3,6 +3,7 @@ import {
   CodeGenerationOutput,
   CodeGenerator,
   ComponentRefOutput,
+  containsOutputPath,
   CreateCodeFunc,
   objectSchemaAdditionalPropsOutputPathPart,
   OutputPath,
@@ -22,7 +23,8 @@ import {
   isIntegerSchema,
   isNumberSchema,
   isObjectSchema,
-  isOneOfSchema, isSchema,
+  isOneOfSchema,
+  isSchema,
   isSchemaComponentRef,
   isStringSchema,
   NumberSchema,
@@ -32,6 +34,8 @@ import {
   StringSchema,
 } from '@/oas3/specification';
 import {GenerateConfig} from './generator';
+import {templateZOfZodLibrary} from '@/oas3/codegen/template';
+import {applyZodSchema} from '@/oas3/codegen/zodSchema';
 
 export function applySchema(
   codeGenerator: CodeGenerator,
@@ -322,53 +326,9 @@ function applyOneOfSchema(
   config: GenerateConfig,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  const oneOfItemDirectOutputs: CodeGenerationOutput[] = [];
-  const requiredOutputPaths: OutputPath[] = [];
+  const itemCodeOutputs: CodeGenerationOutput[] = [];
   schema.oneOf.forEach((itemSchema, index) => {
     const itemPath: OutputPath = [...path, `${index}`];
-    requiredOutputPaths.push(itemPath);
-    const itemOutput = applySchema(
-      codeGenerator,
-      itemSchema,
-      itemPath,
-      config,
-      preventFromAddingComponentRefs
-    );
-    oneOfItemDirectOutputs.push(itemOutput);
-  });
-  return {
-    createCode: referencingContext => {
-      const codeRows: string[] = [];
-      oneOfItemDirectOutputs.forEach(directOutput => {
-        const itemComment = directOutput.codeComment
-          ? ` // ${directOutput.codeComment}`
-          : '';
-        codeRows.push(
-          `${directOutput.createCode(referencingContext)}${itemComment}`
-        );
-      });
-      return `${codeRows.join('\n|')}`;
-    },
-    path,
-    getRequiredOutputPaths: () => requiredOutputPaths,
-  };
-}
-
-function applyAllOfSchema(
-  codeGenerator: CodeGenerator,
-  schema: AllOfSchema,
-  path: OutputPath,
-  config: GenerateConfig,
-  preventFromAddingComponentRefs: string[] = []
-): CodeGenerationOutput {
-  const itemCodeOutputs: CodeGenerationOutput[] = [];
-  const requiredOutputPaths: OutputPath[] = [];
-  schema.allOf.forEach((itemSchema, index) => {
-    if (!isSchema(itemSchema)) {
-      return;
-    }
-    const itemPath: OutputPath = [...path, `${index}`];
-    requiredOutputPaths.push(itemPath);
     const itemOutput = applySchema(
       codeGenerator,
       itemSchema,
@@ -381,33 +341,128 @@ function applyAllOfSchema(
   return {
     createCode: referencingContext => {
       const codeRows: string[] = [];
-      itemCodeOutputs.forEach(directOutput => {
-        const itemComment = directOutput.codeComment
-          ? ` // ${directOutput.codeComment}`
+      itemCodeOutputs.forEach(itemCodeOutput => {
+        const itemComment = itemCodeOutput.codeComment
+          ? ` // ${itemCodeOutput.codeComment}`
           : '';
         codeRows.push(
-          `${directOutput.createCode(referencingContext)}${itemComment}`
+          `${itemCodeOutput.createCode(referencingContext)}${itemComment}`
+        );
+      });
+      return `${codeRows.join('\n|')}`;
+    },
+    path,
+    getRequiredOutputPaths: () => {
+      const outputPaths: OutputPath[] = [];
+      itemCodeOutputs.forEach(itemCodeOutput => {
+        itemCodeOutput.getRequiredOutputPaths().forEach(outputPath => {
+          if (!containsOutputPath(outputPaths, outputPath)) {
+            outputPaths.push(outputPath);
+          }
+        });
+      });
+      return outputPaths;
+    },
+  };
+}
+
+function applyAllOfSchema(
+  codeGenerator: CodeGenerator,
+  schema: AllOfSchema,
+  path: OutputPath,
+  config: GenerateConfig,
+  preventFromAddingComponentRefs: string[] = []
+): CodeGenerationOutput {
+  const itemCodeOutputs: CodeGenerationOutput[] = [];
+  schema.allOf.forEach((itemSchema, index) => {
+    if (!isSchema(itemSchema)) {
+      return;
+    }
+    const itemPath: OutputPath = [...path, `${index}`];
+    const itemOutput = applySchema(
+      codeGenerator,
+      itemSchema,
+      itemPath,
+      config,
+      preventFromAddingComponentRefs
+    );
+    itemCodeOutputs.push(itemOutput);
+  });
+  return {
+    createCode: referencingContext => {
+      const codeRows: string[] = [];
+      itemCodeOutputs.forEach(itemCodeOutput => {
+        const itemComment = itemCodeOutput.codeComment
+          ? ` // ${itemCodeOutput.codeComment}`
+          : '';
+        codeRows.push(
+          `${itemCodeOutput.createCode(referencingContext)}${itemComment}`
         );
       });
       return `${codeRows.join('\n&')}`;
     },
     path,
-    getRequiredOutputPaths: () => requiredOutputPaths,
+    getRequiredOutputPaths: () => {
+      const outputPaths: OutputPath[] = [];
+      itemCodeOutputs.forEach(itemCodeOutput => {
+        itemCodeOutput.getRequiredOutputPaths().forEach(outputPath => {
+          if (!containsOutputPath(outputPaths, outputPath)) {
+            outputPaths.push(outputPath);
+          }
+        });
+      });
+      return outputPaths;
+    },
   };
 }
 
 function applyAnyOfSchema(
-  _codeGenerator: CodeGenerator,
-  _schema: AnyOfSchema,
+  codeGenerator: CodeGenerator,
+  schema: AnyOfSchema,
   path: OutputPath,
-  _config: GenerateConfig,
-  _preventFromAddingComponentRefs: string[] = []
+  config: GenerateConfig,
+  preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  // todo: implement
-  const requiredOutputPaths: OutputPath[] = [];
+  const itemCodeOutputs: CodeGenerationOutput[] = [];
+  schema.anyOf.forEach((itemSchema, index) => {
+    const itemPath: OutputPath = [...path, `${index}`];
+    const itemOutput = applySchema(
+      codeGenerator,
+      itemSchema,
+      itemPath,
+      config,
+      preventFromAddingComponentRefs
+    );
+    itemCodeOutputs.push(itemOutput);
+  });
   return {
-    createCode: () => 'any',
+    createCode: referencingContext => {
+      const partialUnionCodeRows: string[] = [];
+      const unionCodeRows: string[] = [];
+      if (!itemCodeOutputs.length) {
+        return 'any';
+      }
+      itemCodeOutputs.forEach(itemCodeOutput => {
+        const itemComment = itemCodeOutput.codeComment
+          ? ` // ${itemCodeOutput.codeComment}`
+          : '';
+        const itemCode = itemCodeOutput.createCode(referencingContext);
+        partialUnionCodeRows.push(`Partial<${itemCode}>`);
+        unionCodeRows.push(`${itemCode}${itemComment}`);
+      });
+      return `(${partialUnionCodeRows.join('\n| ')}\n) & (${unionCodeRows.join('\n| ')}\n)`;
+    },
     path,
-    getRequiredOutputPaths: () => requiredOutputPaths,
+    getRequiredOutputPaths: () => {
+      const outputPaths: OutputPath[] = [];
+      itemCodeOutputs.forEach(itemCodeOutput => {
+        itemCodeOutput.getRequiredOutputPaths().forEach(outputPath => {
+          if (!containsOutputPath(outputPaths, outputPath)) {
+            outputPaths.push(outputPath);
+          }
+        });
+      });
+      return outputPaths;
+    },
   };
 }
