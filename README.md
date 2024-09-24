@@ -338,9 +338,11 @@ of an application then.
 As long as the API contract on the backend side was not violated through breaking changes,
 you don't have to worry about breaking changes in generated code output when upgrading to the next **minor** version.
 
-## Out of scope
+## Unsupported OAS3 features
+- The ["not" keyword](https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/#not) is currently not supported
+- Relative Urls or a Link to another domain for ComponentRefs is not supported.
 
-### Linting
+## Out of scope
 Linting is out of scope of this package. The generator is responsible to generate valid TypeScript (and Zod) definitions.
 That's what it does. Your code setup should be responsible for linting your code, so it might make sense for you to run
 Eslint right after the `generateOas3ToTs` function was executed, e.g. with a script in your `package.json` like so:
@@ -349,10 +351,6 @@ Eslint right after the `generateOas3ToTs` function was executed, e.g. with a scr
   "api:generate": "node api.generate.js && eslint --fix ./generated-api"
 }
 ```
-
-### Unsupported OAS3 features
-- The ["not" keyword](https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/#not) is currently not supported
-- Relative Urls or a Link to another domain for ComponentRefs is not supported.
 
 ## Pull request policy
 If you think an unsupported feature needs to be implemented, feel free to open a new pull request.
