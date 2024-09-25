@@ -332,9 +332,10 @@ Zod schema definitions which are defined in the requests' `endpointSchema` prope
 It uses the [safeParse](https://zod.dev/?id=safeparse) method for this task.
 
 > :bulb: In case of "multipart/form-data" requests, you either have the possibility to submit a FormData instance or
-> to submit a plain object which then is converted to FormData before sending it to the endpoint. In both cases,
-> either when sending or receiving a FormData instance, the ZodValidationRequestHandler does skip the validation.
-> It only validates the request and response bodies if they are in the format of a plain object.
+> to submit a plain object which then is converted to FormData before sending it to the endpoint.
+> The ZodValidationRequestHandler only validates plain object request bodies and skips validation for FormData instances.
+> This also applies to response bodies which usually come as FormData objects when the content-type header is set to
+> "multipart/form-data".
 
 ## Promises: `resolve` vs `reject`
 The provided `RequestHandler` implementations distinguish between "expected" and
