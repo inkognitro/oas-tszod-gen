@@ -131,13 +131,18 @@ import {
   AxiosRequestHandler,
   AxiosRequestHandlerExecutionConfig,
   HttpBearerAuthenticationProvider,
+  ZodValidationRequestHandler,
+  ZodValidationRequestHandlerExecutionConfig,
 } from './generated-api/core';
 import { authenticate } from './generated-api/auth';
+import axios from 'axios';
+import { parse } from 'qs';
 
 declare global {
   interface RequestHandlerExecutionConfig
     extends AxiosRequestHandlerExecutionConfig,
-      AuthRequestHandlerExecutionConfig {}
+      AuthRequestHandlerExecutionConfig,
+      ZodValidationRequestHandlerExecutionConfig {}
 }
 
 let myJwtAuthAccessToken: null | string = null;
@@ -169,6 +174,8 @@ const axiosRequestHandler = new AxiosRequestHandler({
   },
 });
 
+const zodValidationWithAxiosRequestHandler = new ZodValidationRequestHandler(axiosRequestHandler);
+
 const requestHandler = new AuthRequestHandler(
   [myJwtAuthenticationProvider],
   // In case of multiple authentication providers, the order does NOT matter here.
@@ -176,19 +183,19 @@ const requestHandler = new AuthRequestHandler(
   // array, which has the same order as the defined security schemes in the OAS3 specification of that endpoint.
   // The first found token received from the "findToken" method of a supported authentication provider is
   // then added to the request headers.
-  
-  axiosRequestHandler
+
+  zodValidationWithAxiosRequestHandler
 );
 
 async function login() {
-  const optionalConfig: RequestExecutionConfig = {
+  const optionalConfig: RequestHandlerExecutionConfig = {
     refineAxiosRequestConfig: (currentConfig) => ({
       ...currentConfig,
       onUploadProgress: progressEvent => console.log('uploadProgressEvent', progressEvent)
     })
   };
   
-  const requestResult = await authenticate(
+  const result = await authenticate(
     requestHandler,
     {
       contentType: 'application/json',
@@ -200,20 +207,20 @@ async function login() {
     optionalConfig
   );
 
-  if (!requestResult.response || requestResult.response.status !== 200) {
+  if (!result.response || result.response.status !== 200) {
     console.log('Something went wrong!');
     return;
   }
 
-  // The following check is only required if the response with
-  // the status code 200 can have arbitrary content types,
-  // according to the given OAS3 specification
-  if (rr.response.contentType !== 'multipart/form-data') {
-    console.log('unsupported response body content of type FormData');
+  // The following check is only required if the response body of the response
+  // with the status code 200 can have ambiguous content types according to the
+  // given OAS3 specs.
+  if (result.response.contentType !== 'application/json') {
+    console.log('unsupported response body', result.response.body);
     return;
   }
 
-  const body = await requestResult.response.revealBody();
+  const body = await result.response.revealBody();
   myJwtAuthAccessToken = body.accessToken;
   
   console.log('Successfully logged in!');
