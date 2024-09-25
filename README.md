@@ -340,20 +340,20 @@ you don't have to worry about breaking changes in generated code output when upg
 
 ## Lacking OAS3 support
 - Although `default` is supported for response status codes,
-status code pattern matching, e.g. the status code [5XX](https://swagger.io/docs/specification/describing-responses/),
+status code pattern matching (e.g. [5XX](https://swagger.io/docs/specification/describing-responses/))
 is ignored by the generator and will not get recognized by TS.
 As of right now, it is added as a possible response having `any` status code.
-- The generated code output for the
-["not" keyword](https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/#not)
-creates `any` for TS and `z.any()` for Zod.
+- The generated code for the ["not" keyword](https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/#not)
+is `any` for TS and `z.any()` for Zod.
 - Only **Local References** are supported for [$ref syntax](https://swagger.io/docs/specification/using-ref/).
 One might collect all external `$ref` definitions and modify the specs accordingly to have only local references
-when passing the specs to the generator.
-- The `discriminator.mapping` property is ignored. It is recommended to define a single literal value in the
-discriminating property of these schemas which are used in a `oneOf` or `anyOf` schema definition having a discriminator.
+when passing them to the generator.
+- The `discriminator.mapping` property as described [here](https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/)
+is ignored. It is recommended to define a single literal value in the discriminating property of these schemas which are
+used in a `oneOf` or `anyOf` schema definition having a discriminator.
 - The `writeOnly` property described [here](https://swagger.io/docs/specification/data-models/data-types/) is ignored.
-It is anyway recommended to have separate definitions for read and write objects, especially with changing requirements
-(e.g. see [CQRS pattern](https://martinfowler.com/bliki/CQRS.html)).
+It is recommended to have separate definitions for read and write objects, especially with changing requirements
+(see also [CQRS pattern](https://martinfowler.com/bliki/CQRS.html)).
 
 ## Out of scope
 Linting is out of scope of this package. The generator is responsible to generate valid TypeScript (and Zod) definitions.
