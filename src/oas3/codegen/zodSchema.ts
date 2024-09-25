@@ -20,12 +20,14 @@ import {
   isArraySchema,
   isBooleanSchema,
   isIntegerSchema,
+  isNotSchema,
   isNumberSchema,
   isObjectSchema,
   isOneOfSchema,
   isSchema,
   isSchemaComponentRef,
   isStringSchema,
+  NotSchema,
   NumberSchema,
   ObjectSchema,
   OneOfSchema,
@@ -109,6 +111,15 @@ export function applyZodSchema(
       preventFromAddingComponentRefs
     );
   }
+  if (isNotSchema(schema)) {
+    return applyNotSchema(
+      codeGenerator,
+      schema,
+      path,
+      config,
+      preventFromAddingComponentRefs
+    );
+  }
   throw new Error(`schema not supported: ${JSON.stringify(schema)}`);
 }
 
@@ -140,53 +151,55 @@ function applyZodStringSchema(
   }
   return {
     createCode: () => {
+      let code = '';
       if (schema.enum) {
-        return `z.enum('${schema.enum.map(e => e.replaceAll("'", "\\'")).join("', '")}')`;
+        code += `z.enum('${schema.enum.map(e => e.replaceAll("'", "\\'")).join("', '")}')`;
       } else if (schema.format === 'binary') {
-        return 'z.any()';
-      }
-      let code = 'z.string()';
-      let pattern: string | null = null;
-      if (schema.format && config.findCustomStringPatternByFormat) {
-        pattern = config.findCustomStringPatternByFormat(schema.format);
-      }
-      if (!pattern && schema.pattern) {
-        pattern = schema.pattern;
-      }
-      if (pattern) {
-        code += `.regex(/${schema.pattern}/)`;
-      }
-      if (!schema.enum && !pattern && schema.format) {
-        switch (schema.format) {
-          case 'uuid':
-            code += '.uuid()';
-            break;
-          case 'date':
-            code += '.date()';
-            break;
-          case 'time':
-            code += '.time()';
-            break;
-          case 'duration':
-            code += '.duration()';
-            break;
-          case 'date-time':
-            code += '.datetime()';
-            break;
-          case 'email':
-            code += '.email()';
-            break;
-          case 'url':
-            code += '.url()';
-            break;
-          case 'ip':
-          case 'ipv4':
-          case 'ipv6':
-            code += '.ip()';
-            break;
-          case 'emoji':
-            code += '.emoji()';
-            break;
+        code += 'z.any()';
+      } else {
+        code += 'z.string()';
+        let pattern: string | null = null;
+        if (schema.format && config.findCustomStringPatternByFormat) {
+          pattern = config.findCustomStringPatternByFormat(schema.format);
+        }
+        if (!pattern && schema.pattern) {
+          pattern = schema.pattern;
+        }
+        if (pattern) {
+          code += `.regex(/${schema.pattern}/)`;
+        }
+        if (!schema.enum && !pattern && schema.format) {
+          switch (schema.format) {
+            case 'uuid':
+              code += '.uuid()';
+              break;
+            case 'date':
+              code += '.date()';
+              break;
+            case 'time':
+              code += '.time()';
+              break;
+            case 'duration':
+              code += '.duration()';
+              break;
+            case 'date-time':
+              code += '.datetime()';
+              break;
+            case 'email':
+              code += '.email()';
+              break;
+            case 'url':
+              code += '.url()';
+              break;
+            case 'ip':
+            case 'ipv4':
+            case 'ipv6':
+              code += '.ip()';
+              break;
+            case 'emoji':
+              code += '.emoji()';
+              break;
+          }
         }
       }
       if (schema.nullable) {
@@ -222,7 +235,17 @@ function applyZodArraySchema(
     : undefined;
   return {
     createCode: () => {
-      return `z.array(${itemSummary.createCode(itemOutputPath)})`;
+      const parts = [`z.array(${itemSummary.createCode(itemOutputPath)})`];
+      if (schema.minItems) {
+        parts.push(`min(${schema.minItems})`);
+      }
+      if (schema.maxItems) {
+        parts.push(`min(${schema.maxItems})`);
+      }
+      if (schema.nullable) {
+        parts.push('nullable()');
+      }
+      return parts.join('');
     },
     codeComment,
     path,
@@ -237,15 +260,18 @@ function applyZodNumberSchema(
   return {
     createCode: () => {
       let code = 'z.number().safe().finite()';
-      if (schema.minimum) {
+      if (schema.minimum !== undefined) {
         code += `.gte(${schema.minimum})`;
-      } else if (schema.exclusiveMinimum) {
+      } else if (schema.exclusiveMinimum !== undefined) {
         code += `.gt(${schema.exclusiveMinimum})`;
       }
-      if (schema.maximum) {
+      if (schema.maximum !== undefined) {
         code += `.lte(${schema.maximum})`;
-      } else if (schema.exclusiveMinimum) {
+      } else if (schema.exclusiveMinimum !== undefined) {
         code += `.lt(${schema.exclusiveMinimum})`;
+      }
+      if (schema.multipleOf !== undefined) {
+        code += `multipleOf(${schema.multipleOf})`;
       }
       if (schema.nullable) {
         code += '.nullable()';
@@ -264,15 +290,18 @@ function applyZodIntegerSchema(
   return {
     createCode: () => {
       let code = 'z.number().int().safe().finite()';
-      if (schema.minimum) {
+      if (schema.minimum !== undefined) {
         code += `.gte(${schema.minimum})`;
-      } else if (schema.exclusiveMinimum) {
+      } else if (schema.exclusiveMinimum !== undefined) {
         code += `.gt(${schema.exclusiveMinimum})`;
       }
-      if (schema.maximum) {
+      if (schema.maximum !== undefined) {
         code += `.lte(${schema.maximum})`;
-      } else if (schema.exclusiveMinimum) {
+      } else if (schema.exclusiveMinimum !== undefined) {
         code += `.lt(${schema.exclusiveMinimum})`;
+      }
+      if (schema.multipleOf !== undefined) {
+        code += `multipleOf(${schema.multipleOf})`;
       }
       if (schema.nullable) {
         code += '.nullable()';
@@ -390,13 +419,21 @@ export function applyZodObjectSchema(
         );
       }
       if (!codeRows.length && additionalPropertiesDirectOutput) {
-        return `z.record(${additionalPropertiesDirectOutput.createCode(path)})`;
+        let code = `z.record(${additionalPropertiesDirectOutput.createCode(path)})`;
+        if (schema.nullable) {
+          code += '.nullable()';
+        }
+        return code;
       }
       let zodAdditionalPropsCode = '';
       if (additionalPropertiesDirectOutput) {
         zodAdditionalPropsCode = `.catchall(${additionalPropertiesDirectOutput.createCode(path)})`;
       }
-      return `z.object({\n${codeRows.join('\n')}\n})${zodAdditionalPropsCode}`;
+      let code = `z.object({\n${codeRows.join('\n')}\n})${zodAdditionalPropsCode}`;
+      if (schema.nullable) {
+        code += '.nullable()';
+      }
+      return code;
     },
     path,
     getRequiredOutputPaths: () => requiredOutputPaths,
@@ -553,5 +590,21 @@ function applyZodAnyOfSchema(
       });
       return outputPaths;
     },
+  };
+}
+
+function applyNotSchema(
+  _codeGenerator: CodeGenerator,
+  _schema: NotSchema,
+  path: OutputPath,
+  _config: GenerateConfig,
+  _preventFromAddingComponentRefs: string[] = []
+): CodeGenerationOutput {
+  return {
+    createCode: () => {
+      return 'z.any()';
+    },
+    path,
+    getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
   };
 }

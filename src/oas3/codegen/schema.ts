@@ -20,12 +20,14 @@ import {
   isArraySchema,
   isBooleanSchema,
   isIntegerSchema,
+  isNotSchema,
   isNumberSchema,
   isObjectSchema,
   isOneOfSchema,
   isSchema,
   isSchemaComponentRef,
   isStringSchema,
+  NotSchema,
   NumberSchema,
   ObjectSchema,
   OneOfSchema,
@@ -34,8 +36,6 @@ import {
   StringSchema,
 } from '@/oas3/specification';
 import {GenerateConfig} from './generator';
-import {templateZOfZodLibrary} from '@/oas3/codegen/template';
-import {applyZodSchema} from '@/oas3/codegen/zodSchema';
 
 export function applySchema(
   codeGenerator: CodeGenerator,
@@ -110,6 +110,15 @@ export function applySchema(
       preventFromAddingComponentRefs
     );
   }
+  if (isNotSchema(schema)) {
+    return applyNotSchema(
+      codeGenerator,
+      schema,
+      path,
+      config,
+      preventFromAddingComponentRefs
+    );
+  }
   throw new Error(`schema not supported: ${JSON.stringify(schema)}`);
 }
 
@@ -140,14 +149,16 @@ function applyStringSchema(
   }
   return {
     createCode: () => {
-      let code = 'string';
+      let code = '';
       if (schema.enum && schema.enum.length > 0) {
-        code = `'${schema.enum.join("' | '")}'`;
+        code += `'${schema.enum.join("' | '")}'`;
       } else if (schema.format === 'binary') {
-        code = 'Blob';
+        code += 'Blob | any';
+      } else {
+        code += 'string';
       }
       if (schema.nullable) {
-        code = `null | ${code}`;
+        code += ' | null';
       }
       return code;
     },
@@ -179,7 +190,11 @@ function applyArraySchema(
     : undefined;
   return {
     createCode: () => {
-      return `(${itemSummary.createCode(itemOutputPath)})[]`;
+      let code = `(${itemSummary.createCode(itemOutputPath)})[]`;
+      if (schema.nullable) {
+        code += ' | null';
+      }
+      return code;
     },
     codeComment,
     path,
@@ -312,7 +327,11 @@ export function applyObjectSchema(
           )};${propComment}`
         );
       }
-      return `{\n${codeRows.join('\n')}\n}`;
+      let code = `{\n${codeRows.join('\n')}\n}`;
+      if (schema.nullable) {
+        code += ' | null';
+      }
+      return code;
     },
     path,
     getRequiredOutputPaths: () => requiredOutputPaths,
@@ -464,5 +483,21 @@ function applyAnyOfSchema(
       });
       return outputPaths;
     },
+  };
+}
+
+function applyNotSchema(
+  _codeGenerator: CodeGenerator,
+  _schema: NotSchema,
+  path: OutputPath,
+  _config: GenerateConfig,
+  _preventFromAddingComponentRefs: string[] = []
+): CodeGenerationOutput {
+  return {
+    createCode: () => {
+      return 'any';
+    },
+    path,
+    getRequiredOutputPaths: () => [],
   };
 }

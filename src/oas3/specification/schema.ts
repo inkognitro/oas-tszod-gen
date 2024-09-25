@@ -19,6 +19,7 @@ export const zConcreteSchema = z.lazy(() =>
     zOneOfSchema,
     zAllOfSchema,
     zAnyOfSchema,
+    zNotSchema,
   ])
 );
 
@@ -44,6 +45,9 @@ export const zArraySchema = z.object({
   type: z.literal('array'),
   nullable: z.boolean().optional(),
   items: zSchema,
+  uniqueItems: z.boolean().optional(),
+  minItems: z.number().int().optional(),
+  maxItems: z.number().int().optional(),
 });
 
 export type ArraySchema = z.infer<typeof zArraySchema>;
@@ -72,6 +76,7 @@ export const zObjectSchema = z.object({
   required: z.array(z.string()).optional(),
   properties: zObjectSchemaProps.optional(),
   additionalProperties: zSchema.optional(),
+  nullable: z.boolean().optional(),
 });
 
 export type ObjectSchema = z.infer<typeof zObjectSchema>;
@@ -110,8 +115,6 @@ export function isAllOfSchema(anyValue: unknown): anyValue is AllOfSchema {
   return zAllOfSchema.safeParse(anyValue).success;
 }
 
-export type OneOfSchema = z.infer<typeof zOneOfSchema>;
-
 export const zOneOfSchema = z.object({
   oneOf: z.array(zSchema),
   discriminator: z
@@ -121,11 +124,21 @@ export const zOneOfSchema = z.object({
     .optional(),
 });
 
+export type OneOfSchema = z.infer<typeof zOneOfSchema>;
+
 export function isOneOfSchema(anyValue: unknown): anyValue is OneOfSchema {
   return zOneOfSchema.safeParse(anyValue).success;
 }
 
-export type AnyOfSchema = z.infer<typeof zAnyOfSchema>;
+export const zNotSchema = z.object({
+  not: zSchema,
+});
+
+export type NotSchema = z.infer<typeof zNotSchema>;
+
+export function isNotSchema(anyValue: unknown): anyValue is NotSchema {
+  return zNotSchema.safeParse(anyValue).success;
+}
 
 export const zAnyOfSchema = z.object({
   anyOf: z.array(zSchema),
@@ -136,11 +149,11 @@ export const zAnyOfSchema = z.object({
     .optional(),
 });
 
+export type AnyOfSchema = z.infer<typeof zAnyOfSchema>;
+
 export function isAnyOfSchema(anyValue: unknown): anyValue is AnyOfSchema {
   return zAnyOfSchema.safeParse(anyValue).success;
 }
-
-export type NumberSchema = z.infer<typeof zNumberSchema>;
 
 export const zNumberSchema = z.object({
   type: z.literal('number'),
@@ -149,13 +162,14 @@ export const zNumberSchema = z.object({
   exclusiveMinimum: z.number().optional(),
   maximum: z.number().optional(),
   exclusiveMaximum: z.number().optional(),
+  multipleOf: z.number().optional(),
 });
+
+export type NumberSchema = z.infer<typeof zNumberSchema>;
 
 export function isNumberSchema(anyValue: unknown): anyValue is NumberSchema {
   return zNumberSchema.safeParse(anyValue).success;
 }
-
-export type IntegerSchema = z.infer<typeof zIntegerSchema>;
 
 export const zIntegerSchema = z.object({
   type: z.literal('integer'),
@@ -164,7 +178,10 @@ export const zIntegerSchema = z.object({
   exclusiveMinimum: z.number().optional(),
   maximum: z.number().optional(),
   exclusiveMaximum: z.number().optional(),
+  multipleOf: z.number().optional(),
 });
+
+export type IntegerSchema = z.infer<typeof zIntegerSchema>;
 
 export function isIntegerSchema(anyValue: unknown): anyValue is IntegerSchema {
   return zIntegerSchema.safeParse(anyValue).success;
