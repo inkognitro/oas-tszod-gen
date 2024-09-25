@@ -363,6 +363,7 @@ export const templateResponseBodyDataType: TemplateDefinitionOutput = {
       '// according to oas3 specs; NULL if the real "content-type" response header does not match with one defined in the specs (case in-sensitive check)',
       'contentType: ContentType | null;',
       'revealBody: () => Promise<B>;',
+      'revealBodyAsArrayBuffer: () => Promise<ArrayBuffer>;',
     ];
     return `{\n${codeParts.join('\n')}\n}`;
   },

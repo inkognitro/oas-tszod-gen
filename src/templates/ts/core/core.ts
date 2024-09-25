@@ -222,6 +222,7 @@ export type ResponseBodyData<
   // according to oas3 specs; NULL if the real "content-type" response header does not match with one defined in the specs (case in-sensitive check)
   contentType: ContentType | null;
   revealBody: () => Promise<B>;
+  revealBodyArrayBuffer: () => Promise<ArrayBuffer>;
 };
 
 export type ResponseData<

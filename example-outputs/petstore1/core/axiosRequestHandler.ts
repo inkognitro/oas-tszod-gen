@@ -45,7 +45,14 @@ class ResultResponse implements CoreResponse {
     );
     this.cookies = ResultResponse.createPlainCookies(response);
     this.revealBody = this.revealBody.bind(this);
+    this.revealBodyAsArrayBuffer = this.revealBodyAsArrayBuffer.bind(this);
     this.findHeaderValue = this.findHeaderValue.bind(this);
+  }
+
+  revealBodyAsArrayBuffer(): Promise<ArrayBuffer> {
+    return new Promise(resolve => {
+      resolve(this.response.data);
+    });
   }
 
   revealBody(): Promise<ResponseBody> {

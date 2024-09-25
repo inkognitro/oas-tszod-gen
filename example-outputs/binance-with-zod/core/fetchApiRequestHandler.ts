@@ -60,6 +60,7 @@ class ResultResponse implements CoreResponse {
     );
     this.cookies = ResultResponse.createPlainCookies(response);
     this.revealBody = this.revealBody.bind(this);
+    this.revealBodyAsArrayBuffer = this.revealBodyAsArrayBuffer.bind(this);
   }
 
   private static findMatchingSchemaContentType(
@@ -98,6 +99,10 @@ class ResultResponse implements CoreResponse {
       cookies[cookieName] = setCookieHeader;
     });
     return cookies;
+  }
+
+  revealBodyAsArrayBuffer(): Promise<ArrayBuffer> {
+    return this.response.clone().arrayBuffer();
   }
 
   revealBody(): Promise<ResponseBody> {
