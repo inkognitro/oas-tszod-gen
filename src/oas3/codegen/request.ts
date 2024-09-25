@@ -32,7 +32,7 @@ function applyRequestBodyContent(
     config
   );
   let formDataTypeDefinitionOutput: null | DefinitionOutput = null;
-  if (contentType.toLowerCase() === 'multipart/form-data') {
+  if (contentType.toLowerCase().match(/multipart\/form-data;?.*/)) {
     const pathForFormData = [...parentPath, 'FormData'];
     formDataTypeDefinitionOutput = applyNullableFormDataTypeDefinition(
       codeGenerator,

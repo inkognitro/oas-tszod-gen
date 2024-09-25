@@ -77,13 +77,9 @@ function applyResponseBodyContent(
   parentPath: OutputPath,
   config: GenerateConfig
 ): ApplyResponseBodyResult {
-  const formDataContentTypes = [
-    'application/x-www-form-urlencoded',
-    'multipart/form-data',
-  ];
-  if (formDataContentTypes.includes(contentType.toLowerCase())) {
+  if (contentType.toLowerCase().match(/multipart\/form-data;?.*/)) {
     const pathForFormData = [...parentPath, 'FormData'];
-    const typedFormData = applyNullableFormDataTypeDefinition(
+    const formDataTypeDefinition = applyNullableFormDataTypeDefinition(
       codeGenerator,
       contentSchema.schema,
       pathForFormData,
@@ -94,14 +90,14 @@ function applyResponseBodyContent(
       codeOutput: {
         path: pathForFormData,
         createCode: referencingPath => {
-          if (typedFormData) {
-            return typedFormData.createName(referencingPath);
+          if (formDataTypeDefinition) {
+            return formDataTypeDefinition.createName(referencingPath);
           }
           return 'FormData';
         },
         getRequiredOutputPaths: () => {
-          if (typedFormData) {
-            return [typedFormData.path];
+          if (formDataTypeDefinition) {
+            return [formDataTypeDefinition.path];
           }
           return [];
         },
