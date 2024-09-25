@@ -355,7 +355,7 @@ As of right now, it is added as a possible response having `any` status code.
 is `any` for TS and `z.any()` for Zod.
 - Only **Local References** are supported for [$ref syntax](https://swagger.io/docs/specification/using-ref/).
 One might collect all external `$ref` definitions and modify the specs accordingly to have only local references
-when passing them to the generator.
+when passing the specs to the generator.
 - The `discriminator.mapping` property - as described
 [here](https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/) is ignored.
 It is recommended to define the discriminating literal value directly in the schemas which are referenced in
