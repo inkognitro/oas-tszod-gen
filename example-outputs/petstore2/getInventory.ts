@@ -4,7 +4,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore2/core';
@@ -41,7 +41,7 @@ export type GetInventoryRequestResult = RequestResult<
 >;
 
 export function getInventory(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetInventoryRequestResult> {
   return requestHandler.execute(

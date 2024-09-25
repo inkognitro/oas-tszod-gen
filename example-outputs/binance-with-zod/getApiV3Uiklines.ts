@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -109,7 +109,7 @@ export type GetApiV3UiklinesRequestResult = RequestResult<
 >;
 
 export function getApiV3Uiklines(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetApiV3UiklinesPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3UiklinesRequestResult> {

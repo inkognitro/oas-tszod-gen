@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -105,7 +105,7 @@ export type GetSapiV1NftHistoryWithdrawRequestResult = RequestResult<
 >;
 
 export function getSapiV1NftHistoryWithdraw(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1NftHistoryWithdrawPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1NftHistoryWithdrawRequestResult> {

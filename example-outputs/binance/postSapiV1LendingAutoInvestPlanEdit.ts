@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -91,7 +91,7 @@ export type PostSapiV1LendingAutoInvestPlanEditRequestResult = RequestResult<
 >;
 
 export function postSapiV1LendingAutoInvestPlanEdit(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1LendingAutoInvestPlanEditPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingAutoInvestPlanEditRequestResult> {

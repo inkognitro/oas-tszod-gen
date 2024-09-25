@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -66,7 +66,7 @@ export type PostSapiV1SubAccountTransferSubtosubRequestResult = RequestResult<
 >;
 
 export function postSapiV1SubAccountTransferSubtosub(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1SubAccountTransferSubtosubPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountTransferSubtosubRequestResult> {

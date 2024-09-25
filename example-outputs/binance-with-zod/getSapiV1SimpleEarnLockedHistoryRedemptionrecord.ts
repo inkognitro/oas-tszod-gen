@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -116,7 +116,7 @@ export type GetSapiV1SimpleEarnLockedHistoryRedemptionrecordRequestResult =
   >;
 
 export function getSapiV1SimpleEarnLockedHistoryRedemptionrecord(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1SimpleEarnLockedHistoryRedemptionrecordPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedHistoryRedemptionrecordRequestResult> {

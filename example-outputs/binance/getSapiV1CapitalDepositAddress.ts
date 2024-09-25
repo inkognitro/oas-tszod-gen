@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -68,7 +68,7 @@ export type GetSapiV1CapitalDepositAddressRequestResult = RequestResult<
 >;
 
 export function getSapiV1CapitalDepositAddress(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1CapitalDepositAddressPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalDepositAddressRequestResult> {

@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -67,7 +67,7 @@ export type DeleteSapiV1AlgoSpotOrderRequestResult = RequestResult<
 >;
 
 export function deleteSapiV1AlgoSpotOrder(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: DeleteSapiV1AlgoSpotOrderPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1AlgoSpotOrderRequestResult> {

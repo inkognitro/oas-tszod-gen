@@ -260,11 +260,14 @@ export interface RequestResult<
 
 export interface RequestHandlerExecutionConfig {}
 
-export interface RequestHandler {
+export interface SimpleRequestHandler {
   execute(
     request: Request,
     config?: RequestHandlerExecutionConfig
   ): Promise<RequestResult>;
+}
+
+export interface RequestHandler extends SimpleRequestHandler {
   cancelRequestById(requestId: string): void;
   cancelAllRequests(): void;
 }

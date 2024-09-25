@@ -13,7 +13,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore1/core';
@@ -60,7 +60,7 @@ export type GetBulkAccessURLRequestResult = RequestResult<
 >;
 
 export function getBulkAccessURL(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetBulkAccessURLPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetBulkAccessURLRequestResult> {

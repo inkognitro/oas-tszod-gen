@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -65,7 +65,7 @@ export type PostSapiV1SimpleEarnLockedRedeemRequestResult = RequestResult<
 >;
 
 export function postSapiV1SimpleEarnLockedRedeem(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1SimpleEarnLockedRedeemPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnLockedRedeemRequestResult> {

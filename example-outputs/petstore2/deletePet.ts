@@ -4,7 +4,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore2/core';
@@ -37,7 +37,7 @@ export type DeletePetResponse = Response<400, any>;
 export type DeletePetRequestResult = RequestResult<Request, DeletePetResponse>;
 
 export function deletePet(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: DeletePetPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeletePetRequestResult> {

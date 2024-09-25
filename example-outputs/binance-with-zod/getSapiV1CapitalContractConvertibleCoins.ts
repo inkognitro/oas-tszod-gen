@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -74,7 +74,7 @@ export type GetSapiV1CapitalContractConvertibleCoinsRequestResult =
   RequestResult<Request, GetSapiV1CapitalContractConvertibleCoinsResponse>;
 
 export function getSapiV1CapitalContractConvertibleCoins(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalContractConvertibleCoinsRequestResult> {
   return requestHandler.execute(

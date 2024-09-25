@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -66,7 +66,7 @@ export type PostSapiV1EthStakingWbethWrapRequestResult = RequestResult<
 >;
 
 export function postSapiV1EthStakingWbethWrap(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1EthStakingWbethWrapPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1EthStakingWbethWrapRequestResult> {

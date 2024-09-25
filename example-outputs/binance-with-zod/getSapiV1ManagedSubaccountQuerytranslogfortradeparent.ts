@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -119,7 +119,7 @@ export type GetSapiV1ManagedSubaccountQuerytranslogfortradeparentRequestResult =
   >;
 
 export function getSapiV1ManagedSubaccountQuerytranslogfortradeparent(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1ManagedSubaccountQuerytranslogfortradeparentPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountQuerytranslogfortradeparentRequestResult> {

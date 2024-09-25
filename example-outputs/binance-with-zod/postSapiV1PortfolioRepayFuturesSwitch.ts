@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -79,7 +79,7 @@ export type PostSapiV1PortfolioRepayFuturesSwitchRequestResult = RequestResult<
 >;
 
 export function postSapiV1PortfolioRepayFuturesSwitch(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1PortfolioRepayFuturesSwitchPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1PortfolioRepayFuturesSwitchRequestResult> {

@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -66,7 +66,7 @@ export type GetSapiV1MarginMaxborrowableRequestResult = RequestResult<
 >;
 
 export function getSapiV1MarginMaxborrowable(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1MarginMaxborrowablePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginMaxborrowableRequestResult> {

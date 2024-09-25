@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -103,7 +103,7 @@ export type GetSapiV1ConvertLimitQueryopenordersRequestResult = RequestResult<
 >;
 
 export function getSapiV1ConvertLimitQueryopenorders(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1ConvertLimitQueryopenordersPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ConvertLimitQueryopenordersRequestResult> {

@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -58,7 +58,7 @@ export type GetApiV3DepthRequestResult = RequestResult<
 >;
 
 export function getApiV3Depth(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetApiV3DepthPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3DepthRequestResult> {

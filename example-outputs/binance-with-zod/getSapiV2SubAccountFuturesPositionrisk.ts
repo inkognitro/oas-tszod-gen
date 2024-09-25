@@ -13,7 +13,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -87,7 +87,7 @@ export type GetSapiV2SubAccountFuturesPositionriskRequestResult = RequestResult<
 >;
 
 export function getSapiV2SubAccountFuturesPositionrisk(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV2SubAccountFuturesPositionriskPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2SubAccountFuturesPositionriskRequestResult> {

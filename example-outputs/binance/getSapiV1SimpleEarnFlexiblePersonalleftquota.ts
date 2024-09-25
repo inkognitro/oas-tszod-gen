@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -62,7 +62,7 @@ export type GetSapiV1SimpleEarnFlexiblePersonalleftquotaRequestResult =
   RequestResult<Request, GetSapiV1SimpleEarnFlexiblePersonalleftquotaResponse>;
 
 export function getSapiV1SimpleEarnFlexiblePersonalleftquota(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1SimpleEarnFlexiblePersonalleftquotaPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexiblePersonalleftquotaRequestResult> {

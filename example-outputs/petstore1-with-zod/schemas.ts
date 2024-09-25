@@ -171,8 +171,8 @@ export const drsObjectZodSchema = z.object({
   updated_time: z.string().datetime().optional(), // date-time
   version: z.string().optional(),
   mime_type: z.string().optional(),
-  checksums: z.array(checksumZodSchema),
-  access_methods: z.array(accessMethodZodSchema).optional(),
+  checksums: z.array(checksumZodSchema).min(1),
+  access_methods: z.array(accessMethodZodSchema).min(1).optional(),
   contents: z.array(contentsObjectZodSchema).optional(),
   description: z.string().optional(),
   aliases: z.array(z.string()).optional(),

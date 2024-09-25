@@ -11,7 +11,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore1/core';
@@ -53,7 +53,7 @@ export type PostObjectRequestResult = RequestResult<
 >;
 
 export function postObject(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostObjectPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostObjectRequestResult> {

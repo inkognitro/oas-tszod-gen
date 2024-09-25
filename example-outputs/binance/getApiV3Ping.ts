@@ -4,7 +4,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -34,7 +34,7 @@ export type GetApiV3PingRequestResult = RequestResult<
 >;
 
 export function getApiV3Ping(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3PingRequestResult> {
   return requestHandler.execute(

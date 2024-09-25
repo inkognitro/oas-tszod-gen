@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -95,7 +95,7 @@ export type PostSapiV1GiftcardCreatecodeRequestResult = RequestResult<
 >;
 
 export function postSapiV1GiftcardCreatecode(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1GiftcardCreatecodePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1GiftcardCreatecodeRequestResult> {

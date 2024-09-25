@@ -228,6 +228,34 @@ export const templateRequestResultType: TemplateDefinitionOutput = {
   getRequiredOutputPaths: () => [],
 };
 
+const templateSimpleRequestHandlerTypePath = [
+  'core',
+  'core',
+  'simpleRequestHandler',
+];
+export const templateSimpleRequestHandlerType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'interface',
+  path: templateSimpleRequestHandlerTypePath,
+  createName: () => {
+    return 'SimpleRequestHandler';
+  },
+  createCode: () => {
+    return `{\nexecute(request: ${templateRequestType.createName(
+      templateSimpleRequestHandlerTypePath
+    )}, config?: ${templateRequestHandlerExecutionConfigType.createName(
+      templateSimpleRequestHandlerTypePath
+    )}): Promise<${templateRequestResultType.createName(
+      templateSimpleRequestHandlerTypePath
+    )}>\n}`;
+  },
+  getRequiredOutputPaths: () => [
+    templateRequestType.path,
+    templateRequestHandlerExecutionConfigType.path,
+    templateRequestResultType.path,
+  ],
+};
+
 const templateRequestHandlerTypePath = ['core', 'core', 'requestHandler'];
 export const templateRequestHandlerType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
@@ -237,15 +265,12 @@ export const templateRequestHandlerType: TemplateDefinitionOutput = {
     return 'RequestHandler';
   },
   createCode: () => {
-    return `{\nexecute(request: ${templateRequestType.createName(
+    return `extends ${templateSimpleRequestHandlerType.createName(
       templateRequestHandlerTypePath
-    )}, config?: ${templateRequestHandlerExecutionConfigType.createName(
-      templateRequestHandlerTypePath
-    )}): Promise<${templateRequestResultType.createName(
-      templateRequestHandlerTypePath
-    )}>\ncancelRequestById(requestId: string): void;\ncancelAllRequests(): void;\n}`;
+    )} {\ncancelRequestById(requestId: string): void;\ncancelAllRequests(): void;\n}`;
   },
   getRequiredOutputPaths: () => [
+    templateSimpleRequestHandlerType.path,
     templateRequestType.path,
     templateRequestHandlerExecutionConfigType.path,
     templateRequestResultType.path,
@@ -748,5 +773,6 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateResponseType,
   templateRequestResultType,
   templateRequestHandlerExecutionConfigType,
+  templateSimpleRequestHandlerType,
   templateRequestHandlerType,
 ];

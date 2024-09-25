@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -70,7 +70,7 @@ export type GetSapiV1FuturesHistdatalinkRequestResult = RequestResult<
 >;
 
 export function getSapiV1FuturesHistdatalink(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1FuturesHistdatalinkPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1FuturesHistdatalinkRequestResult> {

@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -51,7 +51,7 @@ export type PostSapiV1AccountDisablefastwithdrawswitchRequestResult =
   RequestResult<Request, PostSapiV1AccountDisablefastwithdrawswitchResponse>;
 
 export function postSapiV1AccountDisablefastwithdrawswitch(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1AccountDisablefastwithdrawswitchPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AccountDisablefastwithdrawswitchRequestResult> {

@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -101,7 +101,7 @@ export type GetSapiV1BlvtRedeemRecordRequestResult = RequestResult<
 >;
 
 export function getSapiV1BlvtRedeemRecord(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1BlvtRedeemRecordPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1BlvtRedeemRecordRequestResult> {

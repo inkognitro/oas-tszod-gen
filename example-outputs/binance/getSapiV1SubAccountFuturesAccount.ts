@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -89,7 +89,7 @@ export type GetSapiV1SubAccountFuturesAccountRequestResult = RequestResult<
 >;
 
 export function getSapiV1SubAccountFuturesAccount(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1SubAccountFuturesAccountPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountFuturesAccountRequestResult> {

@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -70,7 +70,7 @@ export type GetSapiV1NftUserGetassetRequestResult = RequestResult<
 >;
 
 export function getSapiV1NftUserGetasset(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1NftUserGetassetPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1NftUserGetassetRequestResult> {

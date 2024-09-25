@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -115,7 +115,7 @@ export type PostApiV3OrderOcoRequestResult = RequestResult<
 >;
 
 export function postApiV3OrderOco(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostApiV3OrderOcoPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3OrderOcoRequestResult> {

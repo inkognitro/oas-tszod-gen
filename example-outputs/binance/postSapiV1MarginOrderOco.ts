@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -113,7 +113,7 @@ export type PostSapiV1MarginOrderOcoRequestResult = RequestResult<
 >;
 
 export function postSapiV1MarginOrderOco(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1MarginOrderOcoPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginOrderOcoRequestResult> {

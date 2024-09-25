@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -81,7 +81,7 @@ export type PostSapiV1DciProductAuto_compoundEditStatusRequestResult =
   RequestResult<Request, PostSapiV1DciProductAuto_compoundEditStatusResponse>;
 
 export function postSapiV1DciProductAuto_compoundEditStatus(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1DciProductAuto_compoundEditStatusPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1DciProductAuto_compoundEditStatusRequestResult> {

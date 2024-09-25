@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -105,7 +105,7 @@ export type GetSapiV1SubAccountTransferSubuserhistoryRequestResult =
   RequestResult<Request, GetSapiV1SubAccountTransferSubuserhistoryResponse>;
 
 export function getSapiV1SubAccountTransferSubuserhistory(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1SubAccountTransferSubuserhistoryPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountTransferSubuserhistoryRequestResult> {

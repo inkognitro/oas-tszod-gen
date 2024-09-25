@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -78,7 +78,7 @@ export type PostSapiV1PortfolioRepayFuturesNegativeBalanceRequestResult =
   >;
 
 export function postSapiV1PortfolioRepayFuturesNegativeBalance(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1PortfolioRepayFuturesNegativeBalancePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1PortfolioRepayFuturesNegativeBalanceRequestResult> {

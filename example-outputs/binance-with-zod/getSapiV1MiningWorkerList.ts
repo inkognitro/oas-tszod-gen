@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -119,7 +119,7 @@ export type GetSapiV1MiningWorkerListRequestResult = RequestResult<
 >;
 
 export function getSapiV1MiningWorkerList(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1MiningWorkerListPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MiningWorkerListRequestResult> {

@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -72,7 +72,7 @@ export type PostSapiV1AlgoSpotNewordertwapRequestResult = RequestResult<
 >;
 
 export function postSapiV1AlgoSpotNewordertwap(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1AlgoSpotNewordertwapPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AlgoSpotNewordertwapRequestResult> {

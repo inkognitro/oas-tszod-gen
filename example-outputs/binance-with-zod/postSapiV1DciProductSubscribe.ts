@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -109,7 +109,7 @@ export type PostSapiV1DciProductSubscribeRequestResult = RequestResult<
 >;
 
 export function postSapiV1DciProductSubscribe(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1DciProductSubscribePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1DciProductSubscribeRequestResult> {

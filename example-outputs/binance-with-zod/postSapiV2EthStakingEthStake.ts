@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -83,7 +83,7 @@ export type PostSapiV2EthStakingEthStakeRequestResult = RequestResult<
 >;
 
 export function postSapiV2EthStakingEthStake(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV2EthStakingEthStakePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV2EthStakingEthStakeRequestResult> {

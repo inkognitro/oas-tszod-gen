@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -53,7 +53,7 @@ export type PutApiV3UserdatastreamRequestResult = RequestResult<
 >;
 
 export function putApiV3Userdatastream(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PutApiV3UserdatastreamPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PutApiV3UserdatastreamRequestResult> {

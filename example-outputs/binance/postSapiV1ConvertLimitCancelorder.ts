@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -65,7 +65,7 @@ export type PostSapiV1ConvertLimitCancelorderRequestResult = RequestResult<
 >;
 
 export function postSapiV1ConvertLimitCancelorder(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1ConvertLimitCancelorderPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ConvertLimitCancelorderRequestResult> {

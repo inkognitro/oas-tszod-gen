@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -87,7 +87,7 @@ export type GetApiV3RatelimitOrderRequestResult = RequestResult<
 >;
 
 export function getApiV3RatelimitOrder(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetApiV3RatelimitOrderPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3RatelimitOrderRequestResult> {

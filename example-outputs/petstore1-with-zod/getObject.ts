@@ -12,7 +12,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore1-with-zod/core';
@@ -60,7 +60,7 @@ export type GetObjectResponse =
 export type GetObjectRequestResult = RequestResult<Request, GetObjectResponse>;
 
 export function getObject(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetObjectPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetObjectRequestResult> {

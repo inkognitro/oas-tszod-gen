@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -73,7 +73,7 @@ export type GetSapiV1ConvertOrderstatusRequestResult = RequestResult<
 >;
 
 export function getSapiV1ConvertOrderstatus(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1ConvertOrderstatusPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ConvertOrderstatusRequestResult> {

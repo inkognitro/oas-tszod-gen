@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -85,7 +85,7 @@ export type GetSapiV1C2cOrdermatchListuserorderhistoryRequestResult =
   RequestResult<Request, GetSapiV1C2cOrdermatchListuserorderhistoryResponse>;
 
 export function getSapiV1C2cOrdermatchListuserorderhistory(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1C2cOrdermatchListuserorderhistoryPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1C2cOrdermatchListuserorderhistoryRequestResult> {

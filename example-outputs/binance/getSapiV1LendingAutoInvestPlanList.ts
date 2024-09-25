@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -91,7 +91,7 @@ export type GetSapiV1LendingAutoInvestPlanListRequestResult = RequestResult<
 >;
 
 export function getSapiV1LendingAutoInvestPlanList(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1LendingAutoInvestPlanListPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestPlanListRequestResult> {

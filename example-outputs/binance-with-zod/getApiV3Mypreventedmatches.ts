@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -105,7 +105,7 @@ export type GetApiV3MypreventedmatchesRequestResult = RequestResult<
 >;
 
 export function getApiV3Mypreventedmatches(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetApiV3MypreventedmatchesPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3MypreventedmatchesRequestResult> {

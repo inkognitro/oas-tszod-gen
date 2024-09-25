@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -56,7 +56,7 @@ export type GetSapiV1BnbburnRequestResult = RequestResult<
 >;
 
 export function getSapiV1Bnbburn(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1BnbburnPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1BnbburnRequestResult> {

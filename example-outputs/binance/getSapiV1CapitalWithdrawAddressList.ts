@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -62,7 +62,7 @@ export type GetSapiV1CapitalWithdrawAddressListRequestResult = RequestResult<
 >;
 
 export function getSapiV1CapitalWithdrawAddressList(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalWithdrawAddressListRequestResult> {
   return requestHandler.execute(

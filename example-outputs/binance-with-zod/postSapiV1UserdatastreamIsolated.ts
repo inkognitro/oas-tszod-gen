@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -46,7 +46,7 @@ export type PostSapiV1UserdatastreamIsolatedRequestResult = RequestResult<
 >;
 
 export function postSapiV1UserdatastreamIsolated(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1UserdatastreamIsolatedRequestResult> {
   return requestHandler.execute(

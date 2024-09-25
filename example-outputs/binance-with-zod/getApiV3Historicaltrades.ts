@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -51,7 +51,7 @@ export type GetApiV3HistoricaltradesRequestResult = RequestResult<
 >;
 
 export function getApiV3Historicaltrades(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetApiV3HistoricaltradesPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3HistoricaltradesRequestResult> {

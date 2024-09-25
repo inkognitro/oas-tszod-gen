@@ -13,7 +13,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -67,7 +67,7 @@ export type GetApiV3TickerPriceRequestResult = RequestResult<
 >;
 
 export function getApiV3TickerPrice(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetApiV3TickerPricePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3TickerPriceRequestResult> {

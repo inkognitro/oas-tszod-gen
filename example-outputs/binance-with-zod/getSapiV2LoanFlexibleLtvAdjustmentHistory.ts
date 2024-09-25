@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -107,7 +107,7 @@ export type GetSapiV2LoanFlexibleLtvAdjustmentHistoryRequestResult =
   RequestResult<Request, GetSapiV2LoanFlexibleLtvAdjustmentHistoryResponse>;
 
 export function getSapiV2LoanFlexibleLtvAdjustmentHistory(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV2LoanFlexibleLtvAdjustmentHistoryPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2LoanFlexibleLtvAdjustmentHistoryRequestResult> {

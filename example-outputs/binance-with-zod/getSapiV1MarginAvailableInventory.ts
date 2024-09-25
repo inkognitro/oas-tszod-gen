@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -89,7 +89,7 @@ export type GetSapiV1MarginAvailableInventoryRequestResult = RequestResult<
 >;
 
 export function getSapiV1MarginAvailableInventory(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1MarginAvailableInventoryPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginAvailableInventoryRequestResult> {

@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -79,7 +79,7 @@ export type PostSapiV1LendingCustomizedfixedPurchaseRequestResult =
   RequestResult<Request, PostSapiV1LendingCustomizedfixedPurchaseResponse>;
 
 export function postSapiV1LendingCustomizedfixedPurchase(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1LendingCustomizedfixedPurchasePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingCustomizedfixedPurchaseRequestResult> {

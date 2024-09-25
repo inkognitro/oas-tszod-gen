@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -80,7 +80,7 @@ export type GetSapiV1MarginForceliquidationrecRequestResult = RequestResult<
 >;
 
 export function getSapiV1MarginForceliquidationrec(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1MarginForceliquidationrecPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginForceliquidationrecRequestResult> {

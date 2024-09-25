@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -99,7 +99,7 @@ export type PostSapiV1ConvertGetquoteRequestResult = RequestResult<
 >;
 
 export function postSapiV1ConvertGetquote(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1ConvertGetquotePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ConvertGetquoteRequestResult> {

@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -57,7 +57,7 @@ export type GetSapiV1MarginLeveragebracketRequestResult = RequestResult<
 >;
 
 export function getSapiV1MarginLeveragebracket(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginLeveragebracketRequestResult> {
   return requestHandler.execute(

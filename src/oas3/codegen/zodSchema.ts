@@ -237,13 +237,13 @@ function applyZodArraySchema(
     createCode: () => {
       const parts = [`z.array(${itemSummary.createCode(itemOutputPath)})`];
       if (schema.minItems) {
-        parts.push(`min(${schema.minItems})`);
+        parts.push(`.min(${schema.minItems})`);
       }
       if (schema.maxItems) {
-        parts.push(`min(${schema.maxItems})`);
+        parts.push(`.min(${schema.maxItems})`);
       }
       if (schema.nullable) {
-        parts.push('nullable()');
+        parts.push('.nullable()');
       }
       return parts.join('');
     },

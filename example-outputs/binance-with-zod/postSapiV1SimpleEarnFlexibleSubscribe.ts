@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -87,7 +87,7 @@ export type PostSapiV1SimpleEarnFlexibleSubscribeRequestResult = RequestResult<
 >;
 
 export function postSapiV1SimpleEarnFlexibleSubscribe(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1SimpleEarnFlexibleSubscribePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnFlexibleSubscribeRequestResult> {

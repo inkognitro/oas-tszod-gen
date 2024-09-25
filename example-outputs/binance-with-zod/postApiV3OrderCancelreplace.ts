@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -210,7 +210,7 @@ export type PostApiV3OrderCancelreplaceRequestResult = RequestResult<
 >;
 
 export function postApiV3OrderCancelreplace(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostApiV3OrderCancelreplacePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3OrderCancelreplaceRequestResult> {

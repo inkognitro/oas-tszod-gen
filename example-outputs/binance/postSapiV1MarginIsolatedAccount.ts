@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -65,7 +65,7 @@ export type PostSapiV1MarginIsolatedAccountRequestResult = RequestResult<
 >;
 
 export function postSapiV1MarginIsolatedAccount(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1MarginIsolatedAccountPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginIsolatedAccountRequestResult> {

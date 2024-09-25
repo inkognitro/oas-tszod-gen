@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -67,7 +67,7 @@ export type GetSapiV1MarginExchangeSmallLiabilityRequestResult = RequestResult<
 >;
 
 export function getSapiV1MarginExchangeSmallLiability(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1MarginExchangeSmallLiabilityPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginExchangeSmallLiabilityRequestResult> {

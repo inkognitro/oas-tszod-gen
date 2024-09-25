@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -46,7 +46,7 @@ export type GetApiV3TradesRequestResult = RequestResult<
 >;
 
 export function getApiV3Trades(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetApiV3TradesPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3TradesRequestResult> {

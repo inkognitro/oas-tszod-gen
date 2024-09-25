@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -75,7 +75,7 @@ export type GetSapiV1AssetAssetdividendRequestResult = RequestResult<
 >;
 
 export function getSapiV1AssetAssetdividend(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1AssetAssetdividendPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetAssetdividendRequestResult> {

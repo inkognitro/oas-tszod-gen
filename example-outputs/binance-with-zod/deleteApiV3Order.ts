@@ -11,7 +11,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -80,7 +80,7 @@ export type DeleteApiV3OrderRequestResult = RequestResult<
 >;
 
 export function deleteApiV3Order(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: DeleteApiV3OrderPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteApiV3OrderRequestResult> {

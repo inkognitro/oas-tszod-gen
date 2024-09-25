@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -94,7 +94,7 @@ export type GetApiV3ExchangeinfoRequestResult = RequestResult<
 >;
 
 export function getApiV3Exchangeinfo(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetApiV3ExchangeinfoPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3ExchangeinfoRequestResult> {

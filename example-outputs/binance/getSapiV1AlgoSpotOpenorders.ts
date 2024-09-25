@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -78,7 +78,7 @@ export type GetSapiV1AlgoSpotOpenordersRequestResult = RequestResult<
 >;
 
 export function getSapiV1AlgoSpotOpenorders(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1AlgoSpotOpenordersPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AlgoSpotOpenordersRequestResult> {

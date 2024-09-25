@@ -12,7 +12,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore1-with-zod/core';
@@ -59,7 +59,7 @@ export type GetAccessURLRequestResult = RequestResult<
 >;
 
 export function getAccessURL(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetAccessURLPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetAccessURLRequestResult> {

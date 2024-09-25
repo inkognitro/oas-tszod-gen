@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -79,7 +79,7 @@ export type PostSapiV1MarginMaxLeverageRequestResult = RequestResult<
 >;
 
 export function postSapiV1MarginMaxLeverage(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1MarginMaxLeveragePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginMaxLeverageRequestResult> {

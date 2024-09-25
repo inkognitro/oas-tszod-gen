@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -66,7 +66,7 @@ export type PostSapiV1ManagedSubaccountDepositRequestResult = RequestResult<
 >;
 
 export function postSapiV1ManagedSubaccountDeposit(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1ManagedSubaccountDepositPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ManagedSubaccountDepositRequestResult> {

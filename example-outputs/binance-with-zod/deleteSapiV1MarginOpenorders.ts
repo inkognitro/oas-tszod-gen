@@ -13,7 +13,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -96,7 +96,7 @@ export type DeleteSapiV1MarginOpenordersRequestResult = RequestResult<
 >;
 
 export function deleteSapiV1MarginOpenorders(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: DeleteSapiV1MarginOpenordersPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1MarginOpenordersRequestResult> {

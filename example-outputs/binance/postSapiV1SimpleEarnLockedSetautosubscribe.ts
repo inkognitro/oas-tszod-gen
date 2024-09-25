@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -63,7 +63,7 @@ export type PostSapiV1SimpleEarnLockedSetautosubscribeRequestResult =
   RequestResult<Request, PostSapiV1SimpleEarnLockedSetautosubscribeResponse>;
 
 export function postSapiV1SimpleEarnLockedSetautosubscribe(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1SimpleEarnLockedSetautosubscribePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnLockedSetautosubscribeRequestResult> {

@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -46,7 +46,7 @@ export type GetApiV3TimeRequestResult = RequestResult<
 >;
 
 export function getApiV3Time(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3TimeRequestResult> {
   return requestHandler.execute(

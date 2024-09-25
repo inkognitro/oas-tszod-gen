@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -71,7 +71,7 @@ export type PostSapiV1MiningHashTransferConfigRequestResult = RequestResult<
 >;
 
 export function postSapiV1MiningHashTransferConfig(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1MiningHashTransferConfigPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MiningHashTransferConfigRequestResult> {

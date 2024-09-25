@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -73,7 +73,7 @@ export type GetSapiV1LoanCollateralDataRequestResult = RequestResult<
 >;
 
 export function getSapiV1LoanCollateralData(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1LoanCollateralDataPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanCollateralDataRequestResult> {

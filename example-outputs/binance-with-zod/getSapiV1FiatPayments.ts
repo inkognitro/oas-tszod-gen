@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -16,7 +16,7 @@ export const getSapiV1FiatPaymentsEndpointSchema = {
   method: 'get',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    transactionType: z.number().int().safe().finite().lte(1),
+    transactionType: z.number().int().safe().finite().gte(0).lte(1),
     beginTime: z.number().int().safe().finite().optional(),
     endTime: z.number().int().safe().finite().optional(),
     page: z.number().int().safe().finite().optional(),
@@ -119,7 +119,7 @@ export type GetSapiV1FiatPaymentsRequestResult = RequestResult<
 >;
 
 export function getSapiV1FiatPayments(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1FiatPaymentsPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1FiatPaymentsRequestResult> {

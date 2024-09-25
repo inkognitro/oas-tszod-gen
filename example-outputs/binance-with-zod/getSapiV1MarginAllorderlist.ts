@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -117,7 +117,7 @@ export type GetSapiV1MarginAllorderlistRequestResult = RequestResult<
 >;
 
 export function getSapiV1MarginAllorderlist(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1MarginAllorderlistPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginAllorderlistRequestResult> {

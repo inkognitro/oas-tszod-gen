@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -83,7 +83,7 @@ export type GetSapiV1AssetWalletBalanceRequestResult = RequestResult<
 >;
 
 export function getSapiV1AssetWalletBalance(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1AssetWalletBalancePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetWalletBalanceRequestResult> {

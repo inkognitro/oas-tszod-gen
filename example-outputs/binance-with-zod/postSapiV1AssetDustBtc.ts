@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -103,7 +103,7 @@ export type PostSapiV1AssetDustBtcRequestResult = RequestResult<
 >;
 
 export function postSapiV1AssetDustBtc(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1AssetDustBtcPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AssetDustBtcRequestResult> {

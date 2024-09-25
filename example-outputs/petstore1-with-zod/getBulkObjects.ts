@@ -15,7 +15,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore1-with-zod/core';
@@ -71,7 +71,7 @@ export type GetBulkObjectsRequestResult = RequestResult<
 >;
 
 export function getBulkObjects(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetBulkObjectsPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetBulkObjectsRequestResult> {

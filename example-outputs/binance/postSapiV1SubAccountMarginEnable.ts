@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -65,7 +65,7 @@ export type PostSapiV1SubAccountMarginEnableRequestResult = RequestResult<
 >;
 
 export function postSapiV1SubAccountMarginEnable(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1SubAccountMarginEnablePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountMarginEnableRequestResult> {

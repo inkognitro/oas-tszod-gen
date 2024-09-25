@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -83,7 +83,7 @@ export type PostSapiV1SubAccountBlvtEnableRequestResult = RequestResult<
 >;
 
 export function postSapiV1SubAccountBlvtEnable(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1SubAccountBlvtEnablePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountBlvtEnableRequestResult> {

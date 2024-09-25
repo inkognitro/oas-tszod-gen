@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore2/core';
@@ -63,7 +63,7 @@ export type AddPetResponse =
 export type AddPetRequestResult = RequestResult<Request, AddPetResponse>;
 
 export function addPet(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: AddPetPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<AddPetRequestResult> {

@@ -12,7 +12,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore1-with-zod/core';
@@ -59,7 +59,7 @@ export type PostAccessURLRequestResult = RequestResult<
 >;
 
 export function postAccessURL(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostAccessURLPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostAccessURLRequestResult> {

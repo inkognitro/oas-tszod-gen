@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -95,7 +95,7 @@ export type PostSapiV3AssetGetuserassetRequestResult = RequestResult<
 >;
 
 export function postSapiV3AssetGetuserasset(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV3AssetGetuserassetPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV3AssetGetuserassetRequestResult> {

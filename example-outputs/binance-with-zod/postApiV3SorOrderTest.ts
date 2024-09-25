@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -112,7 +112,7 @@ export type PostApiV3SorOrderTestRequestResult = RequestResult<
 >;
 
 export function postApiV3SorOrderTest(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostApiV3SorOrderTestPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3SorOrderTestRequestResult> {

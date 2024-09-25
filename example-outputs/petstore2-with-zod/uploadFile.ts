@@ -9,7 +9,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore2-with-zod/core';
@@ -44,7 +44,7 @@ export const uploadFileEndpointSchema = {
 
 export type UploadFileRequestBody = {
   contentType: 'application/octet-stream';
-  body: Blob;
+  body: Blob | any;
 };
 
 export type UploadFilePayload = UploadFileRequestBody & {
@@ -67,7 +67,7 @@ export type UploadFileRequestResult = RequestResult<
 >;
 
 export function uploadFile(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: UploadFilePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<UploadFileRequestResult> {

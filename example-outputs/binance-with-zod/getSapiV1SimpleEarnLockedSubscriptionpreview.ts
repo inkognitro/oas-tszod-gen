@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -101,7 +101,7 @@ export type GetSapiV1SimpleEarnLockedSubscriptionpreviewRequestResult =
   RequestResult<Request, GetSapiV1SimpleEarnLockedSubscriptionpreviewResponse>;
 
 export function getSapiV1SimpleEarnLockedSubscriptionpreview(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1SimpleEarnLockedSubscriptionpreviewPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedSubscriptionpreviewRequestResult> {

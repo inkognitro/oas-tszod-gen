@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore2-with-zod/core';
@@ -61,7 +61,7 @@ export type CreateUsersWithListInputRequestResult = RequestResult<
 >;
 
 export function createUsersWithListInput(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: CreateUsersWithListInputPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<CreateUsersWithListInputRequestResult> {

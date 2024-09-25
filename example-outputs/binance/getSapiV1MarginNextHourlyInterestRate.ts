@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -66,7 +66,7 @@ export type GetSapiV1MarginNextHourlyInterestRateRequestResult = RequestResult<
 >;
 
 export function getSapiV1MarginNextHourlyInterestRate(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1MarginNextHourlyInterestRatePayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginNextHourlyInterestRateRequestResult> {

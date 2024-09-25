@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -64,7 +64,7 @@ export type GetSapiV1ConvertAssetinfoRequestResult = RequestResult<
 >;
 
 export function getSapiV1ConvertAssetinfo(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1ConvertAssetinfoPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ConvertAssetinfoRequestResult> {

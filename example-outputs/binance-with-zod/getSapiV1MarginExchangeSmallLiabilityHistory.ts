@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -101,7 +101,7 @@ export type GetSapiV1MarginExchangeSmallLiabilityHistoryRequestResult =
   RequestResult<Request, GetSapiV1MarginExchangeSmallLiabilityHistoryResponse>;
 
 export function getSapiV1MarginExchangeSmallLiabilityHistory(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1MarginExchangeSmallLiabilityHistoryPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginExchangeSmallLiabilityHistoryRequestResult> {

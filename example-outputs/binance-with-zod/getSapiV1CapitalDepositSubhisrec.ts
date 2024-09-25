@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -111,7 +111,7 @@ export type GetSapiV1CapitalDepositSubhisrecRequestResult = RequestResult<
 >;
 
 export function getSapiV1CapitalDepositSubhisrec(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1CapitalDepositSubhisrecPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalDepositSubhisrecRequestResult> {

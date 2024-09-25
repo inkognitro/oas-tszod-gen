@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore2-with-zod/core';
@@ -42,7 +42,7 @@ export type DeleteOrderRequestResult = RequestResult<
 >;
 
 export function deleteOrder(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: DeleteOrderPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteOrderRequestResult> {

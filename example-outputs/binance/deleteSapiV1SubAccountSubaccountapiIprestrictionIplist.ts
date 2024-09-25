@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -72,7 +72,7 @@ export type DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistRequestResult 
   >;
 
 export function deleteSapiV1SubAccountSubaccountapiIprestrictionIplist(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistRequestResult> {

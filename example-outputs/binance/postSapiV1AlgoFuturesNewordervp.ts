@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -74,7 +74,7 @@ export type PostSapiV1AlgoFuturesNewordervpRequestResult = RequestResult<
 >;
 
 export function postSapiV1AlgoFuturesNewordervp(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1AlgoFuturesNewordervpPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AlgoFuturesNewordervpRequestResult> {

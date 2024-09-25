@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -72,7 +72,7 @@ export type GetSapiV1SimpleEarnFlexibleHistoryRatehistoryRequestResult =
   RequestResult<Request, GetSapiV1SimpleEarnFlexibleHistoryRatehistoryResponse>;
 
 export function getSapiV1SimpleEarnFlexibleHistoryRatehistory(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1SimpleEarnFlexibleHistoryRatehistoryPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexibleHistoryRatehistoryRequestResult> {

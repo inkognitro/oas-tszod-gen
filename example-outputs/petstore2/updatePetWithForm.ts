@@ -4,7 +4,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore2/core';
@@ -41,7 +41,7 @@ export type UpdatePetWithFormRequestResult = RequestResult<
 >;
 
 export function updatePetWithForm(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: UpdatePetWithFormPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<UpdatePetWithFormRequestResult> {

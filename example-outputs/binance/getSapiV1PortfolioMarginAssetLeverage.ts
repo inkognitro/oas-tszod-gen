@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -56,7 +56,7 @@ export type GetSapiV1PortfolioMarginAssetLeverageRequestResult = RequestResult<
 >;
 
 export function getSapiV1PortfolioMarginAssetLeverage(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1PortfolioMarginAssetLeverageRequestResult> {
   return requestHandler.execute(

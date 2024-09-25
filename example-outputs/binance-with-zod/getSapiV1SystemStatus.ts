@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -48,7 +48,7 @@ export type GetSapiV1SystemStatusRequestResult = RequestResult<
 >;
 
 export function getSapiV1SystemStatus(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SystemStatusRequestResult> {
   return requestHandler.execute(

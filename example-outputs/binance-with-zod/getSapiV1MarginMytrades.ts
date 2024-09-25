@@ -11,7 +11,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -85,7 +85,7 @@ export type GetSapiV1MarginMytradesRequestResult = RequestResult<
 >;
 
 export function getSapiV1MarginMytrades(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1MarginMytradesPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginMytradesRequestResult> {

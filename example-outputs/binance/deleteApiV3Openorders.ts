@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -62,7 +62,7 @@ export type DeleteApiV3OpenordersRequestResult = RequestResult<
 >;
 
 export function deleteApiV3Openorders(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: DeleteApiV3OpenordersPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteApiV3OpenordersRequestResult> {

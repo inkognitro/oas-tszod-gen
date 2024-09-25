@@ -4,7 +4,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -41,7 +41,7 @@ export type PostApiV3UserdatastreamRequestResult = RequestResult<
 >;
 
 export function postApiV3Userdatastream(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3UserdatastreamRequestResult> {
   return requestHandler.execute(

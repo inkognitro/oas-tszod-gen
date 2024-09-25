@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -70,7 +70,7 @@ export type PostSapiV1LoanAdjustLtvRequestResult = RequestResult<
 >;
 
 export function postSapiV1LoanAdjustLtv(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1LoanAdjustLtvPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LoanAdjustLtvRequestResult> {

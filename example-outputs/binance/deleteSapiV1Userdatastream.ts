@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -45,7 +45,7 @@ export type DeleteSapiV1UserdatastreamRequestResult = RequestResult<
 >;
 
 export function deleteSapiV1Userdatastream(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: DeleteSapiV1UserdatastreamPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1UserdatastreamRequestResult> {

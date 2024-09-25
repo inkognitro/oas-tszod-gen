@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -61,7 +61,7 @@ export type GetSapiV1MarginAllpairsRequestResult = RequestResult<
 >;
 
 export function getSapiV1MarginAllpairs(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1MarginAllpairsPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginAllpairsRequestResult> {

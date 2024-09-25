@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -68,7 +68,7 @@ export type PostSapiV1EthStakingEthRedeemRequestResult = RequestResult<
 >;
 
 export function postSapiV1EthStakingEthRedeem(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1EthStakingEthRedeemPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1EthStakingEthRedeemRequestResult> {

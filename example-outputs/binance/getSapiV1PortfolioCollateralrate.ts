@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -50,7 +50,7 @@ export type GetSapiV1PortfolioCollateralrateRequestResult = RequestResult<
 >;
 
 export function getSapiV1PortfolioCollateralrate(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1PortfolioCollateralrateRequestResult> {
   return requestHandler.execute(

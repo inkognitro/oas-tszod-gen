@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -72,7 +72,7 @@ export type GetSapiV1MarginIsolatedmargindataRequestResult = RequestResult<
 >;
 
 export function getSapiV1MarginIsolatedmargindata(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1MarginIsolatedmargindataPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginIsolatedmargindataRequestResult> {

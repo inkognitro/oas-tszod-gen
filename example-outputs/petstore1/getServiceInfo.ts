@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore1/core';
@@ -32,7 +32,7 @@ export type GetServiceInfoRequestResult = RequestResult<
 >;
 
 export function getServiceInfo(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetServiceInfoRequestResult> {
   return requestHandler.execute(

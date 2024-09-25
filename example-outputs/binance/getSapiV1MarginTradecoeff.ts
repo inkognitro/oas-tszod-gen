@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -66,7 +66,7 @@ export type GetSapiV1MarginTradecoeffRequestResult = RequestResult<
 >;
 
 export function getSapiV1MarginTradecoeff(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1MarginTradecoeffPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginTradecoeffRequestResult> {

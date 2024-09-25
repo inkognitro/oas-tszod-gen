@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -73,7 +73,7 @@ export type PostSapiV1LoanCustomizeMargin_callRequestResult = RequestResult<
 >;
 
 export function postSapiV1LoanCustomizeMargin_call(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1LoanCustomizeMargin_callPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LoanCustomizeMargin_callRequestResult> {

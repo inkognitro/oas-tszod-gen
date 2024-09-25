@@ -4,7 +4,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore2/core';
@@ -51,7 +51,7 @@ export type LoginUserResponse =
 export type LoginUserRequestResult = RequestResult<Request, LoginUserResponse>;
 
 export function loginUser(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: LoginUserPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<LoginUserRequestResult> {

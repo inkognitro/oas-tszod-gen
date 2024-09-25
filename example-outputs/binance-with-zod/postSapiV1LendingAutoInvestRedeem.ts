@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -83,7 +83,7 @@ export type PostSapiV1LendingAutoInvestRedeemRequestResult = RequestResult<
 >;
 
 export function postSapiV1LendingAutoInvestRedeem(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1LendingAutoInvestRedeemPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingAutoInvestRedeemRequestResult> {

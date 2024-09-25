@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -95,7 +95,7 @@ export type PostSapiV1ConvertLimitPlaceorderRequestResult = RequestResult<
 >;
 
 export function postSapiV1ConvertLimitPlaceorder(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1ConvertLimitPlaceorderPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ConvertLimitPlaceorderRequestResult> {

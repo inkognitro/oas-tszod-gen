@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore2-with-zod/core';
@@ -69,7 +69,7 @@ export type CreateUserRequestResult = RequestResult<
 >;
 
 export function createUser(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: CreateUserPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<CreateUserRequestResult> {

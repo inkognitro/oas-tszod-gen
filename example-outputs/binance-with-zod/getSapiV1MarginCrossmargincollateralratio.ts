@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -68,7 +68,7 @@ export type GetSapiV1MarginCrossmargincollateralratioRequestResult =
   RequestResult<Request, GetSapiV1MarginCrossmargincollateralratioResponse>;
 
 export function getSapiV1MarginCrossmargincollateralratio(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginCrossmargincollateralratioRequestResult> {
   return requestHandler.execute(

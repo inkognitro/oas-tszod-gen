@@ -10,7 +10,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore1/core';
@@ -50,7 +50,7 @@ export type OptionsObjectRequestResult = RequestResult<
 >;
 
 export function optionsObject(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: OptionsObjectPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<OptionsObjectRequestResult> {

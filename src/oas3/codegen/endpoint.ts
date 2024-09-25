@@ -11,7 +11,7 @@ import {
 import {
   templateCreateRequestFunction,
   templateRequestHandlerExecutionConfigType,
-  templateRequestHandlerType,
+  templateSimpleRequestHandlerType,
   templateRequestResultType,
   templateRequestType,
 } from './template';
@@ -245,7 +245,7 @@ export function applyEndpointCallerFunction(
         return codeGenerator.createFunctionName(path, referencingPath);
       },
       createCode: () => {
-        const rhTn = templateRequestHandlerType.createName(path);
+        const rhTn = templateSimpleRequestHandlerType.createName(path);
         const pTn = payloadTypeDefinition?.createName(path);
         const payloadParamCode = pTn ? `, payload: ${pTn}` : '';
         const rrTn = requestResultTypeDefinition.createName(path);
@@ -269,7 +269,7 @@ export function applyEndpointCallerFunction(
           endpointSchemaConstDefinition.path,
           templateRequestType.path,
           requestResultTypeDefinition.path,
-          templateRequestHandlerType.path,
+          templateSimpleRequestHandlerType.path,
           templateCreateRequestFunction.path,
           templateRequestHandlerExecutionConfigType.path,
         ];

@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -18,7 +18,7 @@ export const getSapiV1CapitalWithdrawHistoryEndpointSchema = {
   queryParamsZodSchema: z.object({
     coin: z.string().optional(),
     withdrawOrderId: z.string().optional(),
-    status: z.number().int().safe().finite().lte(6).optional(),
+    status: z.number().int().safe().finite().gte(0).lte(6).optional(),
     startTime: z.number().int().safe().finite().optional(),
     endTime: z.number().int().safe().finite().optional(),
     offset: z.number().int().safe().finite().optional(),
@@ -117,7 +117,7 @@ export type GetSapiV1CapitalWithdrawHistoryRequestResult = RequestResult<
 >;
 
 export function getSapiV1CapitalWithdrawHistory(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1CapitalWithdrawHistoryPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalWithdrawHistoryRequestResult> {

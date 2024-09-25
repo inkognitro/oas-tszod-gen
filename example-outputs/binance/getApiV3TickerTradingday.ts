@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -53,7 +53,7 @@ export type GetApiV3TickerTradingdayRequestResult = RequestResult<
 >;
 
 export function getApiV3TickerTradingday(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetApiV3TickerTradingdayPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3TickerTradingdayRequestResult> {

@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -50,7 +50,7 @@ export type PostSapiV1CapitalContractConvertibleCoinsRequestResult =
   RequestResult<Request, PostSapiV1CapitalContractConvertibleCoinsResponse>;
 
 export function postSapiV1CapitalContractConvertibleCoins(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1CapitalContractConvertibleCoinsPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1CapitalContractConvertibleCoinsRequestResult> {

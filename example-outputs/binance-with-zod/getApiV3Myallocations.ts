@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -117,7 +117,7 @@ export type GetApiV3MyallocationsRequestResult = RequestResult<
 >;
 
 export function getApiV3Myallocations(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetApiV3MyallocationsPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3MyallocationsRequestResult> {

@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore2/core';
@@ -54,7 +54,7 @@ export type GetOrderByIdRequestResult = RequestResult<
 >;
 
 export function getOrderById(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetOrderByIdPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetOrderByIdRequestResult> {

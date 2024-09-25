@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -80,7 +80,7 @@ export type GetSapiV1AssetDribbletRequestResult = RequestResult<
 >;
 
 export function getSapiV1AssetDribblet(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1AssetDribbletPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetDribbletRequestResult> {

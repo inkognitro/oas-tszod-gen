@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -74,7 +74,7 @@ export type GetApiV3OpenorderlistRequestResult = RequestResult<
 >;
 
 export function getApiV3Openorderlist(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetApiV3OpenorderlistPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3OpenorderlistRequestResult> {

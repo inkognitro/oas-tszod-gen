@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -71,7 +71,7 @@ export type GetSapiV1SimpleEarnFlexibleSubscriptionpreviewRequestResult =
   >;
 
 export function getSapiV1SimpleEarnFlexibleSubscriptionpreview(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: GetSapiV1SimpleEarnFlexibleSubscriptionpreviewPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexibleSubscriptionpreviewRequestResult> {

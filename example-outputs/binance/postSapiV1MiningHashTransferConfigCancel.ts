@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -65,7 +65,7 @@ export type PostSapiV1MiningHashTransferConfigCancelRequestResult =
   RequestResult<Request, PostSapiV1MiningHashTransferConfigCancelResponse>;
 
 export function postSapiV1MiningHashTransferConfigCancel(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1MiningHashTransferConfigCancelPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MiningHashTransferConfigCancelRequestResult> {

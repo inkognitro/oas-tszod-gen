@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -89,7 +89,7 @@ export type PostSapiV1MarginManualLiquidationRequestResult = RequestResult<
 >;
 
 export function postSapiV1MarginManualLiquidation(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1MarginManualLiquidationPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginManualLiquidationRequestResult> {

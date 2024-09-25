@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -61,7 +61,7 @@ export type DeleteSapiV1MarginOrderRequestResult = RequestResult<
 >;
 
 export function deleteSapiV1MarginOrder(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: DeleteSapiV1MarginOrderPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1MarginOrderRequestResult> {

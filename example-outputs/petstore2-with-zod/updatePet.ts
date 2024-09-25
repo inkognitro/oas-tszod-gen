@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore2-with-zod/core';
@@ -81,7 +81,7 @@ export type UpdatePetResponse =
 export type UpdatePetRequestResult = RequestResult<Request, UpdatePetResponse>;
 
 export function updatePet(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: UpdatePetPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<UpdatePetRequestResult> {

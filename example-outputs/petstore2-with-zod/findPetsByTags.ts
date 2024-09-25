@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore2-with-zod/core';
@@ -60,7 +60,7 @@ export type FindPetsByTagsRequestResult = RequestResult<
 >;
 
 export function findPetsByTags(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: FindPetsByTagsPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<FindPetsByTagsRequestResult> {

@@ -5,7 +5,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
@@ -45,7 +45,7 @@ export type PutSapiV1UserdatastreamIsolatedRequestResult = RequestResult<
 >;
 
 export function putSapiV1UserdatastreamIsolated(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PutSapiV1UserdatastreamIsolatedPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PutSapiV1UserdatastreamIsolatedRequestResult> {

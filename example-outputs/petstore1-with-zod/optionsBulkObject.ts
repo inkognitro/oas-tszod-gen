@@ -13,7 +13,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/petstore1-with-zod/core';
@@ -60,7 +60,7 @@ export type OptionsBulkObjectRequestResult = RequestResult<
 >;
 
 export function optionsBulkObject(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: OptionsBulkObjectPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<OptionsBulkObjectRequestResult> {

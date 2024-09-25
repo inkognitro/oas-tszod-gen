@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -53,7 +53,7 @@ export type DeleteSapiV1UserdatastreamIsolatedRequestResult = RequestResult<
 >;
 
 export function deleteSapiV1UserdatastreamIsolated(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: DeleteSapiV1UserdatastreamIsolatedPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1UserdatastreamIsolatedRequestResult> {

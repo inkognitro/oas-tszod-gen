@@ -6,7 +6,7 @@ import {
   Response,
   RequestResult,
   Request,
-  RequestHandler,
+  SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance-with-zod/core';
@@ -79,7 +79,7 @@ export type PostSapiV1SubAccountTransferSubtomasterRequestResult =
   RequestResult<Request, PostSapiV1SubAccountTransferSubtomasterResponse>;
 
 export function postSapiV1SubAccountTransferSubtomaster(
-  requestHandler: RequestHandler,
+  requestHandler: SimpleRequestHandler,
   payload: PostSapiV1SubAccountTransferSubtomasterPayload,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountTransferSubtomasterRequestResult> {
