@@ -2,7 +2,6 @@ import {isSpecification, zSpecification} from './specification';
 const petStore1Specs = require('../../../example-specs/petstore1.oas3.json');
 const petStore2Specs = require('../../../example-specs/petstore2.oas3.json');
 const binanceSpecs = require('../../../example-specs/binance.oas3.json');
-// const githubSpecs = require('../../../example-specs/github.oas3.json');
 
 test('isSpecification invalidates incorrect input', () => {
   expect(isSpecification('foo')).toBe(false);
@@ -23,10 +22,3 @@ test('isSpecification validates PetStore2 specification as correct input', () =>
 test('isSpecification validates Binance specification as correct input', () => {
   expect(isSpecification(binanceSpecs)).toBe(true);
 });
-
-// todo: implement githubSpecs test
-// test('isSpecification validates Github specification as correct input', () => {
-//   const result = zSpecification.safeParse(githubSpecs);
-//   console.log(result.error);
-//   expect(result.success).toBe(true);
-// });
