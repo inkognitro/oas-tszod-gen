@@ -321,7 +321,7 @@ This implementation is responsible for validating the request and response data 
 This one is only available when Zod schemas are generated due to the `withZod: true` configuration.
 This request handler does throw an error when requests or responses do not comply with the
 zod schema definitions which are defined inside the requests' `endpointSchema` property.
-It uses the [parse](https://zod.dev/?id=parse) method for this task.
+It uses the [safeParse](https://zod.dev/?id=safeparse) method for this task.
 
 ## Promises: `resolve` vs `reject`
 The provided `RequestHandler` implementations distinguish between "expected" and
