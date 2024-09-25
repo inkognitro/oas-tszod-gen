@@ -20,7 +20,7 @@ export class ZodValidationRequestHandler implements RequestHandler {
     return new Promise((resolve, reject) => {
       const requestZodSchema = this.createRequestZodSchema(request);
       const requestValidationResult = requestZodSchema.safeParse(request);
-      if (requestValidationResult.success) {
+      if (!requestValidationResult.success) {
         reject(requestValidationResult.error);
         return;
       }
