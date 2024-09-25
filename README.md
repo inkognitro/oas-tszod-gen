@@ -340,7 +340,7 @@ you don't have to worry about breaking changes in generated code output when upg
 
 ## Lacking OAS3 support
 - Although `default` is supported for response status codes,
-status code pattern matching (e.g. [5XX](https://swagger.io/docs/specification/describing-responses/))
+status code pattern matching (e.g. for [5XX](https://swagger.io/docs/specification/describing-responses/))
 is ignored by the generator and will not get recognized by TS.
 As of right now, it is added as a possible response having `any` status code.
 - The generated code for the ["not" keyword](https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/#not)
