@@ -178,11 +178,12 @@ const zodValidationWithAxiosRequestHandler = new ZodValidationRequestHandler(axi
 
 const requestHandler = new AuthRequestHandler(
   [myJwtAuthenticationProvider],
-  // In case of multiple authentication providers, the order does NOT matter here.
-  // The order of prioritized authentication providers is taken from the "request.endpointSchema.supportedSecuritySchemas"
-  // array, which has the same order as the defined security schemes in the OAS3 specification of that endpoint.
-  // The first found token received from the "findToken" method of a supported authentication provider is
-  // then added to the request headers.
+  // The order does not matter here, in case of multiple authentication providers.
+  // Authentication provider are prioritized by the names which are listed in the
+  // "request.endpointSchema.supportedSecuritySchemas" array. This array has the same
+  // order as the security schemes in the OAS3 specs of that operation,
+  // or endpoint respectively. The first found token received from the "findToken"
+  // method of a supported authentication provider is then added to the request headers.
 
   zodValidationWithAxiosRequestHandler
 );
