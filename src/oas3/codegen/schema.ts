@@ -14,7 +14,6 @@ import {
   AnyOfSchema,
   ArraySchema,
   BooleanSchema,
-  ComponentRef,
   IntegerSchema,
   isAllOfSchema,
   isAnyOfSchema,
@@ -31,6 +30,7 @@ import {
   ObjectSchema,
   OneOfSchema,
   Schema,
+  SchemaComponentRef,
   StringSchema,
 } from '@/oas3/specification';
 import {GenerateConfig} from './generator';
@@ -224,7 +224,7 @@ function applyIntegerSchema(
 
 export function applyComponentRefSchema(
   codeGenerator: CodeGenerator,
-  schema: ComponentRef,
+  schema: SchemaComponentRef,
   path: OutputPath,
   config: GenerateConfig,
   preventFromAddingComponentRefs: string[] = []
@@ -374,7 +374,7 @@ function applyAllOfSchema(
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const itemCodeOutputs: CodeGenerationOutput[] = [];
-  schema.allOf.forEach((itemSchema, index) => {
+  schema.allOf.forEach((itemSchema: Schema, index) => {
     if (!isSchema(itemSchema)) {
       return;
     }

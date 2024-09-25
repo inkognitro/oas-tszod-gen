@@ -21,22 +21,9 @@ export const postSapiV1ConvertLimitPlaceorderEndpointSchema = {
     limitPrice: z.number().safe().finite(),
     baseAmount: z.number().safe().finite().optional(),
     quoteAmount: z.number().safe().finite().optional(),
-    side: z.union([z.literal('SELL'), z.literal('BUY')]),
-    walletType: z
-      .union([
-        z.literal('SPOT'),
-        z.literal('FUNDING'),
-        z.literal('SPOT_FUNDING'),
-      ])
-      .optional(),
-    expiredType: z
-      .union([
-        z.literal('1_D'),
-        z.literal('3_D'),
-        z.literal('7_D'),
-        z.literal('30_D'),
-      ])
-      .optional(),
+    side: z.enum('SELL', 'BUY'),
+    walletType: z.enum('SPOT', 'FUNDING', 'SPOT_FUNDING').optional(),
+    expiredType: z.enum('1_D', '3_D', '7_D', '30_D').optional(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

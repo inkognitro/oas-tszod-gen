@@ -25,9 +25,7 @@ export const deleteApiV3OrderEndpointSchema = {
     orderId: z.number().int().safe().finite().optional(),
     origClientOrderId: z.string().optional(),
     newClientOrderId: z.string().optional(),
-    cancelRestrictions: z
-      .union([z.literal('ONLY_NEW'), z.literal('ONLY_PARTIALLY_FILLED')])
-      .optional(),
+    cancelRestrictions: z.enum('ONLY_NEW', 'ONLY_PARTIALLY_FILLED').optional(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

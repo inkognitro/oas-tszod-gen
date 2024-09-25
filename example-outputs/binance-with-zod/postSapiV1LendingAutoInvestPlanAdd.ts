@@ -16,36 +16,24 @@ export const postSapiV1LendingAutoInvestPlanAddEndpointSchema = {
   method: 'post',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    sourceType: z.union([z.literal('MAIN_SITE'), z.literal('TR')]),
+    sourceType: z.enum('MAIN_SITE', 'TR'),
     requestId: z.string().optional(),
-    planType: z.union([
-      z.literal('SINGLE'),
-      z.literal('PORTFOLIO'),
-      z.literal('INDEX'),
-    ]),
+    planType: z.enum('SINGLE', 'PORTFOLIO', 'INDEX'),
     IndexId: z.number().int().safe().finite().optional(),
     subscriptionAmount: z.number().safe().finite(),
-    subscriptionCycle: z.union([
-      z.literal('H1'),
-      z.literal('H4'),
-      z.literal('H8'),
-      z.literal('H12'),
-      z.literal('WEEKLY'),
-      z.literal('DAILY'),
-      z.literal('MONTHLY'),
-      z.literal('BI_WEEKLY'),
-    ]),
+    subscriptionCycle: z.enum(
+      'H1',
+      'H4',
+      'H8',
+      'H12',
+      'WEEKLY',
+      'DAILY',
+      'MONTHLY',
+      'BI_WEEKLY'
+    ),
     subscriptionStartDay: z.number().int().safe().finite().optional(),
     subscriptionStartWeekday: z
-      .union([
-        z.literal('MON'),
-        z.literal('TUE'),
-        z.literal('WED'),
-        z.literal('THU'),
-        z.literal('FRI'),
-        z.literal('SAT'),
-        z.literal('SUN'),
-      ])
+      .enum('MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN')
       .optional(),
     subscriptionStartTime: z.number().int().safe().finite(),
     sourceAsset: z.string(),

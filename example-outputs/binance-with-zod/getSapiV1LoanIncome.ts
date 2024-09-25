@@ -18,15 +18,15 @@ export const getSapiV1LoanIncomeEndpointSchema = {
   queryParamsZodSchema: z.object({
     asset: z.string().optional(),
     type: z
-      .union([
-        z.literal('borrowIn'),
-        z.literal('collateralSpent'),
-        z.literal('repayAmount'),
-        z.literal('collateralReturn'),
-        z.literal('addCollateral'),
-        z.literal('removeCollateral'),
-        z.literal('collateralReturnAfterLiquidation'),
-      ])
+      .enum(
+        'borrowIn',
+        'collateralSpent',
+        'repayAmount',
+        'collateralReturn',
+        'addCollateral',
+        'removeCollateral',
+        'collateralReturnAfterLiquidation'
+      )
       .optional(),
     startTime: z.number().int().safe().finite().optional(),
     endTime: z.number().int().safe().finite().optional(),

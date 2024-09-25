@@ -1,361 +1,171 @@
-import {ComponentRef, isComponentRef} from './componentRef';
+import {
+  isSchemaComponentRef,
+  SchemaComponentRef,
+  zSchemaComponentRef,
+} from './componentRef';
+import {z} from 'zod';
 
-export type ConcreteSchema =
-  | BooleanSchema
-  | StringSchema
-  | NumberSchema
-  | IntegerSchema
-  | ArraySchema
-  | ObjectSchema
-  | OneOfSchema
-  | AllOfSchema
-  | AnyOfSchema;
+// @ts-ignore - due to recursion
+export const zConcreteSchema = z.lazy(() =>
+  z.union([
+    z.discriminatedUnion('type', [
+      zBooleanSchema,
+      zStringSchema,
+      zNumberSchema,
+      zIntegerSchema,
+      zArraySchema,
+      zObjectSchema,
+    ]),
+    zOneOfSchema,
+    zAllOfSchema,
+    zAnyOfSchema,
+  ])
+);
+
+export type ConcreteSchema = z.infer<typeof zConcreteSchema>;
 
 export function isConcreteSchema(
   anyValue: unknown
 ): anyValue is ConcreteSchema {
-  return (
-    isBooleanSchema(anyValue) ||
-    isStringSchema(anyValue) ||
-    isNumberSchema(anyValue) ||
-    isIntegerSchema(anyValue) ||
-    isArraySchema(anyValue) ||
-    isObjectSchema(anyValue) ||
-    isOneOfSchema(anyValue) ||
-    isAllOfSchema(anyValue) ||
-    isAnyOfSchema(anyValue)
-  );
+  return zConcreteSchema.safeParse(anyValue).success;
 }
 
-export type Schema = ConcreteSchema | ComponentRef;
+// @ts-ignore - due to recursion
+export const zSchema = z.union([zConcreteSchema, zSchemaComponentRef]);
+
+export type Schema = ConcreteSchema | SchemaComponentRef;
 
 export function isSchema(anyValue: unknown): anyValue is Schema {
-  return isComponentRef(anyValue) || isConcreteSchema(anyValue);
+  return isSchemaComponentRef(anyValue) || isConcreteSchema(anyValue);
 }
 
-export type ArraySchema = {
-  type: 'array';
-  nullable?: boolean;
-  items: Schema;
-};
+// @ts-ignore - due to recursion
+export const zArraySchema = z.object({
+  type: z.literal('array'),
+  nullable: z.boolean().optional(),
+  items: zSchema,
+});
+
+export type ArraySchema = z.infer<typeof zArraySchema>;
 
 export function isArraySchema(anyValue: unknown): anyValue is ArraySchema {
-  const value = anyValue as ArraySchema;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (value.type !== 'array') {
-    return false;
-  }
-  if (value.nullable !== undefined && typeof value.nullable !== 'boolean') {
-    return false;
-  }
-  if (!isSchema(value.items)) {
-    return false;
-  }
-  return true;
+  return zArraySchema.safeParse(anyValue).success;
 }
 
-export type BooleanSchema = {
-  type: 'boolean';
-  nullable?: boolean;
-};
+export const zBooleanSchema = z.object({
+  type: z.literal('boolean'),
+  nullable: z.boolean().optional(),
+});
+
+export type BooleanSchema = z.infer<typeof zBooleanSchema>;
 
 export function isBooleanSchema(anyValue: unknown): anyValue is BooleanSchema {
-  const value = anyValue as BooleanSchema;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (value.type !== 'boolean') {
-    return false;
-  }
-  if (value.nullable !== undefined && typeof value.nullable !== 'boolean') {
-    return false;
-  }
-  return true;
+  return zBooleanSchema.safeParse(anyValue).success;
 }
 
-export type ObjectSchemaProperties = {[propName: string]: Schema};
+export const zObjectSchemaProps = z.record(zSchema);
 
-export type ObjectSchema = {
-  type: 'object';
-  required?: string[];
-  properties?: ObjectSchemaProperties;
-  additionalProperties?: Schema;
-};
+export type ObjectSchemaProps = z.infer<typeof zObjectSchemaProps>;
+
+export const zObjectSchema = z.object({
+  type: z.literal('object'),
+  required: z.array(z.string()).optional(),
+  properties: zObjectSchemaProps.optional(),
+  additionalProperties: zSchema.optional(),
+});
+
+export type ObjectSchema = z.infer<typeof zObjectSchema>;
 
 export function isObjectSchema(anyValue: unknown): anyValue is ObjectSchema {
-  const value = anyValue as ObjectSchema;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (value.type !== 'object') {
-    return false;
-  }
-  if (value.required !== undefined && !Array.isArray(value.required)) {
-    return false;
-  }
-  if (value.required) {
-    const invalidEntry = value.required.find(e => typeof e !== 'string');
-    if (invalidEntry) {
-      return false;
-    }
-  }
-  if (
-    value.properties &&
-    (typeof value.properties !== 'object' || Array.isArray(value.properties))
-  ) {
-    return false;
-  }
-  if (value.properties) {
-    for (const propName in value.properties) {
-      const propValue = value.properties[propName];
-      if (!isSchema(propValue)) {
-        return false;
-      }
-    }
-  }
-  if (
-    value.additionalProperties !== undefined &&
-    !isSchema(value.additionalProperties)
-  ) {
-    return false;
-  }
-  return true;
+  return zObjectSchema.safeParse(anyValue).success;
 }
 
-export type StringSchema = {
-  type: 'string';
-  format?: string;
-  enum?: string[];
-  nullable?: boolean;
-  minLength?: number;
-  maxLength?: number;
-};
+export const zStringSchema = z.object({
+  type: z.literal('string'),
+  pattern: z.string().optional(),
+  format: z.string().optional(),
+  enum: z.array(z.string()).optional(),
+  nullable: z.boolean().optional(),
+  minLength: z.number().optional(),
+  maxLength: z.number().optional(),
+});
+
+export type StringSchema = z.infer<typeof zStringSchema>;
 
 export function isStringSchema(anyValue: unknown): anyValue is StringSchema {
-  const value = anyValue as StringSchema;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (value.type !== 'string') {
-    return false;
-  }
-  if (value.format !== undefined && typeof value.format !== 'string') {
-    return false;
-  }
-  if (value.enum !== undefined && !Array.isArray(value.enum)) {
-    return false;
-  }
-  if (value.enum !== undefined) {
-    const invalidEntry = value.enum.find(e => typeof e !== 'string');
-    if (invalidEntry) {
-      return false;
-    }
-  }
-  if (value.nullable !== undefined && typeof value.nullable !== 'boolean') {
-    return false;
-  }
-  if (value.minLength !== undefined && typeof value.minLength !== 'number') {
-    return false;
-  }
-  if (value.maxLength !== undefined && typeof value.maxLength !== 'number') {
-    return false;
-  }
-  return true;
+  return zStringSchema.safeParse(anyValue).success;
 }
 
-export type AllOfMetaData = {
-  description?: string;
-};
+export const zSchemaMetaData = z.object({
+  description: z.string().optional(),
+});
 
-function isAllOfMetaData(anyValue: unknown): anyValue is AllOfMetaData {
-  const value = anyValue as AllOfMetaData;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (
-    value.description !== undefined &&
-    typeof value.description !== 'string'
-  ) {
-    return false;
-  }
-  return true;
-}
+export type AllOfSchema = z.infer<typeof zAllOfSchema>;
 
-export type AllOfSchema = {
-  allOf: (Schema | AllOfMetaData)[]; // at least one element should be a complete schema
-};
+export const zAllOfSchema = z.object({
+  allOf: z.array(z.union([zSchema, zSchemaMetaData])), // at least one element should be a complete schema
+});
 
 export function isAllOfSchema(anyValue: unknown): anyValue is AllOfSchema {
-  const value = anyValue as AllOfSchema;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (!Array.isArray(value.allOf)) {
-    return false;
-  }
-  let hasAtLeastOneValidSchema = false;
-  for (const index in value.allOf) {
-    const item = value.allOf[index];
-    if (isSchema(item)) {
-      hasAtLeastOneValidSchema = true;
-      continue;
-    }
-    if (!isAllOfMetaData(item)) {
-      return false;
-    }
-  }
-  if (!hasAtLeastOneValidSchema) {
-    return false;
-  }
-  return true;
+  return zAllOfSchema.safeParse(anyValue).success;
 }
 
-export type OneOfSchema = {
-  oneOf: Schema[];
-  discriminator?: {
-    propertyName: string;
-  };
-};
+export type OneOfSchema = z.infer<typeof zOneOfSchema>;
+
+export const zOneOfSchema = z.object({
+  oneOf: z.array(zSchema),
+  discriminator: z
+    .object({
+      propertyName: z.string(),
+    })
+    .optional(),
+});
 
 export function isOneOfSchema(anyValue: unknown): anyValue is OneOfSchema {
-  const value = anyValue as OneOfSchema;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (!Array.isArray(value.oneOf)) {
-    return false;
-  }
-  if (
-    value.discriminator !== undefined &&
-    typeof value.discriminator.propertyName !== 'string'
-  ) {
-    return false;
-  }
-  const invalidEntry = value.oneOf.find(e => {
-    if (!isSchema(e)) {
-      return true;
-    }
-    return false;
-  });
-  if (invalidEntry) {
-    return false;
-  }
-  return true;
+  return zOneOfSchema.safeParse(anyValue).success;
 }
 
-export type AnyOfSchema = {
-  anyOf: Schema[];
-  discriminator?: {
-    propertyName: string;
-  };
-};
+export type AnyOfSchema = z.infer<typeof zAnyOfSchema>;
+
+export const zAnyOfSchema = z.object({
+  anyOf: z.array(zSchema),
+  discriminator: z
+    .object({
+      propertyName: z.string(),
+    })
+    .optional(),
+});
 
 export function isAnyOfSchema(anyValue: unknown): anyValue is AnyOfSchema {
-  const value = anyValue as AnyOfSchema;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (!Array.isArray(value.anyOf)) {
-    return false;
-  }
-  if (
-    value.discriminator !== undefined &&
-    typeof value.discriminator.propertyName !== 'string'
-  ) {
-    return false;
-  }
-  const invalidEntry = value.anyOf.find(e => {
-    if (!isSchema(e)) {
-      return true;
-    }
-    return false;
-  });
-  if (invalidEntry) {
-    return false;
-  }
-  return true;
+  return zAnyOfSchema.safeParse(anyValue).success;
 }
 
-export type NumberSchema = {
-  type: 'number';
-  nullable?: boolean;
-  minimum?: number;
-  exclusiveMinimum?: number;
-  maximum?: number;
-  exclusiveMaximum?: number;
-};
+export type NumberSchema = z.infer<typeof zNumberSchema>;
+
+export const zNumberSchema = z.object({
+  type: z.literal('number'),
+  nullable: z.boolean().optional(),
+  minimum: z.number().optional(),
+  exclusiveMinimum: z.number().optional(),
+  maximum: z.number().optional(),
+  exclusiveMaximum: z.number().optional(),
+});
 
 export function isNumberSchema(anyValue: unknown): anyValue is NumberSchema {
-  const value = anyValue as NumberSchema;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (value.type !== 'number') {
-    return false;
-  }
-  if (value.nullable !== undefined && typeof value.nullable !== 'boolean') {
-    return false;
-  }
-  if (value.minimum !== undefined && typeof value.minimum !== 'number') {
-    return false;
-  }
-  if (
-    value.exclusiveMinimum !== undefined &&
-    typeof value.exclusiveMinimum !== 'number'
-  ) {
-    return false;
-  }
-  if (value.maximum !== undefined && typeof value.maximum !== 'number') {
-    return false;
-  }
-  if (
-    value.exclusiveMaximum !== undefined &&
-    typeof value.exclusiveMaximum !== 'number'
-  ) {
-    return false;
-  }
-  return true;
+  return zNumberSchema.safeParse(anyValue).success;
 }
 
-export type IntegerSchema = {
-  type: 'integer';
-  nullable?: boolean;
-  minimum?: number;
-  exclusiveMinimum?: number;
-  maximum?: number;
-  exclusiveMaximum?: number;
-};
+export type IntegerSchema = z.infer<typeof zIntegerSchema>;
+
+export const zIntegerSchema = z.object({
+  type: z.literal('integer'),
+  nullable: z.boolean().optional(),
+  minimum: z.number().optional(),
+  exclusiveMinimum: z.number().optional(),
+  maximum: z.number().optional(),
+  exclusiveMaximum: z.number().optional(),
+});
 
 export function isIntegerSchema(anyValue: unknown): anyValue is IntegerSchema {
-  const value = anyValue as IntegerSchema;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (value.type !== 'integer') {
-    return false;
-  }
-  if (value.nullable !== undefined && typeof value.nullable !== 'boolean') {
-    return false;
-  }
-  if (value.minimum !== undefined && typeof value.minimum !== 'number') {
-    return false;
-  }
-  if (
-    value.exclusiveMinimum !== undefined &&
-    typeof value.exclusiveMinimum !== 'number'
-  ) {
-    return false;
-  }
-  if (value.maximum !== undefined && typeof value.maximum !== 'number') {
-    return false;
-  }
-  if (
-    value.exclusiveMaximum !== undefined &&
-    typeof value.exclusiveMaximum !== 'number'
-  ) {
-    return false;
-  }
-  return true;
+  return zIntegerSchema.safeParse(anyValue).success;
 }

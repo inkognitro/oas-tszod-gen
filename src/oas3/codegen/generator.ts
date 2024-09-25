@@ -157,9 +157,10 @@ export type GenerateConfig = {
   outputFolderPath: string;
   importRootAlias?: string;
   predefinedFolderOutputPaths?: OutputPath[];
-  withZod: boolean;
+  withZod?: boolean;
   requestHandlers?: RequestHandlersGenerateConfig;
   ignoreEndpointsWithoutOperationId?: boolean;
+  findCustomStringPatternByFormat?: (format: string) => null | string;
 };
 
 export class DefaultCodeGenerator implements CodeGenerator {

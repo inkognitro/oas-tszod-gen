@@ -21,10 +21,8 @@ export const postSapiV1BnbburnEndpointSchema = {
   method: 'post',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    spotBNBBurn: z.union([z.literal('true'), z.literal('false')]).optional(),
-    interestBNBBurn: z
-      .union([z.literal('true'), z.literal('false')])
-      .optional(),
+    spotBNBBurn: z.enum('true', 'false').optional(),
+    interestBNBBurn: z.enum('true', 'false').optional(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

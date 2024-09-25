@@ -22,7 +22,7 @@ export const getSapiV1MarginOrderEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
-    isIsolated: z.union([z.literal('TRUE'), z.literal('FALSE')]).optional(),
+    isIsolated: z.enum('TRUE', 'FALSE').optional(),
     orderId: z.number().int().safe().finite().optional(),
     origClientOrderId: z.string().optional(),
     recvWindow: z.number().int().safe().finite().optional(),

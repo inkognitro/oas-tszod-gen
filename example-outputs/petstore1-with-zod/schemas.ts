@@ -40,8 +40,8 @@ export const serviceZodSchema = z.object({
   }),
   contactUrl: z.string().optional(), // uri
   documentationUrl: z.string().optional(), // uri
-  createdAt: z.string().optional(), // date-time
-  updatedAt: z.string().optional(), // date-time
+  createdAt: z.string().datetime().optional(), // date-time
+  updatedAt: z.string().datetime().optional(), // date-time
   environment: z.string().optional(),
   version: z.string(),
 });
@@ -56,7 +56,7 @@ export type DrsService = {
 export const drsServiceZodSchema = z.object({
   maxBulkRequestLength: z.number().int().safe().finite(),
   type: z.object({
-    artifact: z.literal('drs'),
+    artifact: z.enum('drs'),
   }),
 });
 
@@ -80,14 +80,7 @@ export type Authorizations = {
 export const authorizationsZodSchema = z.object({
   drs_object_id: z.string().optional(),
   supported_types: z
-    .array(
-      z.union([
-        z.literal('None'),
-        z.literal('BasicAuth'),
-        z.literal('BearerAuth'),
-        z.literal('PassportAuth'),
-      ])
-    )
+    .array(z.enum('None', 'BasicAuth', 'BearerAuth', 'PassportAuth'))
     .optional(),
   passport_auth_issuers: z.array(z.string()).optional(),
   bearer_auth_issuers: z.array(z.string()).optional(),
@@ -122,16 +115,16 @@ export type AccessMethod = {
 };
 
 export const accessMethodZodSchema = z.object({
-  type: z.union([
-    z.literal('s3'),
-    z.literal('gs'),
-    z.literal('ftp'),
-    z.literal('gsiftp'),
-    z.literal('globus'),
-    z.literal('htsget'),
-    z.literal('https'),
-    z.literal('file'),
-  ]),
+  type: z.enum(
+    's3',
+    'gs',
+    'ftp',
+    'gsiftp',
+    'globus',
+    'htsget',
+    'https',
+    'file'
+  ),
   access_url: accessURLZodSchema.optional(),
   access_id: z.string().optional(),
   region: z.string().optional(),
@@ -174,8 +167,8 @@ export const drsObjectZodSchema = z.object({
   name: z.string().optional(),
   self_uri: z.string(),
   size: z.number().int().safe().finite(),
-  created_time: z.string(), // date-time
-  updated_time: z.string().optional(), // date-time
+  created_time: z.string().datetime(), // date-time
+  updated_time: z.string().datetime().optional(), // date-time
   version: z.string().optional(),
   mime_type: z.string().optional(),
   checksums: z.array(checksumZodSchema),

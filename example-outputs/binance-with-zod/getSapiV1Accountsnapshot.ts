@@ -25,11 +25,7 @@ export const getSapiV1AccountsnapshotEndpointSchema = {
   method: 'get',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    type: z.union([
-      z.literal('SPOT'),
-      z.literal('MARGIN'),
-      z.literal('FUTURES'),
-    ]),
+    type: z.enum('SPOT', 'MARGIN', 'FUTURES'),
     startTime: z.number().int().safe().finite().optional(),
     endTime: z.number().int().safe().finite().optional(),
     limit: z.number().int().safe().finite().gte(7).lte(30).optional(),

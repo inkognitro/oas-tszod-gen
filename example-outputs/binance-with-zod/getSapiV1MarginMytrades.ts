@@ -22,7 +22,7 @@ export const getSapiV1MarginMytradesEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
-    isIsolated: z.union([z.literal('TRUE'), z.literal('FALSE')]).optional(),
+    isIsolated: z.enum('TRUE', 'FALSE').optional(),
     startTime: z.number().int().safe().finite().optional(),
     endTime: z.number().int().safe().finite().optional(),
     fromId: z.number().int().safe().finite().optional(),

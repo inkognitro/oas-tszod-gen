@@ -4,7 +4,7 @@ import {
   Endpoint,
   RequestBody,
   Parameter,
-  ObjectSchemaProperties,
+  ObjectSchemaProps,
   ConcreteParameterLocation,
   concreteParameterLocations,
 } from '@/oas3/specification';
@@ -154,7 +154,7 @@ function findRequestParamsObjectSchema(
   codeGenerator: CodeGenerator,
   parameterSchemas: Parameter[]
 ): null | ObjectSchema {
-  const objectSchemaProps: ObjectSchemaProperties = {};
+  const objectSchemaProps: ObjectSchemaProps = {};
   const requiredObjectSchemaPropNames: string[] = [];
   let hasAnyParams = false;
   const payloadPropNameByParamLocation: {

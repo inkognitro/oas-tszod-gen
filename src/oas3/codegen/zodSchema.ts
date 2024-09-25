@@ -14,7 +14,6 @@ import {
   AnyOfSchema,
   ArraySchema,
   BooleanSchema,
-  ComponentRef,
   IntegerSchema,
   isAllOfSchema,
   isAnyOfSchema,
@@ -31,6 +30,7 @@ import {
   ObjectSchema,
   OneOfSchema,
   Schema,
+  SchemaComponentRef,
   StringSchema,
 } from '@/oas3/specification';
 import {templateZOfZodLibrary} from './template';
@@ -56,7 +56,7 @@ export function applyZodSchema(
     return applyZodBooleanSchema(schema, path);
   }
   if (isStringSchema(schema)) {
-    return applyZodStringSchema(schema, path);
+    return applyZodStringSchema(schema, path, config);
   }
   if (isNumberSchema(schema)) {
     return applyZodNumberSchema(schema, path);
@@ -131,7 +131,8 @@ function applyZodBooleanSchema(
 
 function applyZodStringSchema(
   schema: StringSchema,
-  path: OutputPath
+  path: OutputPath,
+  config: GenerateConfig
 ): CodeGenerationOutput {
   let codeComment: undefined | string = undefined;
   if (schema.format && schema.format !== 'uuid') {
@@ -139,18 +140,54 @@ function applyZodStringSchema(
   }
   return {
     createCode: () => {
-      if (schema.enum && schema.enum.length === 1) {
-        return `z.literal('${schema.enum[0].replaceAll("'", "\\'")}')`;
-      } else if (schema.enum && schema.enum.length > 1) {
-        return `z.union([${schema.enum
-          .map(v => `z.literal('${v.replaceAll("'", "\\'")}')`)
-          .join(',')}])`;
+      if (schema.enum) {
+        return `z.enum('${schema.enum.map(e => e.replaceAll("'", "\\'")).join("', '")}')`;
       } else if (schema.format === 'binary') {
         return 'z.any()';
       }
       let code = 'z.string()';
-      if (schema.format === 'uuid') {
-        code += '.uuid()';
+      let pattern: string | null = null;
+      if (schema.format && config.findCustomStringPatternByFormat) {
+        pattern = config.findCustomStringPatternByFormat(schema.format);
+      }
+      if (!pattern && schema.pattern) {
+        pattern = schema.pattern;
+      }
+      if (pattern) {
+        code += `.regex(/${schema.pattern}/)`;
+      }
+      if (!schema.enum && !pattern && schema.format) {
+        switch (schema.format) {
+          case 'uuid':
+            code += '.uuid()';
+            break;
+          case 'date':
+            code += '.date()';
+            break;
+          case 'time':
+            code += '.time()';
+            break;
+          case 'duration':
+            code += '.duration()';
+            break;
+          case 'date-time':
+            code += '.datetime()';
+            break;
+          case 'email':
+            code += '.email()';
+            break;
+          case 'url':
+            code += '.url()';
+            break;
+          case 'ip':
+          case 'ipv4':
+          case 'ipv6':
+            code += '.ip()';
+            break;
+          case 'emoji':
+            code += '.emoji()';
+            break;
+        }
       }
       if (schema.nullable) {
         code += '.nullable()';
@@ -249,7 +286,7 @@ function applyZodIntegerSchema(
 
 export function applyZodComponentRefSchema(
   codeGenerator: CodeGenerator,
-  schema: ComponentRef,
+  schema: SchemaComponentRef,
   path: OutputPath,
   config: GenerateConfig,
   preventFromAddingComponentRefs: string[] = []

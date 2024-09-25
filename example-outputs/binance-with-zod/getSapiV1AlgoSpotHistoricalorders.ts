@@ -17,7 +17,7 @@ export const getSapiV1AlgoSpotHistoricalordersEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
-    side: z.union([z.literal('SELL'), z.literal('BUY')]),
+    side: z.enum('SELL', 'BUY'),
     startTime: z.number().int().safe().finite().optional(),
     endTime: z.number().int().safe().finite().optional(),
     page: z.number().int().safe().finite().optional(),

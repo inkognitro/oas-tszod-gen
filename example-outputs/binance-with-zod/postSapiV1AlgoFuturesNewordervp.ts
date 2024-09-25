@@ -17,16 +17,10 @@ export const postSapiV1AlgoFuturesNewordervpEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
-    side: z.union([z.literal('SELL'), z.literal('BUY')]),
-    positionSide: z
-      .union([z.literal('BOTH'), z.literal('LONG'), z.literal('SHORT')])
-      .optional(),
+    side: z.enum('SELL', 'BUY'),
+    positionSide: z.enum('BOTH', 'LONG', 'SHORT').optional(),
     quantity: z.number().safe().finite(),
-    urgency: z.union([
-      z.literal('LOW'),
-      z.literal('MEDIUM'),
-      z.literal('HIGH'),
-    ]),
+    urgency: z.enum('LOW', 'MEDIUM', 'HIGH'),
     clientAlgoId: z.string().optional(),
     reduceOnly: z.boolean().optional(),
     limitPrice: z.number().safe().finite().optional(),

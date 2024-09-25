@@ -1,100 +1,46 @@
-import {isSchema, Schema} from './schema';
-import {ComponentRef, isResponseComponentRef} from './componentRef';
+import {zSchema} from './schema';
+import {zResponseComponentRef} from './componentRef';
+import {z} from 'zod';
 
-export type ResponseBodyContent = {
-  schema: Schema;
-};
+export const zResponseBodyContent = z.object({
+  schema: zSchema,
+});
 
-function isResponseBodyContent(
-  anyValue: unknown
-): anyValue is ResponseBodyContent {
-  const value = anyValue as ResponseBodyContent;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  return isSchema(value.schema);
-}
+export type ResponseBodyContent = z.infer<typeof zResponseBodyContent>;
 
-export type ResponseBodyContentByContentTypeMap = {
-  [contentType: 'application/json' | string]: ResponseBodyContent;
-};
+export const zResponseBodyContentByContentTypeMap =
+  z.record(zResponseBodyContent);
 
-export type ResponseHeader = {
-  schema: Schema;
-};
+export type ResponseBodyContentByContentTypeMap = z.infer<
+  typeof zResponseBodyContentByContentTypeMap
+>;
 
-function isResponseHeader(anyValue: unknown): anyValue is ResponseHeader {
-  const value = anyValue as ResponseHeader;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  return isSchema(value.schema);
-}
+export const zResponseHeader = z.object({
+  schema: zSchema,
+});
 
-export type ResponseHeaderByNameMap = {
-  [name: string]: ResponseHeader;
-};
+export const zResponseHeaderByNameMap = z.record(zResponseHeader);
 
-export type ConcreteResponse = {
-  description?: string;
-  content?: ResponseBodyContentByContentTypeMap;
-  headers?: ResponseHeaderByNameMap;
-};
+export type ResponseHeaderByNameMap = z.infer<typeof zResponseHeaderByNameMap>;
+
+export const zConcreteResponse = z.object({
+  description: z.string().optional(),
+  content: zResponseBodyContentByContentTypeMap.optional(),
+  headers: zResponseHeaderByNameMap.optional(),
+});
+
+export type ConcreteResponse = z.infer<typeof zConcreteResponse>;
 
 export function isConcreteResponse(
   anyValue: unknown
 ): anyValue is ConcreteResponse {
-  const value = anyValue as ConcreteResponse;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (!!value.description && typeof value.description !== 'string') {
-    return false;
-  }
-  if (value.headers) {
-    for (const headerName in value.headers) {
-      const responseHeader = value.headers[headerName];
-      if (!isResponseHeader(responseHeader)) {
-        return false;
-      }
-    }
-  }
-  if (value.content) {
-    for (const contentType in value.content) {
-      const responseBodyContent = value.content[contentType];
-      if (!isResponseBodyContent(responseBodyContent)) {
-        return false;
-      }
-    }
-  }
-  return true;
+  return zConcreteResponse.safeParse(anyValue).success;
 }
 
-export type Response = ConcreteResponse | ComponentRef;
+export const zResponse = z.union([zConcreteResponse, zResponseComponentRef]);
 
-export function isResponse(anyValue: unknown): anyValue is Response {
-  return isConcreteResponse(anyValue) || isResponseComponentRef(anyValue);
-}
+export type Response = z.infer<typeof zResponse>;
 
-export type ResponseByStatusCodeMap = {
-  [statusCode: string]: Response;
-};
+export const zResponseByStatusCodeMap = z.record(zResponse);
 
-export function isResponseByStatusCodeMap(
-  anyValue: unknown
-): anyValue is ResponseByStatusCodeMap {
-  if (typeof anyValue !== 'object' || Array.isArray(anyValue)) {
-    return false;
-  }
-  const value = anyValue as ResponseByStatusCodeMap;
-  for (const statusCode in value) {
-    if (isNaN(parseInt(statusCode)) && statusCode !== 'default') {
-      return false;
-    }
-    const responseOrRef = value[statusCode];
-    if (!isResponse(responseOrRef)) {
-      return false;
-    }
-  }
-  return true;
-}
+export type ResponseByStatusCodeMap = z.infer<typeof zResponseByStatusCodeMap>;

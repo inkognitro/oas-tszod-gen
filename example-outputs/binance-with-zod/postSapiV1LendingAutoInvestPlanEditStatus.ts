@@ -17,11 +17,7 @@ export const postSapiV1LendingAutoInvestPlanEditStatusEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     planId: z.number().int().safe().finite(),
-    status: z.union([
-      z.literal('ONGOING'),
-      z.literal('PAUSED'),
-      z.literal('REMOVED'),
-    ]),
+    status: z.enum('ONGOING', 'PAUSED', 'REMOVED'),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

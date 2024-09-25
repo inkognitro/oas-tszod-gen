@@ -24,7 +24,7 @@ export const deleteSapiV1MarginOpenordersEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
-    isIsolated: z.union([z.literal('TRUE'), z.literal('FALSE')]).optional(),
+    isIsolated: z.enum('TRUE', 'FALSE').optional(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

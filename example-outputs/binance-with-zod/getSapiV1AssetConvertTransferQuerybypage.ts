@@ -20,7 +20,7 @@ export const getSapiV1AssetConvertTransferQuerybypageEndpointSchema = {
     asset: z.string().optional(),
     startTime: z.number().int().safe().finite(),
     endTime: z.number().int().safe().finite(),
-    accountType: z.union([z.literal('MAIN'), z.literal('CARD')]).optional(),
+    accountType: z.enum('MAIN', 'CARD').optional(),
     current: z.number().int().safe().finite().optional(),
     size: z.number().int().safe().finite().optional(),
     recvWindow: z.number().int().safe().finite().optional(),

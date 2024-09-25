@@ -17,7 +17,7 @@ export const getSapiV1MarginTransferEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     asset: z.string().optional(),
-    type: z.union([z.literal('ROLL_IN'), z.literal('ROLL_OUT')]).optional(),
+    type: z.enum('ROLL_IN', 'ROLL_OUT').optional(),
     startTime: z.number().int().safe().finite().optional(),
     endTime: z.number().int().safe().finite().optional(),
     current: z.number().int().safe().finite().optional(),

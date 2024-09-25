@@ -17,9 +17,7 @@ export const postSapiV1AssetGetFundingAssetEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     asset: z.string().optional(),
-    needBtcValuation: z
-      .union([z.literal('true'), z.literal('false')])
-      .optional(),
+    needBtcValuation: z.enum('true', 'false').optional(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

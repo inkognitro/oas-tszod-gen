@@ -17,7 +17,7 @@ export const getSapiV1SubAccountListEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     email: z.string().optional(),
-    isFreeze: z.union([z.literal('true'), z.literal('false')]).optional(),
+    isFreeze: z.enum('true', 'false').optional(),
     page: z.number().int().safe().finite().optional(),
     limit: z.number().int().safe().finite().optional(),
     recvWindow: z.number().int().safe().finite().optional(),

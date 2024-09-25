@@ -1,15 +1,15 @@
 import {
   ObjectSchema,
-  ObjectSchemaProperties,
+  ObjectSchemaProps,
   ConcreteResponse,
   ResponseBodyContent,
   ResponseHeaderByNameMap,
   isStringSchema,
-  ComponentRef,
   Response,
   isResponseComponentRef,
   isConcreteResponse,
   findConcreteSchema,
+  ResponseComponentRef,
 } from '@/oas3/specification';
 import {
   CodeGenerationOutput,
@@ -32,7 +32,7 @@ function createHeadersObjectSchema(
   headersSchema: ResponseHeaderByNameMap
 ): ObjectSchema {
   const requiredProps: string[] = [];
-  const props: ObjectSchemaProperties = {};
+  const props: ObjectSchemaProps = {};
   for (const headerName in headersSchema) {
     requiredProps.push(headerName);
     const headerSchema = headersSchema[headerName].schema;
@@ -193,7 +193,7 @@ function applyConcreteResponse(
 
 function applyComponentRefResponse(
   codeGenerator: CodeGenerator,
-  schema: ComponentRef,
+  schema: ResponseComponentRef,
   path: OutputPath,
   config: GenerateConfig,
   preventFromAddingComponentRefs: string[] = []

@@ -3,7 +3,7 @@ import {
   ConcreteParameterLocation,
   findConcreteParameter,
   ObjectSchema,
-  ObjectSchemaProperties,
+  ObjectSchemaProps,
   Parameter,
 } from '@/oas3/specification';
 
@@ -12,7 +12,7 @@ export function findObjectSchemaFromLocationParameters(
   requestParameters: Parameter[],
   paramLocation: ConcreteParameterLocation
 ): null | ObjectSchema {
-  const objectSchemaProps: ObjectSchemaProperties = {};
+  const objectSchemaProps: ObjectSchemaProps = {};
   const requiredObjectSchemaPropNames: string[] = [];
   let hasParametersForLocation = false;
   requestParameters.forEach(paramOrRef => {

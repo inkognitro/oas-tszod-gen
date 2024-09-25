@@ -1,6 +1,6 @@
 import {
+  RequestBodyContent,
   RequestBodyContentByTypeMap,
-  ResponseBodyContent,
 } from '@/oas3/specification';
 import {
   CodeGenerationOutput,
@@ -21,7 +21,7 @@ type ApplyRequestBodyResult = {
 function applyRequestBodyContent(
   codeGenerator: CodeGenerator,
   contentType: string,
-  contentSchema: ResponseBodyContent,
+  contentSchema: RequestBodyContent,
   parentPath: OutputPath,
   config: GenerateConfig
 ): ApplyRequestBodyResult {

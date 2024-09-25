@@ -28,17 +28,17 @@ export function findConcreteSchema(
   spec: Specification,
   schema: Schema
 ): null | ConcreteSchema {
+  if (isSchemaComponentRef(schema)) {
+    const componentSchema = findComponentSchemaByRef(spec, schema.$ref);
+    if (!componentSchema) {
+      return null;
+    }
+    return findConcreteSchema(spec, componentSchema);
+  }
   if (isConcreteSchema(schema)) {
     return schema;
   }
-  if (!isSchemaComponentRef(schema)) {
-    return null;
-  }
-  const componentSchema = findComponentSchemaByRef(spec, schema.$ref);
-  if (!componentSchema) {
-    return null;
-  }
-  return findConcreteSchema(spec, componentSchema);
+  return null;
 }
 
 export function findComponentParameterByRef(

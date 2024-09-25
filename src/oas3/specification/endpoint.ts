@@ -1,100 +1,29 @@
-import {isSchema, Schema} from './schema';
-import {isResponseByStatusCodeMap, ResponseByStatusCodeMap} from './response';
-import {ComponentRef, isParameterComponentRef} from './componentRef';
+import {zSchema} from './schema';
+import {zResponseByStatusCodeMap} from './response';
+import {zParameterComponentRef} from './componentRef';
+import {z} from 'zod';
 
-type PermissionsBySecurityName = {
-  [securityName: string]: string[];
-};
+const zPermissionsBySecurityName = z.record(z.array(z.string()));
 
-function isPermissionsBySecurityName(
-  anyValue: unknown
-): anyValue is PermissionsBySecurityName {
-  const value = anyValue as PermissionsBySecurityName;
-  if (typeof value !== 'object' || Array.isArray(value)) {
-    return false;
-  }
-  const securityNames = Object.values(value);
-  for (const securityName in securityNames) {
-    const permissions = securityNames[securityName];
-    if (!Array.isArray(permissions)) {
-      return false;
-    }
-    if (permissions.find(p => typeof p !== 'string')) {
-      return false;
-    }
-  }
-  return true;
-}
+const zPermissionsBySecurityNameArray = z.array(zPermissionsBySecurityName);
 
-export type PermissionsBySecurityNameArray = PermissionsBySecurityName[];
+export const zRequestBodyContent = z.object({
+  schema: zSchema,
+});
 
-export function isPermissionsBySecurityNameArray(
-  anyValue: unknown
-): anyValue is PermissionsBySecurityNameArray {
-  const value = anyValue as PermissionsBySecurityNameArray;
-  if (value === null) {
-    return true;
-  }
-  if (!Array.isArray(value)) {
-    return false;
-  }
-  if (value.find(v => !isPermissionsBySecurityName(v))) {
-    return false;
-  }
-  return true;
-}
+export type RequestBodyContent = z.infer<typeof zRequestBodyContent>;
 
-export type RequestBodyContent = {
-  schema: Schema;
-};
+export const zRequestBodyContentByTypeMap = z.record(zRequestBodyContent);
 
-export function isRequestBodyContent(
-  anyValue: unknown
-): anyValue is RequestBodyContent {
-  const value = anyValue as RequestBodyContent;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (!isSchema(value.schema)) {
-    return false;
-  }
-  return true;
-}
+export type RequestBodyContentByTypeMap = z.infer<
+  typeof zRequestBodyContentByTypeMap
+>;
 
-export type RequestBodyContentByTypeMap = {
-  [contentType: string]: RequestBodyContent;
-};
+export const zRequestBody = z.object({
+  content: zRequestBodyContentByTypeMap.optional(),
+});
 
-export function isRequestBodyContentByTypeMap(
-  anyValue: unknown
-): anyValue is RequestBodyContentByTypeMap {
-  const value = anyValue as RequestBodyContentByTypeMap;
-  if (typeof value !== 'object' || Array.isArray(value.content)) {
-    return false;
-  }
-  for (const contentType in value) {
-    const requestBodyContent = value[contentType];
-    if (!isRequestBodyContent(requestBodyContent)) {
-      return false;
-    }
-  }
-  return true;
-}
-
-export type RequestBody = {
-  content?: RequestBodyContentByTypeMap;
-};
-
-export function isRequestBody(anyValue: unknown): anyValue is RequestBody {
-  const value = anyValue as RequestBody;
-  if (typeof value !== 'object' || Array.isArray(value)) {
-    return false;
-  }
-  if (value.content && !isRequestBodyContentByTypeMap(value.content)) {
-    return false;
-  }
-  return true;
-}
+export type RequestBody = z.infer<typeof zRequestBody>;
 
 export type ConcreteParameterLocation = 'query' | 'path' | 'header' | 'cookie';
 export const concreteParameterLocations: ConcreteParameterLocation[] = [
@@ -104,93 +33,41 @@ export const concreteParameterLocations: ConcreteParameterLocation[] = [
   'cookie',
 ];
 
-export type ConcreteParameter = {
-  name: string;
-  in: ConcreteParameterLocation;
-  required?: boolean;
-  schema: Schema;
-};
+const zConcreteParameter = z.object({
+  name: z.string(),
+  in: z.enum(['query', 'path', 'header', 'cookie']),
+  required: z.boolean().optional(),
+  schema: zSchema,
+});
+
+export type ConcreteParameter = z.infer<typeof zConcreteParameter>;
 
 export function isConcreteParameter(
   anyValue: unknown
 ): anyValue is ConcreteParameter {
-  const value = anyValue as ConcreteParameter;
-  if (typeof value !== 'object') {
-    return false;
-  }
-  if (typeof value.name !== 'string') {
-    return false;
-  }
-  if (
-    typeof value.in !== 'string' ||
-    !concreteParameterLocations.includes(value.in)
-  ) {
-    return false;
-  }
-  if (value.required !== undefined && typeof value.required !== 'boolean') {
-    return false;
-  }
-  if (!isSchema(value.schema)) {
-    return false;
-  }
-  return true;
+  return zConcreteParameter.safeParse(anyValue).success;
 }
 
-export type Parameter = ConcreteParameter | ComponentRef;
+export const zParameter = z.union([zConcreteParameter, zParameterComponentRef]);
+
+export type Parameter = z.infer<typeof zParameter>;
 
 export function isParameter(anyValue: unknown): anyValue is Parameter {
-  return isConcreteParameter(anyValue) || isParameterComponentRef(anyValue);
+  return zParameter.safeParse(anyValue).success;
 }
 
-export type Endpoint = {
-  operationId?: string;
-  tags: string[];
-  parameters?: Parameter[];
-  requestBody?: RequestBody;
-  summary?: string;
-  responses: ResponseByStatusCodeMap;
-  security?: null | PermissionsBySecurityNameArray;
-};
+export const zEndpoint = z.object({
+  operationId: z.string().optional(),
+  tags: z.array(z.string()),
+  parameters: z.array(zParameter).optional(),
+  requestBody: zRequestBody.optional(),
+  summary: z.string().optional(),
+  responses: zResponseByStatusCodeMap,
+  security: zPermissionsBySecurityNameArray.nullable().optional(),
+});
+
+export type Endpoint = z.infer<typeof zEndpoint>;
 
 export function isEndpoint(anyValue: unknown): anyValue is Endpoint {
-  const value = anyValue as Endpoint;
-  if (typeof value !== 'object' || Array.isArray(value)) {
-    return false;
-  }
-  if (value.operationId && typeof value.operationId !== 'string') {
-    return false;
-  }
-  if (!Array.isArray(value.tags)) {
-    return false;
-  }
-  const invalidTag = value.tags.find(t => typeof t !== 'string');
-  if (invalidTag) {
-    return false;
-  }
-  if (value.parameters !== undefined && !Array.isArray(value.parameters)) {
-    return false;
-  }
-  const invalidParameter = value.parameters?.find(p => !isParameter(p));
-  if (invalidParameter) {
-    return false;
-  }
-  if (value.parameters !== undefined && !Array.isArray(value.parameters)) {
-    return false;
-  }
-  if (value.requestBody !== undefined && !isRequestBody(value.requestBody)) {
-    return false;
-  }
-  if (value.summary !== undefined && typeof value.summary !== 'string') {
-    return false;
-  }
-  if (!isResponseByStatusCodeMap(value.responses)) {
-    return false;
-  }
-  if (
-    value.security !== undefined &&
-    !isPermissionsBySecurityNameArray(value.security)
-  ) {
-    return false;
-  }
-  return true;
+  return zEndpoint.safeParse(anyValue).success;
 }
