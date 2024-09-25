@@ -350,8 +350,8 @@ One might collect all external `$ref` definitions and modify the specs according
 when passing them to the generator.
 - The `discriminator.mapping` property - as described
 [here](https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/) is ignored.
-It is recommended to define a single literal value with the `enum` property of a string schema for the discriminating
-property of those schemas which are used in `oneOf` or `anyOf` having a discriminator.
+It is recommended to define the discriminating literal value directly in the schemas which are referenced in
+`oneOf` or `anyOf` (as long as the discriminator is defined in there). This can be achieved through a string enum.
 - The `writeOnly` property described [here](https://swagger.io/docs/specification/data-models/data-types/) is ignored.
 It is recommended to have separate definitions for read and write objects, especially with changing requirements
 (see also [CQRS pattern](https://martinfowler.com/bliki/CQRS.html)).
