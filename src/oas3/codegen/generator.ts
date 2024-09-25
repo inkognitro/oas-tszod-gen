@@ -29,7 +29,6 @@ import {
   requestResultOutputPathPart,
   responseOutputPathPart,
 } from './endpoint';
-import {mkdirp} from 'mkdirp';
 import {templateDefinitionOutputs} from './template';
 import {applySchema} from './schema';
 import {applyZodSchema} from './zodSchema';
@@ -56,13 +55,17 @@ function removeDirectoryRecursively(path: string) {
 
 async function writeFile(path: string, content: string) {
   const dirPath = path.split('\\').join('/').split('/').slice(0, -1).join('/');
-  await mkdirp(dirPath);
+  fs.mkdirSync(dirPath, {recursive: true}, (err: Error) => {
+    if (err) throw err;
+  });
   fs.writeFileSync(path, content);
 }
 
 async function appendToFile(path: string, content: string) {
   const dirPath = path.split('\\').join('/').split('/').slice(0, -1).join('/');
-  await mkdirp(dirPath);
+  fs.mkdirSync(dirPath, {recursive: true}, (err: Error) => {
+    if (err) throw err;
+  });
   fs.appendFileSync(path, content);
 }
 
