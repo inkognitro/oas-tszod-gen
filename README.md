@@ -317,10 +317,10 @@ This might be useful when you want to provide a separate `ScopedRequestHandler` 
 Anyway, React stuff is out-of-scope of this package.
 
 ### ZodValidationRequestHandler
-**:warning: not available yet**
-
 This implementation is responsible for validating the request and response data through their Zod schemas.
 This one is only available when Zod schemas are generated due to the `withZod: true` configuration.
+This request handler will throw an error when request or response data was found which does not correspond to the
+zod schema definition.
 
 ## Promises: `resolve` vs `reject`
 The provided `RequestHandler` implementations distinguish between "expected" and
