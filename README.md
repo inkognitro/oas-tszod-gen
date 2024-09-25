@@ -327,8 +327,8 @@ Anyway, React stuff is out-of-scope of this package.
 ### ZodValidationRequestHandler
 This implementation is responsible for validating the request and response data through their Zod schemas.
 This one is only available when Zod schemas are generated due to the `withZod: true` configuration.
-This request handler does throw an error when requests or responses do not comply with the
-zod schema definitions which are defined inside the requests' `endpointSchema` property.
+This request handler does `reject` the promise with the Zod error when requests or responses do not comply with the
+Zod schema definitions which are defined in the requests' `endpointSchema` property.
 It uses the [safeParse](https://zod.dev/?id=safeparse) method for this task.
 
 ## Promises: `resolve` vs `reject`
