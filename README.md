@@ -18,13 +18,14 @@ However, I coded my own solution because I wanted to:
 - have a uniform way as an alternative to [Axios' interceptors](https://axios-http.com/docs/interceptors)
 through different `RequestHandler` implementations
 
-> :bulb: [Axios](https://axios-http.com/docs/intro) is great. It offers a lot and it works with
-> [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API) under the hood.
+> :bulb: [Axios](https://axios-http.com/docs/intro) is great. It offers a lot, and it works with
+> [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API) under the hood by default.
 > But one might have PWAs and [service workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
 > in mind where XMLHttpRequest is out of scope.
 > Others just want to use `fetch` for backend stuff in their [NextJs](https://nextjs.org/docs/app/api-reference/functions/fetch)
 > app to benefit from automatic caching. There are lots of articles out there which discuss things like
 > [Axios Vs Fetch](https://blog.logrocket.com/axios-vs-fetch-best-http-requests/).
+> Even though, since version 1.7.0 Axios does natively support a [fetch adapter](https://github.com/axios/axios?tab=readme-ov-file#-fetch-adapter).
 
 ## Generator: Setup and usage
 First, install the package as a dev dependency:
