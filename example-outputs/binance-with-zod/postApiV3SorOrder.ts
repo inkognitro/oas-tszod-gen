@@ -17,26 +17,26 @@ export const postApiV3SorOrderEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
-    side: z.enum('SELL', 'BUY'),
-    type: z.enum(
+    side: z.enum(['SELL', 'BUY']),
+    type: z.enum([
       'LIMIT',
       'MARKET',
       'STOP_LOSS',
       'STOP_LOSS_LIMIT',
       'TAKE_PROFIT',
       'TAKE_PROFIT_LIMIT',
-      'LIMIT_MAKER'
-    ),
-    timeInForce: z.enum('GTC', 'IOC', 'FOK').optional(),
+      'LIMIT_MAKER',
+    ]),
+    timeInForce: z.enum(['GTC', 'IOC', 'FOK']).optional(),
     quantity: z.number().safe().finite(),
     price: z.number().safe().finite().optional(),
     newClientOrderId: z.string().optional(),
     strategyId: z.number().int().safe().finite().optional(),
     strategyType: z.number().int().safe().finite().optional(),
     icebergQty: z.number().safe().finite().optional(),
-    newOrderRespType: z.enum('ACK', 'RESULT', 'FULL').optional(),
+    newOrderRespType: z.enum(['ACK', 'RESULT', 'FULL']).optional(),
     selfTradePreventionMode: z
-      .enum('EXPIRE_TAKER', 'EXPIRE_MAKER', 'EXPIRE_BOTH', 'NONE')
+      .enum(['EXPIRE_TAKER', 'EXPIRE_MAKER', 'EXPIRE_BOTH', 'NONE'])
       .optional(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),

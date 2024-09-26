@@ -16,7 +16,7 @@ export const postSapiV1MarginManualLiquidationEndpointSchema = {
   method: 'post',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    type: z.enum('MARGIN', 'ISOLATED'),
+    type: z.enum(['MARGIN', 'ISOLATED']),
     symbol: z.string().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

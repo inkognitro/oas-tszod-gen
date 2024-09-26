@@ -26,31 +26,31 @@ export const postSapiV1MarginOrderEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
-    isIsolated: z.enum('TRUE', 'FALSE').optional(),
-    side: z.enum('SELL', 'BUY'),
-    type: z.enum(
+    isIsolated: z.enum(['TRUE', 'FALSE']).optional(),
+    side: z.enum(['SELL', 'BUY']),
+    type: z.enum([
       'LIMIT',
       'MARKET',
       'STOP_LOSS',
       'STOP_LOSS_LIMIT',
       'TAKE_PROFIT',
       'TAKE_PROFIT_LIMIT',
-      'LIMIT_MAKER'
-    ),
+      'LIMIT_MAKER',
+    ]),
     quantity: z.number().safe().finite(),
     quoteOrderQty: z.number().safe().finite().optional(),
     price: z.number().safe().finite().optional(),
     stopPrice: z.number().safe().finite().optional(),
     newClientOrderId: z.string().optional(),
     icebergQty: z.number().safe().finite().optional(),
-    newOrderRespType: z.enum('ACK', 'RESULT', 'FULL').optional(),
+    newOrderRespType: z.enum(['ACK', 'RESULT', 'FULL']).optional(),
     sideEffectType: z
-      .enum('NO_SIDE_EFFECT', 'MARGIN_BUY', 'AUTO_REPAY')
+      .enum(['NO_SIDE_EFFECT', 'MARGIN_BUY', 'AUTO_REPAY'])
       .optional(),
-    timeInForce: z.enum('GTC', 'IOC', 'FOK').optional(),
+    timeInForce: z.enum(['GTC', 'IOC', 'FOK']).optional(),
     autoRepayAtCancel: z.boolean(),
     selfTradePreventionMode: z
-      .enum('EXPIRE_TAKER', 'EXPIRE_MAKER', 'EXPIRE_BOTH', 'NONE')
+      .enum(['EXPIRE_TAKER', 'EXPIRE_MAKER', 'EXPIRE_BOTH', 'NONE'])
       .optional(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),

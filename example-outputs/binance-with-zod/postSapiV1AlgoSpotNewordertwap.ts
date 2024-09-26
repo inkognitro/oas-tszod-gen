@@ -17,7 +17,7 @@ export const postSapiV1AlgoSpotNewordertwapEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
-    side: z.enum('SELL', 'BUY'),
+    side: z.enum(['SELL', 'BUY']),
     quantity: z.number().safe().finite(),
     duration: z.number().int().safe().finite(),
     clientAlgoId: z.string().optional(),

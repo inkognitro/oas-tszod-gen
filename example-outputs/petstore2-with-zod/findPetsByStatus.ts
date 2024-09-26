@@ -18,7 +18,7 @@ export const findPetsByStatusEndpointSchema = {
     {name: 'petstore_auth', requiredPermissions: ['write:pets', 'read:pets']},
   ],
   queryParamsZodSchema: z.object({
-    status: z.enum('available', 'pending', 'sold').optional(),
+    status: z.enum(['available', 'pending', 'sold']).optional(),
   }),
   bodyByContentType: {},
   responseByStatus: {

@@ -19,7 +19,7 @@ export const getSapiV1MarginCapitalFlowEndpointSchema = {
     asset: z.string().optional(),
     symbol: z.string().optional(),
     type: z
-      .enum(
+      .enum([
         'TRANSFER',
         'BORROW',
         'REPAY',
@@ -35,8 +35,8 @@ export const getSapiV1MarginCapitalFlowEndpointSchema = {
         'LIQUIDATION_FEE',
         'SMALL_BALANCE_CONVERT',
         'COMMISSION_RETURN',
-        'SMALL_CONVERT'
-      )
+        'SMALL_CONVERT',
+      ])
       .optional(),
     startTime: z.number().int().safe().finite().optional(),
     endTime: z.number().int().safe().finite().optional(),

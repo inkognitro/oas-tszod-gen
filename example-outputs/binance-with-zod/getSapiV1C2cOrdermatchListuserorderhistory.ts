@@ -16,7 +16,7 @@ export const getSapiV1C2cOrdermatchListuserorderhistoryEndpointSchema = {
   method: 'get',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    tradeType: z.enum('BUY', 'SELL'),
+    tradeType: z.enum(['BUY', 'SELL']),
     startTimestamp: z.number().int().safe().finite().optional(),
     endTimestamp: z.number().int().safe().finite().optional(),
     page: z.number().int().safe().finite().optional(),

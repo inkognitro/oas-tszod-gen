@@ -25,7 +25,7 @@ export const getApiV3Ticker24hrEndpointSchema = {
   queryParamsZodSchema: z.object({
     symbol: z.string().optional(),
     symbols: z.string().optional(),
-    type: z.enum('FULL', 'MINI').optional(),
+    type: z.enum(['FULL', 'MINI']).optional(),
   }),
   bodyByContentType: {},
   responseByStatus: {

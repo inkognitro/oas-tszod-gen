@@ -17,7 +17,7 @@ export const getApiV3UiklinesEndpointSchema = {
   supportedSecuritySchemas: [],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
-    interval: z.enum(
+    interval: z.enum([
       '1s',
       '1m',
       '3m',
@@ -33,8 +33,8 @@ export const getApiV3UiklinesEndpointSchema = {
       '1d',
       '3d',
       '1w',
-      '1M'
-    ),
+      '1M',
+    ]),
     startTime: z.number().int().safe().finite().optional(),
     endTime: z.number().int().safe().finite().optional(),
     timeZone: z.string().optional(),

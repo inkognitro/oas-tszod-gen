@@ -35,7 +35,7 @@ export const petZodSchema = z.object({
   category: categoryZodSchema.optional(),
   photoUrls: z.array(z.string()),
   tags: z.array(tagZodSchema).optional(),
-  status: z.enum('available', 'pending', 'sold').optional(),
+  status: z.enum(['available', 'pending', 'sold']).optional(),
 });
 
 export type ApiResponse = {
@@ -64,7 +64,7 @@ export const orderZodSchema = z.object({
   petId: z.number().int().safe().finite().optional(),
   quantity: z.number().int().safe().finite().optional(),
   shipDate: z.string().datetime().optional(), // date-time
-  status: z.enum('placed', 'approved', 'delivered').optional(),
+  status: z.enum(['placed', 'approved', 'delivered']).optional(),
   complete: z.boolean().optional(),
 });
 

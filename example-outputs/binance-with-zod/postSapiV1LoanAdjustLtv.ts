@@ -18,7 +18,7 @@ export const postSapiV1LoanAdjustLtvEndpointSchema = {
   queryParamsZodSchema: z.object({
     orderId: z.number().int().safe().finite(),
     amount: z.number().safe().finite(),
-    direction: z.enum('ADDITIONAL', 'REDUCED'),
+    direction: z.enum(['ADDITIONAL', 'REDUCED']),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

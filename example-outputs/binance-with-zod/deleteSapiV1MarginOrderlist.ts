@@ -22,7 +22,7 @@ export const deleteSapiV1MarginOrderlistEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
-    isIsolated: z.enum('TRUE', 'FALSE').optional(),
+    isIsolated: z.enum(['TRUE', 'FALSE']).optional(),
     orderListId: z.number().int().safe().finite().optional(),
     listClientOrderId: z.string().optional(),
     newClientOrderId: z.string().optional(),

@@ -16,7 +16,7 @@ export const postSapiV1AssetDustBtcEndpointSchema = {
   method: 'post',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    accountType: z.enum('SPOT', 'MARGIN').optional(),
+    accountType: z.enum(['SPOT', 'MARGIN']).optional(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

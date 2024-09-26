@@ -19,7 +19,7 @@ export const postSapiV1DciProductSubscribeEndpointSchema = {
     id: z.string(),
     orderId: z.string(),
     depositAmount: z.number().safe().finite(),
-    autoCompoundPlan: z.enum('NONE', 'STANDARD', 'ADVANCE'),
+    autoCompoundPlan: z.enum(['NONE', 'STANDARD', 'ADVANCE']),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

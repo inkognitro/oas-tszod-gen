@@ -18,20 +18,20 @@ export const postSapiV1SubAccountUniversaltransferEndpointSchema = {
   queryParamsZodSchema: z.object({
     fromEmail: z.string().optional(),
     toEmail: z.string().optional(),
-    fromAccountType: z.enum(
+    fromAccountType: z.enum([
       'SPOT',
       'USDT_FUTURE',
       'COIN_FUTURE',
       'MARGIN',
-      'ISOLATED_MARGIN'
-    ),
-    toAccountType: z.enum(
+      'ISOLATED_MARGIN',
+    ]),
+    toAccountType: z.enum([
       'SPOT',
       'USDT_FUTURE',
       'COIN_FUTURE',
       'MARGIN',
-      'ISOLATED_MARGIN'
-    ),
+      'ISOLATED_MARGIN',
+    ]),
     clientTranId: z.string().optional(),
     symbol: z.string().optional(),
     asset: z.string(),

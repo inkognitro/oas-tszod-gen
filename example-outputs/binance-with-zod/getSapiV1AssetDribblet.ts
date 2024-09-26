@@ -16,7 +16,7 @@ export const getSapiV1AssetDribbletEndpointSchema = {
   method: 'get',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    accountType: z.enum('SPOT', 'MARGIN').optional(),
+    accountType: z.enum(['SPOT', 'MARGIN']).optional(),
     startTime: z.number().int().safe().finite().optional(),
     endTime: z.number().int().safe().finite().optional(),
     recvWindow: z.number().int().safe().finite().optional(),

@@ -16,7 +16,7 @@ export const getSapiV1DciProductListEndpointSchema = {
   method: 'get',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    optionType: z.enum('CALL', 'PUT'),
+    optionType: z.enum(['CALL', 'PUT']),
     exercisedCoin: z.string(),
     investCoin: z.string(),
     pageSize: z.string().optional(),

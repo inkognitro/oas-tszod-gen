@@ -17,15 +17,15 @@ export const getSapiV1DciProductPositionsEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     status: z
-      .enum(
+      .enum([
         'PENDING',
         'PURCHASE_SUCCESS',
         'SETTLED',
         'PURCHASE_FAIL',
         'REFUNDING',
         'REFUND_SUCCESS',
-        'SETTLING'
-      )
+        'SETTLING',
+      ])
       .optional(),
     pageSize: z.string().optional(),
     pageIndex: z.number().int().safe().finite().optional(),

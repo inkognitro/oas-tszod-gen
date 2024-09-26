@@ -17,7 +17,7 @@ export const getSapiV1FuturesHistdatalinkEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
-    dataType: z.enum('T_DEPTH', 'S_DEPTH'),
+    dataType: z.enum(['T_DEPTH', 'S_DEPTH']),
     startTime: z.number().int().safe().finite().optional(),
     endTime: z.number().int().safe().finite().optional(),
     recvWindow: z.number().int().safe().finite().optional(),

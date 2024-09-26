@@ -16,7 +16,7 @@ export const postSapiV1AssetTransferEndpointSchema = {
   method: 'post',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    type: z.enum(
+    type: z.enum([
       'MAIN_C2C',
       'MAIN_UMFUTURE',
       'MAIN_CMFUTURE',
@@ -44,8 +44,8 @@ export const postSapiV1AssetTransferEndpointSchema = {
       'PAY_MAIN',
       'ISOLATEDMARGIN_MARGIN',
       'MARGIN_ISOLATEDMARGIN',
-      'ISOLATEDMARGIN_ISOLATEDMARGIN'
-    ),
+      'ISOLATEDMARGIN_ISOLATEDMARGIN',
+    ]),
     asset: z.string(),
     amount: z.number().safe().finite(),
     fromSymbol: z.string().optional(),

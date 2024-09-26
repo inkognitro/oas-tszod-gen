@@ -19,7 +19,7 @@ export const postSapiV2LoanFlexibleAdjustLtvEndpointSchema = {
     loanCoin: z.string().optional(),
     collateralCoin: z.string().optional(),
     adjustmentAmount: z.number().safe().finite(),
-    direction: z.enum('ADDITIONAL', 'REDUCED'),
+    direction: z.enum(['ADDITIONAL', 'REDUCED']),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

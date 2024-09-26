@@ -17,7 +17,7 @@ export const postSapiV1DciProductAuto_compoundEditStatusEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     positionId: z.number().int().safe().finite(),
-    autoCompoundPlan: z.enum('NONE', 'STANDARD', 'ADVANCE'),
+    autoCompoundPlan: z.enum(['NONE', 'STANDARD', 'ADVANCE']),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

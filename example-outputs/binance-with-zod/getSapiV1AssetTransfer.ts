@@ -16,7 +16,7 @@ export const getSapiV1AssetTransferEndpointSchema = {
   method: 'get',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    type: z.enum(
+    type: z.enum([
       'MAIN_C2C',
       'MAIN_UMFUTURE',
       'MAIN_CMFUTURE',
@@ -44,8 +44,8 @@ export const getSapiV1AssetTransferEndpointSchema = {
       'PAY_MAIN',
       'ISOLATEDMARGIN_MARGIN',
       'MARGIN_ISOLATEDMARGIN',
-      'ISOLATEDMARGIN_ISOLATEDMARGIN'
-    ),
+      'ISOLATEDMARGIN_ISOLATEDMARGIN',
+    ]),
     startTime: z.number().int().safe().finite().optional(),
     endTime: z.number().int().safe().finite().optional(),
     current: z.number().int().safe().finite().optional(),

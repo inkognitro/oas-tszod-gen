@@ -18,7 +18,7 @@ export const postApiV3OrderOcoEndpointSchema = {
   queryParamsZodSchema: z.object({
     symbol: z.string(),
     listClientOrderId: z.string().optional(),
-    side: z.enum('SELL', 'BUY'),
+    side: z.enum(['SELL', 'BUY']),
     quantity: z.number().safe().finite(),
     limitClientOrderId: z.string().optional(),
     limitStrategyId: z.number().int().safe().finite().optional(),
@@ -32,10 +32,10 @@ export const postApiV3OrderOcoEndpointSchema = {
     stopStrategyType: z.number().int().safe().finite().optional(),
     stopLimitPrice: z.number().safe().finite().optional(),
     stopIcebergQty: z.number().safe().finite().optional(),
-    stopLimitTimeInForce: z.enum('GTC', 'FOK', 'IOC').optional(),
-    newOrderRespType: z.enum('ACK', 'RESULT', 'FULL').optional(),
+    stopLimitTimeInForce: z.enum(['GTC', 'FOK', 'IOC']).optional(),
+    newOrderRespType: z.enum(['ACK', 'RESULT', 'FULL']).optional(),
     selfTradePreventionMode: z
-      .enum('EXPIRE_TAKER', 'EXPIRE_MAKER', 'EXPIRE_BOTH', 'NONE')
+      .enum(['EXPIRE_TAKER', 'EXPIRE_MAKER', 'EXPIRE_BOTH', 'NONE'])
       .optional(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),

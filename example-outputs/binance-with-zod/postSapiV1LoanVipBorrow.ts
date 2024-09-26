@@ -21,7 +21,7 @@ export const postSapiV1LoanVipBorrowEndpointSchema = {
     loanAmount: z.number().safe().finite(),
     collateralAccountId: z.string(),
     collateralCoin: z.string(),
-    isFlexibleRate: z.enum('TRUE', 'FALSE'),
+    isFlexibleRate: z.enum(['TRUE', 'FALSE']),
     loanTerm: z.number().int().safe().finite().optional(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),

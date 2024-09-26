@@ -17,7 +17,7 @@ export const getSapiV1MarginNextHourlyInterestRateEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     assets: z.string().optional(),
-    isIsolated: z.enum('TRUE', 'FALSE').optional(),
+    isIsolated: z.enum(['TRUE', 'FALSE']).optional(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

@@ -18,7 +18,7 @@ export const getSapiV1LendingProjectPositionListEndpointSchema = {
   queryParamsZodSchema: z.object({
     asset: z.string(),
     projectId: z.string().optional(),
-    status: z.enum('ALL', 'SUBSCRIBABLE', 'UNSUBSCRIBABLE').optional(),
+    status: z.enum(['ALL', 'SUBSCRIBABLE', 'UNSUBSCRIBABLE']).optional(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

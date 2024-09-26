@@ -16,12 +16,12 @@ export const postSapiV1LendingAutoInvestPlanAddEndpointSchema = {
   method: 'post',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    sourceType: z.enum('MAIN_SITE', 'TR'),
+    sourceType: z.enum(['MAIN_SITE', 'TR']),
     requestId: z.string().optional(),
-    planType: z.enum('SINGLE', 'PORTFOLIO', 'INDEX'),
+    planType: z.enum(['SINGLE', 'PORTFOLIO', 'INDEX']),
     IndexId: z.number().int().safe().finite().optional(),
     subscriptionAmount: z.number().safe().finite(),
-    subscriptionCycle: z.enum(
+    subscriptionCycle: z.enum([
       'H1',
       'H4',
       'H8',
@@ -29,11 +29,11 @@ export const postSapiV1LendingAutoInvestPlanAddEndpointSchema = {
       'WEEKLY',
       'DAILY',
       'MONTHLY',
-      'BI_WEEKLY'
-    ),
+      'BI_WEEKLY',
+    ]),
     subscriptionStartDay: z.number().int().safe().finite().optional(),
     subscriptionStartWeekday: z
-      .enum('MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN')
+      .enum(['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'])
       .optional(),
     subscriptionStartTime: z.number().int().safe().finite(),
     sourceAsset: z.string(),

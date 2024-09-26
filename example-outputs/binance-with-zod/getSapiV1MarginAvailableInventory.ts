@@ -16,7 +16,7 @@ export const getSapiV1MarginAvailableInventoryEndpointSchema = {
   method: 'get',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    type: z.enum('MARGIN', 'ISOLATED'),
+    type: z.enum(['MARGIN', 'ISOLATED']),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),
   }),

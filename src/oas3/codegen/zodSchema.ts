@@ -153,7 +153,11 @@ function applyZodStringSchema(
     createCode: () => {
       let code = '';
       if (schema.enum) {
-        code += `z.enum('${schema.enum.map(e => e.replaceAll("'", "\\'")).join("', '")}')`;
+        if (!schema.enum.length) {
+          code += 'z.enum([])';
+        } else {
+          code += `z.enum(['${schema.enum.map(e => e.replaceAll("'", "\\'")).join("', '")}'])`;
+        }
       } else if (schema.format === 'binary') {
         code += 'z.any()';
       } else {

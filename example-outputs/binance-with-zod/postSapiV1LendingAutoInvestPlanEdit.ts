@@ -18,7 +18,7 @@ export const postSapiV1LendingAutoInvestPlanEditEndpointSchema = {
   queryParamsZodSchema: z.object({
     planId: z.number().int().safe().finite(),
     subscriptionAmount: z.number().safe().finite(),
-    subscriptionCycle: z.enum(
+    subscriptionCycle: z.enum([
       'H1',
       'H4',
       'H8',
@@ -26,11 +26,11 @@ export const postSapiV1LendingAutoInvestPlanEditEndpointSchema = {
       'WEEKLY',
       'DAILY',
       'MONTHLY',
-      'BI_WEEKLY'
-    ),
+      'BI_WEEKLY',
+    ]),
     subscriptionStartDay: z.number().int().safe().finite().optional(),
     subscriptionStartWeekday: z
-      .enum('MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN')
+      .enum(['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'])
       .optional(),
     subscriptionStartTime: z.number().int().safe().finite(),
     sourceAsset: z.string(),

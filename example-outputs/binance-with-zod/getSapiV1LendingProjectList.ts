@@ -17,11 +17,11 @@ export const getSapiV1LendingProjectListEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     asset: z.string().optional(),
-    type: z.enum('ACTIVITY', 'CUSTOMIZED_FIXED'),
-    status: z.enum('ALL', 'SUBSCRIBABLE', 'UNSUBSCRIBABLE').optional(),
+    type: z.enum(['ACTIVITY', 'CUSTOMIZED_FIXED']),
+    status: z.enum(['ALL', 'SUBSCRIBABLE', 'UNSUBSCRIBABLE']).optional(),
     isSortAsc: z.boolean().optional(),
     sortBy: z
-      .enum('START_TIME', 'LOT_SIZE', 'INTEREST_RATE', 'DURATION')
+      .enum(['START_TIME', 'LOT_SIZE', 'INTEREST_RATE', 'DURATION'])
       .optional(),
     current: z.number().int().safe().finite().optional(),
     size: z.number().int().safe().finite().optional(),

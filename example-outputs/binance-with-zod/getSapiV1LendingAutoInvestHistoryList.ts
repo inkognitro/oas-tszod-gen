@@ -20,7 +20,7 @@ export const getSapiV1LendingAutoInvestHistoryListEndpointSchema = {
     startTime: z.number().int().safe().finite().optional(),
     endTime: z.number().int().safe().finite().optional(),
     targetAsset: z.number().safe().finite().optional(),
-    planType: z.enum('SINGLE', 'PORTFOLIO', 'INDEX', 'ALL').optional(),
+    planType: z.enum(['SINGLE', 'PORTFOLIO', 'INDEX', 'ALL']).optional(),
     size: z.number().int().safe().finite().optional(),
     current: z.number().int().safe().finite().optional(),
     recvWindow: z.number().int().safe().finite().optional(),

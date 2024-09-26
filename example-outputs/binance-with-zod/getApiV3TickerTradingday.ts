@@ -26,7 +26,7 @@ export const getApiV3TickerTradingdayEndpointSchema = {
     symbol: z.string().optional(),
     symbols: z.string().optional(),
     timeZone: z.string().optional(),
-    type: z.enum('FULL', 'MINI').optional(),
+    type: z.enum(['FULL', 'MINI']).optional(),
   }),
   bodyByContentType: {},
   responseByStatus: {

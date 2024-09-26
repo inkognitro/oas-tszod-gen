@@ -56,7 +56,7 @@ export type DrsService = {
 export const drsServiceZodSchema = z.object({
   maxBulkRequestLength: z.number().int().safe().finite(),
   type: z.object({
-    artifact: z.enum('drs'),
+    artifact: z.enum(['drs']),
   }),
 });
 
@@ -80,7 +80,7 @@ export type Authorizations = {
 export const authorizationsZodSchema = z.object({
   drs_object_id: z.string().optional(),
   supported_types: z
-    .array(z.enum('None', 'BasicAuth', 'BearerAuth', 'PassportAuth'))
+    .array(z.enum(['None', 'BasicAuth', 'BearerAuth', 'PassportAuth']))
     .optional(),
   passport_auth_issuers: z.array(z.string()).optional(),
   bearer_auth_issuers: z.array(z.string()).optional(),
@@ -115,7 +115,7 @@ export type AccessMethod = {
 };
 
 export const accessMethodZodSchema = z.object({
-  type: z.enum(
+  type: z.enum([
     's3',
     'gs',
     'ftp',
@@ -123,8 +123,8 @@ export const accessMethodZodSchema = z.object({
     'globus',
     'htsget',
     'https',
-    'file'
-  ),
+    'file',
+  ]),
   access_url: accessURLZodSchema.optional(),
   access_id: z.string().optional(),
   region: z.string().optional(),

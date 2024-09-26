@@ -16,7 +16,7 @@ export const postSapiV1PortfolioBnbTransferEndpointSchema = {
   method: 'post',
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
-    transferSide: z.enum('TO_UM', 'FROM_UM'),
+    transferSide: z.enum(['TO_UM', 'FROM_UM']),
     amount: z.number().safe().finite(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),

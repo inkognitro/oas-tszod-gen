@@ -20,14 +20,14 @@ export const getSapiV1ManagedSubaccountQueryTransLogEndpointSchema = {
     endTime: z.number().int().safe().finite().optional(),
     page: z.number().int().safe().finite().optional(),
     limit: z.number().int().safe().finite().optional(),
-    transfers: z.enum('FROM', 'TO'),
-    transferFunctionAccountType: z.enum(
+    transfers: z.enum(['FROM', 'TO']),
+    transferFunctionAccountType: z.enum([
       'SPOT',
       'MARGIN',
       'ISOLATED_MARGIN',
       'USDT_FUTURE',
-      'COIN_FUTURE'
-    ),
+      'COIN_FUTURE',
+    ]),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
     signature: z.string(),

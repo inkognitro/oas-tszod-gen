@@ -17,9 +17,9 @@ export const postSapiV1MarginOrderOcoEndpointSchema = {
   supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
-    isIsolated: z.enum('TRUE', 'FALSE').optional(),
+    isIsolated: z.enum(['TRUE', 'FALSE']).optional(),
     listClientOrderId: z.string().optional(),
-    side: z.enum('SELL', 'BUY'),
+    side: z.enum(['SELL', 'BUY']),
     quantity: z.number().safe().finite(),
     limitClientOrderId: z.string().optional(),
     price: z.number().safe().finite(),
@@ -28,13 +28,13 @@ export const postSapiV1MarginOrderOcoEndpointSchema = {
     stopPrice: z.number().safe().finite(),
     stopLimitPrice: z.number().safe().finite().optional(),
     stopIcebergQty: z.number().safe().finite().optional(),
-    stopLimitTimeInForce: z.enum('GTC', 'FOK', 'IOC').optional(),
-    newOrderRespType: z.enum('ACK', 'RESULT', 'FULL').optional(),
+    stopLimitTimeInForce: z.enum(['GTC', 'FOK', 'IOC']).optional(),
+    newOrderRespType: z.enum(['ACK', 'RESULT', 'FULL']).optional(),
     sideEffectType: z
-      .enum('NO_SIDE_EFFECT', 'MARGIN_BUY', 'AUTO_REPAY')
+      .enum(['NO_SIDE_EFFECT', 'MARGIN_BUY', 'AUTO_REPAY'])
       .optional(),
     selfTradePreventionMode: z
-      .enum('EXPIRE_TAKER', 'EXPIRE_MAKER', 'EXPIRE_BOTH', 'NONE')
+      .enum(['EXPIRE_TAKER', 'EXPIRE_MAKER', 'EXPIRE_BOTH', 'NONE'])
       .optional(),
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),
