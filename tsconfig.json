@@ -24,6 +24,7 @@
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
     "src/templates/**",
-    "example-outputs/**"
+    "example-specs/**",
+    "dist/**"
   ]
 }

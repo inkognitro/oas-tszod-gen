@@ -1,5 +1,5 @@
 import {Request, RequestHandler, RequestResult, ResponseSchema} from './core';
-import {z, ZodSchema} from 'zod';
+import {SafeParseReturnType, z, ZodSchema} from 'zod';
 
 export type ZodValidationRequestHandlerExecutionConfig = {};
 
@@ -21,19 +21,18 @@ export class ZodValidationRequestHandler implements RequestHandler {
       const requestZodSchema = this.createRequestZodSchema(request);
       const requestValidationResult = requestZodSchema.safeParse(request);
       if (!requestValidationResult.success) {
-        reject(requestValidationResult.error);
-        return;
+        return reject(requestValidationResult.error);
       }
       this.nextRequestHandler.execute(request, config).then(rr => {
-        const requestZodSchema = this.createResponseZodSchema(rr);
-        const responseValidationResult = requestZodSchema.safeParse(
-          rr.response
-        );
-        if (!responseValidationResult.success) {
-          reject(responseValidationResult.error);
-          return;
+        if (!rr.response) {
+          return resolve(rr);
         }
-        resolve(rr);
+        this.safeParseAsyncRequestResult(rr).then(result => {
+          if (!result.success) {
+            return reject(result.error);
+          }
+          resolve(rr);
+        });
       });
     });
   }
@@ -57,40 +56,43 @@ export class ZodValidationRequestHandler implements RequestHandler {
     if (!contentType) {
       return z.object(schemaProps);
     }
-    const bodySchema = schema.bodyByContentType[contentType];
-    if (bodySchema && !(request.body instanceof FormData)) {
-      schemaProps['body'] = bodySchema.zodSchema;
+    const bodyZodSchema = schema.bodyByContentType[contentType]?.zodSchema;
+    if (bodyZodSchema) {
+      schemaProps['body'] = z.union([z.instanceof(FormData), bodyZodSchema]);
     }
     return z.object(schemaProps);
   }
 
-  private createResponseZodSchema(rr: RequestResult): ZodSchema {
-    const response = rr.response;
+  private async safeParseAsyncRequestResult(
+    rr: RequestResult
+  ): Promise<SafeParseReturnType<any, any>> {
+    const response = {...rr.response};
     if (!response) {
-      return z.object({});
+      return z.object({}).safeParse({});
     }
     const schemaByStatus = rr.request.endpointSchema.responseByStatus;
     if (!schemaByStatus) {
-      return z.object({});
+      return z.object({}).safeParse(response);
     }
     const schema: undefined | ResponseSchema =
       schemaByStatus[response.status] ?? schemaByStatus['default'];
     if (!schema) {
-      return z.object({});
+      return z.object({}).safeParse(response);
     }
     const schemaProps: Record<string, ZodSchema> = {};
     if (schema.headersZodSchema) {
       schemaProps['headers'] = schema.headersZodSchema;
     }
     const contentType = response.contentType;
-    if (!contentType) {
-      return z.object(schemaProps);
+    if (!contentType || contentType.match(/multipart\/form-data;?.*/)) {
+      return z.object(schemaProps).safeParse(response);
     }
-    const bodySchema = schema.bodyByContentType[contentType];
-    if (bodySchema && !(response.body instanceof FormData)) {
-      schemaProps['body'] = bodySchema.zodSchema;
+    const bodyZodSchema = schema.bodyByContentType[contentType]?.zodSchema;
+    if (bodyZodSchema) {
+      schemaProps['body'] = bodyZodSchema;
+      response['body'] = await response.revealBody();
     }
-    return z.object(schemaProps);
+    return await z.object(schemaProps).safeParseAsync(response);
   }
 
   public cancelAllRequests() {
