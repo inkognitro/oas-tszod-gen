@@ -95,7 +95,7 @@ export class ZodValidationRequestHandler implements RequestHandler {
         response['body'] = body;
       }
     }
-    return await z.object(schemaProps).safeParseAsync(response);
+    return z.object(schemaProps).safeParse(response);
   }
 
   public cancelAllRequests() {
