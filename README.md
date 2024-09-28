@@ -9,23 +9,24 @@ Before you consider using this library, I suggest having a look at the combinati
 and [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) or [OpenApi Typescript](https://openapi-ts.dev/) (if you are OK with just Typescript). This code generator serves as a combined alternative for these three libraries.
 However, I coded my own solution because I wanted to:
 
-- have full ownership of my production code without any additional package dependency
-- have the possibility to go with other implementations under the hood than [Axios](https://axios-http.com/docs/intro)
-  (e.g. with [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)) having a uniform adapter API
-- have generated [Zod](https://zod.dev) schemas as an opt-in possibility, with runtime validation of requests and responses
-- have separated functions and type definitions for each endpoint in a single file, located in its context folder
+- have full ownership of my production code without any additional dependency
+- have generated endpoint caller functions representing the reality which is given from some OAS3 specs
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
+- have a uniform adapter API passing endpoint schemas in a property of the request object on runtime
+- have separated functions and type definitions for each endpoint in a single file, located in its context folder
+- be able to go with other implementations under the hood than [Axios](https://axios-http.com/docs/intro)
+- have the opt-in possibility for generated [Zod](https://zod.dev) schemas with included runtime validation of requests
+and responses
 - have a uniform way as an alternative to [Axios' interceptors](https://axios-http.com/docs/interceptors)
 through different `RequestHandler` implementations
 
 > :bulb: [Axios](https://axios-http.com/docs/intro) is great. It offers a lot, and it works with
 > [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API) under the hood by default.
 > But one might have PWAs and [service workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
-> in mind where XMLHttpRequest is out of scope.
-> Others just want to use `fetch` for backend stuff in their [NextJs](https://nextjs.org/docs/app/api-reference/functions/fetch)
-> app to benefit from automatic caching. There are lots of articles out there which discuss things like
+> in mind where XMLHttpRequest is out of scope. There are lots of articles out there which discuss things like
 > [Axios Vs Fetch](https://blog.logrocket.com/axios-vs-fetch-best-http-requests/).
-> Even though, since version 1.7.0 Axios does natively support a [fetch adapter](https://github.com/axios/axios?tab=readme-ov-file#-fetch-adapter).
+> Even though, since version 1.7.0 Axios does natively support a
+> [fetch adapter](https://github.com/axios/axios?tab=readme-ov-file#-fetch-adapter).
 
 ## Generator: Setup and usage
 First, install the package as a dev dependency:
