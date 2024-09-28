@@ -333,11 +333,10 @@ This request handler does `reject` the promise with the Zod error when requests 
 Zod schema definitions which are defined in the requests' `endpointSchema` property.
 It uses the [safeParse](https://zod.dev/?id=safeparse) method for this task.
 
-> :bulb: In case of "multipart/form-data" requests, you either have the possibility to submit a FormData instance or
-> to submit a plain object which then is converted to FormData before sending it to the endpoint.
+> :bulb: In case of "multipart/form-data" requests, you are allowed to either pass a FormData instance or
+> a plain object in the `body` property of the endpoint caller function payload.
 > The ZodValidationRequestHandler only validates plain object request bodies and skips validation for FormData instances.
-> This also applies to response bodies which usually come as FormData objects when the content-type header is set to
-> "multipart/form-data".
+> This also applies to response bodies which come as FromData after calling the `revealBody` method of a response.
 
 ## Promises: `resolve` vs `reject`
 The provided `RequestHandler` implementations distinguish between "expected" and
