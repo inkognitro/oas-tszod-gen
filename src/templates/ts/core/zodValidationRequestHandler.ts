@@ -84,13 +84,16 @@ export class ZodValidationRequestHandler implements RequestHandler {
       schemaProps['headers'] = schema.headersZodSchema;
     }
     const contentType = response.contentType;
-    if (!contentType || contentType.match(/multipart\/form-data;?.*/)) {
+    if (!contentType) {
       return z.object(schemaProps).safeParse(response);
     }
     const bodyZodSchema = schema.bodyByContentType[contentType]?.zodSchema;
     if (bodyZodSchema) {
-      schemaProps['body'] = bodyZodSchema;
-      response['body'] = await response.revealBody();
+      const body = await response.revealBody();
+      if (!(body instanceof FormData)) {
+        schemaProps['body'] = bodyZodSchema;
+        response['body'] = body;
+      }
     }
     return await z.object(schemaProps).safeParseAsync(response);
   }
