@@ -7,7 +7,6 @@ import {
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -72,9 +71,9 @@ export type GetApiV3MytradesPayload = {
 };
 
 export type GetApiV3MytradesResponse =
-  | Response<200, ResponseData<ResponseBodyData<'application/json', MyTrade[]>>>
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<200, ResponseBodyData<'application/json', MyTrade[]>>
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3MytradesRequestResult = RequestResult<
   Request,

@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -52,32 +51,30 @@ export type GetSapiV1LendingProjectListPayload = {
 export type GetSapiV1LendingProjectListResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            asset: string;
-            displayPriority: number; // int
-            duration: number; // int
-            interestPerLot: string;
-            interestRate: string;
-            lotSize: string;
-            lotsLowLimit: number; // int
-            lotsPurchased: number; // int
-            lotsUpLimit: number; // int
-            maxLotsPerUser: number; // int
-            needKyc: boolean;
-            projectId: string;
-            projectName: string;
-            status: string;
-            type: string;
-            withAreaLimitation: boolean;
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          asset: string;
+          displayPriority: number; // int
+          duration: number; // int
+          interestPerLot: string;
+          interestRate: string;
+          lotSize: string;
+          lotsLowLimit: number; // int
+          lotsPurchased: number; // int
+          lotsUpLimit: number; // int
+          maxLotsPerUser: number; // int
+          needKyc: boolean;
+          projectId: string;
+          projectName: string;
+          status: string;
+          type: string;
+          withAreaLimitation: boolean;
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingProjectListRequestResult = RequestResult<
   Request,

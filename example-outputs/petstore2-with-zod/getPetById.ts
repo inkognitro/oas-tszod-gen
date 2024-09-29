@@ -2,7 +2,6 @@ import {petZodSchema, Pet} from '@example-outputs/petstore2-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -51,13 +50,11 @@ export type GetPetByIdPayload = {
 export type GetPetByIdResponse =
   | Response<
       200,
-      ResponseData<
-        | ResponseBodyData<'application/xml', Pet>
-        | ResponseBodyData<'application/json', Pet>
-      >
+      | ResponseBodyData<'application/xml', Pet>
+      | ResponseBodyData<'application/json', Pet>
     >
-  | Response<400, any>
-  | Response<404, any>;
+  | Response<400>
+  | Response<404>;
 
 export type GetPetByIdRequestResult = RequestResult<
   Request,

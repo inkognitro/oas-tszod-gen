@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -68,30 +67,28 @@ export type GetApiV3TickerPayload = {
 export type GetApiV3TickerResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            symbol: string;
-            priceChange: string;
-            priceChangePercent: string;
-            weightedAvgPrice: string;
-            openPrice: string;
-            highPrice: string;
-            lowPrice: string;
-            lastPrice: string;
-            volume: string;
-            quoteVolume: string;
-            openTime: number; // int
-            closeTime: number; // int
-            firstId: number; // int
-            lastId: number; // int
-            count: number; // int
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          symbol: string;
+          priceChange: string;
+          priceChangePercent: string;
+          weightedAvgPrice: string;
+          openPrice: string;
+          highPrice: string;
+          lowPrice: string;
+          lastPrice: string;
+          volume: string;
+          quoteVolume: string;
+          openTime: number; // int
+          closeTime: number; // int
+          firstId: number; // int
+          lastId: number; // int
+          count: number; // int
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3TickerRequestResult = RequestResult<
   Request,

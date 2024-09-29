@@ -1,6 +1,5 @@
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -25,14 +24,12 @@ export const getSapiV1SystemStatusEndpointSchema = {
 
 export type GetSapiV1SystemStatusResponse = Response<
   200,
-  ResponseData<
-    ResponseBodyData<
-      'application/json',
-      {
-        status: number; // int
-        msg: string;
-      }
-    >
+  ResponseBodyData<
+    'application/json',
+    {
+      status: number; // int
+      msg: string;
+    }
   >
 >;
 

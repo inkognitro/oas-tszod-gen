@@ -1,7 +1,6 @@
 import {BnbBurnStatus, Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -45,12 +44,9 @@ export type PostSapiV1BnbburnPayload = {
 };
 
 export type PostSapiV1BnbburnResponse =
-  | Response<
-      200,
-      ResponseData<ResponseBodyData<'application/json', BnbBurnStatus>>
-    >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<200, ResponseBodyData<'application/json', BnbBurnStatus>>
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1BnbburnRequestResult = RequestResult<
   Request,

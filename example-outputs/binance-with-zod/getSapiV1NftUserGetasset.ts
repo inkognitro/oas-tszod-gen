@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -70,22 +69,20 @@ export type GetSapiV1NftUserGetassetPayload = {
 export type GetSapiV1NftUserGetassetResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            total: number; // int
-            list: {
-              network: string;
-              contractAddress: string;
-              tokenId: string;
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          total: number; // int
+          list: {
+            network: string;
+            contractAddress: string;
+            tokenId: string;
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1NftUserGetassetRequestResult = RequestResult<
   Request,

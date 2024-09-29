@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -63,19 +62,17 @@ export type GetSapiV1MarginDelistSchedulePayload = {
 export type GetSapiV1MarginDelistScheduleResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            delistTime?: number; // int
-            crossMarginAssets?: string[];
-            isolatedMarginSymbols?: string[];
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          delistTime?: number; // int
+          crossMarginAssets?: string[];
+          isolatedMarginSymbols?: string[];
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginDelistScheduleRequestResult = RequestResult<
   Request,

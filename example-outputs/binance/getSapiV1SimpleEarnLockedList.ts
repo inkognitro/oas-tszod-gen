@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -48,36 +47,34 @@ export type GetSapiV1SimpleEarnLockedListPayload = {
 export type GetSapiV1SimpleEarnLockedListResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            rows: {
-              projectId: string;
-              detail: {
-                asset: string;
-                rewardAsset: string;
-                duration: number; // int
-                renewable: boolean;
-                isSoldOut: boolean;
-                apr: string;
-                status: string;
-                subscriptionStartTime: string;
-                extraRewardAsset: string;
-                extraRewardAPR: string;
-              };
-              quota: {
-                totalPersonalQuota: string;
-                minimum: string;
-              };
-            }[];
-            total: number; // int
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          rows: {
+            projectId: string;
+            detail: {
+              asset: string;
+              rewardAsset: string;
+              duration: number; // int
+              renewable: boolean;
+              isSoldOut: boolean;
+              apr: string;
+              status: string;
+              subscriptionStartTime: string;
+              extraRewardAsset: string;
+              extraRewardAPR: string;
+            };
+            quota: {
+              totalPersonalQuota: string;
+              minimum: string;
+            };
+          }[];
+          total: number; // int
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnLockedListRequestResult = RequestResult<
   Request,

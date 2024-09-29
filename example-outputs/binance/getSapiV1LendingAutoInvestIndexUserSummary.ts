@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -46,38 +45,36 @@ export type GetSapiV1LendingAutoInvestIndexUserSummaryPayload = {
 export type GetSapiV1LendingAutoInvestIndexUserSummaryResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            indexId: number; // int
+      ResponseBodyData<
+        'application/json',
+        {
+          indexId: number; // int
+          totalInvestedInUSD: string;
+          currentInvestedInUSD: string;
+          pnlInUSD: string;
+          roi: string;
+          assetAllocation: {
+            targetAsset: string;
+            allocation: string;
+          }[];
+          details: {
+            targetAsset: string;
+            averagePriceInUSD: string;
             totalInvestedInUSD: string;
             currentInvestedInUSD: string;
+            purchasedAmount: string;
             pnlInUSD: string;
             roi: string;
-            assetAllocation: {
-              targetAsset: string;
-              allocation: string;
-            }[];
-            details: {
-              targetAsset: string;
-              averagePriceInUSD: string;
-              totalInvestedInUSD: string;
-              currentInvestedInUSD: string;
-              purchasedAmount: string;
-              pnlInUSD: string;
-              roi: string;
-              percentage: string;
-              availableAmount: string;
-              redeemedAmount: string;
-              assetValueInUSD: string;
-            }[];
-          }
-        >
+            percentage: string;
+            availableAmount: string;
+            redeemedAmount: string;
+            assetValueInUSD: string;
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingAutoInvestIndexUserSummaryRequestResult =
   RequestResult<Request, GetSapiV1LendingAutoInvestIndexUserSummaryResponse>;

@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -49,25 +48,23 @@ export type GetSapiV1MarginExchangeSmallLiabilityHistoryPayload = {
 export type GetSapiV1MarginExchangeSmallLiabilityHistoryResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            total: number; // int
-            rows: {
-              asset: string;
-              amount: string;
-              targetAsset: string;
-              targetAmount: string;
-              bizType: string;
-              timestamp: number; // int
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          total: number; // int
+          rows: {
+            asset: string;
+            amount: string;
+            targetAsset: string;
+            targetAmount: string;
+            bizType: string;
+            timestamp: number; // int
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginExchangeSmallLiabilityHistoryRequestResult =
   RequestResult<Request, GetSapiV1MarginExchangeSmallLiabilityHistoryResponse>;

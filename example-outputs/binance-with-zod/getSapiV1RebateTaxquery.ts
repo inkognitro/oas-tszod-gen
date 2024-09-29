@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -80,30 +79,28 @@ export type GetSapiV1RebateTaxqueryPayload = {
 export type GetSapiV1RebateTaxqueryResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            status: string;
-            type: string;
-            code: string;
+      ResponseBodyData<
+        'application/json',
+        {
+          status: string;
+          type: string;
+          code: string;
+          data: {
+            page: number; // int
+            totalRecords: number; // int
+            totalPageNum: number; // int
             data: {
-              page: number; // int
-              totalRecords: number; // int
-              totalPageNum: number; // int
-              data: {
-                asset: string;
-                type: number; // int
-                amount: string;
-                updateTime: number; // int
-              }[];
-            };
-          }
-        >
+              asset: string;
+              type: number; // int
+              amount: string;
+              updateTime: number; // int
+            }[];
+          };
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1RebateTaxqueryRequestResult = RequestResult<
   Request,

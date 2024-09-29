@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -46,24 +45,22 @@ export type GetSapiV1GiftcardBuycodeTokenLimitPayload = {
 export type GetSapiV1GiftcardBuycodeTokenLimitResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            code: string;
-            message: string;
-            data: {
-              coin?: string;
-              fromMin?: string;
-              fromMax?: string;
-            };
-            success: boolean;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          code: string;
+          message: string;
+          data: {
+            coin?: string;
+            fromMin?: string;
+            fromMax?: string;
+          };
+          success: boolean;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1GiftcardBuycodeTokenLimitRequestResult = RequestResult<
   Request,

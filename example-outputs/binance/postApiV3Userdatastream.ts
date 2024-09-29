@@ -1,6 +1,5 @@
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -25,13 +24,11 @@ export const postApiV3UserdatastreamEndpointSchema = {
 
 export type PostApiV3UserdatastreamResponse = Response<
   200,
-  ResponseData<
-    ResponseBodyData<
-      'application/json',
-      {
-        listenKey: string;
-      }
-    >
+  ResponseBodyData<
+    'application/json',
+    {
+      listenKey: string;
+    }
   >
 >;
 

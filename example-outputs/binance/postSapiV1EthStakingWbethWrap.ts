@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -46,19 +45,17 @@ export type PostSapiV1EthStakingWbethWrapPayload = {
 export type PostSapiV1EthStakingWbethWrapResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            success: boolean;
-            wbethAmount: string;
-            exchangeRate: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          success: boolean;
+          wbethAmount: string;
+          exchangeRate: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1EthStakingWbethWrapRequestResult = RequestResult<
   Request,

@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -85,35 +84,33 @@ export type GetSapiV1AlgoFuturesSubordersPayload = {
 export type GetSapiV1AlgoFuturesSubordersResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            total: number; // int
-            executedQty: string;
+      ResponseBodyData<
+        'application/json',
+        {
+          total: number; // int
+          executedQty: string;
+          executedAmt: string;
+          subOrders: {
+            algoId: number; // int
+            orderId: number; // int
+            orderStatus: string;
+            executedQty?: string;
             executedAmt: string;
-            subOrders: {
-              algoId: number; // int
-              orderId: number; // int
-              orderStatus: string;
-              executedQty?: string;
-              executedAmt: string;
-              feeAmt: string;
-              feeAsset: string;
-              bookTime: number; // int
-              avgPrice: string;
-              side: string;
-              symbol: string;
-              subId: number; // int
-              timeInForce: string;
-              origQty: string;
-            }[];
-          }
-        >
+            feeAmt: string;
+            feeAsset: string;
+            bookTime: number; // int
+            avgPrice: string;
+            side: string;
+            symbol: string;
+            subId: number; // int
+            timeInForce: string;
+            origQty: string;
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AlgoFuturesSubordersRequestResult = RequestResult<
   Request,

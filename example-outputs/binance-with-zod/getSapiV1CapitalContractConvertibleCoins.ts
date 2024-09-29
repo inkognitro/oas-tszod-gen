@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -52,23 +51,21 @@ export const getSapiV1CapitalContractConvertibleCoinsEndpointSchema = {
 export type GetSapiV1CapitalContractConvertibleCoinsResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            convertEnabled: boolean;
-            coins: string[];
-            exchangeRates: {
-              USDC: string;
-              TUSD: string;
-              USDP: string;
-            };
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          convertEnabled: boolean;
+          coins: string[];
+          exchangeRates: {
+            USDC: string;
+            TUSD: string;
+            USDP: string;
+          };
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1CapitalContractConvertibleCoinsRequestResult =
   RequestResult<Request, GetSapiV1CapitalContractConvertibleCoinsResponse>;

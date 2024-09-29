@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -88,42 +87,40 @@ export type GetSapiV1SubAccountFuturesAccountPayload = {
 export type GetSapiV1SubAccountFuturesAccountResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            email: string;
+      ResponseBodyData<
+        'application/json',
+        {
+          email: string;
+          asset: string;
+          assets: {
             asset: string;
-            assets: {
-              asset: string;
-              initialMargin: string;
-              maintenanceMargin: string;
-              marginBalance: string;
-              maxWithdrawAmount: string;
-              openOrderInitialMargin: string;
-              positionInitialMargin: string;
-              unrealizedProfit: string;
-              walletBalance: string;
-            }[];
-            canDeposit: boolean;
-            canTrade: boolean;
-            canWithdraw: boolean;
-            feeTier: number; // int
+            initialMargin: string;
+            maintenanceMargin: string;
+            marginBalance: string;
             maxWithdrawAmount: string;
-            totalInitialMargin: string;
-            totalMaintenanceMargin: string;
-            totalMarginBalance: string;
-            totalOpenOrderInitialMargin: string;
-            totalPositionInitialMargin: string;
-            totalUnrealizedProfit: string;
-            totalWalletBalance: string;
-            updateTime: number; // int
-          }
-        >
+            openOrderInitialMargin: string;
+            positionInitialMargin: string;
+            unrealizedProfit: string;
+            walletBalance: string;
+          }[];
+          canDeposit: boolean;
+          canTrade: boolean;
+          canWithdraw: boolean;
+          feeTier: number; // int
+          maxWithdrawAmount: string;
+          totalInitialMargin: string;
+          totalMaintenanceMargin: string;
+          totalMarginBalance: string;
+          totalOpenOrderInitialMargin: string;
+          totalPositionInitialMargin: string;
+          totalUnrealizedProfit: string;
+          totalWalletBalance: string;
+          updateTime: number; // int
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountFuturesAccountRequestResult = RequestResult<
   Request,

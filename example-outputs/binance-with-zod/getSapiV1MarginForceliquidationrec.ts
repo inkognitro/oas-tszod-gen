@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -83,29 +82,27 @@ export type GetSapiV1MarginForceliquidationrecPayload = {
 export type GetSapiV1MarginForceliquidationrecResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            rows: {
-              avgPrice: string;
-              executedQty: string;
-              orderId: number; // int
-              price: string;
-              qty: string;
-              side: string;
-              symbol: string;
-              timeInForce: string;
-              isIsolated: boolean;
-              updatedTime: number; // int
-            }[];
-            total: number; // int
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          rows: {
+            avgPrice: string;
+            executedQty: string;
+            orderId: number; // int
+            price: string;
+            qty: string;
+            side: string;
+            symbol: string;
+            timeInForce: string;
+            isIsolated: boolean;
+            updatedTime: number; // int
+          }[];
+          total: number; // int
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginForceliquidationrecRequestResult = RequestResult<
   Request,

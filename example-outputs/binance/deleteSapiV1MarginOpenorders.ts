@@ -5,7 +5,6 @@ import {
 } from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -51,16 +50,14 @@ export type DeleteSapiV1MarginOpenordersPayload = {
 export type DeleteSapiV1MarginOpenordersResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          ((Partial<CanceledMarginOrderDetail> | Partial<MarginOcoOrder>) &
-            (CanceledMarginOrderDetail | MarginOcoOrder))[]
-        >
+      ResponseBodyData<
+        'application/json',
+        ((Partial<CanceledMarginOrderDetail> | Partial<MarginOcoOrder>) &
+          (CanceledMarginOrderDetail | MarginOcoOrder))[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteSapiV1MarginOpenordersRequestResult = RequestResult<
   Request,

@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -48,31 +47,29 @@ export type GetSapiV1AssetDribbletPayload = {
 export type GetSapiV1AssetDribbletResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            total: number; // int
-            userAssetDribblets: {
-              operateTime: number; // int
-              totalTransferedAmount: string;
-              totalServiceChargeAmount: string;
+      ResponseBodyData<
+        'application/json',
+        {
+          total: number; // int
+          userAssetDribblets: {
+            operateTime: number; // int
+            totalTransferedAmount: string;
+            totalServiceChargeAmount: string;
+            transId: number; // int
+            userAssetDribbletDetails: {
               transId: number; // int
-              userAssetDribbletDetails: {
-                transId: number; // int
-                serviceChargeAmount: string;
-                amount: string;
-                operateTime: number; // int
-                transferedAmount: string;
-                fromAsset: string;
-              }[];
+              serviceChargeAmount: string;
+              amount: string;
+              operateTime: number; // int
+              transferedAmount: string;
+              fromAsset: string;
             }[];
-          }
-        >
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AssetDribbletRequestResult = RequestResult<
   Request,

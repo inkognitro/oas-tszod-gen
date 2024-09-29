@@ -23,8 +23,8 @@ export const getServiceInfoEndpointSchema = {
 };
 
 export type GetServiceInfoResponse =
-  | Response<200, $200ServiceInfoResponse>
-  | Response<500, $500InternalServerErrorResponse>;
+  | $200ServiceInfoResponse<200>
+  | $500InternalServerErrorResponse<500>;
 
 export type GetServiceInfoRequestResult = RequestResult<
   Request,

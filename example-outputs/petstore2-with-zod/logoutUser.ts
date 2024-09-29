@@ -1,6 +1,5 @@
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -21,7 +20,7 @@ export const logoutUserEndpointSchema = {
   },
 };
 
-export type LogoutUserResponse = Response<any, any>;
+export type LogoutUserResponse = Response;
 
 export type LogoutUserRequestResult = RequestResult<
   Request,

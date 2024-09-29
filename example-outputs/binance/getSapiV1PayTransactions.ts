@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -48,53 +47,51 @@ export type GetSapiV1PayTransactionsPayload = {
 export type GetSapiV1PayTransactionsResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            code: string;
-            message: string;
-            data: {
-              orderType: string;
-              transactionId: string;
-              transactionTime: number; // int
-              amount: string;
+      ResponseBodyData<
+        'application/json',
+        {
+          code: string;
+          message: string;
+          data: {
+            orderType: string;
+            transactionId: string;
+            transactionTime: number; // int
+            amount: string;
+            currency: string;
+            walletType: number; // int
+            walletTypes: number[]; // item: int
+            fundsDetail: {
               currency: string;
-              walletType: number; // int
-              walletTypes: number[]; // item: int
-              fundsDetail: {
-                currency: string;
-                amount: string;
-              }[];
-              payerInfo: {
-                name: string;
-                type: string;
-                binanceId: string;
-                accountId: string;
-              };
-              receiverInfo: {
-                name: string;
-                type: string;
-                email: string;
-                binanceId: string;
-                accountId: string;
-                countryCode: string;
-                phoneNumber: string;
-                mobileCode: string;
-                extend?: {
-                  institutionName: string;
-                  cardNumber: string;
-                  digitalWalletId: string;
-                }[];
-              };
+              amount: string;
             }[];
-            success: boolean;
-          }
-        >
+            payerInfo: {
+              name: string;
+              type: string;
+              binanceId: string;
+              accountId: string;
+            };
+            receiverInfo: {
+              name: string;
+              type: string;
+              email: string;
+              binanceId: string;
+              accountId: string;
+              countryCode: string;
+              phoneNumber: string;
+              mobileCode: string;
+              extend?: {
+                institutionName: string;
+                cardNumber: string;
+                digitalWalletId: string;
+              }[];
+            };
+          }[];
+          success: boolean;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1PayTransactionsRequestResult = RequestResult<
   Request,

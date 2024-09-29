@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -80,26 +79,24 @@ export type GetSapiV1SubAccountTransferSubuserhistoryPayload = {
 export type GetSapiV1SubAccountTransferSubuserhistoryResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            counterParty: string;
-            email: string;
-            type: number; // int
-            asset: string;
-            qty: string;
-            fromAccountType: string;
-            toAccountType: string;
-            status: string;
-            tranId: number; // int
-            time: number; // int
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          counterParty: string;
+          email: string;
+          type: number; // int
+          asset: string;
+          qty: string;
+          fromAccountType: string;
+          toAccountType: string;
+          status: string;
+          tranId: number; // int
+          time: number; // int
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountTransferSubuserhistoryRequestResult =
   RequestResult<Request, GetSapiV1SubAccountTransferSubuserhistoryResponse>;

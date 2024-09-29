@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -50,28 +49,26 @@ export type GetSapiV1NftHistoryTransactionsPayload = {
 export type GetSapiV1NftHistoryTransactionsResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            total: number; // int
-            list: {
-              orderNo: string;
-              tokens: {
-                network: string;
-                tokenId: string;
-                contractAddress: string;
-              }[];
-              tradeTime: number; // int
-              tradeAmount: string;
-              tradeCurrency: string;
+      ResponseBodyData<
+        'application/json',
+        {
+          total: number; // int
+          list: {
+            orderNo: string;
+            tokens: {
+              network: string;
+              tokenId: string;
+              contractAddress: string;
             }[];
-          }
-        >
+            tradeTime: number; // int
+            tradeAmount: string;
+            tradeCurrency: string;
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1NftHistoryTransactionsRequestResult = RequestResult<
   Request,

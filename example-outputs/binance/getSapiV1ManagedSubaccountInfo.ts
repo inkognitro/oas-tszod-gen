@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -48,30 +47,28 @@ export type GetSapiV1ManagedSubaccountInfoPayload = {
 export type GetSapiV1ManagedSubaccountInfoResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            total: number; // int
-            managerSubUserInfoVoList: {
-              rootUserId: number; // int
-              managersubUserId: number; // int
-              bindParentUserId: number; // int
-              email?: string;
-              insertTimeStamp: number; // int
-              bindParentEmail: string;
-              isSubUserEnabled: boolean;
-              isUserActive: boolean;
-              isMarginEnabled: boolean;
-              isFutureEnabled: boolean;
-              isSignedLVTRiskAgreement: boolean;
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          total: number; // int
+          managerSubUserInfoVoList: {
+            rootUserId: number; // int
+            managersubUserId: number; // int
+            bindParentUserId: number; // int
+            email?: string;
+            insertTimeStamp: number; // int
+            bindParentEmail: string;
+            isSubUserEnabled: boolean;
+            isUserActive: boolean;
+            isMarginEnabled: boolean;
+            isFutureEnabled: boolean;
+            isSignedLVTRiskAgreement: boolean;
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ManagedSubaccountInfoRequestResult = RequestResult<
   Request,

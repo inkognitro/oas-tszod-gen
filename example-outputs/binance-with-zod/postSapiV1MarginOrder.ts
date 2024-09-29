@@ -11,7 +11,6 @@ import {
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -123,17 +122,15 @@ export type PostSapiV1MarginOrderPayload = {
 export type PostSapiV1MarginOrderResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          | MarginOrderResponseAck
-          | MarginOrderResponseResult
-          | MarginOrderResponseFull
-        >
+      ResponseBodyData<
+        'application/json',
+        | MarginOrderResponseAck
+        | MarginOrderResponseResult
+        | MarginOrderResponseFull
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1MarginOrderRequestResult = RequestResult<
   Request,

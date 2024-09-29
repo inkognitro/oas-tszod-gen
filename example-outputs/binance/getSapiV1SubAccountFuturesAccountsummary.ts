@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -45,10 +44,19 @@ export type GetSapiV1SubAccountFuturesAccountsummaryPayload = {
 export type GetSapiV1SubAccountFuturesAccountsummaryResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
+      ResponseBodyData<
+        'application/json',
+        {
+          totalInitialMargin: string;
+          totalMaintenanceMargin: string;
+          totalMarginBalance: string;
+          totalOpenOrderInitialMargin: string;
+          totalPositionInitialMargin: string;
+          totalUnrealizedProfit: string;
+          totalWalletBalance: string;
+          asset: string;
+          subAccountList: {
+            email: string;
             totalInitialMargin: string;
             totalMaintenanceMargin: string;
             totalMarginBalance: string;
@@ -57,23 +65,12 @@ export type GetSapiV1SubAccountFuturesAccountsummaryResponse =
             totalUnrealizedProfit: string;
             totalWalletBalance: string;
             asset: string;
-            subAccountList: {
-              email: string;
-              totalInitialMargin: string;
-              totalMaintenanceMargin: string;
-              totalMarginBalance: string;
-              totalOpenOrderInitialMargin: string;
-              totalPositionInitialMargin: string;
-              totalUnrealizedProfit: string;
-              totalWalletBalance: string;
-              asset: string;
-            }[];
-          }
-        >
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountFuturesAccountsummaryRequestResult =
   RequestResult<Request, GetSapiV1SubAccountFuturesAccountsummaryResponse>;

@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -78,24 +77,22 @@ export type GetSapiV1SimpleEarnLockedHistoryRewardsrecordPayload = {
 export type GetSapiV1SimpleEarnLockedHistoryRewardsrecordResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            rows: {
-              positionId: string;
-              time: number; // int
-              asset: string;
-              lockPeriod: string;
-              amount: string;
-            }[];
-            total: number; // int
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          rows: {
+            positionId: string;
+            time: number; // int
+            asset: string;
+            lockPeriod: string;
+            amount: string;
+          }[];
+          total: number; // int
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnLockedHistoryRewardsrecordRequestResult =
   RequestResult<Request, GetSapiV1SimpleEarnLockedHistoryRewardsrecordResponse>;

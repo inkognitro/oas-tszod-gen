@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -79,33 +78,31 @@ export type GetSapiV1AlgoFuturesOpenordersPayload = {
 export type GetSapiV1AlgoFuturesOpenordersResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            total: number; // int
-            orders?: {
-              algoId: number; // int
-              symbol: string;
-              side: string;
-              positionSide: string;
-              totalQty: string;
-              executedQty: string;
-              executedAmt: string;
-              avgPrice: string;
-              clientAlgoId: string;
-              bookTime: number; // int
-              endTime: number; // int
-              algoStatus: string;
-              algoType: string;
-              urgency: string;
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          total: number; // int
+          orders?: {
+            algoId: number; // int
+            symbol: string;
+            side: string;
+            positionSide: string;
+            totalQty: string;
+            executedQty: string;
+            executedAmt: string;
+            avgPrice: string;
+            clientAlgoId: string;
+            bookTime: number; // int
+            endTime: number; // int
+            algoStatus: string;
+            algoType: string;
+            urgency: string;
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AlgoFuturesOpenordersRequestResult = RequestResult<
   Request,

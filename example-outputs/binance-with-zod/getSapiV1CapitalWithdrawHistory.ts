@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -87,29 +86,27 @@ export type GetSapiV1CapitalWithdrawHistoryPayload = {
 export type GetSapiV1CapitalWithdrawHistoryResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            address: string;
-            amount: string;
-            applyTime: string;
-            coin: string;
-            id: string;
-            withdrawOrderId: string;
-            network: string;
-            transferType: number; // int
-            status: number; // int
-            transactionFee: string;
-            confirmNo?: number; // int
-            info?: string;
-            txId: string;
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          address: string;
+          amount: string;
+          applyTime: string;
+          coin: string;
+          id: string;
+          withdrawOrderId: string;
+          network: string;
+          transferType: number; // int
+          status: number; // int
+          transactionFee: string;
+          confirmNo?: number; // int
+          info?: string;
+          txId: string;
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1CapitalWithdrawHistoryRequestResult = RequestResult<
   Request,

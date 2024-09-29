@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -90,36 +89,34 @@ export type GetSapiV1DciProductListPayload = {
 export type GetSapiV1DciProductListResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            total: number; // int
-            list: {
-              id: string;
-              investCoin: string;
-              exercisedCoin: string;
-              strikePrice: string;
-              duration: number; // int
-              settleDate: number; // int
-              purchaseDecimal: number; // int
-              purchaseEndTime: number; // int
-              canPurchase: boolean;
-              apr: string;
-              orderId: number; // int
-              minAmount: string;
-              maxAmount: string;
-              createTimestamp: number; // int
-              optionType: string;
-              isAutoCompoundEnable: boolean;
-              autoCompoundPlanList: string[];
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          total: number; // int
+          list: {
+            id: string;
+            investCoin: string;
+            exercisedCoin: string;
+            strikePrice: string;
+            duration: number; // int
+            settleDate: number; // int
+            purchaseDecimal: number; // int
+            purchaseEndTime: number; // int
+            canPurchase: boolean;
+            apr: string;
+            orderId: number; // int
+            minAmount: string;
+            maxAmount: string;
+            createTimestamp: number; // int
+            optionType: string;
+            isAutoCompoundEnable: boolean;
+            autoCompoundPlanList: string[];
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1DciProductListRequestResult = RequestResult<
   Request,

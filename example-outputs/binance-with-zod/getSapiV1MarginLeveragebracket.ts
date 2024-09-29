@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -51,24 +50,22 @@ export const getSapiV1MarginLeveragebracketEndpointSchema = {
 export type GetSapiV1MarginLeveragebracketResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            assetNames: string[];
-            rank: number; // int
-            brackets: {
-              leverage?: number; // int
-              maxDebt?: number;
-              maintenanceMarginRate?: number;
-              initialMarginRate?: number;
-              fastNum?: number;
-            }[];
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          assetNames: string[];
+          rank: number; // int
+          brackets: {
+            leverage?: number; // int
+            maxDebt?: number;
+            maintenanceMarginRate?: number;
+            initialMarginRate?: number;
+            fastNum?: number;
+          }[];
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginLeveragebracketRequestResult = RequestResult<
   Request,

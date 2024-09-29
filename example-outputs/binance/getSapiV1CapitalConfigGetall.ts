@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -45,49 +44,47 @@ export type GetSapiV1CapitalConfigGetallPayload = {
 export type GetSapiV1CapitalConfigGetallResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
+      ResponseBodyData<
+        'application/json',
+        {
+          coin: string;
+          depositAllEnable: boolean;
+          free: string;
+          freeze: string;
+          ipoable: string;
+          ipoing: string;
+          isLegalMoney: boolean;
+          locked: string;
+          name: string;
+          networkList: {
+            addressRegex: string;
             coin: string;
-            depositAllEnable: boolean;
-            free: string;
-            freeze: string;
-            ipoable: string;
-            ipoing: string;
-            isLegalMoney: boolean;
-            locked: string;
+            depositDesc: string;
+            depositEnable: boolean;
+            isDefault: boolean;
+            memoRegex: string;
+            minConfirm: number; // int
             name: string;
-            networkList: {
-              addressRegex: string;
-              coin: string;
-              depositDesc: string;
-              depositEnable: boolean;
-              isDefault: boolean;
-              memoRegex: string;
-              minConfirm: number; // int
-              name: string;
-              network: string;
-              specialTips: string;
-              unLockConfirm: number; // int
-              withdrawDesc: string;
-              withdrawEnable: boolean;
-              withdrawFee: string;
-              withdrawIntegerMultiple: string;
-              withdrawMax: string;
-              withdrawMin: string;
-              sameAddress: boolean;
-            }[];
-            storage: string;
-            trading: boolean;
-            withdrawAllEnable: boolean;
-            withdrawing: string;
-          }[]
-        >
+            network: string;
+            specialTips: string;
+            unLockConfirm: number; // int
+            withdrawDesc: string;
+            withdrawEnable: boolean;
+            withdrawFee: string;
+            withdrawIntegerMultiple: string;
+            withdrawMax: string;
+            withdrawMin: string;
+            sameAddress: boolean;
+          }[];
+          storage: string;
+          trading: boolean;
+          withdrawAllEnable: boolean;
+          withdrawing: string;
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1CapitalConfigGetallRequestResult = RequestResult<
   Request,

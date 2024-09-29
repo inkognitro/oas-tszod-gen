@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -45,18 +44,16 @@ export type GetSapiV1SpotDelistSchedulePayload = {
 export type GetSapiV1SpotDelistScheduleResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            delistTime: number; // int
-            symbol: string[];
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          delistTime: number; // int
+          symbol: string[];
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SpotDelistScheduleRequestResult = RequestResult<
   Request,

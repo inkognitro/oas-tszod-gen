@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -49,18 +48,16 @@ export type PostSapiV1SimpleEarnFlexibleRedeemPayload = {
 export type PostSapiV1SimpleEarnFlexibleRedeemResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            redeemId: number; // int
-            success: boolean;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          redeemId: number; // int
+          success: boolean;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SimpleEarnFlexibleRedeemRequestResult = RequestResult<
   Request,

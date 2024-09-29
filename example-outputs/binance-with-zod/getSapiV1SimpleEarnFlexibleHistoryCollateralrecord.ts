@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -81,26 +80,24 @@ export type GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordPayload = {
 export type GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            rows: {
-              amount: string;
-              productId: string;
-              asset: string;
-              createTime: number; // int
-              type: string;
-              productName: string;
-              orderId: number; // int
-            }[];
-            total: number; // int
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          rows: {
+            amount: string;
+            productId: string;
+            asset: string;
+            createTime: number; // int
+            type: string;
+            productName: string;
+            orderId: number; // int
+          }[];
+          total: number; // int
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordRequestResult =
   RequestResult<

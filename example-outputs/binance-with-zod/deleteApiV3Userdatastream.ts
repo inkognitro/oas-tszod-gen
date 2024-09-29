@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -44,8 +43,8 @@ export type DeleteApiV3UserdatastreamPayload = {
 };
 
 export type DeleteApiV3UserdatastreamResponse =
-  | Response<200, ResponseData<ResponseBodyData<'application/json', {}>>>
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<200, ResponseBodyData<'application/json', {}>>
+  | Response<400, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteApiV3UserdatastreamRequestResult = RequestResult<
   Request,

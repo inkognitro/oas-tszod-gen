@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -63,17 +62,15 @@ export type PostSapiV1LendingCustomizedfixedPurchasePayload = {
 export type PostSapiV1LendingCustomizedfixedPurchaseResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            purchaseId: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          purchaseId: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1LendingCustomizedfixedPurchaseRequestResult =
   RequestResult<Request, PostSapiV1LendingCustomizedfixedPurchaseResponse>;

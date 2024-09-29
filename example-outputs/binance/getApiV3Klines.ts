@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -59,17 +58,15 @@ export type GetApiV3KlinesPayload = {
 export type GetApiV3KlinesResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          (
-            | number // int
-            | string
-          )[][]
-        >
+      ResponseBodyData<
+        'application/json',
+        (
+          | number // int
+          | string
+        )[][]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3KlinesRequestResult = RequestResult<
   Request,

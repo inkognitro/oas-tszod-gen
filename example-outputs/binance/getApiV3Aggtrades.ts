@@ -1,7 +1,6 @@
 import {AggTrade, Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -40,11 +39,8 @@ export type GetApiV3AggtradesPayload = {
 };
 
 export type GetApiV3AggtradesResponse =
-  | Response<
-      200,
-      ResponseData<ResponseBodyData<'application/json', AggTrade[]>>
-    >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<200, ResponseBodyData<'application/json', AggTrade[]>>
+  | Response<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3AggtradesRequestResult = RequestResult<
   Request,

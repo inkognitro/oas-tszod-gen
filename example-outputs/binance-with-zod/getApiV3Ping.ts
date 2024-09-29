@@ -1,7 +1,6 @@
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -28,7 +27,7 @@ export const getApiV3PingEndpointSchema = {
 
 export type GetApiV3PingResponse = Response<
   200,
-  ResponseData<ResponseBodyData<'application/json', {}>>
+  ResponseBodyData<'application/json', {}>
 >;
 
 export type GetApiV3PingRequestResult = RequestResult<

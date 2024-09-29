@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -50,36 +49,34 @@ export type GetSapiV1C2cOrdermatchListuserorderhistoryPayload = {
 export type GetSapiV1C2cOrdermatchListuserorderhistoryResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            code: string;
-            message: string;
-            data: {
-              orderNumber: string;
-              advNo: string;
-              tradeType: string;
-              asset: string;
-              fiat: string;
-              fiatSymbol: string;
-              amount: string;
-              totalPrice: string;
-              unitPrice: string;
-              orderStatus: string;
-              createTime: number; // int
-              commission: string;
-              counterPartNickName: string;
-              advertisementRole: string;
-            }[];
-            total: number; // int
-            success: boolean;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          code: string;
+          message: string;
+          data: {
+            orderNumber: string;
+            advNo: string;
+            tradeType: string;
+            asset: string;
+            fiat: string;
+            fiatSymbol: string;
+            amount: string;
+            totalPrice: string;
+            unitPrice: string;
+            orderStatus: string;
+            createTime: number; // int
+            commission: string;
+            counterPartNickName: string;
+            advertisementRole: string;
+          }[];
+          total: number; // int
+          success: boolean;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1C2cOrdermatchListuserorderhistoryRequestResult =
   RequestResult<Request, GetSapiV1C2cOrdermatchListuserorderhistoryResponse>;

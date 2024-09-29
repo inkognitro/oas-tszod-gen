@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -49,28 +48,26 @@ export type GetSapiV1LendingAutoInvestRebalanceHistoryPayload = {
 export type GetSapiV1LendingAutoInvestRebalanceHistoryResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            indexId: number; // int
-            indexName: string;
-            rebalanceId: number; // int
-            status: string;
-            rebalanceFee: string;
-            rebalanceFeeUnit: string;
-            transactionDetails: {
-              asset: string;
-              transactionDateTime: number; // int
-              rebalanceDirection: string;
-              rebalanceAmount: string;
-            }[];
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          indexId: number; // int
+          indexName: string;
+          rebalanceId: number; // int
+          status: string;
+          rebalanceFee: string;
+          rebalanceFeeUnit: string;
+          transactionDetails: {
+            asset: string;
+            transactionDateTime: number; // int
+            rebalanceDirection: string;
+            rebalanceAmount: string;
+          }[];
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingAutoInvestRebalanceHistoryRequestResult =
   RequestResult<Request, GetSapiV1LendingAutoInvestRebalanceHistoryResponse>;

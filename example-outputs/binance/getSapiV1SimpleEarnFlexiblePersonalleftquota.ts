@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -46,17 +45,15 @@ export type GetSapiV1SimpleEarnFlexiblePersonalleftquotaPayload = {
 export type GetSapiV1SimpleEarnFlexiblePersonalleftquotaResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            leftPersonalQuota: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          leftPersonalQuota: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnFlexiblePersonalleftquotaRequestResult =
   RequestResult<Request, GetSapiV1SimpleEarnFlexiblePersonalleftquotaResponse>;

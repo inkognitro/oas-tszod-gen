@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -48,32 +47,30 @@ export type GetSapiV1ConvertTradeflowPayload = {
 export type GetSapiV1ConvertTradeflowResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            list: {
-              quoteId: string;
-              orderId: number; // int
-              orderStatus: string;
-              fromAsset: string;
-              fromAmount: string;
-              toAsset: string;
-              toAmount: string;
-              ratio: string;
-              inverseRatio: string;
-              createTime: number; // int
-            }[];
-            startTime: number; // int
-            endTime: number; // int
-            limit: number; // int
-            moreData: boolean;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          list: {
+            quoteId: string;
+            orderId: number; // int
+            orderStatus: string;
+            fromAsset: string;
+            fromAmount: string;
+            toAsset: string;
+            toAmount: string;
+            ratio: string;
+            inverseRatio: string;
+            createTime: number; // int
+          }[];
+          startTime: number; // int
+          endTime: number; // int
+          limit: number; // int
+          moreData: boolean;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ConvertTradeflowRequestResult = RequestResult<
   Request,

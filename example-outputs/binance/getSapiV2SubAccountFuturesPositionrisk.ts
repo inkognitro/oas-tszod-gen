@@ -5,7 +5,6 @@ import {
 } from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -51,15 +50,13 @@ export type GetSapiV2SubAccountFuturesPositionriskPayload = {
 export type GetSapiV2SubAccountFuturesPositionriskResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          SubAccountUSDTFuturesPositionRisk | SubAccountCOINFuturesPositionRisk
-        >
+      ResponseBodyData<
+        'application/json',
+        SubAccountUSDTFuturesPositionRisk | SubAccountCOINFuturesPositionRisk
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV2SubAccountFuturesPositionriskRequestResult = RequestResult<
   Request,

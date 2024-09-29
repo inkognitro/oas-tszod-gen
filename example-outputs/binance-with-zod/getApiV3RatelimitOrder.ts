@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -65,21 +64,19 @@ export type GetApiV3RatelimitOrderPayload = {
 export type GetApiV3RatelimitOrderResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            rateLimitType: string;
-            interval: string;
-            intervalNum: number; // int
-            limit: number; // int
-            count?: number; // int
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          rateLimitType: string;
+          interval: string;
+          intervalNum: number; // int
+          limit: number; // int
+          count?: number; // int
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3RatelimitOrderRequestResult = RequestResult<
   Request,

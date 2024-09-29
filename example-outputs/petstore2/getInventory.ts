@@ -1,6 +1,5 @@
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -25,13 +24,11 @@ export const getInventoryEndpointSchema = {
 
 export type GetInventoryResponse = Response<
   200,
-  ResponseData<
-    ResponseBodyData<
-      'application/json',
-      {
-        [key: string]: number; // int
-      }
-    >
+  ResponseBodyData<
+    'application/json',
+    {
+      [key: string]: number; // int
+    }
   >
 >;
 

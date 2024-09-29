@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -75,23 +74,21 @@ export type GetSapiV1SubAccountListPayload = {
 export type GetSapiV1SubAccountListResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            subAccounts: {
-              email: string;
-              isFreeze: boolean;
-              createTime: number; // int
-              isManagedSubAccount: boolean;
-              isAssetManagementSubAccount: boolean;
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          subAccounts: {
+            email: string;
+            isFreeze: boolean;
+            createTime: number; // int
+            isManagedSubAccount: boolean;
+            isAssetManagementSubAccount: boolean;
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountListRequestResult = RequestResult<
   Request,

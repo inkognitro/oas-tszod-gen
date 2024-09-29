@@ -1,7 +1,6 @@
 import {RepaymentInfo, RepaymentInfo2, Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -49,12 +48,10 @@ export type PostSapiV1LoanRepayPayload = {
 export type PostSapiV1LoanRepayResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<'application/json', RepaymentInfo | RepaymentInfo2>
-      >
+      ResponseBodyData<'application/json', RepaymentInfo | RepaymentInfo2>
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1LoanRepayRequestResult = RequestResult<
   Request,

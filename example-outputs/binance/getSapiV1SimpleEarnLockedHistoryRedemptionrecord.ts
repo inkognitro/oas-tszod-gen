@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -52,28 +51,26 @@ export type GetSapiV1SimpleEarnLockedHistoryRedemptionrecordPayload = {
 export type GetSapiV1SimpleEarnLockedHistoryRedemptionrecordResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            rows: {
-              positionId: string;
-              redeemId: number; // int
-              time: number; // int
-              asset: string;
-              lockPeriod: string;
-              amount: string;
-              type: string;
-              deliverDate: string;
-              status: string;
-            }[];
-            total: number; // int
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          rows: {
+            positionId: string;
+            redeemId: number; // int
+            time: number; // int
+            asset: string;
+            lockPeriod: string;
+            amount: string;
+            type: string;
+            deliverDate: string;
+            status: string;
+          }[];
+          total: number; // int
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnLockedHistoryRedemptionrecordRequestResult =
   RequestResult<

@@ -37,12 +37,12 @@ export type OptionsObjectPayload = {
 };
 
 export type OptionsObjectResponse =
-  | Response<200, $200OkAuthorizationsResponse>
-  | Response<204, AuthorizationsNotSupportedResponse>
-  | Response<400, $400BadRequestResponse>
-  | Response<404, $404NotFoundDrsObjectResponse>
-  | Response<405, AuthorizationsNotSupportedResponse>
-  | Response<500, $500InternalServerErrorResponse>;
+  | $200OkAuthorizationsResponse<200>
+  | AuthorizationsNotSupportedResponse<204>
+  | $400BadRequestResponse<400>
+  | $404NotFoundDrsObjectResponse<404>
+  | AuthorizationsNotSupportedResponse<405>
+  | $500InternalServerErrorResponse<500>;
 
 export type OptionsObjectRequestResult = RequestResult<
   Request,

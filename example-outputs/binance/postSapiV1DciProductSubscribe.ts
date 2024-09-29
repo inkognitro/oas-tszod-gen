@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -49,29 +48,27 @@ export type PostSapiV1DciProductSubscribePayload = {
 export type PostSapiV1DciProductSubscribeResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            positionId: number; // int
-            investCoin: string;
-            exercisedCoin: string;
-            subscriptionAmount: string;
-            duration: number; // int
-            autoCompoundPlan: string;
-            strikePrice: string;
-            settleDate: number; // int
-            purchaseStatus: string;
-            apr: string;
-            orderId: number; // int
-            purchaseTime: number; // int
-            'optionType"'?: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          positionId: number; // int
+          investCoin: string;
+          exercisedCoin: string;
+          subscriptionAmount: string;
+          duration: number; // int
+          autoCompoundPlan: string;
+          strikePrice: string;
+          settleDate: number; // int
+          purchaseStatus: string;
+          apr: string;
+          orderId: number; // int
+          purchaseTime: number; // int
+          'optionType"'?: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1DciProductSubscribeRequestResult = RequestResult<
   Request,

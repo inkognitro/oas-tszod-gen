@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -62,18 +61,16 @@ export type DeleteSapiV1MarginIsolatedAccountPayload = {
 export type DeleteSapiV1MarginIsolatedAccountResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            success: boolean;
-            symbol: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          success: boolean;
+          symbol: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteSapiV1MarginIsolatedAccountRequestResult = RequestResult<
   Request,

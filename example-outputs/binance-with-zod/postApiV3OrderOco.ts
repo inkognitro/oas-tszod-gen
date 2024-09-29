@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -136,46 +135,44 @@ export type PostApiV3OrderOcoPayload = {
 export type PostApiV3OrderOcoResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            orderListId: number; // int
-            contingencyType: string;
-            listStatusType: string;
-            listOrderStatus: string;
-            listClientOrderId: string;
-            transactionTime: number; // int
+      ResponseBodyData<
+        'application/json',
+        {
+          orderListId: number; // int
+          contingencyType: string;
+          listStatusType: string;
+          listOrderStatus: string;
+          listClientOrderId: string;
+          transactionTime: number; // int
+          symbol: string;
+          orders: {
             symbol: string;
-            orders: {
-              symbol: string;
-              orderId: number; // int
-              clientOrderId: string;
-            }[];
-            orderReports: {
-              symbol: string;
-              orderId: number; // int
-              orderListId: number; // int
-              clientOrderId: string;
-              transactTime: number; // int
-              price: string;
-              origQty: string;
-              executedQty: string;
-              cummulativeQuoteQty: string;
-              status: string;
-              timeInForce: string;
-              type: string;
-              side: string;
-              stopPrice: string;
-              workingTime: string;
-              selfTradePreventionMode: string;
-            }[];
-          }
-        >
+            orderId: number; // int
+            clientOrderId: string;
+          }[];
+          orderReports: {
+            symbol: string;
+            orderId: number; // int
+            orderListId: number; // int
+            clientOrderId: string;
+            transactTime: number; // int
+            price: string;
+            origQty: string;
+            executedQty: string;
+            cummulativeQuoteQty: string;
+            status: string;
+            timeInForce: string;
+            type: string;
+            side: string;
+            stopPrice: string;
+            workingTime: string;
+            selfTradePreventionMode: string;
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostApiV3OrderOcoRequestResult = RequestResult<
   Request,

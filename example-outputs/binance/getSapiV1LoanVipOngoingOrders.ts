@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -51,33 +50,31 @@ export type GetSapiV1LoanVipOngoingOrdersPayload = {
 export type GetSapiV1LoanVipOngoingOrdersResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            rows: {
-              orderId: number; // int
-              loanCoin: string;
-              totalDebt: string;
-              residualInterest: string;
-              collateralAccountId: string;
-              collateralCoin: string;
-              collateralValue: string;
-              totalCollateralValueAfterHaircut?: string;
-              lockedCollateralValue?: string;
-              currentLTV: string;
-              expirationTime: number; // int
-              loanDate: string;
-              loanRate: string;
-              loanTerm: string;
-            }[];
-            total: number; // int
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          rows: {
+            orderId: number; // int
+            loanCoin: string;
+            totalDebt: string;
+            residualInterest: string;
+            collateralAccountId: string;
+            collateralCoin: string;
+            collateralValue: string;
+            totalCollateralValueAfterHaircut?: string;
+            lockedCollateralValue?: string;
+            currentLTV: string;
+            expirationTime: number; // int
+            loanDate: string;
+            loanRate: string;
+            loanTerm: string;
+          }[];
+          total: number; // int
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LoanVipOngoingOrdersRequestResult = RequestResult<
   Request,

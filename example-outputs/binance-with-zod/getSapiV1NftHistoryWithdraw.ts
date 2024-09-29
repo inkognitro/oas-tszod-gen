@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -78,26 +77,24 @@ export type GetSapiV1NftHistoryWithdrawPayload = {
 export type GetSapiV1NftHistoryWithdrawResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            total: number; // int
-            list: {
-              network: string;
-              txID: string;
-              contractAdrress: string;
-              tokenId: string;
-              timestamp: number; // int
-              fee: number;
-              feeAsset: string;
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          total: number; // int
+          list: {
+            network: string;
+            txID: string;
+            contractAdrress: string;
+            tokenId: string;
+            timestamp: number; // int
+            fee: number;
+            feeAsset: string;
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1NftHistoryWithdrawRequestResult = RequestResult<
   Request,

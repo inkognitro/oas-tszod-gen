@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -51,26 +50,24 @@ export type GetSapiV1SubAccountFuturesInternaltransferPayload = {
 export type GetSapiV1SubAccountFuturesInternaltransferResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            success: boolean;
-            futuresType: number; // int
-            transfers: {
-              from: string;
-              to: string;
-              asset: string;
-              qty: string;
-              tranId: number; // int
-              time: number; // int
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          success: boolean;
+          futuresType: number; // int
+          transfers: {
+            from: string;
+            to: string;
+            asset: string;
+            qty: string;
+            tranId: number; // int
+            time: number; // int
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountFuturesInternaltransferRequestResult =
   RequestResult<Request, GetSapiV1SubAccountFuturesInternaltransferResponse>;

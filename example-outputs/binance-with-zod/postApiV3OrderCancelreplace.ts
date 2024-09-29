@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -158,53 +157,51 @@ export type PostApiV3OrderCancelreplacePayload = {
 export type PostApiV3OrderCancelreplaceResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            cancelResult: string;
-            newOrderResult: string;
-            cancelResponse: {
-              symbol: string;
-              origClientOrderId: string;
-              orderId: number; // int
-              orderListId: number; // int
-              clientOrderId: string;
-              price: string;
-              origQty: string;
-              executedQty: string;
-              cummulativeQuoteQty: string;
-              status: string;
-              timeInForce: string;
-              type: string;
-              side: string;
-              selfTradePreventionMode: string;
-              transactTime?: number; // int
-            };
-            newOrderResponse: {
-              symbol: string;
-              orderId: number; // int
-              orderListId: number; // int
-              clientOrderId: string;
-              transactTime: number; // int
-              price: string;
-              origQty: string;
-              executedQty: string;
-              cummulativeQuoteQty: string;
-              status: string;
-              timeInForce: string;
-              type: string;
-              side: string;
-              workingTime: number; // int
-              fills: string[];
-              selfTradePreventionMode: string;
-            };
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          cancelResult: string;
+          newOrderResult: string;
+          cancelResponse: {
+            symbol: string;
+            origClientOrderId: string;
+            orderId: number; // int
+            orderListId: number; // int
+            clientOrderId: string;
+            price: string;
+            origQty: string;
+            executedQty: string;
+            cummulativeQuoteQty: string;
+            status: string;
+            timeInForce: string;
+            type: string;
+            side: string;
+            selfTradePreventionMode: string;
+            transactTime?: number; // int
+          };
+          newOrderResponse: {
+            symbol: string;
+            orderId: number; // int
+            orderListId: number; // int
+            clientOrderId: string;
+            transactTime: number; // int
+            price: string;
+            origQty: string;
+            executedQty: string;
+            cummulativeQuoteQty: string;
+            status: string;
+            timeInForce: string;
+            type: string;
+            side: string;
+            workingTime: number; // int
+            fills: string[];
+            selfTradePreventionMode: string;
+          };
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostApiV3OrderCancelreplaceRequestResult = RequestResult<
   Request,

@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -79,25 +78,23 @@ export type GetApiV3MypreventedmatchesPayload = {
 export type GetApiV3MypreventedmatchesResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            symbol: string;
-            preventedMatchId: number; // int
-            takerOrderId: number; // int
-            makerOrderId: number; // int
-            tradeGroupId: number; // int
-            selfTradePreventionMode: string;
-            price: string;
-            makerPreventedQuantity: string;
-            transactTime: number; // int
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          symbol: string;
+          preventedMatchId: number; // int
+          takerOrderId: number; // int
+          makerOrderId: number; // int
+          tradeGroupId: number; // int
+          selfTradePreventionMode: string;
+          price: string;
+          makerPreventedQuantity: string;
+          transactTime: number; // int
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3MypreventedmatchesRequestResult = RequestResult<
   Request,

@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -74,28 +73,26 @@ export type GetApiV3OpenorderlistPayload = {
 export type GetApiV3OpenorderlistResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            orderListId: number; // int
-            contingencyType: string;
-            listStatusType: string;
-            listOrderStatus: string;
-            listClientOrderId: string;
-            transactionTime: number; // int
+      ResponseBodyData<
+        'application/json',
+        {
+          orderListId: number; // int
+          contingencyType: string;
+          listStatusType: string;
+          listOrderStatus: string;
+          listClientOrderId: string;
+          transactionTime: number; // int
+          symbol: string;
+          orders: {
             symbol: string;
-            orders: {
-              symbol: string;
-              orderId: number; // int
-              clientOrderId: string;
-            }[];
-          }[]
-        >
+            orderId: number; // int
+            clientOrderId: string;
+          }[];
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3OpenorderlistRequestResult = RequestResult<
   Request,

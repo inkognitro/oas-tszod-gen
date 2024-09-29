@@ -43,13 +43,13 @@ export type OptionsBulkObjectRequestBody = {
 export type OptionsBulkObjectPayload = OptionsBulkObjectRequestBody;
 
 export type OptionsBulkObjectResponse =
-  | Response<200, $200OkBulkAuthorizationsResponse>
-  | Response<204, AuthorizationsNotSupportedResponse>
-  | Response<400, $400BadRequestResponse>
-  | Response<404, $404NotFoundDrsObjectResponse>
-  | Response<405, AuthorizationsNotSupportedResponse>
-  | Response<413, $413RequestTooLargeResponse>
-  | Response<500, $500InternalServerErrorResponse>;
+  | $200OkBulkAuthorizationsResponse<200>
+  | AuthorizationsNotSupportedResponse<204>
+  | $400BadRequestResponse<400>
+  | $404NotFoundDrsObjectResponse<404>
+  | AuthorizationsNotSupportedResponse<405>
+  | $413RequestTooLargeResponse<413>
+  | $500InternalServerErrorResponse<500>;
 
 export type OptionsBulkObjectRequestResult = RequestResult<
   Request,

@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -50,31 +49,29 @@ export type GetSapiV1FiatOrdersPayload = {
 export type GetSapiV1FiatOrdersResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            code: string;
-            message: string;
-            data: {
-              orderNo: string;
-              fiatCurrency: string;
-              indicatedAmount: string;
-              amount: string;
-              totalFee: string;
-              method: string;
-              status: string;
-              createTime: number; // int
-              updateTime: number; // int
-            }[];
-            total: number; // int
-            success: boolean;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          code: string;
+          message: string;
+          data: {
+            orderNo: string;
+            fiatCurrency: string;
+            indicatedAmount: string;
+            amount: string;
+            totalFee: string;
+            method: string;
+            status: string;
+            createTime: number; // int
+            updateTime: number; // int
+          }[];
+          total: number; // int
+          success: boolean;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1FiatOrdersRequestResult = RequestResult<
   Request,

@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -71,23 +70,21 @@ export type PostSapiV3AssetGetuserassetPayload = {
 export type PostSapiV3AssetGetuserassetResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            asset: string;
-            free: string;
-            locked: string;
-            freeze: string;
-            withdrawing: string;
-            ipoable: string;
-            btcValuation: string;
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          asset: string;
+          free: string;
+          locked: string;
+          freeze: string;
+          withdrawing: string;
+          ipoable: string;
+          btcValuation: string;
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV3AssetGetuserassetRequestResult = RequestResult<
   Request,

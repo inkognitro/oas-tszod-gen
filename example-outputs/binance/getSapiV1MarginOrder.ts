@@ -1,7 +1,6 @@
 import {MarginOrderDetail, Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -47,12 +46,9 @@ export type GetSapiV1MarginOrderPayload = {
 };
 
 export type GetSapiV1MarginOrderResponse =
-  | Response<
-      200,
-      ResponseData<ResponseBodyData<'application/json', MarginOrderDetail>>
-    >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<200, ResponseBodyData<'application/json', MarginOrderDetail>>
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginOrderRequestResult = RequestResult<
   Request,

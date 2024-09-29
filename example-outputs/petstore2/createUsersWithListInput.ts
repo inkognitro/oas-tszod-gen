@@ -1,7 +1,6 @@
 import {User} from '@example-outputs/petstore2';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -41,12 +40,10 @@ export type CreateUsersWithListInputPayload =
 export type CreateUsersWithListInputResponse =
   | Response<
       200,
-      ResponseData<
-        | ResponseBodyData<'application/xml', User>
-        | ResponseBodyData<'application/json', User>
-      >
+      | ResponseBodyData<'application/xml', User>
+      | ResponseBodyData<'application/json', User>
     >
-  | Response<any, any>;
+  | Response;
 
 export type CreateUsersWithListInputRequestResult = RequestResult<
   Request,

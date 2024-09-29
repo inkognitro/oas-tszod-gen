@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -116,23 +115,21 @@ export type GetSapiV1MarginCapitalFlowPayload = {
 export type GetSapiV1MarginCapitalFlowResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            id: number; // int
-            tranId: number; // int
-            timestamp: number; // int
-            asset: string;
-            symbol: string;
-            type: string;
-            amount: string;
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          id: number; // int
+          tranId: number; // int
+          timestamp: number; // int
+          asset: string;
+          symbol: string;
+          type: string;
+          amount: string;
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginCapitalFlowRequestResult = RequestResult<
   Request,

@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -77,27 +76,25 @@ export type GetSapiV1MiningStatisticsUserListPayload = {
 export type GetSapiV1MiningStatisticsUserListResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            code: number; // int
-            msg: string;
-            data: {
-              type: string;
-              userName: string;
-              list: {
-                time: number; // int
-                hashrate: string;
-                reject: string;
-              }[];
+      ResponseBodyData<
+        'application/json',
+        {
+          code: number; // int
+          msg: string;
+          data: {
+            type: string;
+            userName: string;
+            list: {
+              time: number; // int
+              hashrate: string;
+              reject: string;
             }[];
-          }
-        >
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MiningStatisticsUserListRequestResult = RequestResult<
   Request,

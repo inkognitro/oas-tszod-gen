@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -47,19 +46,17 @@ export type PostSapiV1MiningHashTransferConfigCancelPayload = {
 export type PostSapiV1MiningHashTransferConfigCancelResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            code: number; // int
-            msg: string;
-            data: boolean;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          code: number; // int
+          msg: string;
+          data: boolean;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1MiningHashTransferConfigCancelRequestResult =
   RequestResult<Request, PostSapiV1MiningHashTransferConfigCancelResponse>;

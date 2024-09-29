@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -49,27 +48,25 @@ export type GetSapiV1EthStakingEthHistoryRedemptionhistoryPayload = {
 export type GetSapiV1EthStakingEthHistoryRedemptionhistoryResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            rows: {
-              time: number; // int
-              arrivalTime: number; // int
-              asset: string;
-              amount: string;
-              status: string;
-              distributeAsset: string;
-              distributeAmount: string;
-              conversionRatio: string;
-            }[];
-            total: number; // int
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          rows: {
+            time: number; // int
+            arrivalTime: number; // int
+            asset: string;
+            amount: string;
+            status: string;
+            distributeAsset: string;
+            distributeAmount: string;
+            conversionRatio: string;
+          }[];
+          total: number; // int
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1EthStakingEthHistoryRedemptionhistoryRequestResult =
   RequestResult<

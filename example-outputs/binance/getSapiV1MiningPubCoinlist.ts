@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -32,24 +31,22 @@ export const getSapiV1MiningPubCoinlistEndpointSchema = {
 export type GetSapiV1MiningPubCoinlistResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            code: number; // int
-            msg: string;
-            data: {
-              coinName: string;
-              coinId: number; // int
-              poolIndex: number; // int
-              algoId: number; // int
-              algoName: string;
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          code: number; // int
+          msg: string;
+          data: {
+            coinName: string;
+            coinId: number; // int
+            poolIndex: number; // int
+            algoId: number; // int
+            algoName: string;
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MiningPubCoinlistRequestResult = RequestResult<
   Request,

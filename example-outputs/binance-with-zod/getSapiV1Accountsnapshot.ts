@@ -11,7 +11,6 @@ import {
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -78,15 +77,13 @@ export type GetSapiV1AccountsnapshotPayload = {
 export type GetSapiV1AccountsnapshotResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          SnapshotSpot | SnapshotMargin | SnapshotFutures
-        >
+      ResponseBodyData<
+        'application/json',
+        SnapshotSpot | SnapshotMargin | SnapshotFutures
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AccountsnapshotRequestResult = RequestResult<
   Request,

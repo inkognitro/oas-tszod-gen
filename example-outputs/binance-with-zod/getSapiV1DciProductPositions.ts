@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -99,32 +98,30 @@ export type GetSapiV1DciProductPositionsPayload = {
 export type GetSapiV1DciProductPositionsResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            total: number; // int
-            list: {
-              id: string;
-              investCoin: string;
-              exercisedCoin: string;
-              subscriptionAmount: string;
-              strikePrice: string;
-              duration: number; // int
-              settleDate: number; // int
-              purchaseStatus: string;
-              apr: string;
-              orderId: number; // int
-              purchaseEndTime: number; // int
-              optionType: string;
-              autoCompoundPlan: string;
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          total: number; // int
+          list: {
+            id: string;
+            investCoin: string;
+            exercisedCoin: string;
+            subscriptionAmount: string;
+            strikePrice: string;
+            duration: number; // int
+            settleDate: number; // int
+            purchaseStatus: string;
+            apr: string;
+            orderId: number; // int
+            purchaseEndTime: number; // int
+            optionType: string;
+            autoCompoundPlan: string;
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1DciProductPositionsRequestResult = RequestResult<
   Request,

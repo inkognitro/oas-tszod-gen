@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -86,30 +85,28 @@ export type GetApiV3MyallocationsPayload = {
 export type GetApiV3MyallocationsResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            symbol: string;
-            allocationId: number; // int
-            allocationType: string;
-            orderId: number; // int
-            orderListId: number; // int
-            price: string;
-            qty: string;
-            quoteQty: string;
-            commission: string;
-            commissionAsset: string;
-            time: number; // int
-            isBuyer: boolean;
-            isMaker: boolean;
-            isAllocator: boolean;
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          symbol: string;
+          allocationId: number; // int
+          allocationType: string;
+          orderId: number; // int
+          orderListId: number; // int
+          price: string;
+          qty: string;
+          quoteQty: string;
+          commission: string;
+          commissionAsset: string;
+          time: number; // int
+          isBuyer: boolean;
+          isMaker: boolean;
+          isAllocator: boolean;
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3MyallocationsRequestResult = RequestResult<
   Request,

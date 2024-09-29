@@ -9,7 +9,6 @@ import {
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -71,15 +70,13 @@ export type GetSapiV2SubAccountFuturesAccountPayload = {
 export type GetSapiV2SubAccountFuturesAccountResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          SubAccountUSDTFuturesDetails | SubAccountCOINFuturesDetails
-        >
+      ResponseBodyData<
+        'application/json',
+        SubAccountUSDTFuturesDetails | SubAccountCOINFuturesDetails
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV2SubAccountFuturesAccountRequestResult = RequestResult<
   Request,

@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -55,24 +54,22 @@ export const getSapiV1CapitalWithdrawAddressListEndpointSchema = {
 export type GetSapiV1CapitalWithdrawAddressListResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            address: string;
-            addressTag: string;
-            coin: string;
-            name: string;
-            network: string;
-            origin: string;
-            originType: string;
-            whiteStatus: boolean;
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          address: string;
+          addressTag: string;
+          coin: string;
+          name: string;
+          network: string;
+          origin: string;
+          originType: string;
+          whiteStatus: boolean;
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1CapitalWithdrawAddressListRequestResult = RequestResult<
   Request,

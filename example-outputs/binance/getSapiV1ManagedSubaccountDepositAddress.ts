@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -48,20 +47,18 @@ export type GetSapiV1ManagedSubaccountDepositAddressPayload = {
 export type GetSapiV1ManagedSubaccountDepositAddressResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            coin: string;
-            address: string;
-            tag: string;
-            url: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          coin: string;
+          address: string;
+          tag: string;
+          url: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ManagedSubaccountDepositAddressRequestResult =
   RequestResult<Request, GetSapiV1ManagedSubaccountDepositAddressResponse>;

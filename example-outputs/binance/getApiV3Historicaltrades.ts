@@ -1,7 +1,6 @@
 import {Trade} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -34,7 +33,7 @@ export type GetApiV3HistoricaltradesPayload = {
 
 export type GetApiV3HistoricaltradesResponse = Response<
   200,
-  ResponseData<ResponseBodyData<'application/json', Trade[]>>
+  ResponseBodyData<'application/json', Trade[]>
 >;
 
 export type GetApiV3HistoricaltradesRequestResult = RequestResult<

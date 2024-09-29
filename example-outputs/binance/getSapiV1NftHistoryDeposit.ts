@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -49,24 +48,22 @@ export type GetSapiV1NftHistoryDepositPayload = {
 export type GetSapiV1NftHistoryDepositResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            total: number; // int
-            list: {
-              network: string;
-              txID: null | number; // int
-              contractAdrress: string;
-              tokenId: string;
-              timestamp: number; // int
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          total: number; // int
+          list: {
+            network: string;
+            txID: null | number; // int
+            contractAdrress: string;
+            tokenId: string;
+            timestamp: number; // int
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1NftHistoryDepositRequestResult = RequestResult<
   Request,

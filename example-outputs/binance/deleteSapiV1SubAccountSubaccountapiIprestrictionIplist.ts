@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -50,20 +49,18 @@ export type DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistPayload = {
 export type DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            ipRestrict: string;
-            ipList: string[];
-            updateTime: number; // int
-            apiKey: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          ipRestrict: string;
+          ipList: string[];
+          updateTime: number; // int
+          apiKey: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistRequestResult =
   RequestResult<

@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -68,42 +67,40 @@ export type PostApiV3SorOrderPayload = {
 export type PostApiV3SorOrderResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            symbol: string;
-            orderId: number; // int
-            orderListId: number; // int
-            clientOrderId: string;
-            transactTime: number; // int
+      ResponseBodyData<
+        'application/json',
+        {
+          symbol: string;
+          orderId: number; // int
+          orderListId: number; // int
+          clientOrderId: string;
+          transactTime: number; // int
+          price: string;
+          origQty: string;
+          executedQty: string;
+          cummulativeQuoteQty: string;
+          status: string;
+          timeInForce: string;
+          type: string;
+          side: string;
+          workingTime: number; // int
+          fills: {
+            matchType: string;
             price: string;
-            origQty: string;
-            executedQty: string;
-            cummulativeQuoteQty: string;
-            status: string;
-            timeInForce: string;
-            type: string;
-            side: string;
-            workingTime: number; // int
-            fills: {
-              matchType: string;
-              price: string;
-              qty: string;
-              commission: string;
-              commissionAsset: string;
-              tradeId: number; // int
-              allocId: number; // int
-            }[];
-            workingFloor: string;
-            selfTradePreventionMode: string;
-            usedSor: boolean;
-          }
-        >
+            qty: string;
+            commission: string;
+            commissionAsset: string;
+            tradeId: number; // int
+            allocId: number; // int
+          }[];
+          workingFloor: string;
+          selfTradePreventionMode: string;
+          usedSor: boolean;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostApiV3SorOrderRequestResult = RequestResult<
   Request,

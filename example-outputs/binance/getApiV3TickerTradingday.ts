@@ -1,7 +1,6 @@
 import {DayTicker, DayTickerList, Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -41,11 +40,9 @@ export type GetApiV3TickerTradingdayPayload = {
 export type GetApiV3TickerTradingdayResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<'application/json', DayTicker | DayTickerList>
-      >
+      ResponseBodyData<'application/json', DayTicker | DayTickerList>
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3TickerTradingdayRequestResult = RequestResult<
   Request,

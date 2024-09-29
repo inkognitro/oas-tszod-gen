@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -49,36 +48,34 @@ export type GetSapiV1SimpleEarnFlexiblePositionPayload = {
 export type GetSapiV1SimpleEarnFlexiblePositionResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            rows: {
-              totalAmount: string;
-              tierAnnualPercentageRate: {
-                '0-5BTC': number;
-                '5-10BTC': number;
-              };
-              latestAnnualPercentageRate: string;
-              yesterdayAirdropPercentageRate: string;
-              asset: string;
-              airDropAsset: string;
-              canRedeem: boolean;
-              collateralAmount: string;
-              productId: string;
-              yesterdayRealTimeRewards: string;
-              cumulativeBonusRewards: string;
-              cumulativeRealTimeRewards: string;
-              cumulativeTotalRewards: string;
-              autoSubscribe: boolean;
-            }[];
-            total: number; // int
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          rows: {
+            totalAmount: string;
+            tierAnnualPercentageRate: {
+              '0-5BTC': number;
+              '5-10BTC': number;
+            };
+            latestAnnualPercentageRate: string;
+            yesterdayAirdropPercentageRate: string;
+            asset: string;
+            airDropAsset: string;
+            canRedeem: boolean;
+            collateralAmount: string;
+            productId: string;
+            yesterdayRealTimeRewards: string;
+            cumulativeBonusRewards: string;
+            cumulativeRealTimeRewards: string;
+            cumulativeTotalRewards: string;
+            autoSubscribe: boolean;
+          }[];
+          total: number; // int
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnFlexiblePositionRequestResult = RequestResult<
   Request,

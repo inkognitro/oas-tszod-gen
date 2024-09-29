@@ -45,13 +45,13 @@ export type PostAccessURLPayload = {
 };
 
 export type PostAccessURLResponse =
-  | Response<200, $200OkAccessResponse>
-  | Response<202, $202AcceptedResponse>
-  | Response<400, $400BadRequestResponse>
-  | Response<401, $401UnauthorizedResponse>
-  | Response<403, $403ForbiddenResponse>
-  | Response<404, $404NotFoundAccessResponse>
-  | Response<500, $500InternalServerErrorResponse>;
+  | $200OkAccessResponse<200>
+  | $202AcceptedResponse<202>
+  | $400BadRequestResponse<400>
+  | $401UnauthorizedResponse<401>
+  | $403ForbiddenResponse<403>
+  | $404NotFoundAccessResponse<404>
+  | $500InternalServerErrorResponse<500>;
 
 export type PostAccessURLRequestResult = RequestResult<
   Request,

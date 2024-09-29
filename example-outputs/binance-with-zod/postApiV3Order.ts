@@ -11,7 +11,6 @@ import {
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -121,15 +120,13 @@ export type PostApiV3OrderPayload = {
 export type PostApiV3OrderResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          OrderResponseAck | OrderResponseResult | OrderResponseFull
-        >
+      ResponseBodyData<
+        'application/json',
+        OrderResponseAck | OrderResponseResult | OrderResponseFull
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostApiV3OrderRequestResult = RequestResult<
   Request,

@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -46,20 +45,18 @@ export type DeleteSapiV1AlgoSpotOrderPayload = {
 export type DeleteSapiV1AlgoSpotOrderResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            algoId: number; // int
-            success: boolean;
-            code: number; // int
-            msg: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          algoId: number; // int
+          success: boolean;
+          code: number; // int
+          msg: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteSapiV1AlgoSpotOrderRequestResult = RequestResult<
   Request,

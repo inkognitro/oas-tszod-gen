@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -45,29 +44,27 @@ export type GetSapiV1ConvertLimitQueryopenordersPayload = {
 export type GetSapiV1ConvertLimitQueryopenordersResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            list: {
-              quoteId: string;
-              orderId: number; // int
-              orderStatus: string;
-              fromAsset: string;
-              fromAmount: string;
-              toAsset: string;
-              toAmount: string;
-              ratio: string;
-              inverseRatio: string;
-              createTime: number; // int
-              expiredTimestamp: number; // int
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          list: {
+            quoteId: string;
+            orderId: number; // int
+            orderStatus: string;
+            fromAsset: string;
+            fromAmount: string;
+            toAsset: string;
+            toAmount: string;
+            ratio: string;
+            inverseRatio: string;
+            createTime: number; // int
+            expiredTimestamp: number; // int
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ConvertLimitQueryopenordersRequestResult = RequestResult<
   Request,

@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -60,18 +59,16 @@ export type GetSapiV1PortfolioPmloanPayload = {
 export type GetSapiV1PortfolioPmloanResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            asset: string;
-            amount: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          asset: string;
+          amount: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1PortfolioPmloanRequestResult = RequestResult<
   Request,

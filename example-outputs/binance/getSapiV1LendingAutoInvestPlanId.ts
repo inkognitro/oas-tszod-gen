@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -47,52 +46,50 @@ export type GetSapiV1LendingAutoInvestPlanIdPayload = {
 export type GetSapiV1LendingAutoInvestPlanIdResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            planValueInUSD?: string;
-            planValueInBTC?: string;
-            pnlInUSD?: string;
-            roi?: string;
-            plan?: {
-              planId: number; // int
-              planType: string;
-              editAllowed: string;
-              flexibleAllowedToUse: string;
-              creationDateTime: number; // int
-              firstExecutionDateTime: number; // int
-              nextExecutionDateTime: number; // int
-              status: string;
+      ResponseBodyData<
+        'application/json',
+        {
+          planValueInUSD?: string;
+          planValueInBTC?: string;
+          pnlInUSD?: string;
+          roi?: string;
+          plan?: {
+            planId: number; // int
+            planType: string;
+            editAllowed: string;
+            flexibleAllowedToUse: string;
+            creationDateTime: number; // int
+            firstExecutionDateTime: number; // int
+            nextExecutionDateTime: number; // int
+            status: string;
+            targetAsset: string;
+            sourceAsset: string;
+            totalInvestedInUSD: string;
+            planValueInUSD: string;
+            pnlInUSD: string;
+            roi: string;
+            details: {
               targetAsset: string;
-              sourceAsset: string;
+              averagePriceInUSD: string;
               totalInvestedInUSD: string;
-              planValueInUSD: string;
+              purchasedAmount: string;
+              purchasedAmountUnit: string;
               pnlInUSD: string;
               roi: string;
-              details: {
-                targetAsset: string;
-                averagePriceInUSD: string;
-                totalInvestedInUSD: string;
-                purchasedAmount: string;
-                purchasedAmountUnit: string;
-                pnlInUSD: string;
-                roi: string;
-                percentage: string;
-                assetStatus: string;
-                availableAmount: string;
-                availableAmountUnit: string;
-                redeemedAmout: string;
-                redeemedAmoutUnit: string;
-                assetValueInUSD: string;
-              }[];
+              percentage: string;
+              assetStatus: string;
+              availableAmount: string;
+              availableAmountUnit: string;
+              redeemedAmout: string;
+              redeemedAmoutUnit: string;
+              assetValueInUSD: string;
             }[];
-          }
-        >
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingAutoInvestPlanIdRequestResult = RequestResult<
   Request,

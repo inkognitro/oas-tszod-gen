@@ -1,7 +1,6 @@
 import {ApiResponse} from '@example-outputs/petstore2';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -44,7 +43,7 @@ export type UploadFilePayload = UploadFileRequestBody & {
 
 export type UploadFileResponse = Response<
   200,
-  ResponseData<ResponseBodyData<'application/json', ApiResponse>>
+  ResponseBodyData<'application/json', ApiResponse>
 >;
 
 export type UploadFileRequestResult = RequestResult<

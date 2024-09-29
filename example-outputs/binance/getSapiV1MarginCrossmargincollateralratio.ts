@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -32,21 +31,19 @@ export const getSapiV1MarginCrossmargincollateralratioEndpointSchema = {
 export type GetSapiV1MarginCrossmargincollateralratioResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            collaterals: {
-              minUsdValue: string;
-              maxUsdValue: string;
-              discountRate: string;
-            }[];
-            assetNames: string[];
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          collaterals: {
+            minUsdValue: string;
+            maxUsdValue: string;
+            discountRate: string;
+          }[];
+          assetNames: string[];
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginCrossmargincollateralratioRequestResult =
   RequestResult<Request, GetSapiV1MarginCrossmargincollateralratioResponse>;

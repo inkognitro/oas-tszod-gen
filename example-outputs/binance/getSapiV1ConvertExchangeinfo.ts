@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -44,22 +43,20 @@ export type GetSapiV1ConvertExchangeinfoPayload = {
 export type GetSapiV1ConvertExchangeinfoResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            fromAsset: string;
-            toAsset: string;
-            fromAssetMinAmount: string;
-            fromAssetMaxAmount: string;
-            toAssetMinAmount: string;
-            toAssetMaxAmount: string;
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          fromAsset: string;
+          toAsset: string;
+          fromAssetMinAmount: string;
+          fromAssetMaxAmount: string;
+          toAssetMinAmount: string;
+          toAssetMaxAmount: string;
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ConvertExchangeinfoRequestResult = RequestResult<
   Request,

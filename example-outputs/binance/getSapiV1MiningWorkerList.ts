@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -51,31 +50,29 @@ export type GetSapiV1MiningWorkerListPayload = {
 export type GetSapiV1MiningWorkerListResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            code: number; // int
-            msg: string;
-            data: {
-              workerDatas: {
-                workerId: string;
-                workerName: string;
-                status: number; // int
-                hashRate: number; // int
-                dayHashRate: number; // int
-                rejectRate: number; // int
-                lastShareTime: number; // int
-              }[];
-              totalNum: number; // int
-              pageSize: number; // int
-            };
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          code: number; // int
+          msg: string;
+          data: {
+            workerDatas: {
+              workerId: string;
+              workerName: string;
+              status: number; // int
+              hashRate: number; // int
+              dayHashRate: number; // int
+              rejectRate: number; // int
+              lastShareTime: number; // int
+            }[];
+            totalNum: number; // int
+            pageSize: number; // int
+          };
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MiningWorkerListRequestResult = RequestResult<
   Request,

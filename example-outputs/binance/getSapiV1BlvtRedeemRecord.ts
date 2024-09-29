@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -50,23 +49,21 @@ export type GetSapiV1BlvtRedeemRecordPayload = {
 export type GetSapiV1BlvtRedeemRecordResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            id: number; // int
-            tokenName: string;
-            amount: string;
-            nav: string;
-            fee: string;
-            netProceed: string;
-            timestamp: number; // int
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          id: number; // int
+          tokenName: string;
+          amount: string;
+          nav: string;
+          fee: string;
+          netProceed: string;
+          timestamp: number; // int
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1BlvtRedeemRecordRequestResult = RequestResult<
   Request,

@@ -1,7 +1,6 @@
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -34,7 +33,7 @@ export type DeleteUserPayload = {
   };
 };
 
-export type DeleteUserResponse = Response<400, any> | Response<404, any>;
+export type DeleteUserResponse = Response<400> | Response<404>;
 
 export type DeleteUserRequestResult = RequestResult<
   Request,

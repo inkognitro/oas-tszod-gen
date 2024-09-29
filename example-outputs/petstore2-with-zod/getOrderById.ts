@@ -2,7 +2,6 @@ import {orderZodSchema, Order} from '@example-outputs/petstore2-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -48,13 +47,11 @@ export type GetOrderByIdPayload = {
 export type GetOrderByIdResponse =
   | Response<
       200,
-      ResponseData<
-        | ResponseBodyData<'application/xml', Order>
-        | ResponseBodyData<'application/json', Order>
-      >
+      | ResponseBodyData<'application/xml', Order>
+      | ResponseBodyData<'application/json', Order>
     >
-  | Response<400, any>
-  | Response<404, any>;
+  | Response<400>
+  | Response<404>;
 
 export type GetOrderByIdRequestResult = RequestResult<
   Request,

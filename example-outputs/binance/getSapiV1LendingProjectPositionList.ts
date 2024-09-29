@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -48,33 +47,31 @@ export type GetSapiV1LendingProjectPositionListPayload = {
 export type GetSapiV1LendingProjectPositionListResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            asset: string;
-            canTransfer: boolean;
-            createTimestamp: number; // int
-            duration: number; // int
-            endTime: number; // int
-            interest: string;
-            interestRate: string;
-            lot: number; // int
-            positionId: number; // int
-            principal: string;
-            projectId: string;
-            projectName: string;
-            purchaseTime: number; // int
-            redeemDate: string; // date
-            startTime: number; // int
-            status: string;
-            type: string;
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          asset: string;
+          canTransfer: boolean;
+          createTimestamp: number; // int
+          duration: number; // int
+          endTime: number; // int
+          interest: string;
+          interestRate: string;
+          lot: number; // int
+          positionId: number; // int
+          principal: string;
+          projectId: string;
+          projectName: string;
+          purchaseTime: number; // int
+          redeemDate: string; // date
+          startTime: number; // int
+          status: string;
+          type: string;
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingProjectPositionListRequestResult = RequestResult<
   Request,

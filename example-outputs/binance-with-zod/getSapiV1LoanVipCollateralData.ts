@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -74,28 +73,26 @@ export type GetSapiV1LoanVipCollateralDataPayload = {
 export type GetSapiV1LoanVipCollateralDataResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            rows: {
-              collateralCoin: string;
-              _1stCollateralRatio: string;
-              _1stCollateralRange: string;
-              _2ndCollateralRatio: string;
-              _2ndCollateralRange: string;
-              _3rdCollateralRatio: string;
-              _3rdCollateralRange: string;
-              _4thCollateralRatio: string;
-              _4thCollateralRange: string;
-            }[];
-            total: number; // int
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          rows: {
+            collateralCoin: string;
+            _1stCollateralRatio: string;
+            _1stCollateralRange: string;
+            _2ndCollateralRatio: string;
+            _2ndCollateralRange: string;
+            _3rdCollateralRatio: string;
+            _3rdCollateralRange: string;
+            _4thCollateralRatio: string;
+            _4thCollateralRange: string;
+          }[];
+          total: number; // int
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LoanVipCollateralDataRequestResult = RequestResult<
   Request,

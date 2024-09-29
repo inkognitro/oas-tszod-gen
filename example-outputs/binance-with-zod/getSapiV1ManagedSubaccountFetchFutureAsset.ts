@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -85,35 +84,33 @@ export type GetSapiV1ManagedSubaccountFetchFutureAssetPayload = {
 export type GetSapiV1ManagedSubaccountFetchFutureAssetResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            code: number; // int
-            message: string;
-            snapshotVos: {
-              type: string;
-              updateTime: number; // int
-              data: {
-                assets: {
-                  asset: string;
-                  marginBalance: number;
-                  walletBalance: number;
-                }[];
-                position: {
-                  symbol: string;
-                  entryPrice: number;
-                  markPrice: number;
-                  positionAmt: number;
-                }[];
-              };
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          code: number; // int
+          message: string;
+          snapshotVos: {
+            type: string;
+            updateTime: number; // int
+            data: {
+              assets: {
+                asset: string;
+                marginBalance: number;
+                walletBalance: number;
+              }[];
+              position: {
+                symbol: string;
+                entryPrice: number;
+                markPrice: number;
+                positionAmt: number;
+              }[];
+            };
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ManagedSubaccountFetchFutureAssetRequestResult =
   RequestResult<Request, GetSapiV1ManagedSubaccountFetchFutureAssetResponse>;

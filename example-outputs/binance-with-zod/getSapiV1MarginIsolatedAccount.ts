@@ -7,7 +7,6 @@ import {
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -64,12 +63,10 @@ export type GetSapiV1MarginIsolatedAccountPayload = {
 export type GetSapiV1MarginIsolatedAccountResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<'application/json', IsolatedMarginAccountInfo>
-      >
+      ResponseBodyData<'application/json', IsolatedMarginAccountInfo>
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginIsolatedAccountRequestResult = RequestResult<
   Request,

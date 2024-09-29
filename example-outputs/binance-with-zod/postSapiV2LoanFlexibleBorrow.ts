@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -71,21 +70,19 @@ export type PostSapiV2LoanFlexibleBorrowPayload = {
 export type PostSapiV2LoanFlexibleBorrowResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            loanCoin: string;
-            loanAmount: string;
-            collateralCoin?: string;
-            collateralAmount: string;
-            status: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          loanCoin: string;
+          loanAmount: string;
+          collateralCoin?: string;
+          collateralAmount: string;
+          status: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV2LoanFlexibleBorrowRequestResult = RequestResult<
   Request,

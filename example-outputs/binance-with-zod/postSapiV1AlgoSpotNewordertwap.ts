@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -74,20 +73,18 @@ export type PostSapiV1AlgoSpotNewordertwapPayload = {
 export type PostSapiV1AlgoSpotNewordertwapResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            clientAlgoId: string;
-            success: boolean;
-            code: number; // int
-            msg: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          clientAlgoId: string;
+          success: boolean;
+          code: number; // int
+          msg: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1AlgoSpotNewordertwapRequestResult = RequestResult<
   Request,

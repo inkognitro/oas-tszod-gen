@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -80,32 +79,30 @@ export type GetSapiV1MiningHashTransferConfigDetailsListPayload = {
 export type GetSapiV1MiningHashTransferConfigDetailsListResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            code: number; // int
-            msg: string;
-            data: {
-              configDetails: {
-                configId: number; // int
-                poolUsername: string;
-                toPoolUsername: string;
-                algoName: string;
-                hashRate: number; // int
-                startDay: number; // int
-                endDay: number; // int
-                status: number; // int
-              }[];
-              totalNum: number; // int
-              pageSize: number; // int
-            };
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          code: number; // int
+          msg: string;
+          data: {
+            configDetails: {
+              configId: number; // int
+              poolUsername: string;
+              toPoolUsername: string;
+              algoName: string;
+              hashRate: number; // int
+              startDay: number; // int
+              endDay: number; // int
+              status: number; // int
+            }[];
+            totalNum: number; // int
+            pageSize: number; // int
+          };
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MiningHashTransferConfigDetailsListRequestResult =
   RequestResult<Request, GetSapiV1MiningHashTransferConfigDetailsListResponse>;

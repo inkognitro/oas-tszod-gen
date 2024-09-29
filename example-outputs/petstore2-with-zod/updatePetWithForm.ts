@@ -1,7 +1,6 @@
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -41,7 +40,7 @@ export type UpdatePetWithFormPayload = {
   };
 };
 
-export type UpdatePetWithFormResponse = Response<405, any>;
+export type UpdatePetWithFormResponse = Response<405>;
 
 export type UpdatePetWithFormRequestResult = RequestResult<
   Request,

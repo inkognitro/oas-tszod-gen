@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -47,24 +46,22 @@ export type GetSapiV1MarginIsolatedmargindataPayload = {
 export type GetSapiV1MarginIsolatedmargindataResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            vipLevel?: number; // int
-            symbol?: string;
-            leverage?: string;
-            data?: {
-              coin?: string;
-              dailyInterest?: string;
-              borrowLimit?: string;
-            }[];
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          vipLevel?: number; // int
+          symbol?: string;
+          leverage?: string;
+          data?: {
+            coin?: string;
+            dailyInterest?: string;
+            borrowLimit?: string;
+          }[];
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginIsolatedmargindataRequestResult = RequestResult<
   Request,

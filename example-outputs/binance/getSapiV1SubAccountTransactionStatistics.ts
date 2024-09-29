@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -46,32 +45,30 @@ export type GetSapiV1SubAccountTransactionStatisticsPayload = {
 export type GetSapiV1SubAccountTransactionStatisticsResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            recent30BtcTotal: string;
-            recent30BtcFuturesTotal: string;
-            recent30BtcMarginTotal: string;
-            recent30BusdTotal: string;
-            recent30BusdFuturesTotal: string;
-            recent30BusdMarginTotal: string;
-            tradeInfoVos: {
-              userId?: number; // int
-              btc?: number;
-              btcFutures?: number;
-              btcMargin?: number;
-              busd?: number;
-              busdFutures?: number;
-              busdMargin?: number;
-              date?: number; // int
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          recent30BtcTotal: string;
+          recent30BtcFuturesTotal: string;
+          recent30BtcMarginTotal: string;
+          recent30BusdTotal: string;
+          recent30BusdFuturesTotal: string;
+          recent30BusdMarginTotal: string;
+          tradeInfoVos: {
+            userId?: number; // int
+            btc?: number;
+            btcFutures?: number;
+            btcMargin?: number;
+            busd?: number;
+            busdFutures?: number;
+            busdMargin?: number;
+            date?: number; // int
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountTransactionStatisticsRequestResult =
   RequestResult<Request, GetSapiV1SubAccountTransactionStatisticsResponse>;

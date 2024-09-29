@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -50,18 +49,16 @@ export type GetSapiV1MarginPriceindexPayload = {
 export type GetSapiV1MarginPriceindexResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            calcTime: number; // int
-            price: string;
-            symbol: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          calcTime: number; // int
+          price: string;
+          symbol: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginPriceindexRequestResult = RequestResult<
   Request,

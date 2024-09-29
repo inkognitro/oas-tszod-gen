@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -56,22 +55,20 @@ export type GetSapiV1MarginAllpairsPayload = {
 export type GetSapiV1MarginAllpairsResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            base: string;
-            id: number; // int
-            isBuyAllowed: boolean;
-            isMarginTrade: boolean;
-            isSellAllowed: boolean;
-            quote: string;
-            symbol: string;
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          base: string;
+          id: number; // int
+          isBuyAllowed: boolean;
+          isMarginTrade: boolean;
+          isSellAllowed: boolean;
+          quote: string;
+          symbol: string;
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginAllpairsRequestResult = RequestResult<
   Request,

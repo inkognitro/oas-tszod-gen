@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -90,44 +89,42 @@ export type GetSapiV1LendingAutoInvestPlanListPayload = {
 export type GetSapiV1LendingAutoInvestPlanListResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
+      ResponseBodyData<
+        'application/json',
+        {
+          planValueInUSD: string;
+          planValueInBTC: string;
+          pnlInUSD: string;
+          roi: string;
+          plan: {
+            planId: number; // int
+            planType: string;
+            editAllowed: string;
+            creationDateTime: number; // int
+            firstExecutionDateTime: number; // int
+            nextExecutionDateTime: number; // int
+            status: string;
+            lastUpdatedDateTime: number; // int
+            targetAsset: string;
+            totalTargetAmount: string;
+            sourceAsset: string;
+            totalInvestedInUSD: string;
+            subscriptionAmount: string;
+            subscriptionCycle: string;
+            subscriptionStartDay: string;
+            subscriptionStartWeekday: string;
+            subscriptionStartTime: string;
+            sourceWallet: string;
+            flexibleAllowedToUse: string;
             planValueInUSD: string;
-            planValueInBTC: string;
             pnlInUSD: string;
             roi: string;
-            plan: {
-              planId: number; // int
-              planType: string;
-              editAllowed: string;
-              creationDateTime: number; // int
-              firstExecutionDateTime: number; // int
-              nextExecutionDateTime: number; // int
-              status: string;
-              lastUpdatedDateTime: number; // int
-              targetAsset: string;
-              totalTargetAmount: string;
-              sourceAsset: string;
-              totalInvestedInUSD: string;
-              subscriptionAmount: string;
-              subscriptionCycle: string;
-              subscriptionStartDay: string;
-              subscriptionStartWeekday: string;
-              subscriptionStartTime: string;
-              sourceWallet: string;
-              flexibleAllowedToUse: string;
-              planValueInUSD: string;
-              pnlInUSD: string;
-              roi: string;
-            }[];
-          }
-        >
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingAutoInvestPlanListRequestResult = RequestResult<
   Request,

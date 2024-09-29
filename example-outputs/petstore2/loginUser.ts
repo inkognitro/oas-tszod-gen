@@ -1,6 +1,5 @@
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -37,16 +36,14 @@ export type LoginUserPayload = {
 export type LoginUserResponse =
   | Response<
       200,
-      ResponseData<
-        | ResponseBodyData<'application/xml', string>
-        | ResponseBodyData<'application/json', string>,
-        {
-          'X-Rate-Limit': string;
-          'X-Expires-After': string; // date-time
-        }
-      >
+      | ResponseBodyData<'application/xml', string>
+      | ResponseBodyData<'application/json', string>,
+      {
+        'X-Rate-Limit': string;
+        'X-Expires-After': string; // date-time
+      }
     >
-  | Response<400, any>;
+  | Response<400>;
 
 export type LoginUserRequestResult = RequestResult<Request, LoginUserResponse>;
 

@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -68,22 +67,20 @@ export type PostSapiV1BlvtSubscribePayload = {
 export type PostSapiV1BlvtSubscribeResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            id: number; // int
-            status: string;
-            tokenName: string;
-            amount: string;
-            cost: string;
-            timestamp: number; // int
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          id: number; // int
+          status: string;
+          tokenName: string;
+          amount: string;
+          cost: string;
+          timestamp: number; // int
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1BlvtSubscribeRequestResult = RequestResult<
   Request,

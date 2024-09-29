@@ -2,7 +2,6 @@ import {userZodSchema, User} from '@example-outputs/petstore2-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -56,7 +55,7 @@ export type UpdateUserPayload = UpdateUserRequestBody & {
   };
 };
 
-export type UpdateUserResponse = Response<any, any>;
+export type UpdateUserResponse = Response;
 
 export type UpdateUserRequestResult = RequestResult<
   Request,

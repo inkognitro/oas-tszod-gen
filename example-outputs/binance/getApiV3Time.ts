@@ -1,6 +1,5 @@
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -25,13 +24,11 @@ export const getApiV3TimeEndpointSchema = {
 
 export type GetApiV3TimeResponse = Response<
   200,
-  ResponseData<
-    ResponseBodyData<
-      'application/json',
-      {
-        serverTime: number; // int
-      }
-    >
+  ResponseBodyData<
+    'application/json',
+    {
+      serverTime: number; // int
+    }
   >
 >;
 

@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -47,22 +46,20 @@ export type PostSapiV1AssetGetFundingAssetPayload = {
 export type PostSapiV1AssetGetFundingAssetResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            asset: string;
-            free: string;
-            locked: string;
-            freeze: string;
-            withdrawing: string;
-            btcValuation: string;
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          asset: string;
+          free: string;
+          locked: string;
+          freeze: string;
+          withdrawing: string;
+          btcValuation: string;
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1AssetGetFundingAssetRequestResult = RequestResult<
   Request,

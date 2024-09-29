@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -81,33 +80,31 @@ export type GetSapiV1LoanLoanableDataPayload = {
 export type GetSapiV1LoanLoanableDataResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            rows: {
-              loanCoin: string;
-              _7dHourlyInterestRate: string;
-              _7dDailyInterestRate: string;
-              _14dHourlyInterestRate: string;
-              _14dDailyInterestRate: string;
-              _30dHourlyInterestRate: string;
-              _30dDailyInterestRate: string;
-              _90dHourlyInterestRate: string;
-              _90dDailyInterestRate: string;
-              _180dHourlyInterestRate: string;
-              _180dDailyInterestRate: string;
-              minLimit: string;
-              maxLimit: string;
-              vipLevel: number; // int
-            }[];
-            total: number; // int
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          rows: {
+            loanCoin: string;
+            _7dHourlyInterestRate: string;
+            _7dDailyInterestRate: string;
+            _14dHourlyInterestRate: string;
+            _14dDailyInterestRate: string;
+            _30dHourlyInterestRate: string;
+            _30dDailyInterestRate: string;
+            _90dHourlyInterestRate: string;
+            _90dDailyInterestRate: string;
+            _180dHourlyInterestRate: string;
+            _180dDailyInterestRate: string;
+            minLimit: string;
+            maxLimit: string;
+            vipLevel: number; // int
+          }[];
+          total: number; // int
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LoanLoanableDataRequestResult = RequestResult<
   Request,

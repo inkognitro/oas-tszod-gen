@@ -1,7 +1,6 @@
 import {orderZodSchema, Order} from '@example-outputs/petstore2-with-zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -56,8 +55,8 @@ export type PlaceOrderRequestBody =
 export type PlaceOrderPayload = PlaceOrderRequestBody;
 
 export type PlaceOrderResponse =
-  | Response<200, ResponseData<ResponseBodyData<'application/json', Order>>>
-  | Response<405, any>;
+  | Response<200, ResponseBodyData<'application/json', Order>>
+  | Response<405>;
 
 export type PlaceOrderRequestResult = RequestResult<
   Request,

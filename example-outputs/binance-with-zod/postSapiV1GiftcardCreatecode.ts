@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -70,24 +69,22 @@ export type PostSapiV1GiftcardCreatecodePayload = {
 export type PostSapiV1GiftcardCreatecodeResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
+      ResponseBodyData<
+        'application/json',
+        {
+          code: string;
+          message: string;
+          data: {
+            referenceNo: string;
             code: string;
-            message: string;
-            data: {
-              referenceNo: string;
-              code: string;
-              expiredTime: number; // int
-            };
-            success: boolean;
-          }
-        >
+            expiredTime: number; // int
+          };
+          success: boolean;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1GiftcardCreatecodeRequestResult = RequestResult<
   Request,

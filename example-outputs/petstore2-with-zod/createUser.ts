@@ -1,7 +1,6 @@
 import {userZodSchema, User} from '@example-outputs/petstore2-with-zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -57,10 +56,8 @@ export type CreateUserPayload = CreateUserRequestBody;
 
 export type CreateUserResponse = Response<
   any,
-  ResponseData<
-    | ResponseBodyData<'application/json', User>
-    | ResponseBodyData<'application/xml', User>
-  >
+  | ResponseBodyData<'application/json', User>
+  | ResponseBodyData<'application/xml', User>
 >;
 
 export type CreateUserRequestResult = RequestResult<

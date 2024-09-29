@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -65,19 +64,17 @@ export type GetSapiV1AssetTradefeePayload = {
 export type GetSapiV1AssetTradefeeResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            symbol: string;
-            makerCommission: string;
-            takerCommission: string;
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          symbol: string;
+          makerCommission: string;
+          takerCommission: string;
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AssetTradefeeRequestResult = RequestResult<
   Request,

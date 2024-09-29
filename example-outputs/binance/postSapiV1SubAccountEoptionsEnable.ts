@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -46,18 +45,16 @@ export type PostSapiV1SubAccountEoptionsEnablePayload = {
 export type PostSapiV1SubAccountEoptionsEnableResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            email: string;
-            isEOptionsEnabled: boolean;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          email: string;
+          isEOptionsEnabled: boolean;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SubAccountEoptionsEnableRequestResult = RequestResult<
   Request,

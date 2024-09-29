@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -42,9 +41,9 @@ export type PostSapiV1CapitalContractConvertibleCoinsPayload = {
 };
 
 export type PostSapiV1CapitalContractConvertibleCoinsResponse =
-  | Response<200, ResponseData<ResponseBodyData<'application/json', {}>>>
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<200, ResponseBodyData<'application/json', {}>>
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1CapitalContractConvertibleCoinsRequestResult =
   RequestResult<Request, PostSapiV1CapitalContractConvertibleCoinsResponse>;

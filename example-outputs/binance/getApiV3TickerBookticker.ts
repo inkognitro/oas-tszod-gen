@@ -1,7 +1,6 @@
 import {BookTicker, BookTickerList, Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -39,11 +38,9 @@ export type GetApiV3TickerBooktickerPayload = {
 export type GetApiV3TickerBooktickerResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<'application/json', BookTicker | BookTickerList>
-      >
+      ResponseBodyData<'application/json', BookTicker | BookTickerList>
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3TickerBooktickerRequestResult = RequestResult<
   Request,

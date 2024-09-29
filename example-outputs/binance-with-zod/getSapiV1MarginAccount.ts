@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -75,31 +74,29 @@ export type GetSapiV1MarginAccountPayload = {
 export type GetSapiV1MarginAccountResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            borrowEnabled: boolean;
-            marginLevel: string;
-            totalAssetOfBtc: string;
-            totalLiabilityOfBtc: string;
-            totalNetAssetOfBtc: string;
-            tradeEnabled: boolean;
-            transferEnabled: boolean;
-            userAssets: {
-              asset: string;
-              borrowed: string;
-              free: string;
-              interest: string;
-              locked: string;
-              netAsset: string;
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          borrowEnabled: boolean;
+          marginLevel: string;
+          totalAssetOfBtc: string;
+          totalLiabilityOfBtc: string;
+          totalNetAssetOfBtc: string;
+          tradeEnabled: boolean;
+          transferEnabled: boolean;
+          userAssets: {
+            asset: string;
+            borrowed: string;
+            free: string;
+            interest: string;
+            locked: string;
+            netAsset: string;
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginAccountRequestResult = RequestResult<
   Request,

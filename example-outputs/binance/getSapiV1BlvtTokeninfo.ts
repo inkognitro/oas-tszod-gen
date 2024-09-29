@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -38,34 +37,32 @@ export type GetSapiV1BlvtTokeninfoPayload = {
 export type GetSapiV1BlvtTokeninfoResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            tokenName: string;
-            description: string;
-            underlying: string;
-            tokenIssued: string;
-            basket: string;
-            currentBaskets: {
-              symbol: string;
-              amount: string;
-              notionalValue: string;
-            }[];
-            nav: string;
-            realLeverage: string;
-            fundingRate: string;
-            dailyManagementFee: string;
-            purchaseFeePct: string;
-            dailyPurchaseLimit: string;
-            redeemFeePct: string;
-            dailyRedeemLimit: string;
-            timestamp: number; // int
-          }[]
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          tokenName: string;
+          description: string;
+          underlying: string;
+          tokenIssued: string;
+          basket: string;
+          currentBaskets: {
+            symbol: string;
+            amount: string;
+            notionalValue: string;
+          }[];
+          nav: string;
+          realLeverage: string;
+          fundingRate: string;
+          dailyManagementFee: string;
+          purchaseFeePct: string;
+          dailyPurchaseLimit: string;
+          redeemFeePct: string;
+          dailyRedeemLimit: string;
+          timestamp: number; // int
+        }[]
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1BlvtTokeninfoRequestResult = RequestResult<
   Request,

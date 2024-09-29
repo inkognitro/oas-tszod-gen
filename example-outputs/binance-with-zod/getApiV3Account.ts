@@ -7,7 +7,6 @@ import {
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -60,9 +59,9 @@ export type GetApiV3AccountPayload = {
 };
 
 export type GetApiV3AccountResponse =
-  | Response<200, ResponseData<ResponseBodyData<'application/json', Account>>>
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<200, ResponseBodyData<'application/json', Account>>
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3AccountRequestResult = RequestResult<
   Request,

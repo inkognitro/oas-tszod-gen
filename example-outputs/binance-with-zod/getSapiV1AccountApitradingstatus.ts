@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -78,34 +77,32 @@ export type GetSapiV1AccountApitradingstatusPayload = {
 export type GetSapiV1AccountApitradingstatusResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            data: {
-              isLocked: boolean;
-              plannedRecoverTime: number; // int
-              triggerCondition: {
-                GCR: number; // int
-                IFER: number; // int
-                UFR: number; // int
-              };
-              indicators: {
-                BTCUSDT: {
-                  i: string;
-                  c: number; // int
-                  v: number;
-                  t: number;
-                }[];
-              };
-              updateTime: number; // int
+      ResponseBodyData<
+        'application/json',
+        {
+          data: {
+            isLocked: boolean;
+            plannedRecoverTime: number; // int
+            triggerCondition: {
+              GCR: number; // int
+              IFER: number; // int
+              UFR: number; // int
             };
-          }
-        >
+            indicators: {
+              BTCUSDT: {
+                i: string;
+                c: number; // int
+                v: number;
+                t: number;
+              }[];
+            };
+            updateTime: number; // int
+          };
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AccountApitradingstatusRequestResult = RequestResult<
   Request,

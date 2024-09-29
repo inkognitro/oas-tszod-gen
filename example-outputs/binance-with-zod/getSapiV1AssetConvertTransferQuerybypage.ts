@@ -2,7 +2,6 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -86,28 +85,26 @@ export type GetSapiV1AssetConvertTransferQuerybypagePayload = {
 export type GetSapiV1AssetConvertTransferQuerybypageResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            total: number; // int
-            rows: {
-              tranId: number; // int
-              type: number; // int
-              time: number; // int
-              deductedAsset: string;
-              deductedAmount: string;
-              targetAsset: string;
-              targetAmount: string;
-              status: string;
-              accountType: string;
-            }[];
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          total: number; // int
+          rows: {
+            tranId: number; // int
+            type: number; // int
+            time: number; // int
+            deductedAsset: string;
+            deductedAmount: string;
+            targetAsset: string;
+            targetAmount: string;
+            status: string;
+            accountType: string;
+          }[];
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AssetConvertTransferQuerybypageRequestResult =
   RequestResult<Request, GetSapiV1AssetConvertTransferQuerybypageResponse>;

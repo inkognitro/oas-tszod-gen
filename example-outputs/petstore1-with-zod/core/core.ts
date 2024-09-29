@@ -227,26 +227,22 @@ export type ResponseBodyData<
   ContentType extends string = any,
   B extends ResponseBody = any,
 > = {
-  // according to oas3 specs; NULL if the real "content-type" response header does not match with one defined in the specs (case in-sensitive check)
+  // NULL if the real "content-type" response header does not match with one defined in the OAS3 specs
   contentType: ContentType | null;
   revealBody: () => Promise<B>;
   revealBodyAsArrayBuffer: () => Promise<ArrayBuffer>;
 };
 
-export type ResponseData<
+export type Response<
+  S extends number = any,
   B extends ResponseBodyData = any,
   H extends ResponseHeaders = any,
   C extends ResponseSetCookies = any,
 > = B & {
+  status: S;
   headers: H;
   cookies: C;
-};
-
-export type Response<
-  S extends number = any,
-  D extends ResponseData = any,
-> = D & {
-  status: S;
+  revealBodyAsArrayBuffer: () => Promise<ArrayBuffer>;
 };
 
 export interface RequestResult<

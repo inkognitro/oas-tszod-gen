@@ -1,7 +1,6 @@
 import {PriceTicker, PriceTickerList, Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -39,11 +38,9 @@ export type GetApiV3TickerPricePayload = {
 export type GetApiV3TickerPriceResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<'application/json', PriceTicker | PriceTickerList>
-      >
+      ResponseBodyData<'application/json', PriceTicker | PriceTickerList>
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3TickerPriceRequestResult = RequestResult<
   Request,

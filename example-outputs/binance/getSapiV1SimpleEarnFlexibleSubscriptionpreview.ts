@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -47,22 +46,20 @@ export type GetSapiV1SimpleEarnFlexibleSubscriptionpreviewPayload = {
 export type GetSapiV1SimpleEarnFlexibleSubscriptionpreviewResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            totalAmount: string;
-            rewardAsset: string;
-            airDropAsset: string;
-            estDailyBonusRewards: string;
-            estDailyRealTimeRewards: string;
-            estDailyAirdropRewards: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          totalAmount: string;
+          rewardAsset: string;
+          airDropAsset: string;
+          estDailyBonusRewards: string;
+          estDailyRealTimeRewards: string;
+          estDailyAirdropRewards: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnFlexibleSubscriptionpreviewRequestResult =
   RequestResult<

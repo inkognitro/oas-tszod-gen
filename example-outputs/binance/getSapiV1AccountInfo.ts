@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -45,19 +44,17 @@ export type GetSapiV1AccountInfoPayload = {
 export type GetSapiV1AccountInfoResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            vipLevel: number; // int
-            isMarginEnabled: boolean;
-            isFutureEnabled: boolean;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          vipLevel: number; // int
+          isMarginEnabled: boolean;
+          isFutureEnabled: boolean;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AccountInfoRequestResult = RequestResult<
   Request,

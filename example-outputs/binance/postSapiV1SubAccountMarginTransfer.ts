@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -49,17 +48,15 @@ export type PostSapiV1SubAccountMarginTransferPayload = {
 export type PostSapiV1SubAccountMarginTransferResponse =
   | Response<
       200,
-      ResponseData<
-        ResponseBodyData<
-          'application/json',
-          {
-            txnId: string;
-          }
-        >
+      ResponseBodyData<
+        'application/json',
+        {
+          txnId: string;
+        }
       >
     >
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SubAccountMarginTransferRequestResult = RequestResult<
   Request,

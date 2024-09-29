@@ -1,7 +1,6 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -65,9 +64,9 @@ export type PostApiV3OrderTestPayload = {
 };
 
 export type PostApiV3OrderTestResponse =
-  | Response<200, ResponseData<ResponseBodyData<'application/json', {}>>>
-  | Response<400, ResponseData<ResponseBodyData<'application/json', Error>>>
-  | Response<401, ResponseData<ResponseBodyData<'application/json', Error>>>;
+  | Response<200, ResponseBodyData<'application/json', {}>>
+  | Response<400, ResponseBodyData<'application/json', Error>>
+  | Response<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostApiV3OrderTestRequestResult = RequestResult<
   Request,

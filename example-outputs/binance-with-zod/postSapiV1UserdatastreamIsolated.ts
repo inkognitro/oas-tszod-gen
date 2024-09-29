@@ -1,7 +1,6 @@
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  ResponseData,
   Response,
   RequestResult,
   Request,
@@ -30,13 +29,11 @@ export const postSapiV1UserdatastreamIsolatedEndpointSchema = {
 
 export type PostSapiV1UserdatastreamIsolatedResponse = Response<
   200,
-  ResponseData<
-    ResponseBodyData<
-      'application/json',
-      {
-        listenKey: string;
-      }
-    >
+  ResponseBodyData<
+    'application/json',
+    {
+      listenKey: string;
+    }
   >
 >;
 
