@@ -437,10 +437,7 @@ const templateEndpointSecuritySchemaType: TemplateDefinitionOutput = {
     return 'EndpointSecuritySchema';
   },
   createCode: () => {
-    const codeParts: string[] = [
-      'name: string;',
-      'requiredPermissions: string[];',
-    ];
+    const codeParts: string[] = ['name: string;', 'scopes: string[];'];
     return `{\n${codeParts.join('\n')}\n}`;
   },
   getRequiredOutputPaths: ctx => {

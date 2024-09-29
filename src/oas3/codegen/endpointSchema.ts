@@ -253,14 +253,14 @@ export function applyEndpointSchemaConstDefinition(
     createCode: () => {
       const securitySchemasCodeParts: string[] = [];
       if (schema.security) {
-        schema.security.forEach(permissionsBySecurityName => {
-          for (const securityName in permissionsBySecurityName) {
-            const permissions = permissionsBySecurityName[securityName];
-            const permissionsCodePart = permissions.length
-              ? `['${permissions.join("', '")}']`
+        schema.security.forEach(scopesBySecurityName => {
+          for (const securityName in scopesBySecurityName) {
+            const scopes = scopesBySecurityName[securityName];
+            const scopesCodePart = scopes.length
+              ? `['${scopes.join("', '")}']`
               : '[]';
             securitySchemasCodeParts.push(
-              `{ name: '${securityName}', requiredPermissions: ${permissionsCodePart}}`
+              `{ name: '${securityName}', scopes: ${scopesCodePart}}`
             );
           }
         });

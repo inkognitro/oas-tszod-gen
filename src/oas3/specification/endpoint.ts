@@ -3,9 +3,7 @@ import {zResponseByStatusCodeMap} from './response';
 import {zParameterComponentRef} from './componentRef';
 import {z} from 'zod';
 
-const zPermissionsBySecurityName = z.record(z.array(z.string()));
-
-const zPermissionsBySecurityNameArray = z.array(zPermissionsBySecurityName);
+const zScopesBySecurityName = z.record(z.array(z.string()));
 
 export const zRequestBodyContent = z.object({
   schema: zSchema,
@@ -52,10 +50,6 @@ export const zParameter = z.union([zConcreteParameter, zParameterComponentRef]);
 
 export type Parameter = z.infer<typeof zParameter>;
 
-export function isParameter(anyValue: unknown): anyValue is Parameter {
-  return zParameter.safeParse(anyValue).success;
-}
-
 export const zEndpoint = z.object({
   operationId: z.string().optional(),
   tags: z.array(z.string()),
@@ -63,11 +57,7 @@ export const zEndpoint = z.object({
   requestBody: zRequestBody.optional(),
   summary: z.string().optional(),
   responses: zResponseByStatusCodeMap,
-  security: zPermissionsBySecurityNameArray.nullable().optional(),
+  security: z.array(zScopesBySecurityName).nullable().optional(),
 });
 
 export type Endpoint = z.infer<typeof zEndpoint>;
-
-export function isEndpoint(anyValue: unknown): anyValue is Endpoint {
-  return zEndpoint.safeParse(anyValue).success;
-}
