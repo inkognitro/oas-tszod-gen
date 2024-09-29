@@ -109,11 +109,11 @@ The remaining entries of this array are used for the type or the variable name.
 
 Let's consider some example endpoints which might be defined in your OAS3 specification under the `paths` property:
 
-1. The outputs for the endpoint with the operationId `auth.authenticate` will be put into `./auth/authenticate.ts`
-2. The outputs for the endpoint with the operationId `userManagement.getUsers` will be put into `./user-management/getUsers.ts`
-3. The outputs for the endpoint with the operationId `userManagement.admin.getUsers` will be put into `./user-management/admin/getUsers.ts`
+1. The generated code for the endpoint with the operationId `auth.authenticate` will be put into `./auth/authenticate.ts`
+2. The generated code for the endpoint with the operationId `userManagement.getUsers` will be put into `./user-management/getUsers.ts`
+3. The generated code for the endpoint with the operationId `userManagement.admin.getUsers` will be put into `./user-management/admin/getUsers.ts`
 
-The same principles that apply to dots `.` also apply to slashes `/`.
+The same principles that apply to dots `.` do also apply to slashes `/`.
 
 After generating endpoint caller functions from an OAS3 specification into your codebase,
 it's time to understand how the generated code can be used. The following sections should bring some clarity.
