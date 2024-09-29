@@ -13,7 +13,7 @@ import {
 export const postSapiV1SubAccountVirtualsubaccountEndpointSchema = {
   path: '/sapi/v1/sub-account/virtualSubAccount',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     subAccountString: z.string(),
     recvWindow: z.number().int().safe().finite().optional(),

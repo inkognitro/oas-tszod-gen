@@ -12,7 +12,7 @@ import {
 export const postSapiV1BlvtRedeemEndpointSchema = {
   path: '/sapi/v1/blvt/redeem',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

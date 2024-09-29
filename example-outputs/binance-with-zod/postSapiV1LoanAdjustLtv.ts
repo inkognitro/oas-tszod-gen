@@ -13,7 +13,7 @@ import {
 export const postSapiV1LoanAdjustLtvEndpointSchema = {
   path: '/sapi/v1/loan/adjust/ltv',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     orderId: z.number().int().safe().finite(),
     amount: z.number().safe().finite(),

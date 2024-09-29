@@ -13,7 +13,7 @@ import {
 export const getSapiV1AssetAssetdividendEndpointSchema = {
   path: '/sapi/v1/asset/assetDividend',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string().optional(),
     startTime: z.number().int().safe().finite().optional(),

@@ -12,7 +12,7 @@ import {
 export const postSapiV1AssetDustBtcEndpointSchema = {
   path: '/sapi/v1/asset/dust-btc',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

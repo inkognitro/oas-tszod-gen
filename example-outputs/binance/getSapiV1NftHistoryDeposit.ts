@@ -12,7 +12,7 @@ import {
 export const getSapiV1NftHistoryDepositEndpointSchema = {
   path: '/sapi/v1/nft/history/deposit',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

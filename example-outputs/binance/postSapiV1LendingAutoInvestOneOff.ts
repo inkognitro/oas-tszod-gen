@@ -12,7 +12,7 @@ import {
 export const postSapiV1LendingAutoInvestOneOffEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/one-off',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -13,7 +13,7 @@ import {
 export const postSapiV1SubAccountFuturesInternaltransferEndpointSchema = {
   path: '/sapi/v1/sub-account/futures/internalTransfer',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     fromEmail: z.string(),
     toEmail: z.string(),

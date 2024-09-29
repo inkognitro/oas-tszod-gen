@@ -12,7 +12,7 @@ import {
 export const getSapiV1CapitalDepositAddressEndpointSchema = {
   path: '/sapi/v1/capital/deposit/address',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

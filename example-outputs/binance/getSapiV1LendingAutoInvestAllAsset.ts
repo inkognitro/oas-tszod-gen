@@ -12,7 +12,7 @@ import {
 export const getSapiV1LendingAutoInvestAllAssetEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/all/asset',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

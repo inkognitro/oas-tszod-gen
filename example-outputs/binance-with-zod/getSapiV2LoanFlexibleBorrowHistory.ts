@@ -13,7 +13,7 @@ import {
 export const getSapiV2LoanFlexibleBorrowHistoryEndpointSchema = {
   path: '/sapi/v2/loan/flexible/borrow/history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     loanCoin: z.string().optional(),
     collateralCoin: z.string().optional(),

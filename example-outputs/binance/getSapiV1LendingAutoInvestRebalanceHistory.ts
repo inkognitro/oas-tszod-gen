@@ -12,7 +12,7 @@ import {
 export const getSapiV1LendingAutoInvestRebalanceHistoryEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/rebalance/history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

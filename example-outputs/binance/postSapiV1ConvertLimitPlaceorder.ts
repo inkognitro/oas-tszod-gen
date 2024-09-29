@@ -12,7 +12,7 @@ import {
 export const postSapiV1ConvertLimitPlaceorderEndpointSchema = {
   path: '/sapi/v1/convert/limit/placeOrder',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

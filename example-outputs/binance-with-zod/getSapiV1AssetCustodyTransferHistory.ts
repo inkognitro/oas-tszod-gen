@@ -13,7 +13,7 @@ import {
 export const getSapiV1AssetCustodyTransferHistoryEndpointSchema = {
   path: '/sapi/v1/asset/custody/transfer-history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     email: z.string(),
     startTime: z.number().int().safe().finite(),

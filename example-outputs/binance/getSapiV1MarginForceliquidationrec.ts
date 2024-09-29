@@ -12,7 +12,7 @@ import {
 export const getSapiV1MarginForceliquidationrecEndpointSchema = {
   path: '/sapi/v1/margin/forceLiquidationRec',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

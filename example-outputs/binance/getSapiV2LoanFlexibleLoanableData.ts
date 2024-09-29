@@ -12,7 +12,7 @@ import {
 export const getSapiV2LoanFlexibleLoanableDataEndpointSchema = {
   path: '/sapi/v2/loan/flexible/loanable/data',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -13,7 +13,7 @@ import {
 export const deleteSapiV1UserdatastreamIsolatedEndpointSchema = {
   path: '/sapi/v1/userDataStream/isolated',
   method: 'delete',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     listenKey: z.string().optional(),
   }),

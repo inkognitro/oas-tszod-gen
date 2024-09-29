@@ -11,7 +11,7 @@ import {
 export const getInventoryEndpointSchema = {
   path: '/store/inventory',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'api_key', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'api_key', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

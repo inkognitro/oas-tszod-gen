@@ -14,8 +14,8 @@ export const getPetByIdEndpointSchema = {
   path: '/pet/{petId}',
   method: 'get',
   supportedSecuritySchemas: [
-    {name: 'api_key', requiredPermissions: []},
-    {name: 'petstore_auth', requiredPermissions: ['write:pets', 'read:pets']},
+    {name: 'api_key', scopes: []},
+    {name: 'petstore_auth', scopes: ['write:pets', 'read:pets']},
   ],
   pathParamsZodSchema: z.object({
     petId: z.number().int().safe().finite(),

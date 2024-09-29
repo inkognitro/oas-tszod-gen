@@ -12,7 +12,7 @@ import {
 export const getSapiV2LoanFlexibleBorrowHistoryEndpointSchema = {
   path: '/sapi/v2/loan/flexible/borrow/history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

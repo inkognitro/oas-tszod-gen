@@ -13,7 +13,7 @@ export const findPetsByTagsEndpointSchema = {
   path: '/pet/findByTags',
   method: 'get',
   supportedSecuritySchemas: [
-    {name: 'petstore_auth', requiredPermissions: ['write:pets', 'read:pets']},
+    {name: 'petstore_auth', scopes: ['write:pets', 'read:pets']},
   ],
   bodyByContentType: {},
   responseByStatus: {

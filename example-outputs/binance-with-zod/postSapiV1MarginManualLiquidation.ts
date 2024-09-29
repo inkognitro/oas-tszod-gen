@@ -13,7 +13,7 @@ import {
 export const postSapiV1MarginManualLiquidationEndpointSchema = {
   path: '/sapi/v1/margin/manual-liquidation',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     type: z.enum(['MARGIN', 'ISOLATED']),
     symbol: z.string().optional(),

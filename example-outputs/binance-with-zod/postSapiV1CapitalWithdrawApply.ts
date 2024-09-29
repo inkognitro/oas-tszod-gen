@@ -13,7 +13,7 @@ import {
 export const postSapiV1CapitalWithdrawApplyEndpointSchema = {
   path: '/sapi/v1/capital/withdraw/apply',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     coin: z.string(),
     withdrawOrderId: z.string().optional(),

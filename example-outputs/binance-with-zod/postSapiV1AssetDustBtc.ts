@@ -13,7 +13,7 @@ import {
 export const postSapiV1AssetDustBtcEndpointSchema = {
   path: '/sapi/v1/asset/dust-btc',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     accountType: z.enum(['SPOT', 'MARGIN']).optional(),
     recvWindow: z.number().int().safe().finite().optional(),

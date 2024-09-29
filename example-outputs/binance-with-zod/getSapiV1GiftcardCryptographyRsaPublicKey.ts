@@ -13,7 +13,7 @@ import {
 export const getSapiV1GiftcardCryptographyRsaPublicKeyEndpointSchema = {
   path: '/sapi/v1/giftcard/cryptography/rsa-public-key',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),

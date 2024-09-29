@@ -12,7 +12,7 @@ import {
 export const getSapiV1AlgoSpotOpenordersEndpointSchema = {
   path: '/sapi/v1/algo/spot/openOrders',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

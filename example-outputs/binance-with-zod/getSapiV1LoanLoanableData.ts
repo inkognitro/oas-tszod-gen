@@ -13,7 +13,7 @@ import {
 export const getSapiV1LoanLoanableDataEndpointSchema = {
   path: '/sapi/v1/loan/loanable/data',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     loanCoin: z.string().optional(),
     vipLevel: z.number().int().safe().finite().optional(),

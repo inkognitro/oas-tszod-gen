@@ -12,7 +12,7 @@ import {
 export const getSapiV1ManagedSubaccountInfoEndpointSchema = {
   path: '/sapi/v1/managed-subaccount/info',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -13,7 +13,7 @@ import {
 export const getSapiV1LendingAutoInvestOneOffStatusEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/one-off/status',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     transactionId: z.number().int().safe().finite(),
     requestId: z.string().optional(),

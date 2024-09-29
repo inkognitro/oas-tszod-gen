@@ -13,7 +13,7 @@ import {
 export const postSapiV1LoanCustomizeMargin_callEndpointSchema = {
   path: '/sapi/v1/loan/customize/margin_call',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     orderId: z.number().int().safe().finite().optional(),
     collateralCoin: z.string().optional(),

@@ -13,7 +13,7 @@ import {
 export const getSapiV1BlvtUserlimitEndpointSchema = {
   path: '/sapi/v1/blvt/userLimit',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     tokenName: z.string().optional(),
     recvWindow: z.number().int().safe().finite().optional(),

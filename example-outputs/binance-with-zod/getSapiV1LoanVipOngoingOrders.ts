@@ -13,7 +13,7 @@ import {
 export const getSapiV1LoanVipOngoingOrdersEndpointSchema = {
   path: '/sapi/v1/loan/vip/ongoing/orders',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     orderId: z.number().int().safe().finite().optional(),
     collateralAccountId: z.number().int().safe().finite().optional(),

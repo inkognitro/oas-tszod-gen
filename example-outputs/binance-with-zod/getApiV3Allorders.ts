@@ -18,7 +18,7 @@ import {
 export const getApiV3AllordersEndpointSchema = {
   path: '/api/v3/allOrders',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
     orderId: z.number().int().safe().finite().optional(),

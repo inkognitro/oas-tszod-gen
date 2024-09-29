@@ -13,7 +13,7 @@ import {
 export const getSapiV2LoanFlexibleLtvAdjustmentHistoryEndpointSchema = {
   path: '/sapi/v2/loan/flexible/ltv/adjustment/history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     loanCoin: z.string().optional(),
     collateralCoin: z.string().optional(),

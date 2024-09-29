@@ -18,7 +18,7 @@ import {
 export const deleteApiV3OrderlistEndpointSchema = {
   path: '/api/v3/orderList',
   method: 'delete',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
     orderListId: z.number().int().safe().finite().optional(),

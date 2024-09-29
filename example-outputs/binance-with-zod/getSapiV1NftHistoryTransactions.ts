@@ -13,7 +13,7 @@ import {
 export const getSapiV1NftHistoryTransactionsEndpointSchema = {
   path: '/sapi/v1/nft/history/transactions',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     orderType: z.number().int().safe().finite(),
     startTime: z.number().int().safe().finite().optional(),

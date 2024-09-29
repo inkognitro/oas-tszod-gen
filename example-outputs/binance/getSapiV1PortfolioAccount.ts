@@ -12,7 +12,7 @@ import {
 export const getSapiV1PortfolioAccountEndpointSchema = {
   path: '/sapi/v1/portfolio/account',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

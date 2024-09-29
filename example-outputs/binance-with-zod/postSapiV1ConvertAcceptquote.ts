@@ -13,7 +13,7 @@ import {
 export const postSapiV1ConvertAcceptquoteEndpointSchema = {
   path: '/sapi/v1/convert/acceptQuote',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     quoteId: z.string(),
     recvWindow: z.number().int().safe().finite().optional(),

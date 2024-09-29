@@ -14,7 +14,7 @@ export const deleteSapiV1SubAccountSubaccountapiIprestrictionIplistEndpointSchem
   {
     path: '/sapi/v1/sub-account/subAccountApi/ipRestriction/ipList',
     method: 'delete',
-    supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+    supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
     queryParamsZodSchema: z.object({
       email: z.string(),
       subAccountApiKey: z.string(),

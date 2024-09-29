@@ -12,7 +12,7 @@ import {
 export const postSapiV1SubAccountTransferSubtomasterEndpointSchema = {
   path: '/sapi/v1/sub-account/transfer/subToMaster',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -13,7 +13,7 @@ import {
 export const postSapiV1CapitalContractConvertibleCoinsEndpointSchema = {
   path: '/sapi/v1/capital/contract/convertible-coins',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     coin: z.string(),
     enable: z.boolean(),

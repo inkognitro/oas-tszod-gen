@@ -13,7 +13,7 @@ import {
 export const postSapiV1EthStakingWbethWrapEndpointSchema = {
   path: '/sapi/v1/eth-staking/wbeth/wrap',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     amount: z.number().safe().finite(),
     recvWindow: z.number().int().safe().finite().optional(),

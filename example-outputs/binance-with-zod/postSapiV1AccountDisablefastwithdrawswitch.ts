@@ -13,7 +13,7 @@ import {
 export const postSapiV1AccountDisablefastwithdrawswitchEndpointSchema = {
   path: '/sapi/v1/account/disableFastWithdrawSwitch',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),

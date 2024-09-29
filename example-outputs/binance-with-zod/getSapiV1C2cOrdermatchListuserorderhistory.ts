@@ -13,7 +13,7 @@ import {
 export const getSapiV1C2cOrdermatchListuserorderhistoryEndpointSchema = {
   path: '/sapi/v1/c2c/orderMatch/listUserOrderHistory',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     tradeType: z.enum(['BUY', 'SELL']),
     startTimestamp: z.number().int().safe().finite().optional(),

@@ -13,7 +13,7 @@ import {
 export const postSapiV3AssetGetuserassetEndpointSchema = {
   path: '/sapi/v3/asset/getUserAsset',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string().optional(),
     needBtcValuation: z.enum(['true', 'false']).optional(),

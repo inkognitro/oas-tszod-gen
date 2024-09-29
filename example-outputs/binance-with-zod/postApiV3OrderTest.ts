@@ -13,7 +13,7 @@ import {
 export const postApiV3OrderTestEndpointSchema = {
   path: '/api/v3/order/test',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
     side: z.enum(['SELL', 'BUY']),

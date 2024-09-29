@@ -12,7 +12,7 @@ import {
 export const getSapiV1SubAccountSubTransferHistoryEndpointSchema = {
   path: '/sapi/v1/sub-account/sub/transfer/history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -151,7 +151,7 @@ export function createRequestUrl(
 
 export type EndpointSecuritySchema = {
   name: string;
-  requiredPermissions: string[];
+  scopes: string[];
 };
 
 export type EndpointSchema = {

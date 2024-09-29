@@ -13,7 +13,7 @@ export const updatePetEndpointSchema = {
   path: '/pet',
   method: 'put',
   supportedSecuritySchemas: [
-    {name: 'petstore_auth', requiredPermissions: ['write:pets', 'read:pets']},
+    {name: 'petstore_auth', scopes: ['write:pets', 'read:pets']},
   ],
   bodyByContentType: {
     'application/json': {

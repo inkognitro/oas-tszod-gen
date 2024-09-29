@@ -12,7 +12,7 @@ import {
 export const getSapiV1BnbburnEndpointSchema = {
   path: '/sapi/v1/bnbBurn',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

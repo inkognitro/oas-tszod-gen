@@ -13,7 +13,7 @@ import {
 export const deleteSapiV1AlgoSpotOrderEndpointSchema = {
   path: '/sapi/v1/algo/spot/order',
   method: 'delete',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     algoId: z.number().int().safe().finite(),
     recvWindow: z.number().int().safe().finite().optional(),

@@ -13,7 +13,7 @@ export const deletePetEndpointSchema = {
   path: '/pet/{petId}',
   method: 'delete',
   supportedSecuritySchemas: [
-    {name: 'petstore_auth', requiredPermissions: ['write:pets', 'read:pets']},
+    {name: 'petstore_auth', scopes: ['write:pets', 'read:pets']},
   ],
   pathParamsZodSchema: z.object({
     petId: z.number().int().safe().finite(),

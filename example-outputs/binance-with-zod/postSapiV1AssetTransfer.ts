@@ -13,7 +13,7 @@ import {
 export const postSapiV1AssetTransferEndpointSchema = {
   path: '/sapi/v1/asset/transfer',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     type: z.enum([
       'MAIN_C2C',

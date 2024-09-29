@@ -12,7 +12,7 @@ import {
 export const getSapiV1AlgoSpotSubordersEndpointSchema = {
   path: '/sapi/v1/algo/spot/subOrders',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

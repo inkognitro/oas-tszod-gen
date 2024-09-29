@@ -13,7 +13,7 @@ export const getSapiV1SimpleEarnFlexibleHistoryRedemptionrecordEndpointSchema =
   {
     path: '/sapi/v1/simple-earn/flexible/history/redemptionRecord',
     method: 'get',
-    supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+    supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
     bodyByContentType: {},
     responseByStatus: {
       '200': {

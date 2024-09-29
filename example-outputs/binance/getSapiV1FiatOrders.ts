@@ -12,7 +12,7 @@ import {
 export const getSapiV1FiatOrdersEndpointSchema = {
   path: '/sapi/v1/fiat/orders',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

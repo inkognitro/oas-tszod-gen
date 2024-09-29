@@ -12,7 +12,7 @@ import {
 export const postSapiV1AssetDustEndpointSchema = {
   path: '/sapi/v1/asset/dust',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

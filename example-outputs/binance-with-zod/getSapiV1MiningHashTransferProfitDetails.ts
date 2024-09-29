@@ -13,7 +13,7 @@ import {
 export const getSapiV1MiningHashTransferProfitDetailsEndpointSchema = {
   path: '/sapi/v1/mining/hash-transfer/profit/details',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     configId: z.string(),
     userName: z.string(),

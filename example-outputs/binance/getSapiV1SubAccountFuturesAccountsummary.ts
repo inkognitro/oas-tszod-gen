@@ -12,7 +12,7 @@ import {
 export const getSapiV1SubAccountFuturesAccountsummaryEndpointSchema = {
   path: '/sapi/v1/sub-account/futures/accountSummary',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -13,7 +13,7 @@ import {
 export const postSapiV1AlgoFuturesNewordervpEndpointSchema = {
   path: '/sapi/v1/algo/futures/newOrderVp',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
     side: z.enum(['SELL', 'BUY']),

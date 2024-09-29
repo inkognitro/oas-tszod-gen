@@ -12,7 +12,7 @@ import {
 export const postSapiV1CapitalDepositCreditApplyEndpointSchema = {
   path: '/sapi/v1/capital/deposit/credit-apply',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

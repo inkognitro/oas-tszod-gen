@@ -12,7 +12,7 @@ import {
 export const postSapiV1ConvertLimitCancelorderEndpointSchema = {
   path: '/sapi/v1/convert/limit/cancelOrder',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

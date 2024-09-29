@@ -13,7 +13,7 @@ import {
 export const getSapiV1BlvtRedeemRecordEndpointSchema = {
   path: '/sapi/v1/blvt/redeem/record',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     tokenName: z.string().optional(),
     id: z.number().int().safe().finite().optional(),

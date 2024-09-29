@@ -13,7 +13,7 @@ import {
 export const getSapiV1GiftcardVerifyEndpointSchema = {
   path: '/sapi/v1/giftcard/verify',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     referenceNo: z.string(),
     recvWindow: z.number().int().safe().finite().optional(),

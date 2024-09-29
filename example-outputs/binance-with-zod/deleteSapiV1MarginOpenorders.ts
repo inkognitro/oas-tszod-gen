@@ -20,7 +20,7 @@ import {
 export const deleteSapiV1MarginOpenordersEndpointSchema = {
   path: '/sapi/v1/margin/openOrders',
   method: 'delete',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
     isIsolated: z.enum(['TRUE', 'FALSE']).optional(),

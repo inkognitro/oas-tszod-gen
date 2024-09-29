@@ -13,7 +13,7 @@ import {
 export const postSapiV1GiftcardRedeemcodeEndpointSchema = {
   path: '/sapi/v1/giftcard/redeemCode',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     code: z.string(),
     externalUid: z.string().optional(),

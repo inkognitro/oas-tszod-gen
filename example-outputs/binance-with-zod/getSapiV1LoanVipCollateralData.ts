@@ -13,7 +13,7 @@ import {
 export const getSapiV1LoanVipCollateralDataEndpointSchema = {
   path: '/sapi/v1/loan/vip/collateral/data',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     collateralCoin: z.string().optional(),
     recvWindow: z.number().int().safe().finite().optional(),

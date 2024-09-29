@@ -12,7 +12,7 @@ import {
 export const postSapiV1LoanRepayEndpointSchema = {
   path: '/sapi/v1/loan/repay',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

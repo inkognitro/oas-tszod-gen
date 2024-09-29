@@ -13,7 +13,7 @@ import {
 export const getSapiV1FuturesTransferEndpointSchema = {
   path: '/sapi/v1/futures/transfer',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string(),
     startTime: z.number().int().safe().finite(),

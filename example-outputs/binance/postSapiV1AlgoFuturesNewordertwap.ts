@@ -12,7 +12,7 @@ import {
 export const postSapiV1AlgoFuturesNewordertwapEndpointSchema = {
   path: '/sapi/v1/algo/futures/newOrderTwap',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

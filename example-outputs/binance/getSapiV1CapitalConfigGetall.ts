@@ -12,7 +12,7 @@ import {
 export const getSapiV1CapitalConfigGetallEndpointSchema = {
   path: '/sapi/v1/capital/config/getall',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

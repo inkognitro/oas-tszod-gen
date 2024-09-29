@@ -13,7 +13,7 @@ import {
 export const getApiV3OrderlistEndpointSchema = {
   path: '/api/v3/orderList',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     orderListId: z.number().int().safe().finite().optional(),
     origClientOrderId: z.string().optional(),

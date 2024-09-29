@@ -12,7 +12,7 @@ import {
 export const postSapiV1MiningHashTransferConfigEndpointSchema = {
   path: '/sapi/v1/mining/hash-transfer/config',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

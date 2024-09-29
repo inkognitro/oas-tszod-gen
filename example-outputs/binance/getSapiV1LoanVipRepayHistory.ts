@@ -12,7 +12,7 @@ import {
 export const getSapiV1LoanVipRepayHistoryEndpointSchema = {
   path: '/sapi/v1/loan/vip/repay/history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

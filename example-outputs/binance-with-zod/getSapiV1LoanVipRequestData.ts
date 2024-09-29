@@ -13,7 +13,7 @@ import {
 export const getSapiV1LoanVipRequestDataEndpointSchema = {
   path: '/sapi/v1/loan/vip/request/data',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     current: z.number().int().safe().finite().optional(),
     limit: z.number().int().safe().finite().optional(),

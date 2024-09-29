@@ -12,7 +12,7 @@ import {
 export const getSapiV1SubAccountSubaccountapiIprestrictionEndpointSchema = {
   path: '/sapi/v1/sub-account/subAccountApi/ipRestriction',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -12,7 +12,7 @@ import {
 export const getApiV3RatelimitOrderEndpointSchema = {
   path: '/api/v3/rateLimit/order',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

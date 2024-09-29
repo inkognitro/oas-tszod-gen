@@ -20,7 +20,7 @@ import {
 export const deleteApiV3OpenordersEndpointSchema = {
   path: '/api/v3/openOrders',
   method: 'delete',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
     recvWindow: z.number().int().safe().finite().optional(),

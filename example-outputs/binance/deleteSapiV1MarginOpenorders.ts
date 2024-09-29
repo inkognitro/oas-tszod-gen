@@ -16,7 +16,7 @@ import {
 export const deleteSapiV1MarginOpenordersEndpointSchema = {
   path: '/sapi/v1/margin/openOrders',
   method: 'delete',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

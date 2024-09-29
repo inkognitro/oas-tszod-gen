@@ -13,7 +13,7 @@ import {
 export const postSapiV1SimpleEarnFlexibleRedeemEndpointSchema = {
   path: '/sapi/v1/simple-earn/flexible/redeem',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     productId: z.string(),
     redeemAll: z.boolean().optional(),

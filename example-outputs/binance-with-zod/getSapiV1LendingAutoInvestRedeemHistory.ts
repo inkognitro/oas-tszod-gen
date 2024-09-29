@@ -13,7 +13,7 @@ import {
 export const getSapiV1LendingAutoInvestRedeemHistoryEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/redeem/history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     requestId: z.number().int().safe().finite(),
     startTime: z.number().int().safe().finite().optional(),

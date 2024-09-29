@@ -13,7 +13,7 @@ import {
 export const getSapiV1MiningHashTransferConfigDetailsListEndpointSchema = {
   path: '/sapi/v1/mining/hash-transfer/config/details/list',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     pageIndex: z.number().int().safe().finite().optional(),
     pageSize: z.string().optional(),

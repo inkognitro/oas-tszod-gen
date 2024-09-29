@@ -12,7 +12,7 @@ import {
 export const getSapiV2EthStakingAccountEndpointSchema = {
   path: '/sapi/v2/eth-staking/account',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

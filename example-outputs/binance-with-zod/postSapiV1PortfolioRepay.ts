@@ -13,7 +13,7 @@ import {
 export const postSapiV1PortfolioRepayEndpointSchema = {
   path: '/sapi/v1/portfolio/repay',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     from: z.string().optional(),
     recvWindow: z.number().int().safe().finite().optional(),

@@ -12,7 +12,7 @@ import {
 export const deleteSapiV1AlgoFuturesOrderEndpointSchema = {
   path: '/sapi/v1/algo/futures/order',
   method: 'delete',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

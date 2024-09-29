@@ -12,7 +12,7 @@ import {
 export const getApiV3AccountCommissionEndpointSchema = {
   path: '/api/v3/account/commission',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

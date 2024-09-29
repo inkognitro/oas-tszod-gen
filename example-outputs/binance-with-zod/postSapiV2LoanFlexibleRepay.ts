@@ -13,7 +13,7 @@ import {
 export const postSapiV2LoanFlexibleRepayEndpointSchema = {
   path: '/sapi/v2/loan/flexible/repay',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     loanCoin: z.string().optional(),
     collateralCoin: z.string().optional(),

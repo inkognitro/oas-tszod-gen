@@ -12,7 +12,7 @@ import {
 export const getSapiV1AccountInfoEndpointSchema = {
   path: '/sapi/v1/account/info',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

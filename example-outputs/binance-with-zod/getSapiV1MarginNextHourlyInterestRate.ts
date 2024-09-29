@@ -13,7 +13,7 @@ import {
 export const getSapiV1MarginNextHourlyInterestRateEndpointSchema = {
   path: '/sapi/v1/margin/next-hourly-interest-rate',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     assets: z.string().optional(),
     isIsolated: z.enum(['TRUE', 'FALSE']).optional(),

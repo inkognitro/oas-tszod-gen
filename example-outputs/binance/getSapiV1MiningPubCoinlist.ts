@@ -12,7 +12,7 @@ import {
 export const getSapiV1MiningPubCoinlistEndpointSchema = {
   path: '/sapi/v1/mining/pub/coinList',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

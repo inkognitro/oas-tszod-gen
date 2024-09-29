@@ -13,7 +13,7 @@ import {
 export const getSapiV1AlgoFuturesSubordersEndpointSchema = {
   path: '/sapi/v1/algo/futures/subOrders',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     algoId: z.number().int().safe().finite(),
     page: z.number().int().safe().finite().optional(),

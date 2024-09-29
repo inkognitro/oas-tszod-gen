@@ -12,7 +12,7 @@ import {
 export const deleteApiV3OpenordersEndpointSchema = {
   path: '/api/v3/openOrders',
   method: 'delete',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

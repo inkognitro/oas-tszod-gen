@@ -16,7 +16,7 @@ import {
 export const getSapiV2SubAccountFuturesAccountEndpointSchema = {
   path: '/sapi/v2/sub-account/futures/account',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

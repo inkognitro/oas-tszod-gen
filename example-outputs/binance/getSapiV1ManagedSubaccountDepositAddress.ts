@@ -12,7 +12,7 @@ import {
 export const getSapiV1ManagedSubaccountDepositAddressEndpointSchema = {
   path: '/sapi/v1/managed-subaccount/deposit/address',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

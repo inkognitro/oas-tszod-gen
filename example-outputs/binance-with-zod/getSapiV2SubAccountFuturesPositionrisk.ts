@@ -20,7 +20,7 @@ import {
 export const getSapiV2SubAccountFuturesPositionriskEndpointSchema = {
   path: '/sapi/v2/sub-account/futures/positionRisk',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     email: z.string(),
     futuresType: z.number().int().safe().finite(),

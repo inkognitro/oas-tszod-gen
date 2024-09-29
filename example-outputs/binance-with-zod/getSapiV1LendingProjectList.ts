@@ -13,7 +13,7 @@ import {
 export const getSapiV1LendingProjectListEndpointSchema = {
   path: '/sapi/v1/lending/project/list',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string().optional(),
     type: z.enum(['ACTIVITY', 'CUSTOMIZED_FIXED']),

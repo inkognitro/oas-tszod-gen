@@ -13,7 +13,7 @@ import {
 export const postSapiV1LendingCustomizedfixedPurchaseEndpointSchema = {
   path: '/sapi/v1/lending/customizedFixed/purchase',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     projectId: z.string(),
     lot: z.string(),

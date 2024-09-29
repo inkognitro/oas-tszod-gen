@@ -13,7 +13,7 @@ import {
 export const postSapiV1EthStakingEthRedeemEndpointSchema = {
   path: '/sapi/v1/eth-staking/eth/redeem',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string().optional(),
     amount: z.number().safe().finite(),

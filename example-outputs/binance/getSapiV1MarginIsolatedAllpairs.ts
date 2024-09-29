@@ -12,7 +12,7 @@ import {
 export const getSapiV1MarginIsolatedAllpairsEndpointSchema = {
   path: '/sapi/v1/margin/isolated/allPairs',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

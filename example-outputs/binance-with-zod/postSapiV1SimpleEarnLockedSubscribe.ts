@@ -13,7 +13,7 @@ import {
 export const postSapiV1SimpleEarnLockedSubscribeEndpointSchema = {
   path: '/sapi/v1/simple-earn/locked/subscribe',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     projectId: z.string(),
     amount: z.number().safe().finite(),

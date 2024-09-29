@@ -12,7 +12,7 @@ import {
 export const getSapiV1EthStakingWbethHistoryUnwraphistoryEndpointSchema = {
   path: '/sapi/v1/eth-staking/wbeth/history/unwrapHistory',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -12,7 +12,7 @@ import {
 export const getSapiV2LoanFlexibleLtvAdjustmentHistoryEndpointSchema = {
   path: '/sapi/v2/loan/flexible/ltv/adjustment/history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

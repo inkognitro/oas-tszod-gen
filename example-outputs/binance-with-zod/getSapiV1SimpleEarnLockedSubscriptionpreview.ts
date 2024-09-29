@@ -13,7 +13,7 @@ import {
 export const getSapiV1SimpleEarnLockedSubscriptionpreviewEndpointSchema = {
   path: '/sapi/v1/simple-earn/locked/subscriptionPreview',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     projectId: z.string(),
     amount: z.number().safe().finite(),

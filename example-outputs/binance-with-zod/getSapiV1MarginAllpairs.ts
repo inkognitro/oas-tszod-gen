@@ -13,7 +13,7 @@ import {
 export const getSapiV1MarginAllpairsEndpointSchema = {
   path: '/sapi/v1/margin/allPairs',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
   }),

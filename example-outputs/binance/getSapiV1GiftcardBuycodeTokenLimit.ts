@@ -12,7 +12,7 @@ import {
 export const getSapiV1GiftcardBuycodeTokenLimitEndpointSchema = {
   path: '/sapi/v1/giftcard/buyCode/token-limit',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

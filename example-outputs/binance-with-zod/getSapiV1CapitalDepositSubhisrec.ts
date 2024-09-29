@@ -13,7 +13,7 @@ import {
 export const getSapiV1CapitalDepositSubhisrecEndpointSchema = {
   path: '/sapi/v1/capital/deposit/subHisrec',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     email: z.string(),
     coin: z.string().optional(),

@@ -12,7 +12,7 @@ import {
 export const getSapiV1MarginExchangeSmallLiabilityHistoryEndpointSchema = {
   path: '/sapi/v1/margin/exchange-small-liability-history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

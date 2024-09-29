@@ -12,7 +12,7 @@ import {
 export const getSapiV1MiningPaymentUidEndpointSchema = {
   path: '/sapi/v1/mining/payment/uid',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

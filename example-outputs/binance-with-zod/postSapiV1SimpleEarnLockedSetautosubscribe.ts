@@ -13,7 +13,7 @@ import {
 export const postSapiV1SimpleEarnLockedSetautosubscribeEndpointSchema = {
   path: '/sapi/v1/simple-earn/locked/setAutoSubscribe',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     positionId: z.string(),
     autoSubscribe: z.boolean(),

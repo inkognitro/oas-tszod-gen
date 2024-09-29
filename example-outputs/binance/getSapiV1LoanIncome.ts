@@ -12,7 +12,7 @@ import {
 export const getSapiV1LoanIncomeEndpointSchema = {
   path: '/sapi/v1/loan/income',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

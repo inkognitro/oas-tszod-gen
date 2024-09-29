@@ -12,7 +12,7 @@ import {
 export const postSapiV1PortfolioAutoCollectionEndpointSchema = {
   path: '/sapi/v1/portfolio/auto-collection',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -12,7 +12,7 @@ import {
 export const getSapiV1CapitalDepositHisrecEndpointSchema = {
   path: '/sapi/v1/capital/deposit/hisrec',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

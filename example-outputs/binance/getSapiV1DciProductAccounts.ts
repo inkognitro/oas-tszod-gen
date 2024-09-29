@@ -12,7 +12,7 @@ import {
 export const getSapiV1DciProductAccountsEndpointSchema = {
   path: '/sapi/v1/dci/product/accounts',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -12,7 +12,7 @@ import {
 export const postSapiV2LoanFlexibleAdjustLtvEndpointSchema = {
   path: '/sapi/v2/loan/flexible/adjust/ltv',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

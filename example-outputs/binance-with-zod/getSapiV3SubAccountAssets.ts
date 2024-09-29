@@ -13,7 +13,7 @@ import {
 export const getSapiV3SubAccountAssetsEndpointSchema = {
   path: '/sapi/v3/sub-account/assets',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     email: z.string(),
     recvWindow: z.number().int().safe().finite().optional(),

@@ -13,7 +13,7 @@ export const getSapiV1SimpleEarnFlexibleHistorySubscriptionrecordEndpointSchema 
   {
     path: '/sapi/v1/simple-earn/flexible/history/subscriptionRecord',
     method: 'get',
-    supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+    supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
     bodyByContentType: {},
     responseByStatus: {
       '200': {

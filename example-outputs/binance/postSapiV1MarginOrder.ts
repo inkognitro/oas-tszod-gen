@@ -17,7 +17,7 @@ import {
 export const postSapiV1MarginOrderEndpointSchema = {
   path: '/sapi/v1/margin/order',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

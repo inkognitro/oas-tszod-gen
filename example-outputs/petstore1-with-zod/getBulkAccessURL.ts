@@ -22,7 +22,7 @@ import {
 export const getBulkAccessURLEndpointSchema = {
   path: '/objects/access',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'PassportAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'PassportAuth', scopes: []}],
   bodyByContentType: {
     'application/json': {
       zodSchema: bulkObjectAccessIdZodSchema,

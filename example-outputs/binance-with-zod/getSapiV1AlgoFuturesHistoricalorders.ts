@@ -13,7 +13,7 @@ import {
 export const getSapiV1AlgoFuturesHistoricalordersEndpointSchema = {
   path: '/sapi/v1/algo/futures/historicalOrders',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string().optional(),
     side: z.enum(['SELL', 'BUY']).optional(),

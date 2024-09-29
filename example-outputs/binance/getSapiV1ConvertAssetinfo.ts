@@ -12,7 +12,7 @@ import {
 export const getSapiV1ConvertAssetinfoEndpointSchema = {
   path: '/sapi/v1/convert/assetInfo',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

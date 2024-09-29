@@ -13,7 +13,7 @@ import {
 export const postSapiV1PortfolioRepayFuturesNegativeBalanceEndpointSchema = {
   path: '/sapi/v1/portfolio/repay-futures-negative-balance',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),

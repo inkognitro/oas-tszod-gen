@@ -13,7 +13,7 @@ import {
 export const getSapiV1AssetAssetdetailEndpointSchema = {
   path: '/sapi/v1/asset/assetDetail',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string().optional(),
     recvWindow: z.number().int().safe().finite().optional(),

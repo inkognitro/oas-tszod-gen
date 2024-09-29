@@ -13,7 +13,7 @@ import {
 export const postSapiV1LendingPositionchangedEndpointSchema = {
   path: '/sapi/v1/lending/positionChanged',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     projectId: z.string(),
     lot: z.string(),

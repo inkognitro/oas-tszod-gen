@@ -13,7 +13,7 @@ import {
 export const getSapiV1SimpleEarnFlexibleListEndpointSchema = {
   path: '/sapi/v1/simple-earn/flexible/list',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string().optional(),
     current: z.number().int().safe().finite().optional(),

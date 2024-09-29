@@ -14,7 +14,7 @@ export const getSapiV1AssetLedgerTransferCloudMiningQuerybypageEndpointSchema =
   {
     path: '/sapi/v1/asset/ledger-transfer/cloud-mining/queryByPage',
     method: 'get',
-    supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+    supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
     queryParamsZodSchema: z.object({
       tranId: z.number().int().safe().finite().optional(),
       clientTranId: z.string().optional(),

@@ -12,7 +12,7 @@ import {
 export const getApiV3MyallocationsEndpointSchema = {
   path: '/api/v3/myAllocations',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

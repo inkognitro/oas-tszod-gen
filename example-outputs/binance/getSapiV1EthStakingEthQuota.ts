@@ -12,7 +12,7 @@ import {
 export const getSapiV1EthStakingEthQuotaEndpointSchema = {
   path: '/sapi/v1/eth-staking/eth/quota',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

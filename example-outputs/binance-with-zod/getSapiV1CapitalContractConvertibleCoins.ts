@@ -13,7 +13,7 @@ import {
 export const getSapiV1CapitalContractConvertibleCoinsEndpointSchema = {
   path: '/sapi/v1/capital/contract/convertible-coins',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

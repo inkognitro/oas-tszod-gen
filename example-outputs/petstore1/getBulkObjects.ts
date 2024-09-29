@@ -21,7 +21,7 @@ import {
 export const getBulkObjectsEndpointSchema = {
   path: '/objects',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'PassportAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'PassportAuth', scopes: []}],
   bodyByContentType: {
     'application/json': {},
   },

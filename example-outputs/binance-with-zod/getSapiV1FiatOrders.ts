@@ -13,7 +13,7 @@ import {
 export const getSapiV1FiatOrdersEndpointSchema = {
   path: '/sapi/v1/fiat/orders',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     transactionType: z.number().int().safe().finite().gte(0).lte(1),
     beginTime: z.number().int().safe().finite().optional(),

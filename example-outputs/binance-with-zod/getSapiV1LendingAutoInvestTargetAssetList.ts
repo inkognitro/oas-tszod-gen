@@ -13,7 +13,7 @@ import {
 export const getSapiV1LendingAutoInvestTargetAssetListEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/target-asset/list',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     targetAsset: z.string().optional(),
     size: z.number().int().safe().finite().optional(),

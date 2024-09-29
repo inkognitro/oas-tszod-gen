@@ -13,7 +13,7 @@ import {
 export const postSapiV1AssetDustEndpointSchema = {
   path: '/sapi/v1/asset/dust',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.array(z.string()),
     accountType: z.enum(['SPOT', 'MARGIN']).optional(),

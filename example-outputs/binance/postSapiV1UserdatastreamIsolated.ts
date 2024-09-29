@@ -11,7 +11,7 @@ import {
 export const postSapiV1UserdatastreamIsolatedEndpointSchema = {
   path: '/sapi/v1/userDataStream/isolated',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

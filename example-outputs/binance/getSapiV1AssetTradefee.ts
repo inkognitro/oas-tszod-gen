@@ -12,7 +12,7 @@ import {
 export const getSapiV1AssetTradefeeEndpointSchema = {
   path: '/sapi/v1/asset/tradeFee',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

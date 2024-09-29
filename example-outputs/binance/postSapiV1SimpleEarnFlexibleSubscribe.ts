@@ -12,7 +12,7 @@ import {
 export const postSapiV1SimpleEarnFlexibleSubscribeEndpointSchema = {
   path: '/sapi/v1/simple-earn/flexible/subscribe',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

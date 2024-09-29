@@ -12,7 +12,7 @@ import {
 export const postSapiV1SimpleEarnLockedRedeemEndpointSchema = {
   path: '/sapi/v1/simple-earn/locked/redeem',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

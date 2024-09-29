@@ -13,7 +13,7 @@ export const deleteSapiV1SubAccountSubaccountapiIprestrictionIplistEndpointSchem
   {
     path: '/sapi/v1/sub-account/subAccountApi/ipRestriction/ipList',
     method: 'delete',
-    supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+    supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
     bodyByContentType: {},
     responseByStatus: {
       '200': {

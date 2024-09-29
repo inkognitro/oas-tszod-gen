@@ -12,7 +12,7 @@ import {
 export const postApiV3OrderCancelreplaceEndpointSchema = {
   path: '/api/v3/order/cancelReplace',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

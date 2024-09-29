@@ -13,7 +13,7 @@ import {
 export const getSapiV1AssetWalletBalanceEndpointSchema = {
   path: '/sapi/v1/asset/wallet/balance',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),

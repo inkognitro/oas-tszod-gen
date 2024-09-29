@@ -13,7 +13,7 @@ import {
 export const postSapiV1DciProductSubscribeEndpointSchema = {
   path: '/sapi/v1/dci/product/subscribe',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     id: z.string(),
     orderId: z.string(),

@@ -13,7 +13,7 @@ import {
 export const getSapiV1SubAccountListEndpointSchema = {
   path: '/sapi/v1/sub-account/list',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     email: z.string().optional(),
     isFreeze: z.enum(['true', 'false']).optional(),

@@ -12,7 +12,7 @@ import {
 export const postSapiV1SubAccountMarginTransferEndpointSchema = {
   path: '/sapi/v1/sub-account/margin/transfer',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

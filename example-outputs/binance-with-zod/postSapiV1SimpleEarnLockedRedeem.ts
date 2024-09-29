@@ -13,7 +13,7 @@ import {
 export const postSapiV1SimpleEarnLockedRedeemEndpointSchema = {
   path: '/sapi/v1/simple-earn/locked/redeem',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     positionId: z.string(),
     recvWindow: z.number().int().safe().finite().optional(),

@@ -13,7 +13,7 @@ import {
 export const getSapiV1ConvertTradeflowEndpointSchema = {
   path: '/sapi/v1/convert/tradeFlow',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     startTime: z.number().int().safe().finite(),
     endTime: z.number().int().safe().finite(),

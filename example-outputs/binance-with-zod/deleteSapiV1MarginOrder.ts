@@ -18,7 +18,7 @@ import {
 export const deleteSapiV1MarginOrderEndpointSchema = {
   path: '/sapi/v1/margin/order',
   method: 'delete',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
     isIsolated: z.enum(['TRUE', 'FALSE']).optional(),

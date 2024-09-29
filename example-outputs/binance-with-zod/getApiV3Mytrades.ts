@@ -18,7 +18,7 @@ import {
 export const getApiV3MytradesEndpointSchema = {
   path: '/api/v3/myTrades',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
     orderId: z.number().int().safe().finite().optional(),

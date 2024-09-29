@@ -13,7 +13,7 @@ import {
 export const postSapiV1AlgoSpotNewordertwapEndpointSchema = {
   path: '/sapi/v1/algo/spot/newOrderTwap',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
     side: z.enum(['SELL', 'BUY']),

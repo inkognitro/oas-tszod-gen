@@ -12,7 +12,7 @@ import {
 export const getSapiV1PortfolioAssetIndexPriceEndpointSchema = {
   path: '/sapi/v1/portfolio/asset-index-price',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

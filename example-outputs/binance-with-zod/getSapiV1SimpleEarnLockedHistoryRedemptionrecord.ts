@@ -13,7 +13,7 @@ import {
 export const getSapiV1SimpleEarnLockedHistoryRedemptionrecordEndpointSchema = {
   path: '/sapi/v1/simple-earn/locked/history/redemptionRecord',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     positionId: z.string().optional(),
     redeemId: z.string().optional(),

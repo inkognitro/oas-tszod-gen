@@ -18,7 +18,7 @@ import {
 export const postSapiV1BnbburnEndpointSchema = {
   path: '/sapi/v1/bnbBurn',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     spotBNBBurn: z.enum(['true', 'false']).optional(),
     interestBNBBurn: z.enum(['true', 'false']).optional(),

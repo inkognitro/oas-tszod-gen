@@ -13,7 +13,7 @@ import {
 export const getSapiV1MarginRatelimitOrderEndpointSchema = {
   path: '/sapi/v1/margin/rateLimit/order',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     isIsolated: z.string().optional(),
     symbol: z.string().optional(),

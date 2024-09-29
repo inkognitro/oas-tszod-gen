@@ -19,7 +19,7 @@ import {
 export const postAccessURLEndpointSchema = {
   path: '/objects/{object_id}/access/{access_id}',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'PassportAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'PassportAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': $200OkAccessResponse,

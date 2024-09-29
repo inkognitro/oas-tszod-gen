@@ -12,7 +12,7 @@ import {
 export const getSapiV1FuturesTransferEndpointSchema = {
   path: '/sapi/v1/futures/transfer',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

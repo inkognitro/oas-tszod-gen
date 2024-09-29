@@ -12,7 +12,7 @@ import {
 export const getSapiV1SubAccountTransactionStatisticsEndpointSchema = {
   path: '/sapi/v1/sub-account/transaction-statistics',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

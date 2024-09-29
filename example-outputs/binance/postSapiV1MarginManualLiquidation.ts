@@ -12,7 +12,7 @@ import {
 export const postSapiV1MarginManualLiquidationEndpointSchema = {
   path: '/sapi/v1/margin/manual-liquidation',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -17,7 +17,7 @@ export const uploadFileEndpointSchema = {
   path: '/pet/{petId}/uploadImage',
   method: 'post',
   supportedSecuritySchemas: [
-    {name: 'petstore_auth', requiredPermissions: ['write:pets', 'read:pets']},
+    {name: 'petstore_auth', scopes: ['write:pets', 'read:pets']},
   ],
   queryParamsZodSchema: z.object({
     additionalMetadata: z.string().optional(),

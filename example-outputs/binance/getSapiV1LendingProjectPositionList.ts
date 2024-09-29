@@ -12,7 +12,7 @@ import {
 export const getSapiV1LendingProjectPositionListEndpointSchema = {
   path: '/sapi/v1/lending/project/position/list',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -12,7 +12,7 @@ import {
 export const getSapiV1AssetTransferEndpointSchema = {
   path: '/sapi/v1/asset/transfer',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

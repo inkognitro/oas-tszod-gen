@@ -12,7 +12,7 @@ import {
 export const postSapiV1ManagedSubaccountWithdrawEndpointSchema = {
   path: '/sapi/v1/managed-subaccount/withdraw',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

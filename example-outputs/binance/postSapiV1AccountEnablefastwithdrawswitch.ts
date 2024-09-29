@@ -12,7 +12,7 @@ import {
 export const postSapiV1AccountEnablefastwithdrawswitchEndpointSchema = {
   path: '/sapi/v1/account/enableFastWithdrawSwitch',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

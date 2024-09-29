@@ -13,7 +13,7 @@ import {
 export const postSapiV1LendingAutoInvestRedeemEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/redeem',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     indexId: z.number().int().safe().finite(),
     requestId: z.string().optional(),

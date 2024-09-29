@@ -12,7 +12,7 @@ import {
 export const getSapiV1MarginOpenorderlistEndpointSchema = {
   path: '/sapi/v1/margin/openOrderList',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

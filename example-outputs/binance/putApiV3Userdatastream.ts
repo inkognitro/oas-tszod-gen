@@ -12,7 +12,7 @@ import {
 export const putApiV3UserdatastreamEndpointSchema = {
   path: '/api/v3/userDataStream',
   method: 'put',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

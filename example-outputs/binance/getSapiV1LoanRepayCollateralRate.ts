@@ -12,7 +12,7 @@ import {
 export const getSapiV1LoanRepayCollateralRateEndpointSchema = {
   path: '/sapi/v1/loan/repay/collateral/rate',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

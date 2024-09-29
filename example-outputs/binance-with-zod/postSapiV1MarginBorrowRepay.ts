@@ -13,7 +13,7 @@ import {
 export const postSapiV1MarginBorrowRepayEndpointSchema = {
   path: '/sapi/v1/margin/borrow-repay',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string(),
     isIsolated: z.string(),

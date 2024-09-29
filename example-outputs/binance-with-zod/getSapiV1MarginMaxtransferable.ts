@@ -13,7 +13,7 @@ import {
 export const getSapiV1MarginMaxtransferableEndpointSchema = {
   path: '/sapi/v1/margin/maxTransferable',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string(),
     isolatedSymbol: z.string().optional(),

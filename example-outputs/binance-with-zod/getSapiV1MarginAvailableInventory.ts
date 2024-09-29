@@ -13,7 +13,7 @@ import {
 export const getSapiV1MarginAvailableInventoryEndpointSchema = {
   path: '/sapi/v1/margin/available-inventory',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     type: z.enum(['MARGIN', 'ISOLATED']),
     timestamp: z.number().int().safe().finite(),

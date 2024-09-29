@@ -12,7 +12,7 @@ import {
 export const postSapiV1LendingAutoInvestPlanEditEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/plan/edit',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

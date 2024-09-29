@@ -12,7 +12,7 @@ import {
 export const getSapiV1AlgoFuturesHistoricalordersEndpointSchema = {
   path: '/sapi/v1/algo/futures/historicalOrders',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

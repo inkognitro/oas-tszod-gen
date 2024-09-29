@@ -12,7 +12,7 @@ import {
 export const getSapiV1AccountApirestrictionsEndpointSchema = {
   path: '/sapi/v1/account/apiRestrictions',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

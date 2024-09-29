@@ -12,7 +12,7 @@ import {
 export const postApiV3SorOrderEndpointSchema = {
   path: '/api/v3/sor/order',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

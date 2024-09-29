@@ -12,7 +12,7 @@ import {
 export const getSapiV1SimpleEarnFlexibleListEndpointSchema = {
   path: '/sapi/v1/simple-earn/flexible/list',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

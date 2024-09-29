@@ -12,7 +12,7 @@ import {
 export const getSapiV1PayTransactionsEndpointSchema = {
   path: '/sapi/v1/pay/transactions',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

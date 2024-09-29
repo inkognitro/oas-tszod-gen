@@ -13,7 +13,7 @@ import {
 export const getSapiV1FuturesHistdatalinkEndpointSchema = {
   path: '/sapi/v1/futures/histDataLink',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
     dataType: z.enum(['T_DEPTH', 'S_DEPTH']),

@@ -12,7 +12,7 @@ import {
 export const postSapiV1BlvtSubscribeEndpointSchema = {
   path: '/sapi/v1/blvt/subscribe',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -12,7 +12,7 @@ import {
 export const getSapiV1LoanCollateralDataEndpointSchema = {
   path: '/sapi/v1/loan/collateral/data',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

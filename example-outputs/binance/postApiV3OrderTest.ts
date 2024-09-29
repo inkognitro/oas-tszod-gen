@@ -12,7 +12,7 @@ import {
 export const postApiV3OrderTestEndpointSchema = {
   path: '/api/v3/order/test',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

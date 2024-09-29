@@ -13,7 +13,7 @@ import {
 export const getSapiV1MarginTransferEndpointSchema = {
   path: '/sapi/v1/margin/transfer',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string().optional(),
     type: z.enum(['ROLL_IN', 'ROLL_OUT']).optional(),

@@ -12,7 +12,7 @@ import {
 export const deleteSapiV1MarginOrderEndpointSchema = {
   path: '/sapi/v1/margin/order',
   method: 'delete',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

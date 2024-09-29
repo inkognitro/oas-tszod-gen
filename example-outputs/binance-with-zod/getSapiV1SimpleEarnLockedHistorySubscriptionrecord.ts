@@ -14,7 +14,7 @@ export const getSapiV1SimpleEarnLockedHistorySubscriptionrecordEndpointSchema =
   {
     path: '/sapi/v1/simple-earn/locked/history/subscriptionRecord',
     method: 'get',
-    supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+    supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
     queryParamsZodSchema: z.object({
       purchaseId: z.string().optional(),
       asset: z.string().optional(),

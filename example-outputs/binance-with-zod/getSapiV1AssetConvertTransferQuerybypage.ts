@@ -13,7 +13,7 @@ import {
 export const getSapiV1AssetConvertTransferQuerybypageEndpointSchema = {
   path: '/sapi/v1/asset/convert-transfer/queryByPage',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     tranId: z.number().int().safe().finite().optional(),
     asset: z.string().optional(),

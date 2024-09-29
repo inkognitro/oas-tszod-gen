@@ -13,7 +13,7 @@ import {
 export const getSapiV1ConvertOrderstatusEndpointSchema = {
   path: '/sapi/v1/convert/orderStatus',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     orderId: z.string().optional(),
     quoteId: z.string().optional(),

@@ -13,7 +13,7 @@ import {
 export const postSapiV1SubAccountUniversaltransferEndpointSchema = {
   path: '/sapi/v1/sub-account/universalTransfer',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     fromEmail: z.string().optional(),
     toEmail: z.string().optional(),

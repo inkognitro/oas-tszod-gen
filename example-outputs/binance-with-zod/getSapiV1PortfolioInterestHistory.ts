@@ -13,7 +13,7 @@ import {
 export const getSapiV1PortfolioInterestHistoryEndpointSchema = {
   path: '/sapi/v1/portfolio/interest-history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string(),
     startTime: z.number().int().safe().finite().optional(),

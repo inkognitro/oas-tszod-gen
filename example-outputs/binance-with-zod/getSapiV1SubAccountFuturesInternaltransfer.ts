@@ -13,7 +13,7 @@ import {
 export const getSapiV1SubAccountFuturesInternaltransferEndpointSchema = {
   path: '/sapi/v1/sub-account/futures/internalTransfer',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     email: z.string(),
     futuresType: z.number().int().safe().finite(),

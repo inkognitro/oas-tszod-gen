@@ -12,7 +12,7 @@ import {
 export const postSapiV3AssetGetuserassetEndpointSchema = {
   path: '/sapi/v3/asset/getUserAsset',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

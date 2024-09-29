@@ -12,7 +12,7 @@ import {
 export const postSapiV1EthStakingEthRedeemEndpointSchema = {
   path: '/sapi/v1/eth-staking/eth/redeem',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

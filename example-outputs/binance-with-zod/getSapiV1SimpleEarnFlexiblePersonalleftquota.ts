@@ -13,7 +13,7 @@ import {
 export const getSapiV1SimpleEarnFlexiblePersonalleftquotaEndpointSchema = {
   path: '/sapi/v1/simple-earn/flexible/personalLeftQuota',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     productId: z.string(),
     recvWindow: z.number().int().safe().finite().optional(),

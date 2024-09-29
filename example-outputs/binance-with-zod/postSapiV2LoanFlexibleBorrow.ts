@@ -13,7 +13,7 @@ import {
 export const postSapiV2LoanFlexibleBorrowEndpointSchema = {
   path: '/sapi/v2/loan/flexible/borrow',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     loanCoin: z.string().optional(),
     loanAmount: z.number().safe().finite().optional(),

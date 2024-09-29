@@ -12,7 +12,7 @@ import {
 export const postSapiV1LendingCustomizedfixedPurchaseEndpointSchema = {
   path: '/sapi/v1/lending/customizedFixed/purchase',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

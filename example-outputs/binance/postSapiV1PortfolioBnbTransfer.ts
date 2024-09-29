@@ -12,7 +12,7 @@ import {
 export const postSapiV1PortfolioBnbTransferEndpointSchema = {
   path: '/sapi/v1/portfolio/bnb-transfer',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

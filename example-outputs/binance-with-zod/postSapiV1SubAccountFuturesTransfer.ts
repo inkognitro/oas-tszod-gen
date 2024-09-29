@@ -13,7 +13,7 @@ import {
 export const postSapiV1SubAccountFuturesTransferEndpointSchema = {
   path: '/sapi/v1/sub-account/futures/transfer',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     email: z.string(),
     asset: z.string(),

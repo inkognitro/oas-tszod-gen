@@ -12,7 +12,7 @@ import {
 export const postSapiV1EthStakingWbethWrapEndpointSchema = {
   path: '/sapi/v1/eth-staking/wbeth/wrap',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

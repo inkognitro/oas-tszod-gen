@@ -13,7 +13,7 @@ import {
 export const getSapiV1MarginAllassetsEndpointSchema = {
   path: '/sapi/v1/margin/allAssets',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string(),
   }),

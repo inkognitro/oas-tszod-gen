@@ -13,7 +13,7 @@ import {
 export const getSapiV1ManagedSubaccountInfoEndpointSchema = {
   path: '/sapi/v1/managed-subaccount/info',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     email: z.string(),
     page: z.number().int().safe().finite().optional(),

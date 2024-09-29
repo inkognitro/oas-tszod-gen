@@ -20,7 +20,7 @@ import {
 export const postAccessURLEndpointSchema = {
   path: '/objects/{object_id}/access/{access_id}',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'PassportAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'PassportAuth', scopes: []}],
   pathParamsZodSchema: z.object({
     object_id: z.string(),
     access_id: z.string(),

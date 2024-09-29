@@ -12,7 +12,7 @@ import {
 export const postSapiV2SubAccountSubaccountapiIprestrictionEndpointSchema = {
   path: '/sapi/v2/sub-account/subAccountApi/ipRestriction',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

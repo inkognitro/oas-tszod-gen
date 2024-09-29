@@ -13,7 +13,7 @@ import {
 export const getApiV3AccountCommissionEndpointSchema = {
   path: '/api/v3/account/commission',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbol: z.string(),
     timestamp: z.number().int().safe().finite(),

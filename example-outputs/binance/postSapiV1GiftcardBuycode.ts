@@ -12,7 +12,7 @@ import {
 export const postSapiV1GiftcardBuycodeEndpointSchema = {
   path: '/sapi/v1/giftcard/buyCode',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

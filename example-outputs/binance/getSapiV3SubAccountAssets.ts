@@ -12,7 +12,7 @@ import {
 export const getSapiV3SubAccountAssetsEndpointSchema = {
   path: '/sapi/v3/sub-account/assets',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

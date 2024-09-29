@@ -13,7 +13,7 @@ import {
 export const postSapiV1PortfolioRepayFuturesSwitchEndpointSchema = {
   path: '/sapi/v1/portfolio/repay-futures-switch',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     autoRepay: z.boolean(),
     recvWindow: z.number().int().safe().finite().optional(),

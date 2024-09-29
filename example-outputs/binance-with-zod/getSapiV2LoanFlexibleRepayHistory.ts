@@ -13,7 +13,7 @@ import {
 export const getSapiV2LoanFlexibleRepayHistoryEndpointSchema = {
   path: '/sapi/v2/loan/flexible/repay/history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     loanCoin: z.string().optional(),
     collateralCoin: z.string().optional(),

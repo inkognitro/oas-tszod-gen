@@ -13,7 +13,7 @@ import {
 export const getSapiV1MarginOpenorderlistEndpointSchema = {
   path: '/sapi/v1/margin/openOrderList',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     isIsolated: z.enum(['TRUE', 'FALSE']).optional(),
     symbol: z.string().optional(),

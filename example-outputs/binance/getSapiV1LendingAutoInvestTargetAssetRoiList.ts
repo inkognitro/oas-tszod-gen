@@ -12,7 +12,7 @@ import {
 export const getSapiV1LendingAutoInvestTargetAssetRoiListEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/target-asset/roi/list',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

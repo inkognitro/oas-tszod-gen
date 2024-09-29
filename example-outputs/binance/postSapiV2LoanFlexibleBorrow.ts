@@ -12,7 +12,7 @@ import {
 export const postSapiV2LoanFlexibleBorrowEndpointSchema = {
   path: '/sapi/v2/loan/flexible/borrow',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

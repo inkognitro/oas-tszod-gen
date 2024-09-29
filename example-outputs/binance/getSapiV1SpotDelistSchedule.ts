@@ -12,7 +12,7 @@ import {
 export const getSapiV1SpotDelistScheduleEndpointSchema = {
   path: '/sapi/v1/spot/delist-schedule',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -13,7 +13,7 @@ import {
 export const getSapiV1LoanRepayCollateralRateEndpointSchema = {
   path: '/sapi/v1/loan/repay/collateral/rate',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     loanCoin: z.string(),
     collateralCoin: z.string(),

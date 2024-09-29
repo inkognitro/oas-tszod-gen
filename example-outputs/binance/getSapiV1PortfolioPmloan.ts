@@ -12,7 +12,7 @@ import {
 export const getSapiV1PortfolioPmloanEndpointSchema = {
   path: '/sapi/v1/portfolio/pmLoan',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

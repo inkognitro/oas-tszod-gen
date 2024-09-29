@@ -13,7 +13,7 @@ import {
 export const getSapiV1MarginInterestratehistoryEndpointSchema = {
   path: '/sapi/v1/margin/interestRateHistory',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string(),
     vipLevel: z.number().int().safe().finite().optional(),

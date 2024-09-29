@@ -23,7 +23,7 @@ import {
 export const getBulkObjectsEndpointSchema = {
   path: '/objects',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'PassportAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'PassportAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     expand: z.boolean().optional(),
   }),

@@ -12,7 +12,7 @@ import {
 export const putSapiV1UserdatastreamEndpointSchema = {
   path: '/sapi/v1/userDataStream',
   method: 'put',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

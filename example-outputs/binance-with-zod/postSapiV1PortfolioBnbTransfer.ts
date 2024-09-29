@@ -13,7 +13,7 @@ import {
 export const postSapiV1PortfolioBnbTransferEndpointSchema = {
   path: '/sapi/v1/portfolio/bnb-transfer',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     transferSide: z.enum(['TO_UM', 'FROM_UM']),
     amount: z.number().safe().finite(),

@@ -13,7 +13,7 @@ import {
 export const getSapiV1SimpleEarnAccountEndpointSchema = {
   path: '/sapi/v1/simple-earn/account',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),

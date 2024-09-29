@@ -13,7 +13,7 @@ import {
 export const postSapiV1AssetConvertTransferEndpointSchema = {
   path: '/sapi/v1/asset/convert-transfer',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     clientTranId: z.string(),
     asset: z.string(),

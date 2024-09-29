@@ -12,7 +12,7 @@ import {
 export const getSapiV1MiningHashTransferConfigDetailsListEndpointSchema = {
   path: '/sapi/v1/mining/hash-transfer/config/details/list',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -12,7 +12,7 @@ import {
 export const postSapiV1SubAccountEoptionsEnableEndpointSchema = {
   path: '/sapi/v1/sub-account/eoptions/enable',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

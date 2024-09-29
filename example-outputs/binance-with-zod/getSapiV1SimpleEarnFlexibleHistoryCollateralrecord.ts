@@ -14,7 +14,7 @@ export const getSapiV1SimpleEarnFlexibleHistoryCollateralrecordEndpointSchema =
   {
     path: '/sapi/v1/simple-earn/flexible/history/collateralRecord',
     method: 'get',
-    supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+    supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
     queryParamsZodSchema: z.object({
       productId: z.string().optional(),
       startTime: z.number().int().safe().finite().optional(),

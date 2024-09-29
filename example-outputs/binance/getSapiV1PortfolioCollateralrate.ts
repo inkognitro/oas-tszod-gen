@@ -12,7 +12,7 @@ import {
 export const getSapiV1PortfolioCollateralrateEndpointSchema = {
   path: '/sapi/v1/portfolio/collateralRate',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

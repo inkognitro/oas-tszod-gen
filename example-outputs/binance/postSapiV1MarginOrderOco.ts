@@ -12,7 +12,7 @@ import {
 export const postSapiV1MarginOrderOcoEndpointSchema = {
   path: '/sapi/v1/margin/order/oco',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

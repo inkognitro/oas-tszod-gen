@@ -13,7 +13,7 @@ import {
 export const postSapiV1LoanVipBorrowEndpointSchema = {
   path: '/sapi/v1/loan/vip/borrow',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     loanAccountId: z.number().int().safe().finite(),
     loanCoin: z.string().optional(),

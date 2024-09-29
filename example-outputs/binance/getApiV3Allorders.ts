@@ -12,7 +12,7 @@ import {
 export const getApiV3AllordersEndpointSchema = {
   path: '/api/v3/allOrders',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

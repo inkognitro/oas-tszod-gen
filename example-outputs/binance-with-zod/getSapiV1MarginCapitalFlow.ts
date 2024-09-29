@@ -13,7 +13,7 @@ import {
 export const getSapiV1MarginCapitalFlowEndpointSchema = {
   path: '/sapi/v1/margin/capital-flow',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string().optional(),
     symbol: z.string().optional(),

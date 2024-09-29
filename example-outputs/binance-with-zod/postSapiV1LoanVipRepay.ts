@@ -13,7 +13,7 @@ import {
 export const postSapiV1LoanVipRepayEndpointSchema = {
   path: '/sapi/v1/loan/vip/repay',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     orderId: z.number().int().safe().finite().optional(),
     amount: z.number().safe().finite(),

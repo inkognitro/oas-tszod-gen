@@ -12,7 +12,7 @@ import {
 export const postSapiV1LendingPositionchangedEndpointSchema = {
   path: '/sapi/v1/lending/positionChanged',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -13,7 +13,7 @@ import {
 export const getSapiV1SimpleEarnLockedPositionEndpointSchema = {
   path: '/sapi/v1/simple-earn/locked/position',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     asset: z.string().optional(),
     positionId: z.string().optional(),

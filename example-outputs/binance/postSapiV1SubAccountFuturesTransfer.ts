@@ -12,7 +12,7 @@ import {
 export const postSapiV1SubAccountFuturesTransferEndpointSchema = {
   path: '/sapi/v1/sub-account/futures/transfer',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

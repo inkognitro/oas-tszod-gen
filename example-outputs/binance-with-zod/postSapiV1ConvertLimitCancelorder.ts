@@ -13,7 +13,7 @@ import {
 export const postSapiV1ConvertLimitCancelorderEndpointSchema = {
   path: '/sapi/v1/convert/limit/cancelOrder',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     orderId: z.number().int().safe().finite(),
     recvWindow: z.number().int().safe().finite().optional(),

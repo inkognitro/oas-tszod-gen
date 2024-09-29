@@ -13,7 +13,7 @@ import {
 export const getSapiV1MarginCrossmargindataEndpointSchema = {
   path: '/sapi/v1/margin/crossMarginData',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     vipLevel: z.number().int().safe().finite().optional(),
     coin: z.string().optional(),

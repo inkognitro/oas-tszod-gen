@@ -12,7 +12,7 @@ import {
 export const getSapiV1GiftcardCryptographyRsaPublicKeyEndpointSchema = {
   path: '/sapi/v1/giftcard/cryptography/rsa-public-key',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

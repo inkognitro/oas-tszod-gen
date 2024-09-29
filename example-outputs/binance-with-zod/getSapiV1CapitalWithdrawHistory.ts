@@ -13,7 +13,7 @@ import {
 export const getSapiV1CapitalWithdrawHistoryEndpointSchema = {
   path: '/sapi/v1/capital/withdraw/history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     coin: z.string().optional(),
     withdrawOrderId: z.string().optional(),

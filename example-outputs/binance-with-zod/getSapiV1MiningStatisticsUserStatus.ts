@@ -13,7 +13,7 @@ import {
 export const getSapiV1MiningStatisticsUserStatusEndpointSchema = {
   path: '/sapi/v1/mining/statistics/user/status',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     algo: z.string(),
     userName: z.string(),

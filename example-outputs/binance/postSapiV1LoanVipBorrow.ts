@@ -12,7 +12,7 @@ import {
 export const postSapiV1LoanVipBorrowEndpointSchema = {
   path: '/sapi/v1/loan/vip/borrow',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

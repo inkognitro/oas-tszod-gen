@@ -13,7 +13,7 @@ import {
 export const postSapiV1MarginMaxLeverageEndpointSchema = {
   path: '/sapi/v1/margin/max-leverage',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     maxLeverage: z.number().int().safe().finite(),
     recvWindow: z.number().int().safe().finite().optional(),

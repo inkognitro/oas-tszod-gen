@@ -13,7 +13,7 @@ import {
 export const postSapiV1LendingAutoInvestPlanEditStatusEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/plan/edit-status',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     planId: z.number().int().safe().finite(),
     status: z.enum(['ONGOING', 'PAUSED', 'REMOVED']),

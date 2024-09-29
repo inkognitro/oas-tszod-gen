@@ -20,7 +20,7 @@ import {
 export const getSapiV2SubAccountFuturesAccountsummaryEndpointSchema = {
   path: '/sapi/v2/sub-account/futures/accountSummary',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     futuresType: z.number().int().safe().finite(),
     page: z.number().int().safe().finite().optional(),

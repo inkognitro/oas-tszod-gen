@@ -13,7 +13,7 @@ import {
 export const getSapiV1DciProductListEndpointSchema = {
   path: '/sapi/v1/dci/product/list',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     optionType: z.enum(['CALL', 'PUT']),
     exercisedCoin: z.string(),

@@ -17,7 +17,7 @@ import {
 export const postApiV3OrderEndpointSchema = {
   path: '/api/v3/order',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -12,7 +12,7 @@ import {
 export const getSapiV1RebateTaxqueryEndpointSchema = {
   path: '/sapi/v1/rebate/taxQuery',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

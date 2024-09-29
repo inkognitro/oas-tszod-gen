@@ -13,7 +13,7 @@ import {
 export const postSapiV1LendingAutoInvestPlanAddEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/plan/add',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     sourceType: z.enum(['MAIN_SITE', 'TR']),
     requestId: z.string().optional(),

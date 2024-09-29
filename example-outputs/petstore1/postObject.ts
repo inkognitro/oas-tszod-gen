@@ -19,7 +19,7 @@ import {
 export const postObjectEndpointSchema = {
   path: '/objects/{object_id}',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'PassportAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'PassportAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': $200OkDrsObjectResponse,

@@ -12,7 +12,7 @@ import {
 export const getSapiV1LoanVipCollateralAccountEndpointSchema = {
   path: '/sapi/v1/loan/vip/collateral/account',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

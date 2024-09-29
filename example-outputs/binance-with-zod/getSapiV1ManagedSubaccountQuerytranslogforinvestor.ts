@@ -14,7 +14,7 @@ export const getSapiV1ManagedSubaccountQuerytranslogforinvestorEndpointSchema =
   {
     path: '/sapi/v1/managed-subaccount/queryTransLogForInvestor',
     method: 'get',
-    supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+    supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
     queryParamsZodSchema: z.object({
       email: z.string(),
       startTime: z.number().int().safe().finite().optional(),

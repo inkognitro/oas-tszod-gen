@@ -12,7 +12,7 @@ import {
 export const getSapiV1MarginTransferEndpointSchema = {
   path: '/sapi/v1/margin/transfer',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

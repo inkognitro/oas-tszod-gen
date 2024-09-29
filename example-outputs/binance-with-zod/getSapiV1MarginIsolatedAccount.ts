@@ -18,7 +18,7 @@ import {
 export const getSapiV1MarginIsolatedAccountEndpointSchema = {
   path: '/sapi/v1/margin/isolated/account',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     symbols: z.string().optional(),
     recvWindow: z.number().int().safe().finite().optional(),

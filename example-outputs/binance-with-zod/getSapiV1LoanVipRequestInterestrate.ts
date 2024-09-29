@@ -13,7 +13,7 @@ import {
 export const getSapiV1LoanVipRequestInterestrateEndpointSchema = {
   path: '/sapi/v1/loan/vip/request/interestRate',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     loanCoin: z.string().optional(),
     recvWindow: z.number().int().safe().finite().optional(),

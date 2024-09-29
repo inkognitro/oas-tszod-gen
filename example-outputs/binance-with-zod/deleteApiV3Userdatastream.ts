@@ -13,7 +13,7 @@ import {
 export const deleteApiV3UserdatastreamEndpointSchema = {
   path: '/api/v3/userDataStream',
   method: 'delete',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     listenKey: z.string().optional(),
   }),

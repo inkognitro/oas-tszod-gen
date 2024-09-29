@@ -13,7 +13,7 @@ import {
 export const getSapiV1LendingAutoInvestIndexUserSummaryEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/index/user-summary',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     indexId: z.number().int().safe().finite(),
     recvWindow: z.number().int().safe().finite().optional(),

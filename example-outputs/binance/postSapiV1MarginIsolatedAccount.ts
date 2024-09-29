@@ -12,7 +12,7 @@ import {
 export const postSapiV1MarginIsolatedAccountEndpointSchema = {
   path: '/sapi/v1/margin/isolated/account',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

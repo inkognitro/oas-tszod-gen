@@ -13,7 +13,7 @@ import {
 export const postSapiV1SubAccountFuturesEnableEndpointSchema = {
   path: '/sapi/v1/sub-account/futures/enable',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     email: z.string(),
     recvWindow: z.number().int().safe().finite().optional(),

@@ -12,7 +12,7 @@ import {
 export const postSapiV1DciProductAuto_compoundEditStatusEndpointSchema = {
   path: '/sapi/v1/dci/product/auto_compound/edit-status',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

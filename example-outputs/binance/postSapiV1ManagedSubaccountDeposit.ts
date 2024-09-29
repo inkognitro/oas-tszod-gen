@@ -12,7 +12,7 @@ import {
 export const postSapiV1ManagedSubaccountDepositEndpointSchema = {
   path: '/sapi/v1/managed-subaccount/deposit',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

@@ -12,7 +12,7 @@ import {
 export const postSapiV1MiningHashTransferConfigCancelEndpointSchema = {
   path: '/sapi/v1/mining/hash-transfer/config/cancel',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

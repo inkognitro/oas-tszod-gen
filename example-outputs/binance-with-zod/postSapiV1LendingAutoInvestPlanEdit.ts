@@ -13,7 +13,7 @@ import {
 export const postSapiV1LendingAutoInvestPlanEditEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/plan/edit',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     planId: z.number().int().safe().finite(),
     subscriptionAmount: z.number().safe().finite(),

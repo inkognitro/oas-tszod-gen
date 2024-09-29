@@ -12,7 +12,7 @@ import {
 export const getSapiV1EthStakingEthHistoryWbethrewardshistoryEndpointSchema = {
   path: '/sapi/v1/eth-staking/eth/history/wbethRewardsHistory',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

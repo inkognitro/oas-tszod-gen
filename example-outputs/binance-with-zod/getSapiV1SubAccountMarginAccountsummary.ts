@@ -13,7 +13,7 @@ import {
 export const getSapiV1SubAccountMarginAccountsummaryEndpointSchema = {
   path: '/sapi/v1/sub-account/margin/accountSummary',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     recvWindow: z.number().int().safe().finite().optional(),
     timestamp: z.number().int().safe().finite(),

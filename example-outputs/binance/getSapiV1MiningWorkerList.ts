@@ -12,7 +12,7 @@ import {
 export const getSapiV1MiningWorkerListEndpointSchema = {
   path: '/sapi/v1/mining/worker/list',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

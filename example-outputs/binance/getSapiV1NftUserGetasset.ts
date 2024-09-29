@@ -12,7 +12,7 @@ import {
 export const getSapiV1NftUserGetassetEndpointSchema = {
   path: '/sapi/v1/nft/user/getAsset',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

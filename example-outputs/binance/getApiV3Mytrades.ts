@@ -12,7 +12,7 @@ import {
 export const getApiV3MytradesEndpointSchema = {
   path: '/api/v3/myTrades',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {

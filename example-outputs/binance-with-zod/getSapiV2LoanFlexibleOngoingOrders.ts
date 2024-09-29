@@ -13,7 +13,7 @@ import {
 export const getSapiV2LoanFlexibleOngoingOrdersEndpointSchema = {
   path: '/sapi/v2/loan/flexible/ongoing/orders',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     loanCoin: z.string().optional(),
     collateralCoin: z.string().optional(),

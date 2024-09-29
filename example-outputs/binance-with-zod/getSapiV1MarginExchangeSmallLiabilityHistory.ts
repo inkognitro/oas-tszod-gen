@@ -13,7 +13,7 @@ import {
 export const getSapiV1MarginExchangeSmallLiabilityHistoryEndpointSchema = {
   path: '/sapi/v1/margin/exchange-small-liability-history',
   method: 'get',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   queryParamsZodSchema: z.object({
     current: z.number().int().safe().finite().optional(),
     size: z.number().int().safe().finite().optional(),

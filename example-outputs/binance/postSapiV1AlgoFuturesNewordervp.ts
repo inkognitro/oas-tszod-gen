@@ -12,7 +12,7 @@ import {
 export const postSapiV1AlgoFuturesNewordervpEndpointSchema = {
   path: '/sapi/v1/algo/futures/newOrderVp',
   method: 'post',
-  supportedSecuritySchemas: [{name: 'ApiKeyAuth', requiredPermissions: []}],
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
   bodyByContentType: {},
   responseByStatus: {
     '200': {
