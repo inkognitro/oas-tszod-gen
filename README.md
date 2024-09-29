@@ -336,7 +336,7 @@ It uses the [safeParse](https://zod.dev/?id=safeparse) method for this task.
 > :bulb: In case of "multipart/form-data" requests, you are allowed to either pass a FormData instance or
 > a plain object in the `body` property of the endpoint caller function payload.
 > The ZodValidationRequestHandler only validates plain object request bodies and skips validation for FormData instances.
-> This also applies to response bodies which come as FromData after calling the `revealBody` method of a response.
+> This also applies to response bodies which come as FormData after calling the `revealBody` method of a response.
 
 ## Promises: `resolve` vs `reject`
 The provided `RequestHandler` implementations distinguish between "expected" and
