@@ -376,7 +376,8 @@ Anyway, this is planned to be implemented but currently has low priority to me.
 ## Out of scope
 Linting is out of scope of this package. The generator is responsible to generate valid TypeScript (and Zod) definitions.
 That's what it does. Your code setup should be responsible for linting your code, so it might make sense for you to run
-Eslint right after the `generateOas3ToTs` function was executed, e.g. with a script in your `package.json` like so:
+[ESLint](https://eslint.org/) right after the `generateOas3ToTs` function was executed, e.g. with a script in your
+`package.json` like so:
 ```json
 "scripts": {
   "api:generate": "node api.generate.js && eslint --fix ./generated-api"
