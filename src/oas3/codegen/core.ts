@@ -7,7 +7,7 @@ export interface CodeGenerator {
     componentRef: string,
     referencingPath: OutputPath
   ): string;
-  createComponentNameForConst(
+  createComponentConstNameForResponseSchema(
     componentRef: string,
     referencingPath: OutputPath
   ): string;
@@ -26,6 +26,9 @@ export interface CodeGenerator {
   createOperationOutputPath(operationId: string): OutputPath;
   createOutputPathByComponentRefForType(componentRef: string): OutputPath;
   createOutputPathByComponentRefForConst(componentRef: string): OutputPath;
+  createOutputPathByComponentRefForResponseSchemaConst(
+    componentRef: string
+  ): OutputPath;
   createOutputPathByComponentRefForZodSchemaConst(
     componentRef: string
   ): OutputPath;

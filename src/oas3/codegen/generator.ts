@@ -508,7 +508,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.addOutput(typeOutput, ctx);
 
     const schemaConstOutputPath =
-      this.createOutputPathByComponentRefForConst(componentRef);
+      this.createOutputPathByComponentRefForResponseSchemaConst(componentRef);
     const schemaConstOutput: AnyDefinitionOutput = {
       type: OutputType.DEFINITION,
       ...applyResponseSchema(this, response, schemaConstOutputPath, ctx, [
@@ -516,7 +516,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
       ]),
       definitionType: 'const',
       createName: referencingPath =>
-        this.createComponentNameForConst(componentRef, referencingPath),
+        this.createComponentConstNameForResponseSchema(
+          componentRef,
+          referencingPath
+        ),
     };
     this.addOutput(schemaConstOutput, ctx);
   }
@@ -1140,6 +1143,15 @@ export class DefaultCodeGenerator implements CodeGenerator {
     ];
   }
 
+  createOutputPathByComponentRefForResponseSchemaConst(
+    componentRef: string
+  ): OutputPath {
+    return [
+      ...this.createOutputPathByComponentRefForConst(componentRef),
+      'schema',
+    ];
+  }
+
   createComponentNameForType(
     componentRef: string,
     referencingPath: OutputPath
@@ -1148,12 +1160,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return this.createTypeName(outputPath, referencingPath);
   }
 
-  createComponentNameForConst(
+  createComponentConstNameForResponseSchema(
     componentRef: string,
     referencingPath: OutputPath
   ): string {
     const outputPath =
-      this.createOutputPathByComponentRefForConst(componentRef);
+      this.createOutputPathByComponentRefForResponseSchemaConst(componentRef);
     return `${this.createConstName(outputPath, referencingPath)}`;
   }
 
