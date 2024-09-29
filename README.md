@@ -371,6 +371,7 @@ It is recommended to define the discriminating literal value directly in the sch
 - The properties `readOnly` and `writeOnly` described [here](https://swagger.io/docs/specification/data-models/data-types/) are ignored.
 It is recommended to have separate definitions for read and write objects, especially with changing requirements
 (see also [CQRS pattern](https://martinfowler.com/bliki/CQRS.html)).
+Anyway, this is planned to be implemented but currently has low priority to me.
 
 ## Out of scope
 Linting is out of scope of this package. The generator is responsible to generate valid TypeScript (and Zod) definitions.

@@ -157,10 +157,7 @@ const templateCoreFileInfos: TemplateFileInfo[] = [
 export type RequestHandlersGenerateConfig = RequestHandlerName[];
 
 export type Context = {
-  endpoint: null | {
-    method: string;
-    path: string;
-  };
+  operationType: null | 'read' | 'write';
   response: null | {
     genericStatusVariableValue: null | string;
   };
@@ -201,7 +198,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   generate(config: GenerateConfig) {
     const ctx: Context = {
-      endpoint: null,
+      operationType: null,
       response: null,
       config,
     };

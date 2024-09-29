@@ -202,10 +202,7 @@ export function applyEndpointCallerFunction(
   }
   const localCtx: Context = {
     ...ctx,
-    endpoint: {
-      path: urlPath,
-      method: requestMethod,
-    },
+    operationType: requestMethod.toLowerCase() === 'get' ? 'read' : 'write',
   };
   const operationId =
     schema.operationId ??
