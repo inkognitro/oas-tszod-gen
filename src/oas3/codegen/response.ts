@@ -19,12 +19,9 @@ import {
   OutputPath,
   OutputType,
 } from './core';
-import {GenerateConfig} from './generator';
+import {Context} from './generator';
 import {applyObjectSchema, applySchema} from './schema';
-import {
-  templateResponseBodyDataType,
-  templateResponseDataType,
-} from './template';
+import {templateResponseBodyDataType, templateResponseType} from './template';
 import {applyNullableFormDataTypeDefinition} from './formData';
 
 function createHeadersObjectSchema(
@@ -59,10 +56,10 @@ function applyResponseHeaders(
   codeGenerator: CodeGenerator,
   headersSchema: ResponseHeaderByNameMap,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): CodeGenerationOutput {
   const objectSchema = createHeadersObjectSchema(codeGenerator, headersSchema);
-  return applyObjectSchema(codeGenerator, objectSchema, path, config);
+  return applyObjectSchema(codeGenerator, objectSchema, path, ctx);
 }
 
 type ApplyResponseBodyResult = {
@@ -75,7 +72,7 @@ function applyResponseBodyContent(
   contentType: string,
   contentSchema: ResponseBodyContent,
   parentPath: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): ApplyResponseBodyResult {
   if (contentType.toLowerCase().match(/multipart\/form-data;?.*/)) {
     const pathForFormData = [...parentPath, 'FormData'];
@@ -83,7 +80,7 @@ function applyResponseBodyContent(
       codeGenerator,
       contentSchema.schema,
       pathForFormData,
-      config
+      ctx
     );
     return {
       contentType,
@@ -110,7 +107,7 @@ function applyResponseBodyContent(
       codeGenerator,
       contentSchema.schema,
       [...parentPath, contentType],
-      config
+      ctx
     ),
   };
 }
@@ -119,14 +116,14 @@ function applyConcreteResponse(
   codeGenerator: CodeGenerator,
   schema: ConcreteResponse,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): CodeGenerationOutput {
   const headersCodeOutput = schema.headers
     ? applyResponseHeaders(
         codeGenerator,
         schema.headers,
         [...path, 'headers'],
-        config
+        ctx
       )
     : null;
   const bodyResults: ApplyResponseBodyResult[] = [];
@@ -139,7 +136,7 @@ function applyConcreteResponse(
         contentType,
         contentSchema,
         bodyPath,
-        config
+        ctx
       )
     );
   }
@@ -151,16 +148,28 @@ function applyConcreteResponse(
           bodyResult.contentType
         }', ${bodyResult.codeOutput.createCode(path)}>`;
       });
-      if (!bodyResults.length && !headersCodeOutput) {
-        return 'any';
+      if (
+        !bodyResults.length &&
+        !headersCodeOutput &&
+        !ctx.response?.genericStatusVariableValue
+      ) {
+        return templateResponseType.createName(path);
       }
-      const codeParts: string[] = [
-        !bodyResults.length ? 'any' : `${responseBodyCodeParts.join(' | ')}`,
-      ];
+      const codeParts: string[] = [];
+      if (ctx.response?.genericStatusVariableValue) {
+        codeParts.push(`${ctx.response?.genericStatusVariableValue}`);
+      } else if (responseBodyCodeParts.length || headersCodeOutput) {
+        codeParts.push('any');
+      }
+      if (responseBodyCodeParts.length) {
+        codeParts.push(responseBodyCodeParts.join(' | '));
+      } else if (headersCodeOutput) {
+        codeParts.push('any');
+      }
       if (headersCodeOutput) {
         codeParts.push(headersCodeOutput.createCode(path));
       }
-      return `${templateResponseDataType.createName(path)}<${codeParts.join(
+      return `${templateResponseType.createName(path)}<${codeParts.join(
         ', '
       )}>`;
     },
@@ -181,7 +190,7 @@ function applyConcreteResponse(
       return [
         ...outputPaths,
         templateResponseBodyDataType.path,
-        templateResponseDataType.path,
+        templateResponseType.path,
       ];
     },
   };
@@ -191,7 +200,7 @@ function applyComponentRefResponse(
   codeGenerator: CodeGenerator,
   schema: ResponseComponentRef,
   path: OutputPath,
-  config: GenerateConfig,
+  ctx: Context,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const output: ComponentRefOutput = {
@@ -208,11 +217,20 @@ function applyComponentRefResponse(
       codeGenerator.createOutputPathByComponentRefForType(schema.$ref),
     ],
   };
-  codeGenerator.addOutput(output, config, preventFromAddingComponentRefs);
+  codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
   return {
     ...output,
-    createCode: referencingPath =>
-      codeGenerator.createComponentNameForType(schema.$ref, referencingPath),
+    createCode: referencingPath => {
+      const code = codeGenerator.createComponentNameForType(
+        schema.$ref,
+        referencingPath
+      );
+      const statusCode = ctx.response?.genericStatusVariableValue;
+      if (!statusCode) {
+        return code;
+      }
+      return `${code}<${statusCode}>`;
+    },
   };
 }
 
@@ -220,7 +238,7 @@ export function applyResponse(
   codeGenerator: CodeGenerator,
   response: Response,
   path: OutputPath,
-  config: GenerateConfig,
+  ctx: Context,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   if (isResponseComponentRef(response)) {
@@ -228,12 +246,12 @@ export function applyResponse(
       codeGenerator,
       response,
       path,
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
   }
   if (isConcreteResponse(response)) {
-    return applyConcreteResponse(codeGenerator, response, path, config);
+    return applyConcreteResponse(codeGenerator, response, path, ctx);
   }
   throw new Error(`response not supported: ${JSON.stringify(response)}`);
 }

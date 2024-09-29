@@ -18,7 +18,7 @@ import {
   OutputPath,
   OutputType,
 } from './core';
-import {GenerateConfig} from './generator';
+import {Context} from './generator';
 import {applyZodSchema} from './zodSchema';
 
 type ApplyResponseBodyResult = {
@@ -31,16 +31,16 @@ function applyResponseBodyContent(
   contentType: string,
   bodyContent: RequestBodyContent,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): ApplyResponseBodyResult {
   let zodSchemaCode: undefined | CodeGenerationOutput;
-  if (config.withZod) {
+  if (ctx.config.withZod) {
     const zodSchemaPath = [...path, 'zodSchema'];
     zodSchemaCode = applyZodSchema(
       codeGenerator,
       bodyContent.schema,
       zodSchemaPath,
-      config
+      ctx
     );
   }
   const codeOutput: CodeGenerationOutput = {
@@ -71,7 +71,7 @@ function applyResponseBodyByContentTypeMap(
   codeGenerator: CodeGenerator,
   schema: ResponseBodyContentByContentTypeMap,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): CodeGenerationOutput {
   const bodyResults: ApplyResponseBodyResult[] = [];
   for (const contentType in schema) {
@@ -84,7 +84,7 @@ function applyResponseBodyByContentTypeMap(
         lowercaseContentType,
         contentSchema,
         contentTypeBodyPath,
-        config
+        ctx
       )
     );
   }
@@ -138,16 +138,16 @@ function applyConcreteResponseSchema(
   codeGenerator: CodeGenerator,
   schema: ConcreteResponse,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): CodeGenerationOutput {
   let headersZodSchemaCodeOutput: undefined | CodeGenerationOutput;
-  if (config.withZod && schema.headers) {
+  if (ctx.config.withZod && schema.headers) {
     const headersObjectSchema = createHeadersObjectSchema(schema.headers);
     headersZodSchemaCodeOutput = applyZodSchema(
       codeGenerator,
       headersObjectSchema,
       [...path, 'headers'],
-      config
+      ctx
     );
   }
   let bodyByContentTypeMapCodeOutput: undefined | CodeGenerationOutput;
@@ -156,7 +156,7 @@ function applyConcreteResponseSchema(
       codeGenerator,
       schema.content,
       [...path, 'body'],
-      config
+      ctx
     );
   }
   return {
@@ -210,7 +210,7 @@ function applyComponentRefResponseSchema(
   codeGenerator: CodeGenerator,
   schema: ResponseComponentRef,
   path: OutputPath,
-  config: GenerateConfig,
+  ctx: Context,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const output: ComponentRefOutput = {
@@ -227,7 +227,7 @@ function applyComponentRefResponseSchema(
       codeGenerator.createOutputPathByComponentRefForConst(schema.$ref),
     ],
   };
-  codeGenerator.addOutput(output, config, preventFromAddingComponentRefs);
+  codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
   return {
     ...output,
     createCode: referencingPath =>
@@ -239,7 +239,7 @@ export function applyResponseSchema(
   codeGenerator: CodeGenerator,
   response: Response,
   path: OutputPath,
-  config: GenerateConfig,
+  ctx: Context,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   if (isResponseComponentRef(response)) {
@@ -247,12 +247,12 @@ export function applyResponseSchema(
       codeGenerator,
       response,
       path,
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
   }
   if (isConcreteResponse(response)) {
-    return applyConcreteResponseSchema(codeGenerator, response, path, config);
+    return applyConcreteResponseSchema(codeGenerator, response, path, ctx);
   }
   throw new Error(`response not supported: ${JSON.stringify(response)}`);
 }

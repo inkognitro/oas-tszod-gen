@@ -35,13 +35,13 @@ import {
   SchemaComponentRef,
   StringSchema,
 } from '@/oas3/specification';
-import {GenerateConfig} from './generator';
+import {Context} from './generator';
 
 export function applySchema(
   codeGenerator: CodeGenerator,
   schema: Schema,
   path: OutputPath,
-  config: GenerateConfig,
+  ctx: Context,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   if (isSchemaComponentRef(schema)) {
@@ -49,7 +49,7 @@ export function applySchema(
       codeGenerator,
       schema,
       path,
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
   }
@@ -70,7 +70,7 @@ export function applySchema(
       codeGenerator,
       schema,
       path,
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
   }
@@ -79,7 +79,7 @@ export function applySchema(
       codeGenerator,
       schema,
       path,
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
   }
@@ -88,7 +88,7 @@ export function applySchema(
       codeGenerator,
       schema,
       path,
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
   }
@@ -97,7 +97,7 @@ export function applySchema(
       codeGenerator,
       schema,
       path,
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
   }
@@ -106,7 +106,7 @@ export function applySchema(
       codeGenerator,
       schema,
       path,
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
   }
@@ -115,7 +115,7 @@ export function applySchema(
       codeGenerator,
       schema,
       path,
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
   }
@@ -172,7 +172,7 @@ function applyArraySchema(
   codeGenerator: CodeGenerator,
   schema: ArraySchema,
   path: OutputPath,
-  config: GenerateConfig,
+  ctx: Context,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const requiredOutputPaths: OutputPath[] = [];
@@ -181,7 +181,7 @@ function applyArraySchema(
     codeGenerator,
     schema.items,
     itemOutputPath,
-    config,
+    ctx,
     preventFromAddingComponentRefs
   );
   requiredOutputPaths.push(itemOutputPath);
@@ -241,7 +241,7 @@ export function applyComponentRefSchema(
   codeGenerator: CodeGenerator,
   schema: SchemaComponentRef,
   path: OutputPath,
-  config: GenerateConfig,
+  ctx: Context,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const output: ComponentRefOutput = {
@@ -258,7 +258,7 @@ export function applyComponentRefSchema(
       codeGenerator.createOutputPathByComponentRefForType(schema.$ref),
     ],
   };
-  codeGenerator.addOutput(output, config, preventFromAddingComponentRefs);
+  codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
   return {
     ...output,
     createCode: referencingPath =>
@@ -270,7 +270,7 @@ export function applyObjectSchema(
   codeGenerator: CodeGenerator,
   schema: ObjectSchema,
   path: OutputPath,
-  config: GenerateConfig,
+  ctx: Context,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const directOutputByPropNameMap: {
@@ -288,7 +288,7 @@ export function applyObjectSchema(
       codeGenerator,
       propSchema,
       propSchemaPath,
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
   }
@@ -298,7 +298,7 @@ export function applyObjectSchema(
       codeGenerator,
       schema.additionalProperties,
       [...path, objectSchemaAdditionalPropsOutputPathPart],
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
   }
@@ -342,7 +342,7 @@ function applyOneOfSchema(
   codeGenerator: CodeGenerator,
   schema: OneOfSchema,
   path: OutputPath,
-  config: GenerateConfig,
+  ctx: Context,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const itemCodeOutputs: CodeGenerationOutput[] = [];
@@ -352,7 +352,7 @@ function applyOneOfSchema(
       codeGenerator,
       itemSchema,
       itemPath,
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
     itemCodeOutputs.push(itemOutput);
@@ -389,7 +389,7 @@ function applyAllOfSchema(
   codeGenerator: CodeGenerator,
   schema: AllOfSchema,
   path: OutputPath,
-  config: GenerateConfig,
+  ctx: Context,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const itemCodeOutputs: CodeGenerationOutput[] = [];
@@ -402,7 +402,7 @@ function applyAllOfSchema(
       codeGenerator,
       itemSchema,
       itemPath,
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
     itemCodeOutputs.push(itemOutput);
@@ -439,7 +439,7 @@ function applyAnyOfSchema(
   codeGenerator: CodeGenerator,
   schema: AnyOfSchema,
   path: OutputPath,
-  config: GenerateConfig,
+  ctx: Context,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const itemCodeOutputs: CodeGenerationOutput[] = [];
@@ -449,7 +449,7 @@ function applyAnyOfSchema(
       codeGenerator,
       itemSchema,
       itemPath,
-      config,
+      ctx,
       preventFromAddingComponentRefs
     );
     itemCodeOutputs.push(itemOutput);
@@ -490,7 +490,7 @@ function applyNotSchema(
   _codeGenerator: CodeGenerator,
   _schema: NotSchema,
   path: OutputPath,
-  _config: GenerateConfig,
+  _ctx: Context,
   _preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   return {

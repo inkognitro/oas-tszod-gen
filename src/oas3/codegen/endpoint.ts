@@ -15,7 +15,7 @@ import {
   templateRequestResultType,
   templateRequestType,
 } from './template';
-import {GenerateConfig} from './generator';
+import {Context} from './generator';
 import {applyObjectSchema} from './schema';
 import {applyEndpointResponse} from './endpointResponse';
 import {applyEndpointSchemaConstDefinition} from './endpointSchema';
@@ -29,13 +29,13 @@ function applyRequestResult(
   codeGenerator: CodeGenerator,
   schema: Endpoint,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): DefinitionOutput {
   const endpointResponseDefinition = applyEndpointResponse(
     codeGenerator,
     schema.responses,
     [...path, responseOutputPathPart],
-    config
+    ctx
   );
   const typeDefinition: DefinitionOutput = {
     type: OutputType.DEFINITION,
@@ -55,7 +55,7 @@ function applyRequestResult(
       endpointResponseDefinition.path,
     ],
   };
-  codeGenerator.addOutput(typeDefinition, config);
+  codeGenerator.addOutput(typeDefinition, ctx);
   return typeDefinition;
 }
 
@@ -64,7 +64,7 @@ function applyNullablePayloadTypeDefinition(
   nullableRequestParamsObjectSchema: null | ObjectSchema,
   nullableBodyTypeDefinition: null | DefinitionOutput,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): null | DefinitionOutput {
   if (!nullableRequestParamsObjectSchema && !nullableBodyTypeDefinition) {
     return null;
@@ -74,7 +74,7 @@ function applyNullablePayloadTypeDefinition(
         codeGenerator,
         nullableRequestParamsObjectSchema,
         path,
-        config
+        ctx
       )
     : null;
   const payloadTypeDefinition: DefinitionOutput = {
@@ -105,7 +105,7 @@ function applyNullablePayloadTypeDefinition(
       return outputs;
     },
   };
-  codeGenerator.addOutput(payloadTypeDefinition, config);
+  codeGenerator.addOutput(payloadTypeDefinition, ctx);
   return payloadTypeDefinition;
 }
 
@@ -128,7 +128,7 @@ function applyNullableRequestBodyTypeDefinition(
   codeGenerator: CodeGenerator,
   schema: RequestBody,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): null | DefinitionOutput {
   if (!schema.content) {
     return null;
@@ -138,7 +138,7 @@ function applyNullableRequestBodyTypeDefinition(
       codeGenerator,
       schema.content,
       path,
-      config
+      ctx
     ),
     type: OutputType.DEFINITION,
     definitionType: 'type',
@@ -146,7 +146,7 @@ function applyNullableRequestBodyTypeDefinition(
     createName: referencingPath =>
       codeGenerator.createTypeName(path, referencingPath),
   };
-  codeGenerator.addOutput(definitionOutput, config);
+  codeGenerator.addOutput(definitionOutput, ctx);
   return definitionOutput;
 }
 
@@ -195,11 +195,18 @@ export function applyEndpointCallerFunction(
   urlPath: string,
   requestMethod: string,
   schema: Endpoint,
-  config: GenerateConfig
+  ctx: Context
 ) {
-  if (!schema.operationId && config.ignoreEndpointsWithoutOperationId) {
+  if (!schema.operationId && ctx.config.ignoreEndpointsWithoutOperationId) {
     return;
   }
+  const localCtx: Context = {
+    ...ctx,
+    endpoint: {
+      path: urlPath,
+      method: requestMethod,
+    },
+  };
   const operationId =
     schema.operationId ??
     codeGenerator.generateEndpointOperationId(requestMethod, urlPath);
@@ -210,7 +217,7 @@ export function applyEndpointCallerFunction(
     requestMethod,
     schema,
     [...path, 'endpointSchema'],
-    config
+    localCtx
   );
   const requestParamsObjectSchema = findRequestParamsObjectSchema(
     codeGenerator,
@@ -221,7 +228,7 @@ export function applyEndpointCallerFunction(
         codeGenerator,
         schema.requestBody,
         [...path, 'requestBody'],
-        config
+        localCtx
       )
     : null;
   const payloadTypeDefinition = applyNullablePayloadTypeDefinition(
@@ -229,13 +236,13 @@ export function applyEndpointCallerFunction(
     requestParamsObjectSchema,
     requestBodyTypeDefinition,
     [...path, 'payload'],
-    config
+    localCtx
   );
   const requestResultTypeDefinition = applyRequestResult(
     codeGenerator,
     schema,
     [...path, requestResultOutputPathPart],
-    config
+    localCtx
   );
   codeGenerator.addOutput(
     {
@@ -279,6 +286,6 @@ export function applyEndpointCallerFunction(
         return outputPaths;
       },
     },
-    config
+    localCtx
   );
 }

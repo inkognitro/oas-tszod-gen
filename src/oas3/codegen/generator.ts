@@ -156,6 +156,17 @@ const templateCoreFileInfos: TemplateFileInfo[] = [
 
 export type RequestHandlersGenerateConfig = RequestHandlerName[];
 
+export type Context = {
+  endpoint: null | {
+    method: string;
+    path: string;
+  };
+  response: null | {
+    genericStatusVariableValue: null | string;
+  };
+  config: GenerateConfig;
+};
+
 export type GenerateConfig = {
   outputFolderPath: string;
   importRootAlias?: string;
@@ -189,31 +200,39 @@ export class DefaultCodeGenerator implements CodeGenerator {
   }
 
   generate(config: GenerateConfig) {
-    this.reset(config);
+    const ctx: Context = {
+      endpoint: null,
+      response: null,
+      config,
+    };
+    this.reset(ctx);
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
-      this.generateRequestByMethodMapOutputs(path, requestByMethodMap, config);
+      this.generateRequestByMethodMapOutputs(path, requestByMethodMap, ctx);
     }
-    const fileOutputByFilePath = this.createFileOutputByFilePath(config);
-    this.createFiles(fileOutputByFilePath, config);
+    const fileOutputByFilePath = this.createFileOutputByFilePath(ctx);
+    this.createFiles(fileOutputByFilePath, ctx);
   }
 
-  private reset(config: GenerateConfig) {
+  private reset(ctx: Context) {
     this.outputs = [...templateDefinitionOutputs];
     this.outputPathsWithZodSchemaRecursion = [];
-    this.resetOperationFolderOutputPaths(config);
+    this.resetOperationFolderOutputPaths(ctx);
   }
 
-  private resetOperationFolderOutputPaths(config: GenerateConfig) {
+  private resetOperationFolderOutputPaths(ctx: Context) {
     this.operationFolderOutputPaths = [
       ['core'],
-      ...(config.predefinedFolderOutputPaths ?? []),
+      ...(ctx.config.predefinedFolderOutputPaths ?? []),
     ];
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
       for (const method in requestByMethodMap) {
         const request = requestByMethodMap[method];
-        if (!request.operationId && config.ignoreEndpointsWithoutOperationId) {
+        if (
+          !request.operationId &&
+          ctx.config.ignoreEndpointsWithoutOperationId
+        ) {
           continue;
         }
         const operationId =
@@ -239,25 +258,23 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return `${method.toLowerCase()}${pathPart}`;
   }
 
-  private getTemplateFileInfosToGenerate(
-    config: GenerateConfig
-  ): TemplateFileInfo[] {
+  private getTemplateFileInfosToGenerate(ctx: Context): TemplateFileInfo[] {
     const fileInfos = templateCoreFileInfos.filter(
       fileInfo =>
-        config.withZod ||
+        ctx.config.withZod ||
         fileInfo.requestHandlerName !== 'ZodValidationRequestHandler'
     );
     return fileInfos.filter(
       f =>
-        !config.requestHandlers ||
-        config.requestHandlers.includes(f.requestHandlerName)
+        !ctx.config.requestHandlers ||
+        ctx.config.requestHandlers.includes(f.requestHandlerName)
     );
   }
 
   private createTemplateFileOutputByFilePath(
-    config: GenerateConfig
+    ctx: Context
   ): FileOutputByFilePath {
-    const templateFileInfos = this.getTemplateFileInfosToGenerate(config);
+    const templateFileInfos = this.getTemplateFileInfosToGenerate(ctx);
     if (!templateFileInfos.length) {
       return {};
     }
@@ -277,8 +294,8 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return fileOutputByFilePath;
   }
 
-  private copyTemplateFiles(config: GenerateConfig) {
-    const templateFileInfos = this.getTemplateFileInfosToGenerate(config);
+  private copyTemplateFiles(ctx: Context) {
+    const templateFileInfos = this.getTemplateFileInfosToGenerate(ctx);
     templateFileInfos.forEach(fileInfo => {
       fs.cpSync(
         path.resolve(
@@ -288,7 +305,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
           fileInfo.fileName
         ),
         path.resolve(
-          config.outputFolderPath,
+          ctx.config.outputFolderPath,
           cleanUpFolderPath(fileInfo.folderPath),
           fileInfo.fileName
         )
@@ -298,27 +315,28 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   private createFiles(
     fileOutputByFilePath: FileOutputByFilePath,
-    config: GenerateConfig
+    ctx: Context
   ) {
-    const cleanTargetFolderPath = cleanUpFolderPath(config.outputFolderPath);
+    const cleanTargetFolderPath = cleanUpFolderPath(
+      ctx.config.outputFolderPath
+    );
     removeDirectoryRecursively(cleanTargetFolderPath);
-    this.copyTemplateFiles(config);
+    this.copyTemplateFiles(ctx);
     for (const filePath in fileOutputByFilePath) {
       const fileOutput = fileOutputByFilePath[filePath];
       const fsFilePath = path.resolve(
-        config.outputFolderPath,
+        ctx.config.outputFolderPath,
         cleanUpFolderPath(filePath)
       );
       if (fs.existsSync(fsFilePath)) {
-        appendToFile(
-          fsFilePath,
-          this.createFileContent(fileOutput, config)
-        ).then(() => {
-          this.logger.log(`extended file: ${fsFilePath}`);
-        });
+        appendToFile(fsFilePath, this.createFileContent(fileOutput, ctx)).then(
+          () => {
+            this.logger.log(`extended file: ${fsFilePath}`);
+          }
+        );
         continue;
       }
-      writeFile(fsFilePath, this.createFileContent(fileOutput, config)).then(
+      writeFile(fsFilePath, this.createFileContent(fileOutput, ctx)).then(
         () => {
           this.logger.log(`created file: ${fsFilePath}`);
         }
@@ -329,13 +347,13 @@ export class DefaultCodeGenerator implements CodeGenerator {
   private createDeclarationForGeneratedDefinitionOutput(
     o: DefinitionOutput
   ): string {
+    const genericsDeclarationCode = o.createGenericsDeclarationCode
+      ? `<${o.createGenericsDeclarationCode()}>`
+      : '';
     switch (o.definitionType) {
       case 'function':
         return `export function ${o.createName(o.path)}${o.createCode(o.path)}`;
       case 'const':
-        const typeDeclaration = o.createTypeDeclarationCode
-          ? `: {${o.createTypeDeclarationCode}}`
-          : '';
         const isRecursiveZodSchema =
           this.outputPathsWithZodSchemaRecursion.find(p =>
             areOutputPathsEqual(p, o.path)
@@ -345,13 +363,11 @@ export class DefaultCodeGenerator implements CodeGenerator {
           codeParts.push('// @ts-ignore - due to schema recursion');
         }
         codeParts.push(
-          `export const ${o.createName(
-            o.path
-          )}${typeDeclaration} = ${o.createCode(o.path)}`
+          `export const ${o.createName(o.path)} = ${o.createCode(o.path)}`
         );
         return codeParts.join('\n');
       case 'type':
-        return `export type ${o.createName(o.path)} = ${o.createCode(o.path)}`;
+        return `export type ${o.createName(o.path)}${genericsDeclarationCode} = ${o.createCode(o.path)}`;
       case 'interface':
         return `export interface ${o.createName(o.path)} ${o.createCode(
           o.path
@@ -363,7 +379,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   private createDeclarationForTemplateDefinitionOutput(
     o: TemplateDefinitionOutput,
-    config: GenerateConfig
+    ctx: Context
   ): null | string {
     if (!o.createCode) {
       return null;
@@ -375,29 +391,26 @@ export class DefaultCodeGenerator implements CodeGenerator {
       case 'function':
         return `export function ${o.createName(
           o.path
-        )}${genericsDeclarationCode}${o.createCode(config, o.path)}`;
+        )}${genericsDeclarationCode}${o.createCode(ctx, o.path)}`;
       case 'const':
         return `export const ${o.createName(o.path)} = ${o.createCode(
-          config,
+          ctx,
           o.path
         )}`;
       case 'type':
         return `export type ${o.createName(
           o.path
-        )}${genericsDeclarationCode} = ${o.createCode(config, o.path)}`;
+        )}${genericsDeclarationCode} = ${o.createCode(ctx, o.path)}`;
       case 'interface':
         return `export interface ${o.createName(
           o.path
-        )}${genericsDeclarationCode} ${o.createCode(config, o.path)}`;
+        )}${genericsDeclarationCode} ${o.createCode(ctx, o.path)}`;
       default:
         throw new Error(`output type "${o.definitionType}" is not supported`);
     }
   }
 
-  private createFileContent(
-    fileOutput: FileOutput,
-    config: GenerateConfig
-  ): string {
+  private createFileContent(fileOutput: FileOutput, ctx: Context): string {
     const importContents: string[] = [];
     for (const importPath in fileOutput.importAssetsByPath) {
       const importAssets = fileOutput.importAssetsByPath[importPath];
@@ -426,7 +439,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
         case OutputType.TEMPLATE_DEFINITION:
           // eslint-disable-next-line no-case-declarations
           const templateCode =
-            this.createDeclarationForTemplateDefinitionOutput(o, config);
+            this.createDeclarationForTemplateDefinitionOutput(o, ctx);
           if (templateCode) {
             definitionContents.push(templateCode);
           }
@@ -466,10 +479,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     );
   }
 
-  private addOutputByResponseComponentRef(
-    componentRef: string,
-    config: GenerateConfig
-  ) {
+  private addOutputByResponseComponentRef(componentRef: string, ctx: Context) {
     const response = findComponentResponseByRef(this.oas3Specs, componentRef);
     if (!response) {
       throw new Error(`could not find component "${componentRef}" in specs`);
@@ -479,27 +489,39 @@ export class DefaultCodeGenerator implements CodeGenerator {
     if (this.findOutputByOutputPath(typeOutputPath)) {
       return;
     }
+    const applyResponseCtx: Context = {
+      ...ctx,
+      response: {
+        ...(ctx.response ?? {}),
+        genericStatusVariableValue: 'S',
+      },
+    };
     const typeOutput: AnyDefinitionOutput = {
       type: OutputType.DEFINITION,
-      ...applyResponse(this, response, typeOutputPath, config, [componentRef]),
+      ...applyResponse(this, response, typeOutputPath, applyResponseCtx, [
+        componentRef,
+      ]),
       definitionType: 'type',
+      createGenericsDeclarationCode: () => {
+        return 'S extends number = any';
+      },
       createName: referencingPath =>
         this.createComponentNameForType(componentRef, referencingPath),
     };
-    this.addOutput(typeOutput, config);
+    this.addOutput(typeOutput, ctx);
 
-    const constOutputPath =
+    const schemaConstOutputPath =
       this.createOutputPathByComponentRefForConst(componentRef);
-    const constOutput: AnyDefinitionOutput = {
+    const schemaConstOutput: AnyDefinitionOutput = {
       type: OutputType.DEFINITION,
-      ...applyResponseSchema(this, response, constOutputPath, config, [
+      ...applyResponseSchema(this, response, schemaConstOutputPath, ctx, [
         componentRef,
       ]),
       definitionType: 'const',
       createName: referencingPath =>
         this.createComponentNameForConst(componentRef, referencingPath),
     };
-    this.addOutput(constOutput, config);
+    this.addOutput(schemaConstOutput, ctx);
   }
 
   private addOutputByParameterComponentRef(componentRef: string) {
@@ -517,10 +539,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     );
   }
 
-  private addOutputBySchemaComponentRef(
-    componentRef: string,
-    config: GenerateConfig
-  ) {
+  private addOutputBySchemaComponentRef(componentRef: string, ctx: Context) {
     const schema = findComponentSchemaByRef(this.oas3Specs, componentRef);
     if (!schema) {
       throw new Error(`could not find component "${componentRef}" in specs`);
@@ -532,17 +551,17 @@ export class DefaultCodeGenerator implements CodeGenerator {
     }
     const output: AnyDefinitionOutput = {
       type: OutputType.DEFINITION,
-      ...applySchema(this, schema, typeOutputPath, config, [componentRef]),
+      ...applySchema(this, schema, typeOutputPath, ctx, [componentRef]),
       definitionType: 'type',
       createName: referencingPath =>
         this.createComponentNameForType(componentRef, referencingPath),
     };
-    this.addOutput(output, config);
-    if (config.withZod) {
+    this.addOutput(output, ctx);
+    if (ctx.config.withZod) {
       const zodSchemaOutputPath =
         this.createOutputPathByComponentRefForZodSchemaConst(componentRef);
       const zodSchemaOutput: AnyDefinitionOutput = {
-        ...applyZodSchema(this, schema, zodSchemaOutputPath, config, [
+        ...applyZodSchema(this, schema, zodSchemaOutputPath, ctx, [
           componentRef,
         ]),
         type: OutputType.DEFINITION,
@@ -553,16 +572,13 @@ export class DefaultCodeGenerator implements CodeGenerator {
             referencingPath
           ),
       };
-      this.addOutput(zodSchemaOutput, config);
+      this.addOutput(zodSchemaOutput, ctx);
     }
   }
 
-  private addOutputByComponentRef(
-    componentRef: string,
-    config: GenerateConfig
-  ) {
+  private addOutputByComponentRef(componentRef: string, ctx: Context) {
     if (componentRef.startsWith(responseComponentRefPrefix)) {
-      this.addOutputByResponseComponentRef(componentRef, config);
+      this.addOutputByResponseComponentRef(componentRef, ctx);
       return;
     }
     if (componentRef.startsWith(parameterComponentRefPrefix)) {
@@ -570,29 +586,20 @@ export class DefaultCodeGenerator implements CodeGenerator {
       return;
     }
     if (componentRef.startsWith(schemaComponentRefPrefix)) {
-      this.addOutputBySchemaComponentRef(componentRef, config);
+      this.addOutputBySchemaComponentRef(componentRef, ctx);
       return;
     }
     throw new Error(`case for "${componentRef}" is not supported`);
   }
 
-  hasSameFileContext(
-    outputPath1: OutputPath,
-    outputPath2: OutputPath
-  ): boolean {
-    const filePath1 = this.createFilePathFromOutputPath(outputPath1);
-    const filePath2 = this.createFilePathFromOutputPath(outputPath2);
-    return filePath1 === filePath2;
-  }
-
   private generateRequestByMethodMapOutputs(
     path: string,
     requestByMethodMap: RequestByMethodMap,
-    config: GenerateConfig
+    ctx: Context
   ) {
     for (const method in requestByMethodMap) {
       const requestSchema = requestByMethodMap[method];
-      applyEndpointCallerFunction(this, path, method, requestSchema, config);
+      applyEndpointCallerFunction(this, path, method, requestSchema, ctx);
     }
   }
 
@@ -629,12 +636,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
   private createImportPath(
     localOutputPath: OutputPath,
     refOutputPath: OutputPath,
-    config: GenerateConfig
+    ctx: Context
   ): string {
     const targetFilePath = this.createFilePathFromOutputPath(localOutputPath);
     const targetFolderPathParts = targetFilePath.split('/').slice(0, -1);
-    if (config.importRootAlias) {
-      return `${config.importRootAlias}${targetFolderPathParts.join('/')}`;
+    if (ctx.config.importRootAlias) {
+      return `${ctx.config.importRootAlias}${targetFolderPathParts.join('/')}`;
     }
     const refFilePath = this.createFilePathFromOutputPath(refOutputPath);
     if (targetFilePath === refFilePath) {
@@ -680,7 +687,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   private getRequiredOutputPathsFromOutput(
     o: Output,
-    config: GenerateConfig
+    ctx: Context
   ): OutputPath[] {
     if (o.type === OutputType.DEFINITION) {
       return o.getRequiredOutputPaths();
@@ -689,7 +696,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       return o.getRequiredOutputPaths();
     }
     if (o.type === OutputType.TEMPLATE_DEFINITION) {
-      return o.getRequiredOutputPaths(config);
+      return o.getRequiredOutputPaths(ctx);
     }
     // @ts-ignore
     throw new Error(`output.type "${o.type}" is not supported`);
@@ -698,11 +705,11 @@ export class DefaultCodeGenerator implements CodeGenerator {
   private addImportsToFileOutput(
     fileOutput: FileOutput,
     output: Output,
-    config: GenerateConfig
+    ctx: Context
   ): FileOutput {
     const availableOutputs = this.outputs;
     let nextFileOutput = fileOutput;
-    this.getRequiredOutputPathsFromOutput(output, config).forEach(
+    this.getRequiredOutputPathsFromOutput(output, ctx).forEach(
       requiredOutputPath => {
         let requiredOutput = availableOutputs.find(o =>
           areOutputPathsEqual(o.path, requiredOutputPath)
@@ -745,7 +752,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
         const importPath =
           requiredOutput.fixedImportPath ??
-          this.createImportPath(requiredOutput.path, output.path, config);
+          this.createImportPath(requiredOutput.path, output.path, ctx);
         const importAssets =
           nextFileOutput.importAssetsByPath[importPath] ?? [];
         const isAssetAlreadyConsidered = !!importAssets.find(
@@ -766,11 +773,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return nextFileOutput;
   }
 
-  private createFileOutputByFilePath(
-    config: GenerateConfig
-  ): FileOutputByFilePath {
+  private createFileOutputByFilePath(ctx: Context): FileOutputByFilePath {
     const fileOutputByFilePath: FileOutputByFilePath =
-      this.createTemplateFileOutputByFilePath(config);
+      this.createTemplateFileOutputByFilePath(ctx);
     this.outputs.forEach(output => {
       if (output.isExternalLibrary) {
         return;
@@ -781,7 +786,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
         definitions: [],
         exportPaths: [],
       };
-      fileOutput = this.addImportsToFileOutput(fileOutput, output, config);
+      fileOutput = this.addImportsToFileOutput(fileOutput, output, ctx);
       switch (output.type) {
         case OutputType.COMPONENT_REF:
           break;
@@ -884,14 +889,14 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   addOutput(
     output: Output,
-    config: GenerateConfig,
+    ctx: Context,
     preventFromAddingComponentRefs: string[] = []
   ) {
     switch (output.type) {
       case OutputType.COMPONENT_REF:
         this.outputs.push(output);
         if (!preventFromAddingComponentRefs.includes(output.componentRef)) {
-          this.addOutputByComponentRef(output.componentRef, config);
+          this.addOutputByComponentRef(output.componentRef, ctx);
         }
         break;
       case OutputType.DEFINITION:

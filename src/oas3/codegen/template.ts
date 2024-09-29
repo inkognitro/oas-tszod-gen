@@ -77,7 +77,7 @@ export const templateRequestType: TemplateDefinitionOutput = {
     ];
     return `{${bodyCodeParts.join('\n')}}`;
   },
-  getRequiredOutputPaths: config => {
+  getRequiredOutputPaths: ctx => {
     const requiredOutputPaths = [
       templatePathParamsType.path,
       templateQueryParamsType.path,
@@ -87,7 +87,7 @@ export const templateRequestType: TemplateDefinitionOutput = {
       templateRequestCookiesType.path,
       templateResponseSchemaType.path,
     ];
-    if (config.withZod) {
+    if (ctx.config.withZod) {
       requiredOutputPaths.push(templateZodSchemaOfZodLibrary.path);
     }
     return requiredOutputPaths;
@@ -185,16 +185,32 @@ export const templateResponseType: TemplateDefinitionOutput = {
   createGenericsDeclarationCode: () => {
     const genericCodeParts: string[] = [
       'S extends number = any',
-      `D extends ${templateResponseDataType.createName(
+      `B extends ${templateResponseBodyDataType.createName(
+        templateResponseTypePath
+      )} = any`,
+      `H extends ${templateResponseHeadersType.createName(
+        templateResponseTypePath
+      )} = any`,
+      `C extends ${templateResponseSetCookiesType.createName(
         templateResponseTypePath
       )} = any`,
     ];
     return genericCodeParts.join(',\n');
   },
   createCode: () => {
-    return 'D & {\nstatus: S;\n}';
+    const bodyCodeParts = [
+      'status: S;',
+      'headers: H;',
+      'cookies: C;',
+      'revealBodyAsArrayBuffer: () => Promise<ArrayBuffer>;',
+    ];
+    return `B & {\n${bodyCodeParts.join('\n')}\n}`;
   },
-  getRequiredOutputPaths: () => [templateResponseDataType.path],
+  getRequiredOutputPaths: () => [
+    templateResponseBodyDataType.path,
+    templateResponseHeadersType.path,
+    templateResponseSetCookiesType.path,
+  ],
 };
 
 const templateRequestResultTypePath = ['core', 'core', 'requestResult'];
@@ -360,7 +376,7 @@ export const templateResponseBodyDataType: TemplateDefinitionOutput = {
   },
   createCode: () => {
     const codeParts: string[] = [
-      '// according to oas3 specs; NULL if the real "content-type" response header does not match with one defined in the specs (case in-sensitive check)',
+      '// NULL if the real "content-type" response header does not match with one defined in the OAS3 specs',
       'contentType: ContentType | null;',
       'revealBody: () => Promise<B>;',
       'revealBodyAsArrayBuffer: () => Promise<ArrayBuffer>;',
@@ -368,39 +384,6 @@ export const templateResponseBodyDataType: TemplateDefinitionOutput = {
     return `{\n${codeParts.join('\n')}\n}`;
   },
   getRequiredOutputPaths: () => [templateResponseBodyType.path],
-};
-
-const templateResponseDataTypePath = ['core', 'core', 'responseData'];
-export const templateResponseDataType: TemplateDefinitionOutput = {
-  type: OutputType.TEMPLATE_DEFINITION,
-  definitionType: 'type',
-  path: templateResponseDataTypePath,
-  createName: () => {
-    return 'ResponseData';
-  },
-  createGenericsDeclarationCode: () => {
-    const codeParts: string[] = [
-      `B extends ${templateResponseBodyDataType.createName(
-        templateResponseDataTypePath
-      )} = any`,
-      `H extends ${templateResponseHeadersType.createName(
-        templateResponseDataTypePath
-      )} = any`,
-      `C extends ${templateResponseSetCookiesType.createName(
-        templateResponseDataTypePath
-      )} = any`,
-    ];
-    return `${codeParts.join(',\n')}`;
-  },
-  createCode: () => {
-    const codeParts: string[] = ['headers: H;', 'cookies: C;'];
-    return `B & {\n${codeParts.join('\n')}\n}`;
-  },
-  getRequiredOutputPaths: () => [
-    templateResponseBodyDataType.path,
-    templateResponseHeadersType.path,
-    templateResponseSetCookiesType.path,
-  ],
 };
 
 const templatePathParamsType: TemplateDefinitionOutput = {
@@ -423,9 +406,9 @@ const templateResponseSchemaType: TemplateDefinitionOutput = {
   createName: () => {
     return 'ResponseSchema';
   },
-  createCode: config => {
+  createCode: ctx => {
     const bodyTypeCodeParts: string[] = [];
-    if (config.withZod) {
+    if (ctx.config.withZod) {
       bodyTypeCodeParts.push('zodSchema: ZodSchema;');
     }
     const codeParts: string[] = [
@@ -433,13 +416,13 @@ const templateResponseSchemaType: TemplateDefinitionOutput = {
         '\n'
       )}\n}>;`,
     ];
-    if (config.withZod) {
+    if (ctx.config.withZod) {
       codeParts.push('headersZodSchema?: ZodSchema;');
     }
     return `{\n${codeParts.join('\n')}\n}`;
   },
-  getRequiredOutputPaths: config => {
-    if (config.withZod) {
+  getRequiredOutputPaths: ctx => {
+    if (ctx.config.withZod) {
       return [templateZodSchemaOfZodLibrary.path];
     }
     return [];
@@ -460,8 +443,8 @@ const templateEndpointSecuritySchemaType: TemplateDefinitionOutput = {
     ];
     return `{\n${codeParts.join('\n')}\n}`;
   },
-  getRequiredOutputPaths: config => {
-    if (config.withZod) {
+  getRequiredOutputPaths: ctx => {
+    if (ctx.config.withZod) {
       return [templateZodSchemaOfZodLibrary.path];
     }
     return [];
@@ -476,9 +459,9 @@ export const templateEndpointSchemaType: TemplateDefinitionOutput = {
   createName: () => {
     return 'EndpointSchema';
   },
-  createCode: config => {
+  createCode: ctx => {
     const bodyTypeCodeParts: string[] = [];
-    if (config.withZod) {
+    if (ctx.config.withZod) {
       bodyTypeCodeParts.push('zodSchema: ZodSchema;');
     }
     const codeParts: string[] = [
@@ -493,7 +476,7 @@ export const templateEndpointSchemaType: TemplateDefinitionOutput = {
         '\n'
       )}\n}>;`
     );
-    if (config.withZod) {
+    if (ctx.config.withZod) {
       codeParts.push('headersZodSchema?: ZodSchema;');
       codeParts.push('cookiesZodSchema?: ZodSchema;');
       codeParts.push('pathParamsZodSchema?: ZodSchema;');
@@ -506,12 +489,12 @@ export const templateEndpointSchemaType: TemplateDefinitionOutput = {
     );
     return `{\n${codeParts.join('\n')}\n}`;
   },
-  getRequiredOutputPaths: config => {
+  getRequiredOutputPaths: ctx => {
     const outputPaths = [
       templateResponseSchemaType.path,
       templateEndpointSecuritySchemaType.path,
     ];
-    if (config.withZod) {
+    if (ctx.config.withZod) {
       return [...outputPaths, templateZodSchemaOfZodLibrary.path];
     }
     return outputPaths;
@@ -711,12 +694,12 @@ export const templateCreateRequestFunction: TemplateDefinitionOutput = {
       ',\n'
     )}\n}\n}`;
   },
-  getRequiredOutputPaths: config => {
+  getRequiredOutputPaths: ctx => {
     const requiredOutputPaths = [
       templateRequestCreationSettingsType.path,
       templateCreateRequestUrlFunction.path,
     ];
-    if (config.withZod) {
+    if (ctx.config.withZod) {
       requiredOutputPaths.push(templateZodSchemaOfZodLibrary.path);
     }
     return requiredOutputPaths;
@@ -770,7 +753,6 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateResponseSetCookiesType,
   templateResponseBodyType,
   templateResponseBodyDataType,
-  templateResponseDataType,
   templateResponseType,
   templateRequestResultType,
   templateRequestHandlerExecutionConfigType,

@@ -1,5 +1,5 @@
 import {Specification} from '@/oas3/specification';
-import {GenerateConfig} from './generator';
+import {Context} from './generator';
 
 export interface CodeGenerator {
   getSpecification(): Specification;
@@ -31,11 +31,10 @@ export interface CodeGenerator {
   ): OutputPath;
   addOutput(
     output: Output,
-    config: GenerateConfig,
+    ctx: Context,
     preventFromAddingComponentRefs?: string[]
   ): void;
   addOutputPathWithZodSchemaRecursion(outputPath: OutputPath): void;
-  hasSameFileContext(outputPath1: OutputPath, outputPath2: OutputPath): boolean;
 }
 
 export enum OutputType {
@@ -80,7 +79,7 @@ export function doesOutputPathStartWithOtherOutputPath(
 
 export type CreateCodeFunc = (
   referencingPath: OutputPath,
-  generateConfig?: GenerateConfig
+  Context?: Context
 ) => string;
 
 export type CodeGenerationOutput = {
@@ -105,8 +104,7 @@ export type DefinitionOutput = GenericOutput<
   {
     definitionType: DefinitionType;
     createCode: CreateCodeFunc;
-    createLineBeforeDeclaration?: () => boolean;
-    createTypeDeclarationCode?: () => string;
+    createGenericsDeclarationCode?: () => string;
     codeComment?: string;
     getRequiredOutputPaths: () => OutputPath[];
   }
@@ -116,13 +114,10 @@ export type TemplateDefinitionOutput = GenericOutput<
   OutputType.TEMPLATE_DEFINITION,
   {
     definitionType: 'const' | 'function' | 'type' | 'interface';
-    createCode?: (
-      config: GenerateConfig,
-      referencingPath: OutputPath
-    ) => string;
+    createCode?: (ctx: Context, referencingPath: OutputPath) => string;
     createGenericsDeclarationCode?: () => string;
     codeComment?: string;
-    getRequiredOutputPaths: (config: GenerateConfig) => OutputPath[];
+    getRequiredOutputPaths: (ctx: Context) => OutputPath[];
   }
 >;
 

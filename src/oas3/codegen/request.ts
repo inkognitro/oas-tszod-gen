@@ -9,7 +9,7 @@ import {
   DefinitionOutput,
   OutputPath,
 } from './core';
-import {GenerateConfig} from './generator';
+import {Context} from './generator';
 import {applySchema} from './schema';
 import {applyNullableFormDataTypeDefinition} from './formData';
 
@@ -23,13 +23,13 @@ function applyRequestBodyContent(
   contentType: string,
   contentSchema: RequestBodyContent,
   parentPath: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): ApplyRequestBodyResult {
   const schemaCodeOutput = applySchema(
     codeGenerator,
     contentSchema.schema,
     [...parentPath, contentType],
-    config
+    ctx
   );
   let formDataTypeDefinitionOutput: null | DefinitionOutput = null;
   if (contentType.toLowerCase().match(/multipart\/form-data;?.*/)) {
@@ -38,7 +38,7 @@ function applyRequestBodyContent(
       codeGenerator,
       contentSchema.schema,
       pathForFormData,
-      config
+      ctx
     );
   }
   return {
@@ -70,7 +70,7 @@ export function applyRequestBodyByContentTypeMap(
   codeGenerator: CodeGenerator,
   schema: RequestBodyContentByTypeMap,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): CodeGenerationOutput {
   const bodyResults: ApplyRequestBodyResult[] = [];
   for (const contentType in schema) {
@@ -81,7 +81,7 @@ export function applyRequestBodyByContentTypeMap(
         contentType,
         contentSchema,
         path,
-        config
+        ctx
       )
     );
   }

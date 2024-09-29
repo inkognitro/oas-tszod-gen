@@ -6,13 +6,13 @@ import {
   OutputType,
 } from './core';
 import {isObjectSchema, isStringSchema, Schema} from '@/oas3/specification';
-import {GenerateConfig} from './generator';
+import {Context} from './generator';
 
 export function applyNullableFormDataTypeDefinition(
   codeGenerator: CodeGenerator,
   schema: Schema,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): DefinitionOutput | null {
   if (!isObjectSchema(schema)) {
     return null;
@@ -62,6 +62,6 @@ export function applyNullableFormDataTypeDefinition(
       return [];
     },
   };
-  codeGenerator.addOutput(output, config);
+  codeGenerator.addOutput(output, ctx);
   return output;
 }

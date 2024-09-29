@@ -7,7 +7,7 @@ import {
   OutputType,
 } from './core';
 import {ResponseByStatusCodeMap} from '@/oas3/specification';
-import {GenerateConfig} from './generator';
+import {Context} from './generator';
 import {applyResponse} from './response';
 import {templateResponseType} from './template';
 
@@ -23,33 +23,30 @@ export function applyEndpointResponse(
   codeGenerator: CodeGenerator,
   schema: ResponseByStatusCodeMap,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): DefinitionOutput {
   const responseOutputs: CodeGenerationOutput[] = [];
   for (const statusCodeStr in schema) {
-    const statusInCode = findNumericStatusCode(statusCodeStr) ?? 'any';
+    const statusInCode = findNumericStatusCode(statusCodeStr);
     const responseSchema = schema[statusCodeStr];
     const responseOutputPath: OutputPath = [...path, statusCodeStr];
-    const responseDataOutput = applyResponse(
-      codeGenerator,
-      responseSchema,
-      responseOutputPath,
-      config
+    const responseCtx: Context = !statusInCode
+      ? ctx
+      : {
+          ...ctx,
+          response: {
+            ...(ctx.response ?? {}),
+            genericStatusVariableValue: `${statusInCode}`,
+          },
+        };
+    responseOutputs.push(
+      applyResponse(
+        codeGenerator,
+        responseSchema,
+        responseOutputPath,
+        responseCtx
+      )
     );
-    responseOutputs.push({
-      path: responseOutputPath,
-      createCode: () => {
-        return `${templateResponseType.createName(
-          responseOutputPath
-        )}<${statusInCode}, ${responseDataOutput.createCode(
-          responseOutputPath
-        )}>`;
-      },
-      getRequiredOutputPaths: () => [
-        ...responseDataOutput.getRequiredOutputPaths(),
-        templateResponseType.path,
-      ],
-    });
   }
   const responseDefinition: DefinitionOutput = {
     type: OutputType.DEFINITION,
@@ -77,6 +74,6 @@ export function applyEndpointResponse(
       return [...outputPaths, templateResponseType.path];
     },
   };
-  codeGenerator.addOutput(responseDefinition, config);
+  codeGenerator.addOutput(responseDefinition, ctx);
   return responseDefinition;
 }

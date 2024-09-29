@@ -6,7 +6,7 @@ import {
   OutputPath,
   OutputType,
 } from './core';
-import {GenerateConfig} from './generator';
+import {Context} from './generator';
 import {
   ConcreteParameterLocation,
   concreteParameterLocations,
@@ -30,16 +30,16 @@ function applyRequestBodyContent(
   contentType: string,
   bodyContent: RequestBodyContent,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): ApplyRequestBodyResult {
   let zodSchemaCode: undefined | CodeGenerationOutput;
-  if (config.withZod) {
+  if (ctx.config.withZod) {
     const zodSchemaPath = [...path, 'zodSchema'];
     zodSchemaCode = applyZodSchema(
       codeGenerator,
       bodyContent.schema,
       zodSchemaPath,
-      config
+      ctx
     );
   }
   const codeOutput: CodeGenerationOutput = {
@@ -70,7 +70,7 @@ function applyRequestBodyByContentTypeMap(
   codeGenerator: CodeGenerator,
   schema: RequestBodyContentByTypeMap,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): CodeGenerationOutput {
   const bodyResults: ApplyRequestBodyResult[] = [];
   for (const contentType in schema) {
@@ -83,7 +83,7 @@ function applyRequestBodyByContentTypeMap(
         lowercaseContentType,
         contentSchema,
         contentTypeBodyPath,
-        config
+        ctx
       )
     );
   }
@@ -121,7 +121,7 @@ function applyResponseByStatusCodeMap(
   codeGenerator: CodeGenerator,
   schema: ResponseByStatusCodeMap,
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): CodeGenerationOutput {
   type ResponseResult = {status: string; codeOutput: CodeGenerationOutput};
   const responseResults: ResponseResult[] = [];
@@ -133,7 +133,7 @@ function applyResponseByStatusCodeMap(
         codeGenerator,
         response,
         [...path, status],
-        config
+        ctx
       ),
     });
   }
@@ -174,7 +174,7 @@ function applyParameterZodSchemas(
   codeGenerator: CodeGenerator,
   parameterSchemas: Parameter[],
   path: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): ParameterZodSchemaResult[] {
   const results: ParameterZodSchemaResult[] = [];
   const payloadPropNameByParamLocation: {
@@ -204,7 +204,7 @@ function applyParameterZodSchemas(
         codeGenerator,
         objectSchema,
         [...path, payloadPropName],
-        config
+        ctx
       ),
     });
   });
@@ -217,7 +217,7 @@ export function applyEndpointSchemaConstDefinition(
   requestMethod: string,
   schema: Endpoint,
   outputPath: OutputPath,
-  config: GenerateConfig
+  ctx: Context
 ): DefinitionOutput {
   let bodyByContentTypeMapCodeOutput: undefined | CodeGenerationOutput;
   if (schema.requestBody?.content) {
@@ -225,22 +225,22 @@ export function applyEndpointSchemaConstDefinition(
       codeGenerator,
       schema.requestBody.content,
       [...outputPath, 'body'],
-      config
+      ctx
     );
   }
   const responseByStatusCodeMapOutput = applyResponseByStatusCodeMap(
     codeGenerator,
     schema.responses,
     [...outputPath, 'response'],
-    config
+    ctx
   );
   let parameterZodSchemaResults: undefined | ParameterZodSchemaResult[];
-  if (config.withZod && schema.parameters) {
+  if (ctx.config.withZod && schema.parameters) {
     parameterZodSchemaResults = applyParameterZodSchemas(
       codeGenerator,
       schema.parameters,
       outputPath,
-      config
+      ctx
     );
   }
   const definition: DefinitionOutput = {
@@ -325,6 +325,6 @@ export function applyEndpointSchemaConstDefinition(
       return outputPaths;
     },
   };
-  codeGenerator.addOutput(definition, config);
+  codeGenerator.addOutput(definition, ctx);
   return definition;
 }
