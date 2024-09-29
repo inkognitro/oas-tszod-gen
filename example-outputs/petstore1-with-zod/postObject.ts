@@ -1,4 +1,11 @@
 import {
+  $200OkDrsObjectResponseSchema,
+  $202AcceptedResponseSchema,
+  $400BadRequestResponseSchema,
+  $401UnauthorizedResponseSchema,
+  $403ForbiddenResponseSchema,
+  $404NotFoundAccessResponseSchema,
+  $500InternalServerErrorResponseSchema,
   $200OkDrsObjectResponse,
   $202AcceptedResponse,
   $400BadRequestResponse,
@@ -26,13 +33,13 @@ export const postObjectEndpointSchema = {
   }),
   bodyByContentType: {},
   responseByStatus: {
-    '200': $200OkDrsObjectResponse,
-    '202': $202AcceptedResponse,
-    '400': $400BadRequestResponse,
-    '401': $401UnauthorizedResponse,
-    '403': $403ForbiddenResponse,
-    '404': $404NotFoundAccessResponse,
-    '500': $500InternalServerErrorResponse,
+    '200': $200OkDrsObjectResponseSchema,
+    '202': $202AcceptedResponseSchema,
+    '400': $400BadRequestResponseSchema,
+    '401': $401UnauthorizedResponseSchema,
+    '403': $403ForbiddenResponseSchema,
+    '404': $404NotFoundAccessResponseSchema,
+    '500': $500InternalServerErrorResponseSchema,
   },
 };
 

@@ -1,4 +1,6 @@
 import {
+  $200ServiceInfoResponseSchema,
+  $500InternalServerErrorResponseSchema,
   $200ServiceInfoResponse,
   $500InternalServerErrorResponse,
 } from '@example-outputs/petstore1';
@@ -17,8 +19,8 @@ export const getServiceInfoEndpointSchema = {
   supportedSecuritySchemas: [],
   bodyByContentType: {},
   responseByStatus: {
-    '200': $200ServiceInfoResponse,
-    '500': $500InternalServerErrorResponse,
+    '200': $200ServiceInfoResponseSchema,
+    '500': $500InternalServerErrorResponseSchema,
   },
 };
 

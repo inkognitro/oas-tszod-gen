@@ -1,10 +1,14 @@
 import {
+  $200OkAuthorizationsResponseSchema,
+  authorizationsNotSupportedResponseSchema,
+  $400BadRequestResponseSchema,
+  $404NotFoundDrsObjectResponseSchema,
+  $500InternalServerErrorResponseSchema,
   $200OkAuthorizationsResponse,
-  authorizationsNotSupportedResponse,
+  AuthorizationsNotSupportedResponse,
   $400BadRequestResponse,
   $404NotFoundDrsObjectResponse,
   $500InternalServerErrorResponse,
-  AuthorizationsNotSupportedResponse,
 } from '@example-outputs/petstore1';
 import {
   Response,
@@ -21,12 +25,12 @@ export const optionsObjectEndpointSchema = {
   supportedSecuritySchemas: [],
   bodyByContentType: {},
   responseByStatus: {
-    '200': $200OkAuthorizationsResponse,
-    '204': authorizationsNotSupportedResponse,
-    '400': $400BadRequestResponse,
-    '404': $404NotFoundDrsObjectResponse,
-    '405': authorizationsNotSupportedResponse,
-    '500': $500InternalServerErrorResponse,
+    '200': $200OkAuthorizationsResponseSchema,
+    '204': authorizationsNotSupportedResponseSchema,
+    '400': $400BadRequestResponseSchema,
+    '404': $404NotFoundDrsObjectResponseSchema,
+    '405': authorizationsNotSupportedResponseSchema,
+    '500': $500InternalServerErrorResponseSchema,
   },
 };
 

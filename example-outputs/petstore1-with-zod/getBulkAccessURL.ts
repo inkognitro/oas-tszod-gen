@@ -1,5 +1,14 @@
 import {
   bulkObjectAccessIdZodSchema,
+  $200OkAccessesResponseSchema,
+  $202AcceptedResponseSchema,
+  $400BadRequestResponseSchema,
+  $401UnauthorizedResponseSchema,
+  $403ForbiddenResponseSchema,
+  $404NotFoundAccessResponseSchema,
+  $413RequestTooLargeResponseSchema,
+  $500InternalServerErrorResponseSchema,
+  BulkObjectAccessId,
   $200OkAccessesResponse,
   $202AcceptedResponse,
   $400BadRequestResponse,
@@ -8,7 +17,6 @@ import {
   $404NotFoundAccessResponse,
   $413RequestTooLargeResponse,
   $500InternalServerErrorResponse,
-  BulkObjectAccessId,
 } from '@example-outputs/petstore1-with-zod';
 import {
   Response,
@@ -29,14 +37,14 @@ export const getBulkAccessURLEndpointSchema = {
     },
   },
   responseByStatus: {
-    '200': $200OkAccessesResponse,
-    '202': $202AcceptedResponse,
-    '400': $400BadRequestResponse,
-    '401': $401UnauthorizedResponse,
-    '403': $403ForbiddenResponse,
-    '404': $404NotFoundAccessResponse,
-    '413': $413RequestTooLargeResponse,
-    '500': $500InternalServerErrorResponse,
+    '200': $200OkAccessesResponseSchema,
+    '202': $202AcceptedResponseSchema,
+    '400': $400BadRequestResponseSchema,
+    '401': $401UnauthorizedResponseSchema,
+    '403': $403ForbiddenResponseSchema,
+    '404': $404NotFoundAccessResponseSchema,
+    '413': $413RequestTooLargeResponseSchema,
+    '500': $500InternalServerErrorResponseSchema,
   },
 };
 

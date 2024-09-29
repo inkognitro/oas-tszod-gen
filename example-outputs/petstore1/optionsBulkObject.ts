@@ -1,12 +1,17 @@
 import {
+  $200OkBulkAuthorizationsResponseSchema,
+  authorizationsNotSupportedResponseSchema,
+  $400BadRequestResponseSchema,
+  $404NotFoundDrsObjectResponseSchema,
+  $413RequestTooLargeResponseSchema,
+  $500InternalServerErrorResponseSchema,
+  BulkObjectId,
   $200OkBulkAuthorizationsResponse,
-  authorizationsNotSupportedResponse,
+  AuthorizationsNotSupportedResponse,
   $400BadRequestResponse,
   $404NotFoundDrsObjectResponse,
   $413RequestTooLargeResponse,
   $500InternalServerErrorResponse,
-  AuthorizationsNotSupportedResponse,
-  BulkObjectId,
 } from '@example-outputs/petstore1';
 import {
   Response,
@@ -25,13 +30,13 @@ export const optionsBulkObjectEndpointSchema = {
     'application/json': {},
   },
   responseByStatus: {
-    '200': $200OkBulkAuthorizationsResponse,
-    '204': authorizationsNotSupportedResponse,
-    '400': $400BadRequestResponse,
-    '404': $404NotFoundDrsObjectResponse,
-    '405': authorizationsNotSupportedResponse,
-    '413': $413RequestTooLargeResponse,
-    '500': $500InternalServerErrorResponse,
+    '200': $200OkBulkAuthorizationsResponseSchema,
+    '204': authorizationsNotSupportedResponseSchema,
+    '400': $400BadRequestResponseSchema,
+    '404': $404NotFoundDrsObjectResponseSchema,
+    '405': authorizationsNotSupportedResponseSchema,
+    '413': $413RequestTooLargeResponseSchema,
+    '500': $500InternalServerErrorResponseSchema,
   },
 };
 

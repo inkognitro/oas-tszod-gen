@@ -29,7 +29,7 @@ export type $200ServiceInfoResponse<S extends number = any> = Response<
   ResponseBodyData<'application/json', Service & DrsService>
 >;
 
-export const $200ServiceInfoResponse = {
+export const $200ServiceInfoResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: z.intersection([serviceZodSchema, drsServiceZodSchema]),
@@ -42,7 +42,7 @@ export type $500InternalServerErrorResponse<S extends number = any> = Response<
   ResponseBodyData<'application/json', Error>
 >;
 
-export const $500InternalServerErrorResponse = {
+export const $500InternalServerErrorResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: errorZodSchema,
@@ -55,7 +55,7 @@ export type $200OkAuthorizationsResponse<S extends number = any> = Response<
   ResponseBodyData<'application/json', Authorizations>
 >;
 
-export const $200OkAuthorizationsResponse = {
+export const $200OkAuthorizationsResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: authorizationsZodSchema,
@@ -66,7 +66,7 @@ export const $200OkAuthorizationsResponse = {
 export type AuthorizationsNotSupportedResponse<S extends number = any> =
   Response<S>;
 
-export const authorizationsNotSupportedResponse = {
+export const authorizationsNotSupportedResponseSchema = {
   bodyByContentType: {},
 };
 
@@ -75,7 +75,7 @@ export type $400BadRequestResponse<S extends number = any> = Response<
   ResponseBodyData<'application/json', Error>
 >;
 
-export const $400BadRequestResponse = {
+export const $400BadRequestResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: errorZodSchema,
@@ -88,7 +88,7 @@ export type $404NotFoundDrsObjectResponse<S extends number = any> = Response<
   ResponseBodyData<'application/json', Error>
 >;
 
-export const $404NotFoundDrsObjectResponse = {
+export const $404NotFoundDrsObjectResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: errorZodSchema,
@@ -101,7 +101,7 @@ export type $200OkDrsObjectResponse<S extends number = any> = Response<
   ResponseBodyData<'application/json', DrsObject>
 >;
 
-export const $200OkDrsObjectResponse = {
+export const $200OkDrsObjectResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: drsObjectZodSchema,
@@ -117,7 +117,7 @@ export type $202AcceptedResponse<S extends number = any> = Response<
   }
 >;
 
-export const $202AcceptedResponse = {
+export const $202AcceptedResponseSchema = {
   headersZodSchema: z.object({
     'Retry-After': z.number().int().safe().finite(),
   }),
@@ -129,7 +129,7 @@ export type $401UnauthorizedResponse<S extends number = any> = Response<
   ResponseBodyData<'application/json', Error>
 >;
 
-export const $401UnauthorizedResponse = {
+export const $401UnauthorizedResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: errorZodSchema,
@@ -142,7 +142,7 @@ export type $403ForbiddenResponse<S extends number = any> = Response<
   ResponseBodyData<'application/json', Error>
 >;
 
-export const $403ForbiddenResponse = {
+export const $403ForbiddenResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: errorZodSchema,
@@ -155,7 +155,7 @@ export type $404NotFoundAccessResponse<S extends number = any> = Response<
   ResponseBodyData<'application/json', Error>
 >;
 
-export const $404NotFoundAccessResponse = {
+export const $404NotFoundAccessResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: errorZodSchema,
@@ -175,7 +175,7 @@ export type $200OkBulkAuthorizationsResponse<S extends number = any> = Response<
   >
 >;
 
-export const $200OkBulkAuthorizationsResponse = {
+export const $200OkBulkAuthorizationsResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: z.object({
@@ -192,7 +192,7 @@ export type $413RequestTooLargeResponse<S extends number = any> = Response<
   ResponseBodyData<'application/json', Error>
 >;
 
-export const $413RequestTooLargeResponse = {
+export const $413RequestTooLargeResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: errorZodSchema,
@@ -212,7 +212,7 @@ export type $200OkDrsObjectsResponse<S extends number = any> = Response<
   >
 >;
 
-export const $200OkDrsObjectsResponse = {
+export const $200OkDrsObjectsResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: z.object({
@@ -229,7 +229,7 @@ export type $200OkAccessResponse<S extends number = any> = Response<
   ResponseBodyData<'application/json', AccessURL>
 >;
 
-export const $200OkAccessResponse = {
+export const $200OkAccessResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: accessURLZodSchema,
@@ -249,7 +249,7 @@ export type $200OkAccessesResponse<S extends number = any> = Response<
   >
 >;
 
-export const $200OkAccessesResponse = {
+export const $200OkAccessesResponseSchema = {
   bodyByContentType: {
     'application/json': {
       zodSchema: z.object({
