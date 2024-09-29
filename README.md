@@ -12,7 +12,7 @@ However, I coded my own solution because I wanted to:
 - have full ownership of my production code without any additional dependency
 - have generated endpoint caller functions representing the reality which is given from some OAS3 specs
 - be able to easily test these endpoint caller functions with exchangeable `RequestHandler` implementations
-- have a uniform adapter API passing endpoint schemas in a property of the request object on runtime
+- have a uniform adapter API which passes an endpoint schema inside the request adapter object
 - have separated functions and type definitions for each endpoint in a single file, located in its context folder
 - be able to go with other implementations under the hood than [Axios](https://axios-http.com/docs/intro)
 - have the opt-in possibility for generated [Zod](https://zod.dev) schemas with included runtime validation of requests
