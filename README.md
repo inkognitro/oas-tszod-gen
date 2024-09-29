@@ -94,9 +94,8 @@ node api.generate.js
 ```
 
 **Important:**
-It is recommended to add your output folder in the `.gitignore` file and to regenerate the output in your CI pipeline.
-On every call of the `generateOas3ToTs` function, the output folder is going to be deleted and the code will be rebuilt
-from scratch.
+It is recommended to regenerate the output in your CI pipeline. On every call of the `generateOas3ToTs` function,
+the output folder is going to be deleted and the code will be generated from scratch.
 
 > :bulb: Node version `>= 18.0.0` is required to support
 > the [Blob](https://nodejs.org/docs/v20.17.0/api/globals.html#class-blob) class
