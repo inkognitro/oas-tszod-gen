@@ -107,7 +107,7 @@ A `output` is an object which has a `path` property in it. This property is of t
 The first few entries of the `OutputPath` array do represent the filepath in which the variables and type definitions are going to be put in.
 The remaining entries of this array are used for the type or the variable name.
 
-Let's consider some example endpoints which might be defined in your OAS3 specification under the `paths` variable:
+Let's consider some example endpoints which might be defined in your OAS3 specification under the `paths` property:
 
 1. The outputs for the endpoint with the operationId `auth.authenticate` will be put into `./auth/authenticate.ts`
 2. The outputs for the endpoint with the operationId `userManagement.getUsers` will be put into `./user-management/getUsers.ts`
