@@ -71,6 +71,9 @@ export function applyEndpointResponse(
           }
         });
       });
+      if (responseOutputs.length) {
+        return outputPaths;
+      }
       return [...outputPaths, templateResponseType.path];
     },
   };

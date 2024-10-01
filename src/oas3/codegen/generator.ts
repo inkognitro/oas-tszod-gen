@@ -113,48 +113,52 @@ export interface Logger {
   log(...data: unknown[]): void;
 }
 
-type RequestHandlerName =
+type TemplateName =
   | 'AuthRequestHandler'
   | 'AxiosRequestHandler'
   | 'FetchApiRequestHandler'
   | 'ScopedRequestHandler'
-  | 'ZodValidationRequestHandler';
+  | 'ZodValidationRequestHandler'
+  | 'ResponseExtractors';
 
 type TemplateFileInfo = {
   fileName: string;
   folderPath: string;
-  requestHandlerName: RequestHandlerName;
+  templateName: TemplateName;
 };
 
 const templateCoreFileInfos: TemplateFileInfo[] = [
   {
     fileName: 'fetchApiRequestHandler.ts',
     folderPath: '/core',
-    requestHandlerName: 'FetchApiRequestHandler',
+    templateName: 'FetchApiRequestHandler',
   },
   {
     fileName: 'axiosRequestHandler.ts',
     folderPath: '/core',
-    requestHandlerName: 'AxiosRequestHandler',
+    templateName: 'AxiosRequestHandler',
   },
   {
     fileName: 'authRequestHandler.ts',
     folderPath: '/core',
-    requestHandlerName: 'AuthRequestHandler',
+    templateName: 'AuthRequestHandler',
   },
   {
     fileName: 'scopedRequestHandler.ts',
     folderPath: '/core',
-    requestHandlerName: 'ScopedRequestHandler',
+    templateName: 'ScopedRequestHandler',
   },
   {
     fileName: 'zodValidationRequestHandler.ts',
     folderPath: '/core',
-    requestHandlerName: 'ZodValidationRequestHandler',
+    templateName: 'ZodValidationRequestHandler',
+  },
+  {
+    fileName: 'responseExtractors.ts',
+    folderPath: '/core',
+    templateName: 'ResponseExtractors',
   },
 ];
-
-export type RequestHandlersGenerateConfig = RequestHandlerName[];
 
 export type Context = {
   operationType: null | 'read' | 'write';
@@ -169,7 +173,7 @@ export type GenerateConfig = {
   importRootAlias?: string;
   predefinedFolderOutputPaths?: OutputPath[];
   withZod?: boolean;
-  requestHandlers?: RequestHandlersGenerateConfig;
+  templates?: TemplateName[];
   ignoreEndpointsWithoutOperationId?: boolean;
   findCustomStringPatternByFormat?: (format: string) => null | string;
 };
@@ -259,12 +263,11 @@ export class DefaultCodeGenerator implements CodeGenerator {
     const fileInfos = templateCoreFileInfos.filter(
       fileInfo =>
         ctx.config.withZod ||
-        fileInfo.requestHandlerName !== 'ZodValidationRequestHandler'
+        fileInfo.templateName !== 'ZodValidationRequestHandler'
     );
     return fileInfos.filter(
       f =>
-        !ctx.config.requestHandlers ||
-        ctx.config.requestHandlers.includes(f.requestHandlerName)
+        !ctx.config.templates || ctx.config.templates.includes(f.templateName)
     );
   }
 

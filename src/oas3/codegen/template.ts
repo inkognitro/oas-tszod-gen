@@ -68,7 +68,7 @@ export const templateRequestType: TemplateDefinitionOutput = {
       `queryParams?: ${templateQueryParamsType.createName(
         templateRequestTypePath
       )};`,
-      '// according to oas3 specs; used as default for the "content-type" request header',
+      '// According to given OAS3 specs; used as default for the "content-type" request header',
       'contentType: string | null;',
       `body?: ${templateRequestBodyType.createName(templateRequestTypePath)};`,
       `endpointSchema: ${templateEndpointSchemaType.createName(
@@ -177,7 +177,7 @@ const templateIsPlainObjectType: TemplateDefinitionOutput = {
 const templateResponseTypePath = ['core', 'core', 'response'];
 export const templateResponseType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
-  definitionType: 'type',
+  definitionType: 'interface',
   path: templateResponseTypePath,
   createName: () => {
     return 'Response';
@@ -185,7 +185,8 @@ export const templateResponseType: TemplateDefinitionOutput = {
   createGenericsDeclarationCode: () => {
     const genericCodeParts: string[] = [
       'S extends number = any',
-      `B extends ${templateResponseBodyDataType.createName(
+      'Ct extends string | null = any',
+      `B extends ${templateResponseBodyType.createName(
         templateResponseTypePath
       )} = any`,
       `H extends ${templateResponseHeadersType.createName(
@@ -202,9 +203,53 @@ export const templateResponseType: TemplateDefinitionOutput = {
       'status: S;',
       'headers: H;',
       'cookies: C;',
+      '// NULL if the real "content-type" response header does not match with one defined in the OAS3 specs',
+      'contentType: Ct;',
+      'revealBody: () => Promise<B>;',
       'revealBodyAsArrayBuffer: () => Promise<ArrayBuffer>;',
     ];
-    return `B & {\n${bodyCodeParts.join('\n')}\n}`;
+    return `{\n${bodyCodeParts.join('\n')}\n}`;
+  },
+  getRequiredOutputPaths: () => [
+    templateResponseBodyDataType.path,
+    templateResponseHeadersType.path,
+    templateResponseSetCookiesType.path,
+  ],
+};
+
+const templateResponseUnionTypePath = ['core', 'core', 'responseUnion'];
+export const templateResponseUnionType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: templateResponseUnionTypePath,
+  createName: () => {
+    return 'ResponseUnion';
+  },
+  createGenericsDeclarationCode: () => {
+    const genericCodeParts: string[] = [
+      'S extends number = any',
+      `BodyData extends ${templateResponseBodyDataType.createName(
+        templateResponseUnionTypePath
+      )} = any`,
+      `H extends ${templateResponseHeadersType.createName(
+        templateResponseUnionTypePath
+      )} = any`,
+      `C extends ${templateResponseSetCookiesType.createName(
+        templateResponseUnionTypePath
+      )} = any`,
+    ];
+    return genericCodeParts.join(',\n');
+  },
+  createCode: () => {
+    const responseTypeName = templateResponseType.createName(
+      templateResponseUnionTypePath
+    );
+    const bodyCodeParts = [
+      'BodyData extends any',
+      `? ${responseTypeName}<S, BodyData['contentType'], BodyData['body'], H, C>`,
+      ': never;',
+    ];
+    return `${bodyCodeParts.join('\n')}`;
   },
   getRequiredOutputPaths: () => [
     templateResponseBodyDataType.path,
@@ -375,12 +420,7 @@ export const templateResponseBodyDataType: TemplateDefinitionOutput = {
     return `${codeParts.join(',\n')}`;
   },
   createCode: () => {
-    const codeParts: string[] = [
-      '// NULL if the real "content-type" response header does not match with one defined in the OAS3 specs',
-      'contentType: ContentType | null;',
-      'revealBody: () => Promise<B>;',
-      'revealBodyAsArrayBuffer: () => Promise<ArrayBuffer>;',
-    ];
+    const codeParts: string[] = ['contentType: ContentType;', 'body: B;'];
     return `{\n${codeParts.join('\n')}\n}`;
   },
   getRequiredOutputPaths: () => [templateResponseBodyType.path],
@@ -751,6 +791,7 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateResponseBodyType,
   templateResponseBodyDataType,
   templateResponseType,
+  templateResponseUnionType,
   templateRequestResultType,
   templateRequestHandlerExecutionConfigType,
   templateSimpleRequestHandlerType,

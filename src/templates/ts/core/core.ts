@@ -219,23 +219,34 @@ export type ResponseBodyData<
   ContentType extends string = any,
   B extends ResponseBody = any,
 > = {
-  // NULL if the real "content-type" response header does not match with one defined in the OAS3 specs
-  contentType: ContentType | null;
-  revealBody: () => Promise<B>;
-  revealBodyArrayBuffer: () => Promise<ArrayBuffer>;
+  contentType: ContentType;
+  body: B;
 };
 
 export type Response<
   S extends number = any,
-  B extends ResponseBodyData = any,
+  Ct extends string | null = any,
+  B extends ResponseBody = any,
   H extends ResponseHeaders = any,
   C extends ResponseSetCookies = any,
-> = B & {
+> = {
   status: S;
   headers: H;
   cookies: C;
+  // NULL if the real "content-type" response header does not match with one defined in the OAS3 specs
+  contentType: Ct;
+  revealBody: () => Promise<B>;
   revealBodyAsArrayBuffer: () => Promise<ArrayBuffer>;
 };
+
+export type ResponseUnion<
+  S extends number = any,
+  BodyData extends ResponseBodyData = any,
+  H extends ResponseHeaders = any,
+  C extends ResponseSetCookies = any,
+> = BodyData extends any
+  ? Response<S, BodyData['contentType'], BodyData['body'], H, C>
+  : never;
 
 export interface RequestResult<
   Req extends Request = any,

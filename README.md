@@ -78,10 +78,10 @@ generateOas3ToTs({
   withZod: true, // optional
   // By default or in case of `false`, only TypeScript types are generated without Zod schemas
   
-  requestHandlers: ['AxiosRequestHandler', 'AuthRequestHandler'], // optional
-  // This will add only the defined RequestHandler implementations.
-  // An empty array results in no added implementations.
-  // By default, all available RequestHandler implementations are added.
+  templates: ['AxiosRequestHandler', 'AuthRequestHandler', 'ResponseExtractors'], // optional
+  // This will add only the defined templates.
+  // An empty array results in no added templates.
+  // By default, all available templates will be added to your codebase.
 
   ignoreEndpointsWithoutOperationId: false, // optional
   // In case of `true`, endpoints whithout an "operationId" are ignored for code output. Default is `false`.
@@ -131,6 +131,8 @@ import {
   AuthRequestHandlerExecutionConfig,
   AxiosRequestHandler,
   AxiosRequestHandlerExecutionConfig,
+  findRevealedResponse,
+  getRevealedResponseOrReject,
   HttpBearerAuthenticationProvider,
   ZodValidationRequestHandler,
   ZodValidationRequestHandlerExecutionConfig,
@@ -188,8 +190,52 @@ const requestHandler = new AuthRequestHandler(
 
   zodValidationWithAxiosRequestHandler
 );
+```
 
-async function login() {
+The first two login functions will do the revelation of the response body directly because this is automatically done by
+the response extractor functions `findRevealedResponse` and `getRevealedResponseOrReject`.
+
+The third login function shows how everything works under the hood.
+There are also the extraction functions `findResponse` and `getResponseOrReject`, which return a response whose body
+was not yet revealed. This is for convenience, so you don't have to write that much code.
+
+```typescript
+// same file as before
+
+async function loginOrThrowError() {
+  const res = await getRevealedResponseOrReject(200, 'application/json', authenticate(
+    requestHandler,
+    {
+      contentType: 'application/json',
+      body: {
+        usernameOrEmail: 'inkognitro',
+        password: '12345678'
+      },
+    },
+    optionalConfig
+  ));
+  myJwtAuthAccessToken = res.body.accessToken;
+}
+
+async function loginOrDoNothing() {
+  const res = await findRevealedResponse(200, 'application/json', authenticate(
+    requestHandler,
+    {
+      contentType: 'application/json',
+      body: {
+        usernameOrEmail: 'inkognitro',
+        password: '12345678'
+      },
+    },
+    optionalConfig
+  ));
+  if (!response) {
+    return;
+  }
+  myJwtAuthAccessToken = res.body.accessToken;
+}
+
+async function loginWithExplicitResponseBodyRevealation() {
   const optionalConfig: RequestHandlerExecutionConfig = {
     refineAxiosRequestConfig: (currentConfig) => ({
       ...currentConfig,
@@ -197,7 +243,7 @@ async function login() {
     })
   };
   
-  const result = await authenticate(
+  const requestResult = await authenticate(
     requestHandler,
     {
       contentType: 'application/json',
@@ -209,7 +255,7 @@ async function login() {
     optionalConfig
   );
 
-  if (!result.response || result.response.status !== 200) {
+  if (!requestResult.response || requestResult.response.status !== 200) {
     console.log('Something went wrong!');
     return;
   }
@@ -217,18 +263,16 @@ async function login() {
   // The following check is only required if the response body of the response
   // with the status code 200 can have ambiguous content types according to the
   // given OAS3 specs.
-  if (result.response.contentType !== 'application/json') {
-    console.log('unsupported response body', result.response.body);
+  if (requestResult.response.contentType !== 'application/json') {
+    console.log('unsupported response body', requestResult.response.body);
     return;
   }
 
-  const body = await result.response.revealBody();
+  const body = await requestResult.response.revealBody();
   myJwtAuthAccessToken = body.accessToken;
   
   console.log('Successfully logged in!');
 }
-
-await login();
 ```
 
 ## RequestHandler implementations

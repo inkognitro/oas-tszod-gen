@@ -21,7 +21,11 @@ import {
 } from './core';
 import {Context} from './generator';
 import {applyObjectSchema, applySchema} from './schema';
-import {templateResponseBodyDataType, templateResponseType} from './template';
+import {
+  templateResponseBodyDataType,
+  templateResponseType,
+  templateResponseUnionType,
+} from './template';
 import {applyNullableFormDataTypeDefinition} from './formData';
 
 function createHeadersObjectSchema(
@@ -140,6 +144,10 @@ function applyConcreteResponse(
       )
     );
   }
+  const hasNoSpecificResponseProperties =
+    !bodyResults.length &&
+    !headersCodeOutput &&
+    !ctx.response?.genericStatusVariableValue;
   return {
     path,
     createCode: () => {
@@ -148,11 +156,7 @@ function applyConcreteResponse(
           bodyResult.contentType
         }', ${bodyResult.codeOutput.createCode(path)}>`;
       });
-      if (
-        !bodyResults.length &&
-        !headersCodeOutput &&
-        !ctx.response?.genericStatusVariableValue
-      ) {
+      if (hasNoSpecificResponseProperties) {
         return templateResponseType.createName(path);
       }
       const codeParts: string[] = [];
@@ -169,7 +173,7 @@ function applyConcreteResponse(
       if (headersCodeOutput) {
         codeParts.push(headersCodeOutput.createCode(path));
       }
-      return `${templateResponseType.createName(path)}<${codeParts.join(
+      return `${templateResponseUnionType.createName(path)}<${codeParts.join(
         ', '
       )}>`;
     },
@@ -190,7 +194,9 @@ function applyConcreteResponse(
       return [
         ...outputPaths,
         templateResponseBodyDataType.path,
-        templateResponseType.path,
+        hasNoSpecificResponseProperties
+          ? templateResponseType.path
+          : templateResponseUnionType.path,
       ];
     },
   };
