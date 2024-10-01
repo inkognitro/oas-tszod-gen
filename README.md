@@ -257,8 +257,8 @@ async function loginOrDoNothing() {
 }
 ```
 
-Last but not least, the third variant. This variant shows how everything works under the hood and serves an overview of
-what is going on under the hood in those extractor functions from above.
+Last but not least, the third variant. This variant shows how everything works under the hood and serves as an overview
+of what is going on under the hood in those extractor functions from above.
 ```typescript
 // login3.ts
 
