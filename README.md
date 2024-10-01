@@ -229,7 +229,7 @@ async function loginOrDoNothing() {
     },
     optionalConfig
   ));
-  if (!response) {
+  if (!res) {
     return;
   }
   myJwtAuthAccessToken = res.body.accessToken;
