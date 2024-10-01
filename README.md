@@ -151,26 +151,32 @@ declare global {
       ZodValidationRequestHandlerExecutionConfig {}
 }
 
-let myJwtAuthAccessToken: null | string = null;
-
-const myJwtAuthenticationProvider: HttpBearerAuthenticationProvider = {
-  type: 'httpBearer',
+class MyJwtAuthProvider {
+  public readonly type: 'httpBearer';
   
-  findToken: (): string | null => {
-    return myJwtAuthAccessToken;
-  },
-  
-  securitySchemeName: 'myJwtAuth',
   // This is the name of one of your security definition in your OAS3 specification
-};
+  public readonly securitySchemeName: 'myJwtAuth';
+  
+  private readonly token: null | string;
+  
+  setToken() {
+    this.accessToken = accessToken;
+  }
+  
+  findToken() {
+    this.accessToken = accessToken;
+  }
+}
+
+export const myJwtAuthProvider = new MyJwtAuthProvider();
 
 const myAxiosInstance = axios.create({
   baseURL: 'https://api.acme.com',
-
-  withCredentials: true,
+  
   // In case of browsers:
   // Allow cookies to be passed along with the request for a different api (sub-)domain (CORS)
   // Source: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
+  withCredentials: true,
 });
 
 const axiosRequestHandler = new AxiosRequestHandler({
@@ -183,13 +189,13 @@ const axiosRequestHandler = new AxiosRequestHandler({
 const zodRequestHandler = new ZodValidationRequestHandler(axiosRequestHandler);
 
 export const requestHandler = new AuthRequestHandler(
-  [myJwtAuthenticationProvider],
-  // The order does not matter here, in case of multiple authentication providers.
+  // In case of multiple authentication providers, the order does not matter.
   // Multiple authentication providers are prioritized by the sorting of the names which
   // are listed in the "request.endpointSchema.supportedSecuritySchemas" array.
   // This array has the same order as the security schemes in the OAS3 specs of that operation,
   // or endpoint respectively. The first found token received from the "findToken" method of a
   // supported authentication provider is then added to the request headers.
+  [myJwtAuthProvider],
 
   zodRequestHandler
 );
@@ -206,7 +212,7 @@ to the expected one. This happens by checking the status and the content type of
 ```typescript
 // login1.ts
 
-import { requestHandler } from './requestHandler';
+import { requestHandler, myJwtAuthProvider} from './requestHandler';
 import { getRevealedResponseOrReject } from './generated-api/core';
 import { authenticate } from './generated-api/auth';
 
@@ -222,7 +228,7 @@ async function loginOrThrowError() {
     },
     optionalConfig
   ));
-  myJwtAuthAccessToken = res.body.accessToken;
+  myJwtAuthProvider.setToken(res.body.accessToken);
 }
 ```
 This can be useful when using [@tanstack/query](https://tanstack.com/query/latest).
@@ -233,7 +239,7 @@ another response than expected. This can be achieved by the `findRevealedRespons
 ```typescript
 // login2.ts
 
-import { requestHandler } from './requestHandler';
+import { requestHandler, myJwtAuthProvider } from './requestHandler';
 import { findRevealedResponse } from './generated-api/core';
 import { authenticate } from './generated-api/auth';
 
@@ -253,7 +259,7 @@ async function loginOrDoNothing() {
     console.log('response is ignored...');
     return;
   }
-  myJwtAuthAccessToken = res.body.accessToken;
+  myJwtAuthProvider.setToken(res.body.accessToken);
 }
 ```
 
@@ -262,7 +268,7 @@ of what is going on under the hood in those extractor functions from above.
 ```typescript
 // login3.ts
 
-import { requestHandler } from './requestHandler';
+import { requestHandler, myJwtAuthProvider } from './requestHandler';
 import { authenticate } from './generated-api/auth';
 
 async function loginWithExplicitResponseBodyRevealation() {
@@ -291,7 +297,7 @@ async function loginWithExplicitResponseBodyRevealation() {
   }
 
   const body = await requestResult.response.revealBody();
-  myJwtAuthAccessToken = body.accessToken;
+  myJwtAuthProvider.setToken(body.accessToken);
 }
 ```
 There exist another two extractor functions `getResponseOrReject` and `findResponse`.
