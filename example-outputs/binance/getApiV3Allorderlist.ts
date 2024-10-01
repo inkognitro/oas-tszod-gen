@@ -1,7 +1,7 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -46,7 +46,7 @@ export type GetApiV3AllorderlistPayload = {
 };
 
 export type GetApiV3AllorderlistResponse =
-  | Response<
+  | ResponseUnion<
       200,
       ResponseBodyData<
         'application/json',
@@ -67,8 +67,8 @@ export type GetApiV3AllorderlistResponse =
         }[]
       >
     >
-  | Response<400, ResponseBodyData<'application/json', Error>>
-  | Response<401, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>
+  | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3AllorderlistRequestResult = RequestResult<
   Request,

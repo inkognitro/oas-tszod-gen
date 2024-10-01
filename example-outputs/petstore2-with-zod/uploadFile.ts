@@ -5,7 +5,7 @@ import {
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -55,7 +55,7 @@ export type UploadFilePayload = UploadFileRequestBody & {
   };
 };
 
-export type UploadFileResponse = Response<
+export type UploadFileResponse = ResponseUnion<
   200,
   ResponseBodyData<'application/json', ApiResponse>
 >;

@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -27,7 +27,7 @@ export const getApiV3TimeEndpointSchema = {
   },
 };
 
-export type GetApiV3TimeResponse = Response<
+export type GetApiV3TimeResponse = ResponseUnion<
   200,
   ResponseBodyData<
     'application/json',

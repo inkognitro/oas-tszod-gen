@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -27,7 +27,7 @@ export const postApiV3UserdatastreamEndpointSchema = {
   },
 };
 
-export type PostApiV3UserdatastreamResponse = Response<
+export type PostApiV3UserdatastreamResponse = ResponseUnion<
   200,
   ResponseBodyData<
     'application/json',

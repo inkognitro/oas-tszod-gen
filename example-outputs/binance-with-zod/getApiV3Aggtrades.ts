@@ -7,7 +7,7 @@ import {
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -56,8 +56,8 @@ export type GetApiV3AggtradesPayload = {
 };
 
 export type GetApiV3AggtradesResponse =
-  | Response<200, ResponseBodyData<'application/json', AggTrade[]>>
-  | Response<400, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<200, ResponseBodyData<'application/json', AggTrade[]>>
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3AggtradesRequestResult = RequestResult<
   Request,

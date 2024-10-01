@@ -1,7 +1,7 @@
 import {Trade, Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -36,8 +36,8 @@ export type GetApiV3TradesPayload = {
 };
 
 export type GetApiV3TradesResponse =
-  | Response<200, ResponseBodyData<'application/json', Trade[]>>
-  | Response<400, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<200, ResponseBodyData<'application/json', Trade[]>>
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3TradesRequestResult = RequestResult<
   Request,

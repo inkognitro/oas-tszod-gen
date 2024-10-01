@@ -1,6 +1,6 @@
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -22,7 +22,7 @@ export const getApiV3PingEndpointSchema = {
   },
 };
 
-export type GetApiV3PingResponse = Response<
+export type GetApiV3PingResponse = ResponseUnion<
   200,
   ResponseBodyData<'application/json', {}>
 >;

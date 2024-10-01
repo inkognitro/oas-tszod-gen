@@ -2,7 +2,7 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -54,9 +54,9 @@ export type PostSapiV1AccountDisablefastwithdrawswitchPayload = {
 };
 
 export type PostSapiV1AccountDisablefastwithdrawswitchResponse =
-  | Response<200, ResponseBodyData<'application/json', {}>>
-  | Response<400, ResponseBodyData<'application/json', Error>>
-  | Response<401, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<200, ResponseBodyData<'application/json', {}>>
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>
+  | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1AccountDisablefastwithdrawswitchRequestResult =
   RequestResult<Request, PostSapiV1AccountDisablefastwithdrawswitchResponse>;

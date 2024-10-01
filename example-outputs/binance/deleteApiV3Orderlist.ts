@@ -1,7 +1,7 @@
 import {OcoOrder, Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -46,9 +46,9 @@ export type DeleteApiV3OrderlistPayload = {
 };
 
 export type DeleteApiV3OrderlistResponse =
-  | Response<200, ResponseBodyData<'application/json', OcoOrder>>
-  | Response<400, ResponseBodyData<'application/json', Error>>
-  | Response<401, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<200, ResponseBodyData<'application/json', OcoOrder>>
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>
+  | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteApiV3OrderlistRequestResult = RequestResult<
   Request,

@@ -1,7 +1,7 @@
 import {MarginOrder, Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -47,9 +47,9 @@ export type DeleteSapiV1MarginOrderPayload = {
 };
 
 export type DeleteSapiV1MarginOrderResponse =
-  | Response<200, ResponseBodyData<'application/json', MarginOrder>>
-  | Response<400, ResponseBodyData<'application/json', Error>>
-  | Response<401, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<200, ResponseBodyData<'application/json', MarginOrder>>
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>
+  | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteSapiV1MarginOrderRequestResult = RequestResult<
   Request,

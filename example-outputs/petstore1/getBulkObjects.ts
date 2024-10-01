@@ -18,7 +18,6 @@ import {
   $500InternalServerErrorResponse,
 } from '@example-outputs/petstore1';
 import {
-  Response,
   RequestResult,
   Request,
   SimpleRequestHandler,

@@ -1,7 +1,7 @@
 import {Pet} from '@example-outputs/petstore2';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -56,14 +56,14 @@ export type UpdatePetRequestBody =
 export type UpdatePetPayload = UpdatePetRequestBody;
 
 export type UpdatePetResponse =
-  | Response<
+  | ResponseUnion<
       200,
       | ResponseBodyData<'application/xml', Pet>
       | ResponseBodyData<'application/json', Pet>
     >
-  | Response<400>
-  | Response<404>
-  | Response<405>;
+  | ResponseUnion<400>
+  | ResponseUnion<404>
+  | ResponseUnion<405>;
 
 export type UpdatePetRequestResult = RequestResult<Request, UpdatePetResponse>;
 

@@ -7,7 +7,7 @@ import {
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -71,9 +71,9 @@ export type DeleteApiV3OrderPayload = {
 };
 
 export type DeleteApiV3OrderResponse =
-  | Response<200, ResponseBodyData<'application/json', Order>>
-  | Response<400, ResponseBodyData<'application/json', Error>>
-  | Response<401, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<200, ResponseBodyData<'application/json', Order>>
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>
+  | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteApiV3OrderRequestResult = RequestResult<
   Request,

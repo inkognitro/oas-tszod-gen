@@ -1,6 +1,6 @@
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -32,7 +32,7 @@ export type UpdatePetWithFormPayload = {
   };
 };
 
-export type UpdatePetWithFormResponse = Response<405>;
+export type UpdatePetWithFormResponse = ResponseUnion<405>;
 
 export type UpdatePetWithFormRequestResult = RequestResult<
   Request,

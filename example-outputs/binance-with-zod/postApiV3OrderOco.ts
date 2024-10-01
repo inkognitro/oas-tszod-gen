@@ -2,7 +2,7 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -133,7 +133,7 @@ export type PostApiV3OrderOcoPayload = {
 };
 
 export type PostApiV3OrderOcoResponse =
-  | Response<
+  | ResponseUnion<
       200,
       ResponseBodyData<
         'application/json',
@@ -171,8 +171,8 @@ export type PostApiV3OrderOcoResponse =
         }
       >
     >
-  | Response<400, ResponseBodyData<'application/json', Error>>
-  | Response<401, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>
+  | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostApiV3OrderOcoRequestResult = RequestResult<
   Request,

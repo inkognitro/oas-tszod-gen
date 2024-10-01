@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -33,7 +33,7 @@ export type DeleteOrderPayload = {
   };
 };
 
-export type DeleteOrderResponse = Response<400> | Response<404>;
+export type DeleteOrderResponse = ResponseUnion<400> | ResponseUnion<404>;
 
 export type DeleteOrderRequestResult = RequestResult<
   Request,

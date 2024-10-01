@@ -1,6 +1,6 @@
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -34,7 +34,7 @@ export type LoginUserPayload = {
 };
 
 export type LoginUserResponse =
-  | Response<
+  | ResponseUnion<
       200,
       | ResponseBodyData<'application/xml', string>
       | ResponseBodyData<'application/json', string>,
@@ -43,7 +43,7 @@ export type LoginUserResponse =
         'X-Expires-After': string; // date-time
       }
     >
-  | Response<400>;
+  | ResponseUnion<400>;
 
 export type LoginUserRequestResult = RequestResult<Request, LoginUserResponse>;
 

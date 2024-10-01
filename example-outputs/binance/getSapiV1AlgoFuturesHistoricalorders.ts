@@ -1,7 +1,7 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -48,7 +48,7 @@ export type GetSapiV1AlgoFuturesHistoricalordersPayload = {
 };
 
 export type GetSapiV1AlgoFuturesHistoricalordersResponse =
-  | Response<
+  | ResponseUnion<
       200,
       ResponseBodyData<
         'application/json',
@@ -73,8 +73,8 @@ export type GetSapiV1AlgoFuturesHistoricalordersResponse =
         }
       >
     >
-  | Response<400, ResponseBodyData<'application/json', Error>>
-  | Response<401, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>
+  | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AlgoFuturesHistoricalordersRequestResult = RequestResult<
   Request,

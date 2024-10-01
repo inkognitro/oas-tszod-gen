@@ -1,6 +1,6 @@
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -31,7 +31,7 @@ export type DeletePetPayload = {
   };
 };
 
-export type DeletePetResponse = Response<400>;
+export type DeletePetResponse = ResponseUnion<400>;
 
 export type DeletePetRequestResult = RequestResult<Request, DeletePetResponse>;
 

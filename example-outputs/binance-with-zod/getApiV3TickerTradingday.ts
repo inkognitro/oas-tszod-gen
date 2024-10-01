@@ -9,7 +9,7 @@ import {
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -56,11 +56,11 @@ export type GetApiV3TickerTradingdayPayload = {
 };
 
 export type GetApiV3TickerTradingdayResponse =
-  | Response<
+  | ResponseUnion<
       200,
       ResponseBodyData<'application/json', DayTicker | DayTickerList>
     >
-  | Response<400, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3TickerTradingdayRequestResult = RequestResult<
   Request,

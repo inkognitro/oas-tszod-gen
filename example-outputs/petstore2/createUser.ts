@@ -1,7 +1,7 @@
 import {User} from '@example-outputs/petstore2';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -44,7 +44,7 @@ export type CreateUserRequestBody =
 
 export type CreateUserPayload = CreateUserRequestBody;
 
-export type CreateUserResponse = Response<
+export type CreateUserResponse = ResponseUnion<
   any,
   | ResponseBodyData<'application/json', User>
   | ResponseBodyData<'application/xml', User>

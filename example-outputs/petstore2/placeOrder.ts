@@ -1,7 +1,7 @@
 import {Order} from '@example-outputs/petstore2';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -47,8 +47,8 @@ export type PlaceOrderRequestBody =
 export type PlaceOrderPayload = PlaceOrderRequestBody;
 
 export type PlaceOrderResponse =
-  | Response<200, ResponseBodyData<'application/json', Order>>
-  | Response<405>;
+  | ResponseUnion<200, ResponseBodyData<'application/json', Order>>
+  | ResponseUnion<405>;
 
 export type PlaceOrderRequestResult = RequestResult<
   Request,

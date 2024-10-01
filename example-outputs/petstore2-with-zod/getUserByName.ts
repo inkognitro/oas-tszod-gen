@@ -2,7 +2,7 @@ import {userZodSchema, User} from '@example-outputs/petstore2-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -45,13 +45,13 @@ export type GetUserByNamePayload = {
 };
 
 export type GetUserByNameResponse =
-  | Response<
+  | ResponseUnion<
       200,
       | ResponseBodyData<'application/xml', User>
       | ResponseBodyData<'application/json', User>
     >
-  | Response<400>
-  | Response<404>;
+  | ResponseUnion<400>
+  | ResponseUnion<404>;
 
 export type GetUserByNameRequestResult = RequestResult<
   Request,

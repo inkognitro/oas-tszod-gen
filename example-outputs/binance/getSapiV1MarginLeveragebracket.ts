@@ -1,7 +1,7 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -29,7 +29,7 @@ export const getSapiV1MarginLeveragebracketEndpointSchema = {
 };
 
 export type GetSapiV1MarginLeveragebracketResponse =
-  | Response<
+  | ResponseUnion<
       200,
       ResponseBodyData<
         'application/json',
@@ -46,7 +46,7 @@ export type GetSapiV1MarginLeveragebracketResponse =
         }[]
       >
     >
-  | Response<400, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginLeveragebracketRequestResult = RequestResult<
   Request,

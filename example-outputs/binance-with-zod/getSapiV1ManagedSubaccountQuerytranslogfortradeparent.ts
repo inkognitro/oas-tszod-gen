@@ -2,7 +2,7 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -85,7 +85,7 @@ export type GetSapiV1ManagedSubaccountQuerytranslogfortradeparentPayload = {
 };
 
 export type GetSapiV1ManagedSubaccountQuerytranslogfortradeparentResponse =
-  | Response<
+  | ResponseUnion<
       200,
       ResponseBodyData<
         'application/json',
@@ -106,8 +106,8 @@ export type GetSapiV1ManagedSubaccountQuerytranslogfortradeparentResponse =
         }
       >
     >
-  | Response<400, ResponseBodyData<'application/json', Error>>
-  | Response<401, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>
+  | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ManagedSubaccountQuerytranslogfortradeparentRequestResult =
   RequestResult<

@@ -1,6 +1,6 @@
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -22,7 +22,7 @@ export const getSapiV1SystemStatusEndpointSchema = {
   },
 };
 
-export type GetSapiV1SystemStatusResponse = Response<
+export type GetSapiV1SystemStatusResponse = ResponseUnion<
   200,
   ResponseBodyData<
     'application/json',

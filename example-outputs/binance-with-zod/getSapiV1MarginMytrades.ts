@@ -7,7 +7,7 @@ import {
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -71,9 +71,9 @@ export type GetSapiV1MarginMytradesPayload = {
 };
 
 export type GetSapiV1MarginMytradesResponse =
-  | Response<200, ResponseBodyData<'application/json', MarginTrade[]>>
-  | Response<400, ResponseBodyData<'application/json', Error>>
-  | Response<401, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<200, ResponseBodyData<'application/json', MarginTrade[]>>
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>
+  | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginMytradesRequestResult = RequestResult<
   Request,

@@ -1,7 +1,7 @@
 import {Ticker, TickerList, Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -37,8 +37,11 @@ export type GetApiV3Ticker24hrPayload = {
 };
 
 export type GetApiV3Ticker24hrResponse =
-  | Response<200, ResponseBodyData<'application/json', Ticker | TickerList>>
-  | Response<400, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<
+      200,
+      ResponseBodyData<'application/json', Ticker | TickerList>
+    >
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3Ticker24hrRequestResult = RequestResult<
   Request,

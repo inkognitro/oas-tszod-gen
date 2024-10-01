@@ -19,7 +19,6 @@ import {
   $500InternalServerErrorResponse,
 } from '@example-outputs/petstore1-with-zod';
 import {
-  Response,
   RequestResult,
   Request,
   SimpleRequestHandler,

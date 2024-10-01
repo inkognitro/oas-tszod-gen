@@ -1,7 +1,7 @@
 import {petZodSchema, Pet} from '@example-outputs/petstore2-with-zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -60,12 +60,12 @@ export type AddPetRequestBody =
 export type AddPetPayload = AddPetRequestBody;
 
 export type AddPetResponse =
-  | Response<
+  | ResponseUnion<
       200,
       | ResponseBodyData<'application/xml', Pet>
       | ResponseBodyData<'application/json', Pet>
     >
-  | Response<405>;
+  | ResponseUnion<405>;
 
 export type AddPetRequestResult = RequestResult<Request, AddPetResponse>;
 

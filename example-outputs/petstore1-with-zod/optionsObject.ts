@@ -12,7 +12,6 @@ import {
 } from '@example-outputs/petstore1-with-zod';
 import {z} from 'zod';
 import {
-  Response,
   RequestResult,
   Request,
   SimpleRequestHandler,

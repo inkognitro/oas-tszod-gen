@@ -2,7 +2,7 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -59,7 +59,7 @@ export type PostSapiV1SubAccountEoptionsEnablePayload = {
 };
 
 export type PostSapiV1SubAccountEoptionsEnableResponse =
-  | Response<
+  | ResponseUnion<
       200,
       ResponseBodyData<
         'application/json',
@@ -69,8 +69,8 @@ export type PostSapiV1SubAccountEoptionsEnableResponse =
         }
       >
     >
-  | Response<400, ResponseBodyData<'application/json', Error>>
-  | Response<401, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>
+  | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SubAccountEoptionsEnableRequestResult = RequestResult<
   Request,

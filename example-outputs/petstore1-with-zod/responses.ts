@@ -20,11 +20,11 @@ import {
 } from '@example-outputs/petstore1-with-zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
 } from '@example-outputs/petstore1-with-zod/core';
 import {z} from 'zod';
 
-export type $200ServiceInfoResponse<S extends number = any> = Response<
+export type $200ServiceInfoResponse<S extends number = any> = ResponseUnion<
   S,
   ResponseBodyData<'application/json', Service & DrsService>
 >;
@@ -37,10 +37,8 @@ export const $200ServiceInfoResponseSchema = {
   },
 };
 
-export type $500InternalServerErrorResponse<S extends number = any> = Response<
-  S,
-  ResponseBodyData<'application/json', Error>
->;
+export type $500InternalServerErrorResponse<S extends number = any> =
+  ResponseUnion<S, ResponseBodyData<'application/json', Error>>;
 
 export const $500InternalServerErrorResponseSchema = {
   bodyByContentType: {
@@ -50,10 +48,8 @@ export const $500InternalServerErrorResponseSchema = {
   },
 };
 
-export type $200OkAuthorizationsResponse<S extends number = any> = Response<
-  S,
-  ResponseBodyData<'application/json', Authorizations>
->;
+export type $200OkAuthorizationsResponse<S extends number = any> =
+  ResponseUnion<S, ResponseBodyData<'application/json', Authorizations>>;
 
 export const $200OkAuthorizationsResponseSchema = {
   bodyByContentType: {
@@ -64,13 +60,13 @@ export const $200OkAuthorizationsResponseSchema = {
 };
 
 export type AuthorizationsNotSupportedResponse<S extends number = any> =
-  Response<S>;
+  ResponseUnion<S>;
 
 export const authorizationsNotSupportedResponseSchema = {
   bodyByContentType: {},
 };
 
-export type $400BadRequestResponse<S extends number = any> = Response<
+export type $400BadRequestResponse<S extends number = any> = ResponseUnion<
   S,
   ResponseBodyData<'application/json', Error>
 >;
@@ -83,10 +79,8 @@ export const $400BadRequestResponseSchema = {
   },
 };
 
-export type $404NotFoundDrsObjectResponse<S extends number = any> = Response<
-  S,
-  ResponseBodyData<'application/json', Error>
->;
+export type $404NotFoundDrsObjectResponse<S extends number = any> =
+  ResponseUnion<S, ResponseBodyData<'application/json', Error>>;
 
 export const $404NotFoundDrsObjectResponseSchema = {
   bodyByContentType: {
@@ -96,7 +90,7 @@ export const $404NotFoundDrsObjectResponseSchema = {
   },
 };
 
-export type $200OkDrsObjectResponse<S extends number = any> = Response<
+export type $200OkDrsObjectResponse<S extends number = any> = ResponseUnion<
   S,
   ResponseBodyData<'application/json', DrsObject>
 >;
@@ -109,7 +103,7 @@ export const $200OkDrsObjectResponseSchema = {
   },
 };
 
-export type $202AcceptedResponse<S extends number = any> = Response<
+export type $202AcceptedResponse<S extends number = any> = ResponseUnion<
   S,
   any,
   {
@@ -124,7 +118,7 @@ export const $202AcceptedResponseSchema = {
   bodyByContentType: {},
 };
 
-export type $401UnauthorizedResponse<S extends number = any> = Response<
+export type $401UnauthorizedResponse<S extends number = any> = ResponseUnion<
   S,
   ResponseBodyData<'application/json', Error>
 >;
@@ -137,7 +131,7 @@ export const $401UnauthorizedResponseSchema = {
   },
 };
 
-export type $403ForbiddenResponse<S extends number = any> = Response<
+export type $403ForbiddenResponse<S extends number = any> = ResponseUnion<
   S,
   ResponseBodyData<'application/json', Error>
 >;
@@ -150,7 +144,7 @@ export const $403ForbiddenResponseSchema = {
   },
 };
 
-export type $404NotFoundAccessResponse<S extends number = any> = Response<
+export type $404NotFoundAccessResponse<S extends number = any> = ResponseUnion<
   S,
   ResponseBodyData<'application/json', Error>
 >;
@@ -163,17 +157,18 @@ export const $404NotFoundAccessResponseSchema = {
   },
 };
 
-export type $200OkBulkAuthorizationsResponse<S extends number = any> = Response<
-  S,
-  ResponseBodyData<
-    'application/json',
-    {
-      summary?: Summary;
-      unresolved_drs_objects?: Unresolved;
-      resolved_drs_object?: Authorizations[];
-    }
-  >
->;
+export type $200OkBulkAuthorizationsResponse<S extends number = any> =
+  ResponseUnion<
+    S,
+    ResponseBodyData<
+      'application/json',
+      {
+        summary?: Summary;
+        unresolved_drs_objects?: Unresolved;
+        resolved_drs_object?: Authorizations[];
+      }
+    >
+  >;
 
 export const $200OkBulkAuthorizationsResponseSchema = {
   bodyByContentType: {
@@ -187,7 +182,7 @@ export const $200OkBulkAuthorizationsResponseSchema = {
   },
 };
 
-export type $413RequestTooLargeResponse<S extends number = any> = Response<
+export type $413RequestTooLargeResponse<S extends number = any> = ResponseUnion<
   S,
   ResponseBodyData<'application/json', Error>
 >;
@@ -200,7 +195,7 @@ export const $413RequestTooLargeResponseSchema = {
   },
 };
 
-export type $200OkDrsObjectsResponse<S extends number = any> = Response<
+export type $200OkDrsObjectsResponse<S extends number = any> = ResponseUnion<
   S,
   ResponseBodyData<
     'application/json',
@@ -224,7 +219,7 @@ export const $200OkDrsObjectsResponseSchema = {
   },
 };
 
-export type $200OkAccessResponse<S extends number = any> = Response<
+export type $200OkAccessResponse<S extends number = any> = ResponseUnion<
   S,
   ResponseBodyData<'application/json', AccessURL>
 >;
@@ -237,7 +232,7 @@ export const $200OkAccessResponseSchema = {
   },
 };
 
-export type $200OkAccessesResponse<S extends number = any> = Response<
+export type $200OkAccessesResponse<S extends number = any> = ResponseUnion<
   S,
   ResponseBodyData<
     'application/json',

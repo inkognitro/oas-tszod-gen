@@ -1,7 +1,7 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -35,8 +35,8 @@ export type DeleteApiV3UserdatastreamPayload = {
 };
 
 export type DeleteApiV3UserdatastreamResponse =
-  | Response<200, ResponseBodyData<'application/json', {}>>
-  | Response<400, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<200, ResponseBodyData<'application/json', {}>>
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteApiV3UserdatastreamRequestResult = RequestResult<
   Request,

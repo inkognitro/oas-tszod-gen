@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -25,7 +25,7 @@ export const getInventoryEndpointSchema = {
   },
 };
 
-export type GetInventoryResponse = Response<
+export type GetInventoryResponse = ResponseUnion<
   200,
   ResponseBodyData<
     'application/json',

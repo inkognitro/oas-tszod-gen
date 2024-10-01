@@ -2,7 +2,7 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -45,7 +45,7 @@ export const getSapiV1MarginCrossmargincollateralratioEndpointSchema = {
 };
 
 export type GetSapiV1MarginCrossmargincollateralratioResponse =
-  | Response<
+  | ResponseUnion<
       200,
       ResponseBodyData<
         'application/json',
@@ -59,7 +59,7 @@ export type GetSapiV1MarginCrossmargincollateralratioResponse =
         }[]
       >
     >
-  | Response<400, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginCrossmargincollateralratioRequestResult =
   RequestResult<Request, GetSapiV1MarginCrossmargincollateralratioResponse>;

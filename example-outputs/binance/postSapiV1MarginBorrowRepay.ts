@@ -1,7 +1,7 @@
 import {Error} from '@example-outputs/binance';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -42,7 +42,7 @@ export type PostSapiV1MarginBorrowRepayPayload = {
 };
 
 export type PostSapiV1MarginBorrowRepayResponse =
-  | Response<
+  | ResponseUnion<
       200,
       ResponseBodyData<
         'application/json',
@@ -51,7 +51,7 @@ export type PostSapiV1MarginBorrowRepayResponse =
         }
       >
     >
-  | Response<400, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1MarginBorrowRepayRequestResult = RequestResult<
   Request,

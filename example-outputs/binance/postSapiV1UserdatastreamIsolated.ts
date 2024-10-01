@@ -1,6 +1,6 @@
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -22,7 +22,7 @@ export const postSapiV1UserdatastreamIsolatedEndpointSchema = {
   },
 };
 
-export type PostSapiV1UserdatastreamIsolatedResponse = Response<
+export type PostSapiV1UserdatastreamIsolatedResponse = ResponseUnion<
   200,
   ResponseBodyData<
     'application/json',

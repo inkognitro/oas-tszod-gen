@@ -9,7 +9,7 @@ import {
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -52,11 +52,11 @@ export type GetApiV3TickerBooktickerPayload = {
 };
 
 export type GetApiV3TickerBooktickerResponse =
-  | Response<
+  | ResponseUnion<
       200,
       ResponseBodyData<'application/json', BookTicker | BookTickerList>
     >
-  | Response<400, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3TickerBooktickerRequestResult = RequestResult<
   Request,

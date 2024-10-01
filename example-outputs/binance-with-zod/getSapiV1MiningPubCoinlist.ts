@@ -2,7 +2,7 @@ import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   ResponseBodyData,
-  Response,
+  ResponseUnion,
   RequestResult,
   Request,
   SimpleRequestHandler,
@@ -46,7 +46,7 @@ export const getSapiV1MiningPubCoinlistEndpointSchema = {
 };
 
 export type GetSapiV1MiningPubCoinlistResponse =
-  | Response<
+  | ResponseUnion<
       200,
       ResponseBodyData<
         'application/json',
@@ -63,7 +63,7 @@ export type GetSapiV1MiningPubCoinlistResponse =
         }
       >
     >
-  | Response<400, ResponseBodyData<'application/json', Error>>;
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MiningPubCoinlistRequestResult = RequestResult<
   Request,
