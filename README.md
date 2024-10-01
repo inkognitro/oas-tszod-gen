@@ -157,14 +157,14 @@ class MyJwtAuthProvider {
   // This is the name of one of your security definition in your OAS3 specification
   public readonly securitySchemeName: 'myJwtAuth';
   
-  private readonly token: null | string;
+  private readonly accessToken: null | string;
   
-  setToken() {
+  setToken(accessToken: string | null) {
     this.accessToken = accessToken;
   }
   
-  findToken() {
-    this.accessToken = accessToken;
+  findToken(): null | string {
+    return this.accessToken;
   }
 }
 
@@ -212,7 +212,7 @@ to the expected one. This happens by checking the status and the content type of
 ```typescript
 // login1.ts
 
-import { requestHandler, myJwtAuthProvider} from './requestHandler';
+import { requestHandler, myJwtAuthProvider } from './requestHandler';
 import { getRevealedResponseOrReject } from './generated-api/core';
 import { authenticate } from './generated-api/auth';
 
