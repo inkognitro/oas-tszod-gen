@@ -119,20 +119,23 @@ After generating endpoint caller functions from an OAS3 specification into your 
 it's time to understand how the generated code can be used. The following sections should bring some clarity.
 
 ## Usage of the generated code by example
-The following example shows how to create a `RequestHandler` instance by composing two different `RequestHandler` implementations.
-In order to process a login, a request is triggered by calling the generated `authenticate` endpoint caller function.
-The previously created requestHandler instance is now passed as a first argument to the `authenticate` function.
+The following example code parts do illustrate a login process.
+In order to process this, a request is triggered by calling the generated `authenticate` endpoint caller function.
 After receiving the `RequestResult` followed by the check of the according response status 200, TypeScript recognizes
-the type of the received response body. Finally, the received access token is stored in the `myJwtAuthAccessToken` variable.
+the according types of the received response.
+
+The following code shows how to create a `RequestHandler` instance, which ideally is provided as a service in your app.
+Different `RequestHandler` implementations are composed together.
+These implementations came according due to the `templates` configuration of the code generator.
 
 ```typescript
+// requestHandler.ts
+
 import {
   AuthRequestHandler,
   AuthRequestHandlerExecutionConfig,
   AxiosRequestHandler,
   AxiosRequestHandlerExecutionConfig,
-  findRevealedResponse,
-  getRevealedResponseOrReject,
   HttpBearerAuthenticationProvider,
   ZodValidationRequestHandler,
   ZodValidationRequestHandlerExecutionConfig,
@@ -177,9 +180,9 @@ const axiosRequestHandler = new AxiosRequestHandler({
   },
 });
 
-const zodValidationWithAxiosRequestHandler = new ZodValidationRequestHandler(axiosRequestHandler);
+const zodRequestHandler = new ZodValidationRequestHandler(axiosRequestHandler);
 
-const requestHandler = new AuthRequestHandler(
+export const requestHandler = new AuthRequestHandler(
   [myJwtAuthenticationProvider],
   // The order does not matter here, in case of multiple authentication providers.
   // Multiple authentication providers are prioritized by the sorting of the names which
@@ -188,19 +191,23 @@ const requestHandler = new AuthRequestHandler(
   // or endpoint respectively. The first found token received from the "findToken" method of a
   // supported authentication provider is then added to the request headers.
 
-  zodValidationWithAxiosRequestHandler
+  zodRequestHandler
 );
 ```
 
-The first two login functions will do the revelation of the response body directly because this is automatically done by
-the response extractor functions `findRevealedResponse` and `getRevealedResponseOrReject`.
+Below are three different variants to show how an endpoint call looks like.
 
-The third login function shows how everything works under the hood.
-There are also the extraction functions `findResponse` and `getResponseOrReject`, which return a response whose body
-was not yet revealed. This is for convenience, so you don't have to write that much code.
+The first functions does directly **reveal** the response body.
+This is done by the provided extractor function `getRevealedResponseOrReject`.
+With this extractor function an error is going to be thrown when the result does not correspond
+to the expected status code and / or content type (according to OAS3 specs).
 
 ```typescript
-// same file as before
+// login1.ts
+
+import { requestHandler } from './requestHandler';
+import { getRevealedResponseOrReject } from './generated-api/core';
+import { authenticate } from './generated-api/auth';
 
 async function loginOrThrowError() {
   const res = await getRevealedResponseOrReject(200, 'application/json', authenticate(
@@ -216,6 +223,18 @@ async function loginOrThrowError() {
   ));
   myJwtAuthAccessToken = res.body.accessToken;
 }
+```
+This can be useful when using [@tanstack/query](https://tanstack.com/query/latest).
+
+With the second variant one can achieve the same as in the first example without throwing an error in case of
+another response than expected. This can be achieved by the `findRevealedResponse` like so:
+
+```typescript
+// login2.ts
+
+import { requestHandler } from './requestHandler';
+import { findRevealedResponse } from './generated-api/core';
+import { authenticate } from './generated-api/auth';
 
 async function loginOrDoNothing() {
   const res = await findRevealedResponse(200, 'application/json', authenticate(
@@ -230,19 +249,22 @@ async function loginOrDoNothing() {
     optionalConfig
   ));
   if (!res) {
+    console.log('response is ignored...');
     return;
   }
   myJwtAuthAccessToken = res.body.accessToken;
 }
+```
+
+Last but not least, the third variant. This variant shows how everything works under the hood and serves an overview of
+what is going on under the hood in those extractor functions from above.
+```typescript
+// login3.ts
+
+import { requestHandler } from './requestHandler';
+import { authenticate } from './generated-api/auth';
 
 async function loginWithExplicitResponseBodyRevealation() {
-  const optionalConfig: RequestHandlerExecutionConfig = {
-    refineAxiosRequestConfig: (currentConfig) => ({
-      ...currentConfig,
-      onUploadProgress: progressEvent => console.log('uploadProgressEvent', progressEvent)
-    })
-  };
-  
   const requestResult = await authenticate(
     requestHandler,
     {
@@ -252,11 +274,10 @@ async function loginWithExplicitResponseBodyRevealation() {
         password: '12345678'
       },
     },
-    optionalConfig
   );
 
   if (!requestResult.response || requestResult.response.status !== 200) {
-    console.log('Something went wrong!');
+    console.error('Something went wrong...');
     return;
   }
 
@@ -264,16 +285,17 @@ async function loginWithExplicitResponseBodyRevealation() {
   // with the status code 200 can have ambiguous content types according to the
   // given OAS3 specs.
   if (requestResult.response.contentType !== 'application/json') {
-    console.log('unsupported response body', requestResult.response.body);
+    console.error('unsupported response body:', requestResult.response.body);
     return;
   }
 
   const body = await requestResult.response.revealBody();
   myJwtAuthAccessToken = body.accessToken;
-  
-  console.log('Successfully logged in!');
 }
 ```
+There exist another two extractor functions `getResponseOrReject` and `findResponse`.
+These two functions do return a response with a body which was not yet **revealed**.
+Anyway, this is for convenience, so we don't have to write that much code.
 
 ## RequestHandler implementations
 The decision of having a `RequestHandler` interface with granular implementations was made with different environments
