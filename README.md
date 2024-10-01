@@ -195,12 +195,13 @@ export const requestHandler = new AuthRequestHandler(
 );
 ```
 
-Below are three different variants to show how an endpoint call looks like.
+Below are three different variants to show how an endpoint call can look like when
+using a generated endpoint caller functions.
 
-The first functions does directly **reveal** the response body.
+The first function does directly **reveal** the response body.
 This is done by the provided extractor function `getRevealedResponseOrReject`.
-With this extractor function an error is going to be thrown when the result does not correspond
-to the expected status code and / or content type (according to OAS3 specs).
+With this extractor function an error is thrown in case the actual received response does not correspond
+to the expected one. This happens by checking the status and the content type of the response.
 
 ```typescript
 // login1.ts
@@ -296,6 +297,11 @@ async function loginWithExplicitResponseBodyRevealation() {
 There exist another two extractor functions `getResponseOrReject` and `findResponse`.
 These two functions do return a response with a body which was not yet **revealed**.
 Anyway, this is for convenience, so we don't have to write that much code.
+
+> :bulb: The `response.contentType` property does not always match the exact value of the actual `request.headers['content-type']`
+> which was received from the server. The `response.contentType` property's reason to exist is to make sure that we
+> are able to distinguish between different response types which were defined by the OAS3 specs.
+> The OAS3 content type that has the most characters matching the actual `content-type` header is adopted during runtime.
 
 ## RequestHandler implementations
 The decision of having a `RequestHandler` interface with granular implementations was made with different environments
