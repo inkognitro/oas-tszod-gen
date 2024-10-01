@@ -7,6 +7,7 @@ const templateFiles = [
   'templates/ts/core/fetchApiRequestHandler.ts',
   'templates/ts/core/scopedRequestHandler.ts',
   'templates/ts/core/zodValidationRequestHandler.ts',
+  'templates/ts/core/responseExtractors.ts',
 ];
 
 function copyCoreTemplateFiles() {
