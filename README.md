@@ -78,7 +78,12 @@ generateOas3ToTs({
   withZod: true, // optional
   // By default or in case of `false`, only TypeScript types are generated without Zod schemas
   
-  templates: ['AxiosRequestHandler', 'AuthRequestHandler', 'ResponseExtractors'], // optional
+  templates: [
+    'AxiosRequestHandler',
+    'AuthRequestHandler',
+    'ResponseExtractors',
+    'ZodValidationRequestHandler'
+  ], // optional
   // This will add only the defined templates.
   // An empty array results in no added templates.
   // By default, all available templates will be added to your codebase.
