@@ -310,7 +310,8 @@ export class AxiosRequestHandler implements RequestHandler {
   private createPlainRequestHeaders(request: Request): Record<string, string> {
     const requestHeaders: Record<string, string> = {};
     if (request.headers) {
-      Object.keys(request.headers).forEach((value, key) => {
+      Object.keys(request.headers).forEach(key => {
+        const value = request.headers![key];
         if (typeof value === 'string' || typeof value === 'number') {
           requestHeaders[key] = `${value}`;
         }
