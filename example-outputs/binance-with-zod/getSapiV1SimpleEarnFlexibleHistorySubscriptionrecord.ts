@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1SimpleEarnFlexibleHistorySubscriptionrecordEndpointSchema =
@@ -68,20 +69,23 @@ export const getSapiV1SimpleEarnFlexibleHistorySubscriptionrecordEndpointSchema 
     },
   };
 
-export type GetSapiV1SimpleEarnFlexibleHistorySubscriptionrecordPayload = {
-  queryParams: {
-    productId?: string;
-    purchaseId?: string;
-    asset?: string;
-    startTime?: number; // int
-    endTime?: number; // int
-    current?: number; // int
-    size?: number; // int
-    recvWindow?: number; // int
-    timestamp: number; // int
-    signature: string;
-  };
-};
+export type GetSapiV1SimpleEarnFlexibleHistorySubscriptionrecordRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      productId?: string;
+      purchaseId?: string;
+      asset?: string;
+      startTime?: number; // int
+      endTime?: number; // int
+      current?: number; // int
+      size?: number; // int
+      recvWindow?: number; // int
+      timestamp: number; // int
+      signature: string;
+    }
+  >;
 
 export type GetSapiV1SimpleEarnFlexibleHistorySubscriptionrecordResponse =
   | ResponseUnion<
@@ -109,21 +113,23 @@ export type GetSapiV1SimpleEarnFlexibleHistorySubscriptionrecordResponse =
 
 export type GetSapiV1SimpleEarnFlexibleHistorySubscriptionrecordRequestResult =
   RequestResult<
-    Request,
+    GetSapiV1SimpleEarnFlexibleHistorySubscriptionrecordRequest,
     GetSapiV1SimpleEarnFlexibleHistorySubscriptionrecordResponse
   >;
 
 export function getSapiV1SimpleEarnFlexibleHistorySubscriptionrecord(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnFlexibleHistorySubscriptionrecordPayload,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnFlexibleHistorySubscriptionrecordRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexibleHistorySubscriptionrecordRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1SimpleEarnFlexibleHistorySubscriptionrecordEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SimpleEarnFlexibleHistorySubscriptionrecordEndpointSchema,
+      payload
+    ),
     config
   );
 }

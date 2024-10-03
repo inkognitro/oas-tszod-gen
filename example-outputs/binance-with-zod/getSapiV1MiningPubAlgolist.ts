@@ -1,10 +1,10 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -44,6 +44,8 @@ export const getSapiV1MiningPubAlgolistEndpointSchema = {
   },
 };
 
+export type GetSapiV1MiningPubAlgolistRequest = Request;
+
 export type GetSapiV1MiningPubAlgolistResponse =
   | ResponseUnion<
       200,
@@ -64,7 +66,7 @@ export type GetSapiV1MiningPubAlgolistResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MiningPubAlgolistRequestResult = RequestResult<
-  Request,
+  GetSapiV1MiningPubAlgolistRequest,
   GetSapiV1MiningPubAlgolistResponse
 >;
 
@@ -73,7 +75,7 @@ export function getSapiV1MiningPubAlgolist(
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MiningPubAlgolistRequestResult> {
   return requestHandler.execute(
-    createRequest({endpointSchema: getSapiV1MiningPubAlgolistEndpointSchema}),
+    createRequest(getSapiV1MiningPubAlgolistEndpointSchema),
     config
   );
 }

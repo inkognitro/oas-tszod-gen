@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1MiningHashTransferConfigCancelEndpointSchema = {
@@ -51,15 +52,17 @@ export const postSapiV1MiningHashTransferConfigCancelEndpointSchema = {
   },
 };
 
-export type PostSapiV1MiningHashTransferConfigCancelPayload = {
-  queryParams: {
+export type PostSapiV1MiningHashTransferConfigCancelRequest = RequestUnion<
+  any,
+  any,
+  {
     configId: string;
     userName: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1MiningHashTransferConfigCancelResponse =
   | ResponseUnion<
@@ -77,18 +80,24 @@ export type PostSapiV1MiningHashTransferConfigCancelResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1MiningHashTransferConfigCancelRequestResult =
-  RequestResult<Request, PostSapiV1MiningHashTransferConfigCancelResponse>;
+  RequestResult<
+    PostSapiV1MiningHashTransferConfigCancelRequest,
+    PostSapiV1MiningHashTransferConfigCancelResponse
+  >;
 
 export function postSapiV1MiningHashTransferConfigCancel(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1MiningHashTransferConfigCancelPayload,
+  payload: RequestPayload<
+    PostSapiV1MiningHashTransferConfigCancelRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MiningHashTransferConfigCancelRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1MiningHashTransferConfigCancelEndpointSchema,
-    }),
+    createRequest(
+      postSapiV1MiningHashTransferConfigCancelEndpointSchema,
+      payload
+    ),
     config
   );
 }

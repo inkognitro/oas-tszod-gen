@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postApiV3SorOrderEndpointSchema = {
@@ -96,8 +97,10 @@ export const postApiV3SorOrderEndpointSchema = {
   },
 };
 
-export type PostApiV3SorOrderPayload = {
-  queryParams: {
+export type PostApiV3SorOrderRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     side: 'SELL' | 'BUY';
     type:
@@ -124,8 +127,8 @@ export type PostApiV3SorOrderPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostApiV3SorOrderResponse =
   | ResponseUnion<
@@ -166,20 +169,17 @@ export type PostApiV3SorOrderResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostApiV3SorOrderRequestResult = RequestResult<
-  Request,
+  PostApiV3SorOrderRequest,
   PostApiV3SorOrderResponse
 >;
 
 export function postApiV3SorOrder(
   requestHandler: SimpleRequestHandler,
-  payload: PostApiV3SorOrderPayload,
+  payload: RequestPayload<PostApiV3SorOrderRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3SorOrderRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postApiV3SorOrderEndpointSchema,
-    }),
+    createRequest(postApiV3SorOrderEndpointSchema, payload),
     config
   );
 }

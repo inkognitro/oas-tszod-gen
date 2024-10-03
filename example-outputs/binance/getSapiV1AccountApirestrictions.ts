@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1AccountApirestrictionsEndpointSchema = {
   path: '/sapi/v1/account/apiRestrictions',
@@ -33,13 +34,15 @@ export const getSapiV1AccountApirestrictionsEndpointSchema = {
   },
 };
 
-export type GetSapiV1AccountApirestrictionsPayload = {
-  queryParams: {
+export type GetSapiV1AccountApirestrictionsRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AccountApirestrictionsResponse =
   | ResponseUnion<
@@ -66,20 +69,20 @@ export type GetSapiV1AccountApirestrictionsResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AccountApirestrictionsRequestResult = RequestResult<
-  Request,
+  GetSapiV1AccountApirestrictionsRequest,
   GetSapiV1AccountApirestrictionsResponse
 >;
 
 export function getSapiV1AccountApirestrictions(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AccountApirestrictionsPayload,
+  payload: RequestPayload<
+    GetSapiV1AccountApirestrictionsRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AccountApirestrictionsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AccountApirestrictionsEndpointSchema,
-    }),
+    createRequest(getSapiV1AccountApirestrictionsEndpointSchema, payload),
     config
   );
 }

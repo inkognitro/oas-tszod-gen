@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1AccountEnablefastwithdrawswitchEndpointSchema = {
   path: '/sapi/v1/account/enableFastWithdrawSwitch',
@@ -33,13 +34,15 @@ export const postSapiV1AccountEnablefastwithdrawswitchEndpointSchema = {
   },
 };
 
-export type PostSapiV1AccountEnablefastwithdrawswitchPayload = {
-  queryParams: {
+export type PostSapiV1AccountEnablefastwithdrawswitchRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1AccountEnablefastwithdrawswitchResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', {}>>
@@ -47,18 +50,24 @@ export type PostSapiV1AccountEnablefastwithdrawswitchResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1AccountEnablefastwithdrawswitchRequestResult =
-  RequestResult<Request, PostSapiV1AccountEnablefastwithdrawswitchResponse>;
+  RequestResult<
+    PostSapiV1AccountEnablefastwithdrawswitchRequest,
+    PostSapiV1AccountEnablefastwithdrawswitchResponse
+  >;
 
 export function postSapiV1AccountEnablefastwithdrawswitch(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1AccountEnablefastwithdrawswitchPayload,
+  payload: RequestPayload<
+    PostSapiV1AccountEnablefastwithdrawswitchRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AccountEnablefastwithdrawswitchRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1AccountEnablefastwithdrawswitchEndpointSchema,
-    }),
+    createRequest(
+      postSapiV1AccountEnablefastwithdrawswitchEndpointSchema,
+      payload
+    ),
     config
   );
 }

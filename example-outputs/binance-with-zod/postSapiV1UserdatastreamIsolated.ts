@@ -1,9 +1,9 @@
 import {z} from 'zod';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -27,6 +27,8 @@ export const postSapiV1UserdatastreamIsolatedEndpointSchema = {
   },
 };
 
+export type PostSapiV1UserdatastreamIsolatedRequest = Request;
+
 export type PostSapiV1UserdatastreamIsolatedResponse = ResponseUnion<
   200,
   ResponseBodyData<
@@ -38,7 +40,7 @@ export type PostSapiV1UserdatastreamIsolatedResponse = ResponseUnion<
 >;
 
 export type PostSapiV1UserdatastreamIsolatedRequestResult = RequestResult<
-  Request,
+  PostSapiV1UserdatastreamIsolatedRequest,
   PostSapiV1UserdatastreamIsolatedResponse
 >;
 
@@ -47,9 +49,7 @@ export function postSapiV1UserdatastreamIsolated(
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1UserdatastreamIsolatedRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      endpointSchema: postSapiV1UserdatastreamIsolatedEndpointSchema,
-    }),
+    createRequest(postSapiV1UserdatastreamIsolatedEndpointSchema),
     config
   );
 }

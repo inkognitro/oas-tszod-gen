@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SubAccountUniversaltransferEndpointSchema = {
   path: '/sapi/v1/sub-account/universalTransfer',
@@ -33,8 +34,10 @@ export const getSapiV1SubAccountUniversaltransferEndpointSchema = {
   },
 };
 
-export type GetSapiV1SubAccountUniversaltransferPayload = {
-  queryParams: {
+export type GetSapiV1SubAccountUniversaltransferRequest = RequestUnion<
+  any,
+  any,
+  {
     fromEmail?: string;
     toEmail?: string;
     clientTranId?: string;
@@ -45,8 +48,8 @@ export type GetSapiV1SubAccountUniversaltransferPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SubAccountUniversaltransferResponse =
   | ResponseUnion<
@@ -71,20 +74,20 @@ export type GetSapiV1SubAccountUniversaltransferResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountUniversaltransferRequestResult = RequestResult<
-  Request,
+  GetSapiV1SubAccountUniversaltransferRequest,
   GetSapiV1SubAccountUniversaltransferResponse
 >;
 
 export function getSapiV1SubAccountUniversaltransfer(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SubAccountUniversaltransferPayload,
+  payload: RequestPayload<
+    GetSapiV1SubAccountUniversaltransferRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountUniversaltransferRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SubAccountUniversaltransferEndpointSchema,
-    }),
+    createRequest(getSapiV1SubAccountUniversaltransferEndpointSchema, payload),
     config
   );
 }

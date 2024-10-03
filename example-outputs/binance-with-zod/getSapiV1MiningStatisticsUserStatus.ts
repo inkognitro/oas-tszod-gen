@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MiningStatisticsUserStatusEndpointSchema = {
@@ -69,15 +70,17 @@ export const getSapiV1MiningStatisticsUserStatusEndpointSchema = {
   },
 };
 
-export type GetSapiV1MiningStatisticsUserStatusPayload = {
-  queryParams: {
+export type GetSapiV1MiningStatisticsUserStatusRequest = RequestUnion<
+  any,
+  any,
+  {
     algo: string;
     userName: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MiningStatisticsUserStatusResponse =
   | ResponseUnion<
@@ -113,20 +116,20 @@ export type GetSapiV1MiningStatisticsUserStatusResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MiningStatisticsUserStatusRequestResult = RequestResult<
-  Request,
+  GetSapiV1MiningStatisticsUserStatusRequest,
   GetSapiV1MiningStatisticsUserStatusResponse
 >;
 
 export function getSapiV1MiningStatisticsUserStatus(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MiningStatisticsUserStatusPayload,
+  payload: RequestPayload<
+    GetSapiV1MiningStatisticsUserStatusRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MiningStatisticsUserStatusRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MiningStatisticsUserStatusEndpointSchema,
-    }),
+    createRequest(getSapiV1MiningStatisticsUserStatusEndpointSchema, payload),
     config
   );
 }

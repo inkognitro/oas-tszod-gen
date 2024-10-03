@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1SubAccountFuturesInternaltransferEndpointSchema = {
   path: '/sapi/v1/sub-account/futures/internalTransfer',
@@ -33,8 +34,10 @@ export const postSapiV1SubAccountFuturesInternaltransferEndpointSchema = {
   },
 };
 
-export type PostSapiV1SubAccountFuturesInternaltransferPayload = {
-  queryParams: {
+export type PostSapiV1SubAccountFuturesInternaltransferRequest = RequestUnion<
+  any,
+  any,
+  {
     fromEmail: string;
     toEmail: string;
     futuresType: number; // int
@@ -43,8 +46,8 @@ export type PostSapiV1SubAccountFuturesInternaltransferPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1SubAccountFuturesInternaltransferResponse =
   | ResponseUnion<
@@ -61,18 +64,24 @@ export type PostSapiV1SubAccountFuturesInternaltransferResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SubAccountFuturesInternaltransferRequestResult =
-  RequestResult<Request, PostSapiV1SubAccountFuturesInternaltransferResponse>;
+  RequestResult<
+    PostSapiV1SubAccountFuturesInternaltransferRequest,
+    PostSapiV1SubAccountFuturesInternaltransferResponse
+  >;
 
 export function postSapiV1SubAccountFuturesInternaltransfer(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1SubAccountFuturesInternaltransferPayload,
+  payload: RequestPayload<
+    PostSapiV1SubAccountFuturesInternaltransferRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountFuturesInternaltransferRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1SubAccountFuturesInternaltransferEndpointSchema,
-    }),
+    createRequest(
+      postSapiV1SubAccountFuturesInternaltransferEndpointSchema,
+      payload
+    ),
     config
   );
 }

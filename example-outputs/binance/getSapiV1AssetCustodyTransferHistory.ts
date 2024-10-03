@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1AssetCustodyTransferHistoryEndpointSchema = {
   path: '/sapi/v1/asset/custody/transfer-history',
@@ -33,8 +34,10 @@ export const getSapiV1AssetCustodyTransferHistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1AssetCustodyTransferHistoryPayload = {
-  queryParams: {
+export type GetSapiV1AssetCustodyTransferHistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     startTime: number; // int
     endTime: number; // int
@@ -45,8 +48,8 @@ export type GetSapiV1AssetCustodyTransferHistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AssetCustodyTransferHistoryResponse =
   | ResponseUnion<
@@ -69,20 +72,20 @@ export type GetSapiV1AssetCustodyTransferHistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AssetCustodyTransferHistoryRequestResult = RequestResult<
-  Request,
+  GetSapiV1AssetCustodyTransferHistoryRequest,
   GetSapiV1AssetCustodyTransferHistoryResponse
 >;
 
 export function getSapiV1AssetCustodyTransferHistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AssetCustodyTransferHistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1AssetCustodyTransferHistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetCustodyTransferHistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AssetCustodyTransferHistoryEndpointSchema,
-    }),
+    createRequest(getSapiV1AssetCustodyTransferHistoryEndpointSchema, payload),
     config
   );
 }

@@ -8,13 +8,14 @@ import {
 } from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getApiV3TickerBooktickerEndpointSchema = {
@@ -44,12 +45,14 @@ export const getApiV3TickerBooktickerEndpointSchema = {
   },
 };
 
-export type GetApiV3TickerBooktickerPayload = {
-  queryParams: {
+export type GetApiV3TickerBooktickerRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol?: string;
     symbols?: string;
-  };
-};
+  }
+>;
 
 export type GetApiV3TickerBooktickerResponse =
   | ResponseUnion<
@@ -59,20 +62,17 @@ export type GetApiV3TickerBooktickerResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3TickerBooktickerRequestResult = RequestResult<
-  Request,
+  GetApiV3TickerBooktickerRequest,
   GetApiV3TickerBooktickerResponse
 >;
 
 export function getApiV3TickerBookticker(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3TickerBooktickerPayload,
+  payload: RequestPayload<GetApiV3TickerBooktickerRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3TickerBooktickerRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getApiV3TickerBooktickerEndpointSchema,
-    }),
+    createRequest(getApiV3TickerBooktickerEndpointSchema, payload),
     config
   );
 }

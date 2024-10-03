@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1NftHistoryWithdrawEndpointSchema = {
@@ -62,8 +63,10 @@ export const getSapiV1NftHistoryWithdrawEndpointSchema = {
   },
 };
 
-export type GetSapiV1NftHistoryWithdrawPayload = {
-  queryParams: {
+export type GetSapiV1NftHistoryWithdrawRequest = RequestUnion<
+  any,
+  any,
+  {
     startTime?: number; // int
     endTime?: number; // int
     limit?: number; // int
@@ -71,8 +74,8 @@ export type GetSapiV1NftHistoryWithdrawPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1NftHistoryWithdrawResponse =
   | ResponseUnion<
@@ -97,20 +100,17 @@ export type GetSapiV1NftHistoryWithdrawResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1NftHistoryWithdrawRequestResult = RequestResult<
-  Request,
+  GetSapiV1NftHistoryWithdrawRequest,
   GetSapiV1NftHistoryWithdrawResponse
 >;
 
 export function getSapiV1NftHistoryWithdraw(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1NftHistoryWithdrawPayload,
+  payload: RequestPayload<GetSapiV1NftHistoryWithdrawRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1NftHistoryWithdrawRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1NftHistoryWithdrawEndpointSchema,
-    }),
+    createRequest(getSapiV1NftHistoryWithdrawEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,15 @@
-import {ApiResponse} from '@example-outputs/petstore2';
 import {
+  RequestUnion,
+  RequestBodyData,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2/core';
+import {ApiResponse} from '@example-outputs/petstore2';
 
 export const uploadFileEndpointSchema = {
   path: '/pet/{petId}/uploadImage',
@@ -27,19 +29,15 @@ export const uploadFileEndpointSchema = {
   },
 };
 
-export type UploadFileRequestBody = {
-  contentType: 'application/octet-stream';
-  body: Blob | any;
-};
-
-export type UploadFilePayload = UploadFileRequestBody & {
-  queryParams: {
-    additionalMetadata?: string;
-  };
-  pathParams: {
+export type UploadFileRequest = RequestUnion<
+  RequestBodyData<'application/octet-stream', Blob | any>,
+  {
     petId: number; // int
-  };
-};
+  },
+  {
+    additionalMetadata?: string;
+  }
+>;
 
 export type UploadFileResponse = ResponseUnion<
   200,
@@ -47,17 +45,20 @@ export type UploadFileResponse = ResponseUnion<
 >;
 
 export type UploadFileRequestResult = RequestResult<
-  Request,
+  UploadFileRequest,
   UploadFileResponse
 >;
 
 export function uploadFile(
   requestHandler: SimpleRequestHandler,
-  payload: UploadFilePayload,
+  payload: RequestPayload<
+    UploadFileRequest,
+    'pathParams' | 'queryParams' | 'contentType' | 'body'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<UploadFileRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: uploadFileEndpointSchema}),
+    createRequest(uploadFileEndpointSchema, payload),
     config
   );
 }

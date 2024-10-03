@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1AssetDribbletEndpointSchema = {
   path: '/sapi/v1/asset/dribblet',
@@ -33,16 +34,18 @@ export const getSapiV1AssetDribbletEndpointSchema = {
   },
 };
 
-export type GetSapiV1AssetDribbletPayload = {
-  queryParams: {
+export type GetSapiV1AssetDribbletRequest = RequestUnion<
+  any,
+  any,
+  {
     accountType?: 'SPOT' | 'MARGIN';
     startTime?: number; // int
     endTime?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AssetDribbletResponse =
   | ResponseUnion<
@@ -72,20 +75,17 @@ export type GetSapiV1AssetDribbletResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AssetDribbletRequestResult = RequestResult<
-  Request,
+  GetSapiV1AssetDribbletRequest,
   GetSapiV1AssetDribbletResponse
 >;
 
 export function getSapiV1AssetDribblet(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AssetDribbletPayload,
+  payload: RequestPayload<GetSapiV1AssetDribbletRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetDribbletRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AssetDribbletEndpointSchema,
-    }),
+    createRequest(getSapiV1AssetDribbletEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1LendingAutoInvestRedeemEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/redeem',
@@ -33,16 +34,18 @@ export const postSapiV1LendingAutoInvestRedeemEndpointSchema = {
   },
 };
 
-export type PostSapiV1LendingAutoInvestRedeemPayload = {
-  queryParams: {
+export type PostSapiV1LendingAutoInvestRedeemRequest = RequestUnion<
+  any,
+  any,
+  {
     indexId: number; // int
     requestId?: string;
     redemptionPercentage: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1LendingAutoInvestRedeemResponse =
   | ResponseUnion<
@@ -58,20 +61,20 @@ export type PostSapiV1LendingAutoInvestRedeemResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1LendingAutoInvestRedeemRequestResult = RequestResult<
-  Request,
+  PostSapiV1LendingAutoInvestRedeemRequest,
   PostSapiV1LendingAutoInvestRedeemResponse
 >;
 
 export function postSapiV1LendingAutoInvestRedeem(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1LendingAutoInvestRedeemPayload,
+  payload: RequestPayload<
+    PostSapiV1LendingAutoInvestRedeemRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingAutoInvestRedeemRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1LendingAutoInvestRedeemEndpointSchema,
-    }),
+    createRequest(postSapiV1LendingAutoInvestRedeemEndpointSchema, payload),
     config
   );
 }

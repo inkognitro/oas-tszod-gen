@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1EthStakingEthQuotaEndpointSchema = {
   path: '/sapi/v1/eth-staking/eth/quota',
@@ -33,13 +34,15 @@ export const getSapiV1EthStakingEthQuotaEndpointSchema = {
   },
 };
 
-export type GetSapiV1EthStakingEthQuotaPayload = {
-  queryParams: {
+export type GetSapiV1EthStakingEthQuotaRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1EthStakingEthQuotaResponse =
   | ResponseUnion<
@@ -56,20 +59,17 @@ export type GetSapiV1EthStakingEthQuotaResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1EthStakingEthQuotaRequestResult = RequestResult<
-  Request,
+  GetSapiV1EthStakingEthQuotaRequest,
   GetSapiV1EthStakingEthQuotaResponse
 >;
 
 export function getSapiV1EthStakingEthQuota(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1EthStakingEthQuotaPayload,
+  payload: RequestPayload<GetSapiV1EthStakingEthQuotaRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1EthStakingEthQuotaRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1EthStakingEthQuotaEndpointSchema,
-    }),
+    createRequest(getSapiV1EthStakingEthQuotaEndpointSchema, payload),
     config
   );
 }

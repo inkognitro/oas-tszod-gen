@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MarginAllassetsEndpointSchema = {
   path: '/sapi/v1/margin/allAssets',
@@ -28,11 +29,13 @@ export const getSapiV1MarginAllassetsEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginAllassetsPayload = {
-  queryParams: {
+export type GetSapiV1MarginAllassetsRequest = RequestUnion<
+  any,
+  any,
+  {
     asset: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginAllassetsResponse =
   | ResponseUnion<
@@ -52,20 +55,17 @@ export type GetSapiV1MarginAllassetsResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginAllassetsRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginAllassetsRequest,
   GetSapiV1MarginAllassetsResponse
 >;
 
 export function getSapiV1MarginAllassets(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginAllassetsPayload,
+  payload: RequestPayload<GetSapiV1MarginAllassetsRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginAllassetsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginAllassetsEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginAllassetsEndpointSchema, payload),
     config
   );
 }

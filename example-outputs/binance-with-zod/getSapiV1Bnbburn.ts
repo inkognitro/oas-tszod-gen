@@ -6,13 +6,14 @@ import {
 } from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1BnbburnEndpointSchema = {
@@ -50,13 +51,15 @@ export const getSapiV1BnbburnEndpointSchema = {
   },
 };
 
-export type GetSapiV1BnbburnPayload = {
-  queryParams: {
+export type GetSapiV1BnbburnRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1BnbburnResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', BnbBurnStatus>>
@@ -64,17 +67,17 @@ export type GetSapiV1BnbburnResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1BnbburnRequestResult = RequestResult<
-  Request,
+  GetSapiV1BnbburnRequest,
   GetSapiV1BnbburnResponse
 >;
 
 export function getSapiV1Bnbburn(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1BnbburnPayload,
+  payload: RequestPayload<GetSapiV1BnbburnRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1BnbburnRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getSapiV1BnbburnEndpointSchema}),
+    createRequest(getSapiV1BnbburnEndpointSchema, payload),
     config
   );
 }

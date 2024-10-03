@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV2LoanFlexibleLtvAdjustmentHistoryEndpointSchema = {
@@ -64,8 +65,10 @@ export const getSapiV2LoanFlexibleLtvAdjustmentHistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV2LoanFlexibleLtvAdjustmentHistoryPayload = {
-  queryParams: {
+export type GetSapiV2LoanFlexibleLtvAdjustmentHistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     loanCoin?: string;
     collateralCoin?: string;
     startTime?: number; // int
@@ -75,8 +78,8 @@ export type GetSapiV2LoanFlexibleLtvAdjustmentHistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV2LoanFlexibleLtvAdjustmentHistoryResponse =
   | ResponseUnion<
@@ -101,18 +104,24 @@ export type GetSapiV2LoanFlexibleLtvAdjustmentHistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV2LoanFlexibleLtvAdjustmentHistoryRequestResult =
-  RequestResult<Request, GetSapiV2LoanFlexibleLtvAdjustmentHistoryResponse>;
+  RequestResult<
+    GetSapiV2LoanFlexibleLtvAdjustmentHistoryRequest,
+    GetSapiV2LoanFlexibleLtvAdjustmentHistoryResponse
+  >;
 
 export function getSapiV2LoanFlexibleLtvAdjustmentHistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV2LoanFlexibleLtvAdjustmentHistoryPayload,
+  payload: RequestPayload<
+    GetSapiV2LoanFlexibleLtvAdjustmentHistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2LoanFlexibleLtvAdjustmentHistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV2LoanFlexibleLtvAdjustmentHistoryEndpointSchema,
-    }),
+    createRequest(
+      getSapiV2LoanFlexibleLtvAdjustmentHistoryEndpointSchema,
+      payload
+    ),
     config
   );
 }

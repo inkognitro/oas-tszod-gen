@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV4SubAccountAssetsEndpointSchema = {
   path: '/sapi/v4/sub-account/assets',
@@ -33,14 +34,16 @@ export const getSapiV4SubAccountAssetsEndpointSchema = {
   },
 };
 
-export type GetSapiV4SubAccountAssetsPayload = {
-  queryParams: {
+export type GetSapiV4SubAccountAssetsRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV4SubAccountAssetsResponse =
   | ResponseUnion<
@@ -60,20 +63,17 @@ export type GetSapiV4SubAccountAssetsResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV4SubAccountAssetsRequestResult = RequestResult<
-  Request,
+  GetSapiV4SubAccountAssetsRequest,
   GetSapiV4SubAccountAssetsResponse
 >;
 
 export function getSapiV4SubAccountAssets(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV4SubAccountAssetsPayload,
+  payload: RequestPayload<GetSapiV4SubAccountAssetsRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV4SubAccountAssetsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV4SubAccountAssetsEndpointSchema,
-    }),
+    createRequest(getSapiV4SubAccountAssetsEndpointSchema, payload),
     config
   );
 }

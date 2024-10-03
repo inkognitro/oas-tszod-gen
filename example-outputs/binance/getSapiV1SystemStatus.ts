@@ -1,8 +1,8 @@
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -22,6 +22,8 @@ export const getSapiV1SystemStatusEndpointSchema = {
   },
 };
 
+export type GetSapiV1SystemStatusRequest = Request;
+
 export type GetSapiV1SystemStatusResponse = ResponseUnion<
   200,
   ResponseBodyData<
@@ -34,7 +36,7 @@ export type GetSapiV1SystemStatusResponse = ResponseUnion<
 >;
 
 export type GetSapiV1SystemStatusRequestResult = RequestResult<
-  Request,
+  GetSapiV1SystemStatusRequest,
   GetSapiV1SystemStatusResponse
 >;
 
@@ -43,7 +45,7 @@ export function getSapiV1SystemStatus(
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SystemStatusRequestResult> {
   return requestHandler.execute(
-    createRequest({endpointSchema: getSapiV1SystemStatusEndpointSchema}),
+    createRequest(getSapiV1SystemStatusEndpointSchema),
     config
   );
 }

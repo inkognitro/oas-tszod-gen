@@ -15,11 +15,12 @@ import {
   $500InternalServerErrorResponse,
 } from '@example-outputs/petstore1';
 import {
+  RequestUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore1/core';
 
 export const getAccessURLEndpointSchema = {
@@ -38,12 +39,13 @@ export const getAccessURLEndpointSchema = {
   },
 };
 
-export type GetAccessURLPayload = {
-  pathParams: {
+export type GetAccessURLRequest = RequestUnion<
+  any,
+  {
     object_id: string;
     access_id: string;
-  };
-};
+  }
+>;
 
 export type GetAccessURLResponse =
   | $200OkAccessResponse<200>
@@ -55,17 +57,17 @@ export type GetAccessURLResponse =
   | $500InternalServerErrorResponse<500>;
 
 export type GetAccessURLRequestResult = RequestResult<
-  Request,
+  GetAccessURLRequest,
   GetAccessURLResponse
 >;
 
 export function getAccessURL(
   requestHandler: SimpleRequestHandler,
-  payload: GetAccessURLPayload,
+  payload: RequestPayload<GetAccessURLRequest, 'pathParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetAccessURLRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getAccessURLEndpointSchema}),
+    createRequest(getAccessURLEndpointSchema, payload),
     config
   );
 }

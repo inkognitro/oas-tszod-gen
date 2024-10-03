@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1LendingAutoInvestTargetAssetListEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/target-asset/list',
@@ -33,16 +34,18 @@ export const getSapiV1LendingAutoInvestTargetAssetListEndpointSchema = {
   },
 };
 
-export type GetSapiV1LendingAutoInvestTargetAssetListPayload = {
-  queryParams: {
+export type GetSapiV1LendingAutoInvestTargetAssetListRequest = RequestUnion<
+  any,
+  any,
+  {
     targetAsset?: string;
     size?: number; // int
     current?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LendingAutoInvestTargetAssetListResponse =
   | ResponseUnion<
@@ -66,18 +69,24 @@ export type GetSapiV1LendingAutoInvestTargetAssetListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingAutoInvestTargetAssetListRequestResult =
-  RequestResult<Request, GetSapiV1LendingAutoInvestTargetAssetListResponse>;
+  RequestResult<
+    GetSapiV1LendingAutoInvestTargetAssetListRequest,
+    GetSapiV1LendingAutoInvestTargetAssetListResponse
+  >;
 
 export function getSapiV1LendingAutoInvestTargetAssetList(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LendingAutoInvestTargetAssetListPayload,
+  payload: RequestPayload<
+    GetSapiV1LendingAutoInvestTargetAssetListRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestTargetAssetListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LendingAutoInvestTargetAssetListEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1LendingAutoInvestTargetAssetListEndpointSchema,
+      payload
+    ),
     config
   );
 }

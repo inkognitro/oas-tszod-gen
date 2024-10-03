@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1ManagedSubaccountMarginassetEndpointSchema = {
@@ -61,14 +62,16 @@ export const getSapiV1ManagedSubaccountMarginassetEndpointSchema = {
   },
 };
 
-export type GetSapiV1ManagedSubaccountMarginassetPayload = {
-  queryParams: {
+export type GetSapiV1ManagedSubaccountMarginassetRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1ManagedSubaccountMarginassetResponse =
   | ResponseUnion<
@@ -95,20 +98,20 @@ export type GetSapiV1ManagedSubaccountMarginassetResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ManagedSubaccountMarginassetRequestResult = RequestResult<
-  Request,
+  GetSapiV1ManagedSubaccountMarginassetRequest,
   GetSapiV1ManagedSubaccountMarginassetResponse
 >;
 
 export function getSapiV1ManagedSubaccountMarginasset(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1ManagedSubaccountMarginassetPayload,
+  payload: RequestPayload<
+    GetSapiV1ManagedSubaccountMarginassetRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountMarginassetRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1ManagedSubaccountMarginassetEndpointSchema,
-    }),
+    createRequest(getSapiV1ManagedSubaccountMarginassetEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1LoanCustomizeMargin_callEndpointSchema = {
   path: '/sapi/v1/loan/customize/margin_call',
@@ -33,16 +34,18 @@ export const postSapiV1LoanCustomizeMargin_callEndpointSchema = {
   },
 };
 
-export type PostSapiV1LoanCustomizeMargin_callPayload = {
-  queryParams: {
+export type PostSapiV1LoanCustomizeMargin_callRequest = RequestUnion<
+  any,
+  any,
+  {
     orderId?: number; // int
     collateralCoin?: string;
     marginCall: number;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1LoanCustomizeMargin_callResponse =
   | ResponseUnion<
@@ -65,20 +68,20 @@ export type PostSapiV1LoanCustomizeMargin_callResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1LoanCustomizeMargin_callRequestResult = RequestResult<
-  Request,
+  PostSapiV1LoanCustomizeMargin_callRequest,
   PostSapiV1LoanCustomizeMargin_callResponse
 >;
 
 export function postSapiV1LoanCustomizeMargin_call(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1LoanCustomizeMargin_callPayload,
+  payload: RequestPayload<
+    PostSapiV1LoanCustomizeMargin_callRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LoanCustomizeMargin_callRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1LoanCustomizeMargin_callEndpointSchema,
-    }),
+    createRequest(postSapiV1LoanCustomizeMargin_callEndpointSchema, payload),
     config
   );
 }

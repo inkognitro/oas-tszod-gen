@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1LendingAutoInvestSourceAssetListEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/source-asset/list',
@@ -33,8 +34,10 @@ export const getSapiV1LendingAutoInvestSourceAssetListEndpointSchema = {
   },
 };
 
-export type GetSapiV1LendingAutoInvestSourceAssetListPayload = {
-  queryParams: {
+export type GetSapiV1LendingAutoInvestSourceAssetListRequest = RequestUnion<
+  any,
+  any,
+  {
     targetAsset?: string;
     indexId?: number; // int
     usageType: string;
@@ -42,8 +45,8 @@ export type GetSapiV1LendingAutoInvestSourceAssetListPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LendingAutoInvestSourceAssetListResponse =
   | ResponseUnion<
@@ -66,18 +69,24 @@ export type GetSapiV1LendingAutoInvestSourceAssetListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingAutoInvestSourceAssetListRequestResult =
-  RequestResult<Request, GetSapiV1LendingAutoInvestSourceAssetListResponse>;
+  RequestResult<
+    GetSapiV1LendingAutoInvestSourceAssetListRequest,
+    GetSapiV1LendingAutoInvestSourceAssetListResponse
+  >;
 
 export function getSapiV1LendingAutoInvestSourceAssetList(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LendingAutoInvestSourceAssetListPayload,
+  payload: RequestPayload<
+    GetSapiV1LendingAutoInvestSourceAssetListRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestSourceAssetListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LendingAutoInvestSourceAssetListEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1LendingAutoInvestSourceAssetListEndpointSchema,
+      payload
+    ),
     config
   );
 }

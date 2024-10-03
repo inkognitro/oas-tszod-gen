@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1LoanIncomeEndpointSchema = {
   path: '/sapi/v1/loan/income',
@@ -33,8 +34,10 @@ export const getSapiV1LoanIncomeEndpointSchema = {
   },
 };
 
-export type GetSapiV1LoanIncomePayload = {
-  queryParams: {
+export type GetSapiV1LoanIncomeRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     type?:
       | 'borrowIn'
@@ -50,8 +53,8 @@ export type GetSapiV1LoanIncomePayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LoanIncomeResponse =
   | ResponseUnion<
@@ -71,20 +74,17 @@ export type GetSapiV1LoanIncomeResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LoanIncomeRequestResult = RequestResult<
-  Request,
+  GetSapiV1LoanIncomeRequest,
   GetSapiV1LoanIncomeResponse
 >;
 
 export function getSapiV1LoanIncome(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LoanIncomePayload,
+  payload: RequestPayload<GetSapiV1LoanIncomeRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanIncomeRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LoanIncomeEndpointSchema,
-    }),
+    createRequest(getSapiV1LoanIncomeEndpointSchema, payload),
     config
   );
 }

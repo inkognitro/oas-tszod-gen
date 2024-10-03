@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1LendingProjectPositionListEndpointSchema = {
@@ -68,16 +69,18 @@ export const getSapiV1LendingProjectPositionListEndpointSchema = {
   },
 };
 
-export type GetSapiV1LendingProjectPositionListPayload = {
-  queryParams: {
+export type GetSapiV1LendingProjectPositionListRequest = RequestUnion<
+  any,
+  any,
+  {
     asset: string;
     projectId?: string;
     status?: 'ALL' | 'SUBSCRIBABLE' | 'UNSUBSCRIBABLE';
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LendingProjectPositionListResponse =
   | ResponseUnion<
@@ -109,20 +112,20 @@ export type GetSapiV1LendingProjectPositionListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingProjectPositionListRequestResult = RequestResult<
-  Request,
+  GetSapiV1LendingProjectPositionListRequest,
   GetSapiV1LendingProjectPositionListResponse
 >;
 
 export function getSapiV1LendingProjectPositionList(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LendingProjectPositionListPayload,
+  payload: RequestPayload<
+    GetSapiV1LendingProjectPositionListRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingProjectPositionListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LendingProjectPositionListEndpointSchema,
-    }),
+    createRequest(getSapiV1LendingProjectPositionListEndpointSchema, payload),
     config
   );
 }

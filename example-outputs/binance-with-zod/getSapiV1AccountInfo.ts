@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1AccountInfoEndpointSchema = {
@@ -49,13 +50,15 @@ export const getSapiV1AccountInfoEndpointSchema = {
   },
 };
 
-export type GetSapiV1AccountInfoPayload = {
-  queryParams: {
+export type GetSapiV1AccountInfoRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AccountInfoResponse =
   | ResponseUnion<
@@ -73,20 +76,17 @@ export type GetSapiV1AccountInfoResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AccountInfoRequestResult = RequestResult<
-  Request,
+  GetSapiV1AccountInfoRequest,
   GetSapiV1AccountInfoResponse
 >;
 
 export function getSapiV1AccountInfo(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AccountInfoPayload,
+  payload: RequestPayload<GetSapiV1AccountInfoRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AccountInfoRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AccountInfoEndpointSchema,
-    }),
+    createRequest(getSapiV1AccountInfoEndpointSchema, payload),
     config
   );
 }

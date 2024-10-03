@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getApiV3DepthEndpointSchema = {
   path: '/api/v3/depth',
@@ -28,12 +29,14 @@ export const getApiV3DepthEndpointSchema = {
   },
 };
 
-export type GetApiV3DepthPayload = {
-  queryParams: {
+export type GetApiV3DepthRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     limit?: number; // int
-  };
-};
+  }
+>;
 
 export type GetApiV3DepthResponse =
   | ResponseUnion<
@@ -50,17 +53,17 @@ export type GetApiV3DepthResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3DepthRequestResult = RequestResult<
-  Request,
+  GetApiV3DepthRequest,
   GetApiV3DepthResponse
 >;
 
 export function getApiV3Depth(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3DepthPayload,
+  payload: RequestPayload<GetApiV3DepthRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3DepthRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getApiV3DepthEndpointSchema}),
+    createRequest(getApiV3DepthEndpointSchema, payload),
     config
   );
 }

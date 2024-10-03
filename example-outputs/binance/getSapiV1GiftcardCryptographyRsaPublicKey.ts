@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1GiftcardCryptographyRsaPublicKeyEndpointSchema = {
   path: '/sapi/v1/giftcard/cryptography/rsa-public-key',
@@ -33,13 +34,15 @@ export const getSapiV1GiftcardCryptographyRsaPublicKeyEndpointSchema = {
   },
 };
 
-export type GetSapiV1GiftcardCryptographyRsaPublicKeyPayload = {
-  queryParams: {
+export type GetSapiV1GiftcardCryptographyRsaPublicKeyRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1GiftcardCryptographyRsaPublicKeyResponse =
   | ResponseUnion<
@@ -58,18 +61,24 @@ export type GetSapiV1GiftcardCryptographyRsaPublicKeyResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1GiftcardCryptographyRsaPublicKeyRequestResult =
-  RequestResult<Request, GetSapiV1GiftcardCryptographyRsaPublicKeyResponse>;
+  RequestResult<
+    GetSapiV1GiftcardCryptographyRsaPublicKeyRequest,
+    GetSapiV1GiftcardCryptographyRsaPublicKeyResponse
+  >;
 
 export function getSapiV1GiftcardCryptographyRsaPublicKey(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1GiftcardCryptographyRsaPublicKeyPayload,
+  payload: RequestPayload<
+    GetSapiV1GiftcardCryptographyRsaPublicKeyRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1GiftcardCryptographyRsaPublicKeyRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1GiftcardCryptographyRsaPublicKeyEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1GiftcardCryptographyRsaPublicKeyEndpointSchema,
+      payload
+    ),
     config
   );
 }

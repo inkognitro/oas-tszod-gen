@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1DciProductSubscribeEndpointSchema = {
@@ -63,8 +64,10 @@ export const postSapiV1DciProductSubscribeEndpointSchema = {
   },
 };
 
-export type PostSapiV1DciProductSubscribePayload = {
-  queryParams: {
+export type PostSapiV1DciProductSubscribeRequest = RequestUnion<
+  any,
+  any,
+  {
     id: string;
     orderId: string;
     depositAmount: number;
@@ -72,8 +75,8 @@ export type PostSapiV1DciProductSubscribePayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1DciProductSubscribeResponse =
   | ResponseUnion<
@@ -101,20 +104,17 @@ export type PostSapiV1DciProductSubscribeResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1DciProductSubscribeRequestResult = RequestResult<
-  Request,
+  PostSapiV1DciProductSubscribeRequest,
   PostSapiV1DciProductSubscribeResponse
 >;
 
 export function postSapiV1DciProductSubscribe(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1DciProductSubscribePayload,
+  payload: RequestPayload<PostSapiV1DciProductSubscribeRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1DciProductSubscribeRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1DciProductSubscribeEndpointSchema,
-    }),
+    createRequest(postSapiV1DciProductSubscribeEndpointSchema, payload),
     config
   );
 }

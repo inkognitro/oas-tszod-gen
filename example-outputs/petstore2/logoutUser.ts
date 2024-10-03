@@ -1,8 +1,8 @@
 import {
+  Request,
   ResponseBodyData,
   Response,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -20,10 +20,12 @@ export const logoutUserEndpointSchema = {
   },
 };
 
+export type LogoutUserRequest = Request;
+
 export type LogoutUserResponse = Response;
 
 export type LogoutUserRequestResult = RequestResult<
-  Request,
+  LogoutUserRequest,
   LogoutUserResponse
 >;
 
@@ -32,7 +34,7 @@ export function logoutUser(
   config?: RequestHandlerExecutionConfig
 ): Promise<LogoutUserRequestResult> {
   return requestHandler.execute(
-    createRequest({endpointSchema: logoutUserEndpointSchema}),
+    createRequest(logoutUserEndpointSchema),
     config
   );
 }

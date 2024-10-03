@@ -1,13 +1,15 @@
 import {userZodSchema, User} from '@example-outputs/petstore2-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
+  RequestBodyData,
   ResponseBodyData,
   Response,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2-with-zod/core';
 
 export const updateUserEndpointSchema = {
@@ -35,40 +37,32 @@ export const updateUserEndpointSchema = {
   },
 };
 
-export type UpdateUserRequestBody =
-  | {
-      contentType: 'application/json';
-      body: User;
-    }
-  | {
-      contentType: 'application/xml';
-      body: User;
-    }
-  | {
-      contentType: 'application/x-www-form-urlencoded';
-      body: User;
-    };
-
-export type UpdateUserPayload = UpdateUserRequestBody & {
-  pathParams: {
+export type UpdateUserRequest = RequestUnion<
+  | RequestBodyData<'application/json', User>
+  | RequestBodyData<'application/xml', User>
+  | RequestBodyData<'application/x-www-form-urlencoded', User>,
+  {
     username: string;
-  };
-};
+  }
+>;
 
 export type UpdateUserResponse = Response;
 
 export type UpdateUserRequestResult = RequestResult<
-  Request,
+  UpdateUserRequest,
   UpdateUserResponse
 >;
 
 export function updateUser(
   requestHandler: SimpleRequestHandler,
-  payload: UpdateUserPayload,
+  payload: RequestPayload<
+    UpdateUserRequest,
+    'pathParams' | 'contentType' | 'body'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<UpdateUserRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: updateUserEndpointSchema}),
+    createRequest(updateUserEndpointSchema, payload),
     config
   );
 }

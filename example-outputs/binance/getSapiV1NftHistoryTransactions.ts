@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1NftHistoryTransactionsEndpointSchema = {
   path: '/sapi/v1/nft/history/transactions',
@@ -33,8 +34,10 @@ export const getSapiV1NftHistoryTransactionsEndpointSchema = {
   },
 };
 
-export type GetSapiV1NftHistoryTransactionsPayload = {
-  queryParams: {
+export type GetSapiV1NftHistoryTransactionsRequest = RequestUnion<
+  any,
+  any,
+  {
     orderType: number; // int
     startTime?: number; // int
     endTime?: number; // int
@@ -43,8 +46,8 @@ export type GetSapiV1NftHistoryTransactionsPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1NftHistoryTransactionsResponse =
   | ResponseUnion<
@@ -71,20 +74,20 @@ export type GetSapiV1NftHistoryTransactionsResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1NftHistoryTransactionsRequestResult = RequestResult<
-  Request,
+  GetSapiV1NftHistoryTransactionsRequest,
   GetSapiV1NftHistoryTransactionsResponse
 >;
 
 export function getSapiV1NftHistoryTransactions(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1NftHistoryTransactionsPayload,
+  payload: RequestPayload<
+    GetSapiV1NftHistoryTransactionsRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1NftHistoryTransactionsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1NftHistoryTransactionsEndpointSchema,
-    }),
+    createRequest(getSapiV1NftHistoryTransactionsEndpointSchema, payload),
     config
   );
 }

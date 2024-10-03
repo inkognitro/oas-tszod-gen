@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1BlvtTokeninfoEndpointSchema = {
   path: '/sapi/v1/blvt/tokenInfo',
@@ -28,11 +29,13 @@ export const getSapiV1BlvtTokeninfoEndpointSchema = {
   },
 };
 
-export type GetSapiV1BlvtTokeninfoPayload = {
-  queryParams: {
+export type GetSapiV1BlvtTokeninfoRequest = RequestUnion<
+  any,
+  any,
+  {
     tokenName?: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1BlvtTokeninfoResponse =
   | ResponseUnion<
@@ -65,20 +68,17 @@ export type GetSapiV1BlvtTokeninfoResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1BlvtTokeninfoRequestResult = RequestResult<
-  Request,
+  GetSapiV1BlvtTokeninfoRequest,
   GetSapiV1BlvtTokeninfoResponse
 >;
 
 export function getSapiV1BlvtTokeninfo(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1BlvtTokeninfoPayload,
+  payload: RequestPayload<GetSapiV1BlvtTokeninfoRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1BlvtTokeninfoRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1BlvtTokeninfoEndpointSchema,
-    }),
+    createRequest(getSapiV1BlvtTokeninfoEndpointSchema, payload),
     config
   );
 }

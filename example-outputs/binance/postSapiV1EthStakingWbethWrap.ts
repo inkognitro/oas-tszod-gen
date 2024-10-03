@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1EthStakingWbethWrapEndpointSchema = {
   path: '/sapi/v1/eth-staking/wbeth/wrap',
@@ -33,14 +34,16 @@ export const postSapiV1EthStakingWbethWrapEndpointSchema = {
   },
 };
 
-export type PostSapiV1EthStakingWbethWrapPayload = {
-  queryParams: {
+export type PostSapiV1EthStakingWbethWrapRequest = RequestUnion<
+  any,
+  any,
+  {
     amount: number;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1EthStakingWbethWrapResponse =
   | ResponseUnion<
@@ -58,20 +61,17 @@ export type PostSapiV1EthStakingWbethWrapResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1EthStakingWbethWrapRequestResult = RequestResult<
-  Request,
+  PostSapiV1EthStakingWbethWrapRequest,
   PostSapiV1EthStakingWbethWrapResponse
 >;
 
 export function postSapiV1EthStakingWbethWrap(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1EthStakingWbethWrapPayload,
+  payload: RequestPayload<PostSapiV1EthStakingWbethWrapRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1EthStakingWbethWrapRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1EthStakingWbethWrapEndpointSchema,
-    }),
+    createRequest(postSapiV1EthStakingWbethWrapEndpointSchema, payload),
     config
   );
 }

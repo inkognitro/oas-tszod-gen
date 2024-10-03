@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1SimpleEarnLockedListEndpointSchema = {
@@ -71,16 +72,18 @@ export const getSapiV1SimpleEarnLockedListEndpointSchema = {
   },
 };
 
-export type GetSapiV1SimpleEarnLockedListPayload = {
-  queryParams: {
+export type GetSapiV1SimpleEarnLockedListRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     current?: number; // int
     size?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SimpleEarnLockedListResponse =
   | ResponseUnion<
@@ -115,20 +118,17 @@ export type GetSapiV1SimpleEarnLockedListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnLockedListRequestResult = RequestResult<
-  Request,
+  GetSapiV1SimpleEarnLockedListRequest,
   GetSapiV1SimpleEarnLockedListResponse
 >;
 
 export function getSapiV1SimpleEarnLockedList(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnLockedListPayload,
+  payload: RequestPayload<GetSapiV1SimpleEarnLockedListRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SimpleEarnLockedListEndpointSchema,
-    }),
+    createRequest(getSapiV1SimpleEarnLockedListEndpointSchema, payload),
     config
   );
 }

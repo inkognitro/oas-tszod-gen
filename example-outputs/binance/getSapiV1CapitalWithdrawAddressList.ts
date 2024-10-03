@@ -1,13 +1,13 @@
-import {Error} from '@example-outputs/binance';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1CapitalWithdrawAddressListEndpointSchema = {
   path: '/sapi/v1/capital/withdraw/address/list',
@@ -33,6 +33,8 @@ export const getSapiV1CapitalWithdrawAddressListEndpointSchema = {
   },
 };
 
+export type GetSapiV1CapitalWithdrawAddressListRequest = Request;
+
 export type GetSapiV1CapitalWithdrawAddressListResponse =
   | ResponseUnion<
       200,
@@ -54,7 +56,7 @@ export type GetSapiV1CapitalWithdrawAddressListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1CapitalWithdrawAddressListRequestResult = RequestResult<
-  Request,
+  GetSapiV1CapitalWithdrawAddressListRequest,
   GetSapiV1CapitalWithdrawAddressListResponse
 >;
 
@@ -63,9 +65,7 @@ export function getSapiV1CapitalWithdrawAddressList(
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalWithdrawAddressListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      endpointSchema: getSapiV1CapitalWithdrawAddressListEndpointSchema,
-    }),
+    createRequest(getSapiV1CapitalWithdrawAddressListEndpointSchema),
     config
   );
 }

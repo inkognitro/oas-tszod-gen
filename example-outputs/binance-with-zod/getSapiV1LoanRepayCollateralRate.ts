@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1LoanRepayCollateralRateEndpointSchema = {
@@ -53,16 +54,18 @@ export const getSapiV1LoanRepayCollateralRateEndpointSchema = {
   },
 };
 
-export type GetSapiV1LoanRepayCollateralRatePayload = {
-  queryParams: {
+export type GetSapiV1LoanRepayCollateralRateRequest = RequestUnion<
+  any,
+  any,
+  {
     loanCoin: string;
     collateralCoin: string;
     repayAmount: number;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LoanRepayCollateralRateResponse =
   | ResponseUnion<
@@ -81,20 +84,20 @@ export type GetSapiV1LoanRepayCollateralRateResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LoanRepayCollateralRateRequestResult = RequestResult<
-  Request,
+  GetSapiV1LoanRepayCollateralRateRequest,
   GetSapiV1LoanRepayCollateralRateResponse
 >;
 
 export function getSapiV1LoanRepayCollateralRate(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LoanRepayCollateralRatePayload,
+  payload: RequestPayload<
+    GetSapiV1LoanRepayCollateralRateRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanRepayCollateralRateRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LoanRepayCollateralRateEndpointSchema,
-    }),
+    createRequest(getSapiV1LoanRepayCollateralRateEndpointSchema, payload),
     config
   );
 }

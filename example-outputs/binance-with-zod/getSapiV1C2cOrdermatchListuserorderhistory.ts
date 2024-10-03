@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1C2cOrdermatchListuserorderhistoryEndpointSchema = {
@@ -73,8 +74,10 @@ export const getSapiV1C2cOrdermatchListuserorderhistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1C2cOrdermatchListuserorderhistoryPayload = {
-  queryParams: {
+export type GetSapiV1C2cOrdermatchListuserorderhistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     tradeType: 'BUY' | 'SELL';
     startTimestamp?: number; // int
     endTimestamp?: number; // int
@@ -83,8 +86,8 @@ export type GetSapiV1C2cOrdermatchListuserorderhistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1C2cOrdermatchListuserorderhistoryResponse =
   | ResponseUnion<
@@ -119,18 +122,24 @@ export type GetSapiV1C2cOrdermatchListuserorderhistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1C2cOrdermatchListuserorderhistoryRequestResult =
-  RequestResult<Request, GetSapiV1C2cOrdermatchListuserorderhistoryResponse>;
+  RequestResult<
+    GetSapiV1C2cOrdermatchListuserorderhistoryRequest,
+    GetSapiV1C2cOrdermatchListuserorderhistoryResponse
+  >;
 
 export function getSapiV1C2cOrdermatchListuserorderhistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1C2cOrdermatchListuserorderhistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1C2cOrdermatchListuserorderhistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1C2cOrdermatchListuserorderhistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1C2cOrdermatchListuserorderhistoryEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1C2cOrdermatchListuserorderhistoryEndpointSchema,
+      payload
+    ),
     config
   );
 }

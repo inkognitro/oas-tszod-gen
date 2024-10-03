@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SubAccountFuturesPositionriskEndpointSchema = {
   path: '/sapi/v1/sub-account/futures/positionRisk',
@@ -33,14 +34,16 @@ export const getSapiV1SubAccountFuturesPositionriskEndpointSchema = {
   },
 };
 
-export type GetSapiV1SubAccountFuturesPositionriskPayload = {
-  queryParams: {
+export type GetSapiV1SubAccountFuturesPositionriskRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SubAccountFuturesPositionriskResponse =
   | ResponseUnion<
@@ -63,20 +66,23 @@ export type GetSapiV1SubAccountFuturesPositionriskResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountFuturesPositionriskRequestResult = RequestResult<
-  Request,
+  GetSapiV1SubAccountFuturesPositionriskRequest,
   GetSapiV1SubAccountFuturesPositionriskResponse
 >;
 
 export function getSapiV1SubAccountFuturesPositionrisk(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SubAccountFuturesPositionriskPayload,
+  payload: RequestPayload<
+    GetSapiV1SubAccountFuturesPositionriskRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountFuturesPositionriskRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SubAccountFuturesPositionriskEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SubAccountFuturesPositionriskEndpointSchema,
+      payload
+    ),
     config
   );
 }

@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1SimpleEarnLockedSubscribeEndpointSchema = {
@@ -53,8 +54,10 @@ export const postSapiV1SimpleEarnLockedSubscribeEndpointSchema = {
   },
 };
 
-export type PostSapiV1SimpleEarnLockedSubscribePayload = {
-  queryParams: {
+export type PostSapiV1SimpleEarnLockedSubscribeRequest = RequestUnion<
+  any,
+  any,
+  {
     projectId: string;
     amount: number;
     autoSubscribe?: boolean;
@@ -62,8 +65,8 @@ export type PostSapiV1SimpleEarnLockedSubscribePayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1SimpleEarnLockedSubscribeResponse =
   | ResponseUnion<
@@ -81,20 +84,20 @@ export type PostSapiV1SimpleEarnLockedSubscribeResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SimpleEarnLockedSubscribeRequestResult = RequestResult<
-  Request,
+  PostSapiV1SimpleEarnLockedSubscribeRequest,
   PostSapiV1SimpleEarnLockedSubscribeResponse
 >;
 
 export function postSapiV1SimpleEarnLockedSubscribe(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1SimpleEarnLockedSubscribePayload,
+  payload: RequestPayload<
+    PostSapiV1SimpleEarnLockedSubscribeRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnLockedSubscribeRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1SimpleEarnLockedSubscribeEndpointSchema,
-    }),
+    createRequest(postSapiV1SimpleEarnLockedSubscribeEndpointSchema, payload),
     config
   );
 }

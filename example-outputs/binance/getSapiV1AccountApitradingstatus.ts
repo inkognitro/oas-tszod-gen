@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1AccountApitradingstatusEndpointSchema = {
   path: '/sapi/v1/account/apiTradingStatus',
@@ -33,13 +34,15 @@ export const getSapiV1AccountApitradingstatusEndpointSchema = {
   },
 };
 
-export type GetSapiV1AccountApitradingstatusPayload = {
-  queryParams: {
+export type GetSapiV1AccountApitradingstatusRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AccountApitradingstatusResponse =
   | ResponseUnion<
@@ -72,20 +75,20 @@ export type GetSapiV1AccountApitradingstatusResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AccountApitradingstatusRequestResult = RequestResult<
-  Request,
+  GetSapiV1AccountApitradingstatusRequest,
   GetSapiV1AccountApitradingstatusResponse
 >;
 
 export function getSapiV1AccountApitradingstatus(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AccountApitradingstatusPayload,
+  payload: RequestPayload<
+    GetSapiV1AccountApitradingstatusRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AccountApitradingstatusRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AccountApitradingstatusEndpointSchema,
-    }),
+    createRequest(getSapiV1AccountApitradingstatusEndpointSchema, payload),
     config
   );
 }

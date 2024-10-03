@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1SimpleEarnLockedRedeemEndpointSchema = {
   path: '/sapi/v1/simple-earn/locked/redeem',
@@ -33,14 +34,16 @@ export const postSapiV1SimpleEarnLockedRedeemEndpointSchema = {
   },
 };
 
-export type PostSapiV1SimpleEarnLockedRedeemPayload = {
-  queryParams: {
+export type PostSapiV1SimpleEarnLockedRedeemRequest = RequestUnion<
+  any,
+  any,
+  {
     positionId: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1SimpleEarnLockedRedeemResponse =
   | ResponseUnion<
@@ -57,20 +60,20 @@ export type PostSapiV1SimpleEarnLockedRedeemResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SimpleEarnLockedRedeemRequestResult = RequestResult<
-  Request,
+  PostSapiV1SimpleEarnLockedRedeemRequest,
   PostSapiV1SimpleEarnLockedRedeemResponse
 >;
 
 export function postSapiV1SimpleEarnLockedRedeem(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1SimpleEarnLockedRedeemPayload,
+  payload: RequestPayload<
+    PostSapiV1SimpleEarnLockedRedeemRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnLockedRedeemRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1SimpleEarnLockedRedeemEndpointSchema,
-    }),
+    createRequest(postSapiV1SimpleEarnLockedRedeemEndpointSchema, payload),
     config
   );
 }

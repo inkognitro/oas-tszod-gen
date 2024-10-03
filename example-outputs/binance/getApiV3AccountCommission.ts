@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getApiV3AccountCommissionEndpointSchema = {
   path: '/api/v3/account/commission',
@@ -33,13 +34,15 @@ export const getApiV3AccountCommissionEndpointSchema = {
   },
 };
 
-export type GetApiV3AccountCommissionPayload = {
-  queryParams: {
+export type GetApiV3AccountCommissionRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetApiV3AccountCommissionResponse =
   | ResponseUnion<
@@ -73,20 +76,17 @@ export type GetApiV3AccountCommissionResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3AccountCommissionRequestResult = RequestResult<
-  Request,
+  GetApiV3AccountCommissionRequest,
   GetApiV3AccountCommissionResponse
 >;
 
 export function getApiV3AccountCommission(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3AccountCommissionPayload,
+  payload: RequestPayload<GetApiV3AccountCommissionRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3AccountCommissionRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getApiV3AccountCommissionEndpointSchema,
-    }),
+    createRequest(getApiV3AccountCommissionEndpointSchema, payload),
     config
   );
 }

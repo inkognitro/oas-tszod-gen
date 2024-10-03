@@ -6,13 +6,14 @@ import {
 } from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MarginOpenordersEndpointSchema = {
@@ -52,15 +53,17 @@ export const getSapiV1MarginOpenordersEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginOpenordersPayload = {
-  queryParams: {
+export type GetSapiV1MarginOpenordersRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol?: string;
     isIsolated?: 'TRUE' | 'FALSE';
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginOpenordersResponse =
   | ResponseUnion<
@@ -71,20 +74,17 @@ export type GetSapiV1MarginOpenordersResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginOpenordersRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginOpenordersRequest,
   GetSapiV1MarginOpenordersResponse
 >;
 
 export function getSapiV1MarginOpenorders(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginOpenordersPayload,
+  payload: RequestPayload<GetSapiV1MarginOpenordersRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginOpenordersRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginOpenordersEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginOpenordersEndpointSchema, payload),
     config
   );
 }

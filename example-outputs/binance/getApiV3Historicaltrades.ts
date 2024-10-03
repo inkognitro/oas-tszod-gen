@@ -1,13 +1,14 @@
-import {Trade} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Trade} from '@example-outputs/binance';
 
 export const getApiV3HistoricaltradesEndpointSchema = {
   path: '/api/v3/historicalTrades',
@@ -23,13 +24,15 @@ export const getApiV3HistoricaltradesEndpointSchema = {
   },
 };
 
-export type GetApiV3HistoricaltradesPayload = {
-  queryParams: {
+export type GetApiV3HistoricaltradesRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     limit?: number; // int
     fromId?: number; // int
-  };
-};
+  }
+>;
 
 export type GetApiV3HistoricaltradesResponse = ResponseUnion<
   200,
@@ -37,20 +40,17 @@ export type GetApiV3HistoricaltradesResponse = ResponseUnion<
 >;
 
 export type GetApiV3HistoricaltradesRequestResult = RequestResult<
-  Request,
+  GetApiV3HistoricaltradesRequest,
   GetApiV3HistoricaltradesResponse
 >;
 
 export function getApiV3Historicaltrades(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3HistoricaltradesPayload,
+  payload: RequestPayload<GetApiV3HistoricaltradesRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3HistoricaltradesRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getApiV3HistoricaltradesEndpointSchema,
-    }),
+    createRequest(getApiV3HistoricaltradesEndpointSchema, payload),
     config
   );
 }

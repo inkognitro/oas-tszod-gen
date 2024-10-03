@@ -1,9 +1,9 @@
 import {z} from 'zod';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -25,13 +25,15 @@ export const getApiV3PingEndpointSchema = {
   },
 };
 
+export type GetApiV3PingRequest = Request;
+
 export type GetApiV3PingResponse = ResponseUnion<
   200,
   ResponseBodyData<'application/json', {}>
 >;
 
 export type GetApiV3PingRequestResult = RequestResult<
-  Request,
+  GetApiV3PingRequest,
   GetApiV3PingResponse
 >;
 
@@ -40,7 +42,7 @@ export function getApiV3Ping(
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3PingRequestResult> {
   return requestHandler.execute(
-    createRequest({endpointSchema: getApiV3PingEndpointSchema}),
+    createRequest(getApiV3PingEndpointSchema),
     config
   );
 }

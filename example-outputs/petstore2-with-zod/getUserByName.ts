@@ -1,13 +1,14 @@
 import {userZodSchema, User} from '@example-outputs/petstore2-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2-with-zod/core';
 
 export const getUserByNameEndpointSchema = {
@@ -38,11 +39,12 @@ export const getUserByNameEndpointSchema = {
   },
 };
 
-export type GetUserByNamePayload = {
-  pathParams: {
+export type GetUserByNameRequest = RequestUnion<
+  any,
+  {
     username: string;
-  };
-};
+  }
+>;
 
 export type GetUserByNameResponse =
   | ResponseUnion<
@@ -54,17 +56,17 @@ export type GetUserByNameResponse =
   | ResponseUnion<404>;
 
 export type GetUserByNameRequestResult = RequestResult<
-  Request,
+  GetUserByNameRequest,
   GetUserByNameResponse
 >;
 
 export function getUserByName(
   requestHandler: SimpleRequestHandler,
-  payload: GetUserByNamePayload,
+  payload: RequestPayload<GetUserByNameRequest, 'pathParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetUserByNameRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getUserByNameEndpointSchema}),
+    createRequest(getUserByNameEndpointSchema, payload),
     config
   );
 }

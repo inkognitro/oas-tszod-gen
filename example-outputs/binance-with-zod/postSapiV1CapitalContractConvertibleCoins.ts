@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1CapitalContractConvertibleCoinsEndpointSchema = {
@@ -44,12 +45,14 @@ export const postSapiV1CapitalContractConvertibleCoinsEndpointSchema = {
   },
 };
 
-export type PostSapiV1CapitalContractConvertibleCoinsPayload = {
-  queryParams: {
+export type PostSapiV1CapitalContractConvertibleCoinsRequest = RequestUnion<
+  any,
+  any,
+  {
     coin: string;
     enable: boolean;
-  };
-};
+  }
+>;
 
 export type PostSapiV1CapitalContractConvertibleCoinsResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', {}>>
@@ -57,18 +60,24 @@ export type PostSapiV1CapitalContractConvertibleCoinsResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1CapitalContractConvertibleCoinsRequestResult =
-  RequestResult<Request, PostSapiV1CapitalContractConvertibleCoinsResponse>;
+  RequestResult<
+    PostSapiV1CapitalContractConvertibleCoinsRequest,
+    PostSapiV1CapitalContractConvertibleCoinsResponse
+  >;
 
 export function postSapiV1CapitalContractConvertibleCoins(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1CapitalContractConvertibleCoinsPayload,
+  payload: RequestPayload<
+    PostSapiV1CapitalContractConvertibleCoinsRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1CapitalContractConvertibleCoinsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1CapitalContractConvertibleCoinsEndpointSchema,
-    }),
+    createRequest(
+      postSapiV1CapitalContractConvertibleCoinsEndpointSchema,
+      payload
+    ),
     config
   );
 }

@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MarginDelistScheduleEndpointSchema = {
@@ -51,13 +52,15 @@ export const getSapiV1MarginDelistScheduleEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginDelistSchedulePayload = {
-  queryParams: {
+export type GetSapiV1MarginDelistScheduleRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginDelistScheduleResponse =
   | ResponseUnion<
@@ -75,20 +78,17 @@ export type GetSapiV1MarginDelistScheduleResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginDelistScheduleRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginDelistScheduleRequest,
   GetSapiV1MarginDelistScheduleResponse
 >;
 
 export function getSapiV1MarginDelistSchedule(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginDelistSchedulePayload,
+  payload: RequestPayload<GetSapiV1MarginDelistScheduleRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginDelistScheduleRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginDelistScheduleEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginDelistScheduleEndpointSchema, payload),
     config
   );
 }

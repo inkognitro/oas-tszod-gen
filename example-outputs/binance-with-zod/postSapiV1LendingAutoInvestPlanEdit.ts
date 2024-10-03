@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1LendingAutoInvestPlanEditEndpointSchema = {
@@ -75,8 +76,10 @@ export const postSapiV1LendingAutoInvestPlanEditEndpointSchema = {
   },
 };
 
-export type PostSapiV1LendingAutoInvestPlanEditPayload = {
-  queryParams: {
+export type PostSapiV1LendingAutoInvestPlanEditRequest = RequestUnion<
+  any,
+  any,
+  {
     planId: number; // int
     subscriptionAmount: number;
     subscriptionCycle:
@@ -107,8 +110,8 @@ export type PostSapiV1LendingAutoInvestPlanEditPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1LendingAutoInvestPlanEditResponse =
   | ResponseUnion<
@@ -125,20 +128,20 @@ export type PostSapiV1LendingAutoInvestPlanEditResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1LendingAutoInvestPlanEditRequestResult = RequestResult<
-  Request,
+  PostSapiV1LendingAutoInvestPlanEditRequest,
   PostSapiV1LendingAutoInvestPlanEditResponse
 >;
 
 export function postSapiV1LendingAutoInvestPlanEdit(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1LendingAutoInvestPlanEditPayload,
+  payload: RequestPayload<
+    PostSapiV1LendingAutoInvestPlanEditRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingAutoInvestPlanEditRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1LendingAutoInvestPlanEditEndpointSchema,
-    }),
+    createRequest(postSapiV1LendingAutoInvestPlanEditEndpointSchema, payload),
     config
   );
 }

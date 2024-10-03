@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1AlgoFuturesOpenordersEndpointSchema = {
   path: '/sapi/v1/algo/futures/openOrders',
@@ -33,13 +34,15 @@ export const getSapiV1AlgoFuturesOpenordersEndpointSchema = {
   },
 };
 
-export type GetSapiV1AlgoFuturesOpenordersPayload = {
-  queryParams: {
+export type GetSapiV1AlgoFuturesOpenordersRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AlgoFuturesOpenordersResponse =
   | ResponseUnion<
@@ -71,20 +74,17 @@ export type GetSapiV1AlgoFuturesOpenordersResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AlgoFuturesOpenordersRequestResult = RequestResult<
-  Request,
+  GetSapiV1AlgoFuturesOpenordersRequest,
   GetSapiV1AlgoFuturesOpenordersResponse
 >;
 
 export function getSapiV1AlgoFuturesOpenorders(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AlgoFuturesOpenordersPayload,
+  payload: RequestPayload<GetSapiV1AlgoFuturesOpenordersRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AlgoFuturesOpenordersRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AlgoFuturesOpenordersEndpointSchema,
-    }),
+    createRequest(getSapiV1AlgoFuturesOpenordersEndpointSchema, payload),
     config
   );
 }

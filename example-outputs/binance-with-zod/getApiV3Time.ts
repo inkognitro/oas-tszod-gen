@@ -1,9 +1,9 @@
 import {z} from 'zod';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -27,6 +27,8 @@ export const getApiV3TimeEndpointSchema = {
   },
 };
 
+export type GetApiV3TimeRequest = Request;
+
 export type GetApiV3TimeResponse = ResponseUnion<
   200,
   ResponseBodyData<
@@ -38,7 +40,7 @@ export type GetApiV3TimeResponse = ResponseUnion<
 >;
 
 export type GetApiV3TimeRequestResult = RequestResult<
-  Request,
+  GetApiV3TimeRequest,
   GetApiV3TimeResponse
 >;
 
@@ -47,7 +49,7 @@ export function getApiV3Time(
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3TimeRequestResult> {
   return requestHandler.execute(
-    createRequest({endpointSchema: getApiV3TimeEndpointSchema}),
+    createRequest(getApiV3TimeEndpointSchema),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MarginAccountEndpointSchema = {
   path: '/sapi/v1/margin/account',
@@ -33,13 +34,15 @@ export const getSapiV1MarginAccountEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginAccountPayload = {
-  queryParams: {
+export type GetSapiV1MarginAccountRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginAccountResponse =
   | ResponseUnion<
@@ -69,20 +72,17 @@ export type GetSapiV1MarginAccountResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginAccountRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginAccountRequest,
   GetSapiV1MarginAccountResponse
 >;
 
 export function getSapiV1MarginAccount(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginAccountPayload,
+  payload: RequestPayload<GetSapiV1MarginAccountRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginAccountRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginAccountEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginAccountEndpointSchema, payload),
     config
   );
 }

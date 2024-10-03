@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SimpleEarnFlexibleHistoryRatehistoryEndpointSchema = {
   path: '/sapi/v1/simple-earn/flexible/history/rateHistory',
@@ -33,8 +34,10 @@ export const getSapiV1SimpleEarnFlexibleHistoryRatehistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1SimpleEarnFlexibleHistoryRatehistoryPayload = {
-  queryParams: {
+export type GetSapiV1SimpleEarnFlexibleHistoryRatehistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     productId: string;
     startTime?: number; // int
     endTime?: number; // int
@@ -43,8 +46,8 @@ export type GetSapiV1SimpleEarnFlexibleHistoryRatehistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SimpleEarnFlexibleHistoryRatehistoryResponse =
   | ResponseUnion<
@@ -66,19 +69,24 @@ export type GetSapiV1SimpleEarnFlexibleHistoryRatehistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnFlexibleHistoryRatehistoryRequestResult =
-  RequestResult<Request, GetSapiV1SimpleEarnFlexibleHistoryRatehistoryResponse>;
+  RequestResult<
+    GetSapiV1SimpleEarnFlexibleHistoryRatehistoryRequest,
+    GetSapiV1SimpleEarnFlexibleHistoryRatehistoryResponse
+  >;
 
 export function getSapiV1SimpleEarnFlexibleHistoryRatehistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnFlexibleHistoryRatehistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnFlexibleHistoryRatehistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexibleHistoryRatehistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1SimpleEarnFlexibleHistoryRatehistoryEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SimpleEarnFlexibleHistoryRatehistoryEndpointSchema,
+      payload
+    ),
     config
   );
 }

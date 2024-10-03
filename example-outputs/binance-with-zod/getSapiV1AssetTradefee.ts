@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1AssetTradefeeEndpointSchema = {
@@ -52,14 +53,16 @@ export const getSapiV1AssetTradefeeEndpointSchema = {
   },
 };
 
-export type GetSapiV1AssetTradefeePayload = {
-  queryParams: {
+export type GetSapiV1AssetTradefeeRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AssetTradefeeResponse =
   | ResponseUnion<
@@ -77,20 +80,17 @@ export type GetSapiV1AssetTradefeeResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AssetTradefeeRequestResult = RequestResult<
-  Request,
+  GetSapiV1AssetTradefeeRequest,
   GetSapiV1AssetTradefeeResponse
 >;
 
 export function getSapiV1AssetTradefee(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AssetTradefeePayload,
+  payload: RequestPayload<GetSapiV1AssetTradefeeRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetTradefeeRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AssetTradefeeEndpointSchema,
-    }),
+    createRequest(getSapiV1AssetTradefeeEndpointSchema, payload),
     config
   );
 }

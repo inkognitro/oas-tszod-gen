@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1MarginOrderOcoEndpointSchema = {
   path: '/sapi/v1/margin/order/oco',
@@ -33,8 +34,10 @@ export const postSapiV1MarginOrderOcoEndpointSchema = {
   },
 };
 
-export type PostSapiV1MarginOrderOcoPayload = {
-  queryParams: {
+export type PostSapiV1MarginOrderOcoRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     isIsolated?: 'TRUE' | 'FALSE';
     listClientOrderId?: string;
@@ -58,8 +61,8 @@ export type PostSapiV1MarginOrderOcoPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1MarginOrderOcoResponse =
   | ResponseUnion<
@@ -105,20 +108,17 @@ export type PostSapiV1MarginOrderOcoResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1MarginOrderOcoRequestResult = RequestResult<
-  Request,
+  PostSapiV1MarginOrderOcoRequest,
   PostSapiV1MarginOrderOcoResponse
 >;
 
 export function postSapiV1MarginOrderOco(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1MarginOrderOcoPayload,
+  payload: RequestPayload<PostSapiV1MarginOrderOcoRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginOrderOcoRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1MarginOrderOcoEndpointSchema,
-    }),
+    createRequest(postSapiV1MarginOrderOcoEndpointSchema, payload),
     config
   );
 }

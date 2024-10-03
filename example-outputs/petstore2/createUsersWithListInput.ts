@@ -1,13 +1,15 @@
 import {User} from '@example-outputs/petstore2';
 import {
+  RequestUnion,
+  RequestBodyData,
   ResponseBodyData,
   ResponseUnion,
   Response,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2/core';
 
 export const createUsersWithListInputEndpointSchema = {
@@ -30,13 +32,9 @@ export const createUsersWithListInputEndpointSchema = {
   },
 };
 
-export type CreateUsersWithListInputRequestBody = {
-  contentType: 'application/json';
-  body: User[];
-};
-
-export type CreateUsersWithListInputPayload =
-  CreateUsersWithListInputRequestBody;
+export type CreateUsersWithListInputRequest = RequestUnion<
+  RequestBodyData<'application/json', User[]>
+>;
 
 export type CreateUsersWithListInputResponse =
   | ResponseUnion<
@@ -47,20 +45,20 @@ export type CreateUsersWithListInputResponse =
   | Response;
 
 export type CreateUsersWithListInputRequestResult = RequestResult<
-  Request,
+  CreateUsersWithListInputRequest,
   CreateUsersWithListInputResponse
 >;
 
 export function createUsersWithListInput(
   requestHandler: SimpleRequestHandler,
-  payload: CreateUsersWithListInputPayload,
+  payload: RequestPayload<
+    CreateUsersWithListInputRequest,
+    'contentType' | 'body'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<CreateUsersWithListInputRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: createUsersWithListInputEndpointSchema,
-    }),
+    createRequest(createUsersWithListInputEndpointSchema, payload),
     config
   );
 }

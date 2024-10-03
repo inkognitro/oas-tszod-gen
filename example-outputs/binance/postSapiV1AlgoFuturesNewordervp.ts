@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1AlgoFuturesNewordervpEndpointSchema = {
   path: '/sapi/v1/algo/futures/newOrderVp',
@@ -33,8 +34,10 @@ export const postSapiV1AlgoFuturesNewordervpEndpointSchema = {
   },
 };
 
-export type PostSapiV1AlgoFuturesNewordervpPayload = {
-  queryParams: {
+export type PostSapiV1AlgoFuturesNewordervpRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     side: 'SELL' | 'BUY';
     positionSide?: 'BOTH' | 'LONG' | 'SHORT';
@@ -46,8 +49,8 @@ export type PostSapiV1AlgoFuturesNewordervpPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1AlgoFuturesNewordervpResponse =
   | ResponseUnion<
@@ -66,20 +69,20 @@ export type PostSapiV1AlgoFuturesNewordervpResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1AlgoFuturesNewordervpRequestResult = RequestResult<
-  Request,
+  PostSapiV1AlgoFuturesNewordervpRequest,
   PostSapiV1AlgoFuturesNewordervpResponse
 >;
 
 export function postSapiV1AlgoFuturesNewordervp(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1AlgoFuturesNewordervpPayload,
+  payload: RequestPayload<
+    PostSapiV1AlgoFuturesNewordervpRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AlgoFuturesNewordervpRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1AlgoFuturesNewordervpEndpointSchema,
-    }),
+    createRequest(postSapiV1AlgoFuturesNewordervpEndpointSchema, payload),
     config
   );
 }

@@ -1,12 +1,14 @@
 import {petZodSchema, Pet} from '@example-outputs/petstore2-with-zod';
 import {
+  RequestUnion,
+  RequestBodyData,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2-with-zod/core';
 
 export const addPetEndpointSchema = {
@@ -43,21 +45,11 @@ export const addPetEndpointSchema = {
   },
 };
 
-export type AddPetRequestBody =
-  | {
-      contentType: 'application/json';
-      body: Pet;
-    }
-  | {
-      contentType: 'application/xml';
-      body: Pet;
-    }
-  | {
-      contentType: 'application/x-www-form-urlencoded';
-      body: Pet;
-    };
-
-export type AddPetPayload = AddPetRequestBody;
+export type AddPetRequest = RequestUnion<
+  | RequestBodyData<'application/json', Pet>
+  | RequestBodyData<'application/xml', Pet>
+  | RequestBodyData<'application/x-www-form-urlencoded', Pet>
+>;
 
 export type AddPetResponse =
   | ResponseUnion<
@@ -67,15 +59,15 @@ export type AddPetResponse =
     >
   | ResponseUnion<405>;
 
-export type AddPetRequestResult = RequestResult<Request, AddPetResponse>;
+export type AddPetRequestResult = RequestResult<AddPetRequest, AddPetResponse>;
 
 export function addPet(
   requestHandler: SimpleRequestHandler,
-  payload: AddPetPayload,
+  payload: RequestPayload<AddPetRequest, 'contentType' | 'body'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<AddPetRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: addPetEndpointSchema}),
+    createRequest(addPetEndpointSchema, payload),
     config
   );
 }

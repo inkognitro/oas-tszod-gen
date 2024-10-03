@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1LoanAdjustLtvEndpointSchema = {
@@ -54,16 +55,18 @@ export const postSapiV1LoanAdjustLtvEndpointSchema = {
   },
 };
 
-export type PostSapiV1LoanAdjustLtvPayload = {
-  queryParams: {
+export type PostSapiV1LoanAdjustLtvRequest = RequestUnion<
+  any,
+  any,
+  {
     orderId: number; // int
     amount: number;
     direction: 'ADDITIONAL' | 'REDUCED';
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1LoanAdjustLtvResponse =
   | ResponseUnion<
@@ -83,20 +86,17 @@ export type PostSapiV1LoanAdjustLtvResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1LoanAdjustLtvRequestResult = RequestResult<
-  Request,
+  PostSapiV1LoanAdjustLtvRequest,
   PostSapiV1LoanAdjustLtvResponse
 >;
 
 export function postSapiV1LoanAdjustLtv(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1LoanAdjustLtvPayload,
+  payload: RequestPayload<PostSapiV1LoanAdjustLtvRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LoanAdjustLtvRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1LoanAdjustLtvEndpointSchema,
-    }),
+    createRequest(postSapiV1LoanAdjustLtvEndpointSchema, payload),
     config
   );
 }

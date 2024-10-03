@@ -10,13 +10,14 @@ import {
 } from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postApiV3OrderEndpointSchema = {
@@ -83,8 +84,10 @@ export const postApiV3OrderEndpointSchema = {
   },
 };
 
-export type PostApiV3OrderPayload = {
-  queryParams: {
+export type PostApiV3OrderRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     side: 'SELL' | 'BUY';
     type:
@@ -114,8 +117,8 @@ export type PostApiV3OrderPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostApiV3OrderResponse =
   | ResponseUnion<
@@ -129,17 +132,17 @@ export type PostApiV3OrderResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostApiV3OrderRequestResult = RequestResult<
-  Request,
+  PostApiV3OrderRequest,
   PostApiV3OrderResponse
 >;
 
 export function postApiV3Order(
   requestHandler: SimpleRequestHandler,
-  payload: PostApiV3OrderPayload,
+  payload: RequestPayload<PostApiV3OrderRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3OrderRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: postApiV3OrderEndpointSchema}),
+    createRequest(postApiV3OrderEndpointSchema, payload),
     config
   );
 }

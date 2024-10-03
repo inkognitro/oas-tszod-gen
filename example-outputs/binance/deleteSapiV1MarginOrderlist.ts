@@ -1,13 +1,14 @@
-import {MarginOcoOrder, Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {MarginOcoOrder, Error} from '@example-outputs/binance';
 
 export const deleteSapiV1MarginOrderlistEndpointSchema = {
   path: '/sapi/v1/margin/orderList',
@@ -33,8 +34,10 @@ export const deleteSapiV1MarginOrderlistEndpointSchema = {
   },
 };
 
-export type DeleteSapiV1MarginOrderlistPayload = {
-  queryParams: {
+export type DeleteSapiV1MarginOrderlistRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     isIsolated?: 'TRUE' | 'FALSE';
     orderListId?: number; // int
@@ -43,8 +46,8 @@ export type DeleteSapiV1MarginOrderlistPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type DeleteSapiV1MarginOrderlistResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', MarginOcoOrder>>
@@ -52,20 +55,17 @@ export type DeleteSapiV1MarginOrderlistResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteSapiV1MarginOrderlistRequestResult = RequestResult<
-  Request,
+  DeleteSapiV1MarginOrderlistRequest,
   DeleteSapiV1MarginOrderlistResponse
 >;
 
 export function deleteSapiV1MarginOrderlist(
   requestHandler: SimpleRequestHandler,
-  payload: DeleteSapiV1MarginOrderlistPayload,
+  payload: RequestPayload<DeleteSapiV1MarginOrderlistRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1MarginOrderlistRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: deleteSapiV1MarginOrderlistEndpointSchema,
-    }),
+    createRequest(deleteSapiV1MarginOrderlistEndpointSchema, payload),
     config
   );
 }

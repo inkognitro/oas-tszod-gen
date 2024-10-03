@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1SubAccountFuturesInternaltransferEndpointSchema = {
@@ -64,8 +65,10 @@ export const getSapiV1SubAccountFuturesInternaltransferEndpointSchema = {
   },
 };
 
-export type GetSapiV1SubAccountFuturesInternaltransferPayload = {
-  queryParams: {
+export type GetSapiV1SubAccountFuturesInternaltransferRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     futuresType: number; // int
     startTime?: number; // int
@@ -75,8 +78,8 @@ export type GetSapiV1SubAccountFuturesInternaltransferPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SubAccountFuturesInternaltransferResponse =
   | ResponseUnion<
@@ -101,18 +104,24 @@ export type GetSapiV1SubAccountFuturesInternaltransferResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountFuturesInternaltransferRequestResult =
-  RequestResult<Request, GetSapiV1SubAccountFuturesInternaltransferResponse>;
+  RequestResult<
+    GetSapiV1SubAccountFuturesInternaltransferRequest,
+    GetSapiV1SubAccountFuturesInternaltransferResponse
+  >;
 
 export function getSapiV1SubAccountFuturesInternaltransfer(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SubAccountFuturesInternaltransferPayload,
+  payload: RequestPayload<
+    GetSapiV1SubAccountFuturesInternaltransferRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountFuturesInternaltransferRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SubAccountFuturesInternaltransferEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SubAccountFuturesInternaltransferEndpointSchema,
+      payload
+    ),
     config
   );
 }

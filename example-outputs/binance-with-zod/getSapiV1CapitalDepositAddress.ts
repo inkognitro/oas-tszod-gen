@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1CapitalDepositAddressEndpointSchema = {
@@ -52,15 +53,17 @@ export const getSapiV1CapitalDepositAddressEndpointSchema = {
   },
 };
 
-export type GetSapiV1CapitalDepositAddressPayload = {
-  queryParams: {
+export type GetSapiV1CapitalDepositAddressRequest = RequestUnion<
+  any,
+  any,
+  {
     coin: string;
     network?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1CapitalDepositAddressResponse =
   | ResponseUnion<
@@ -79,20 +82,17 @@ export type GetSapiV1CapitalDepositAddressResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1CapitalDepositAddressRequestResult = RequestResult<
-  Request,
+  GetSapiV1CapitalDepositAddressRequest,
   GetSapiV1CapitalDepositAddressResponse
 >;
 
 export function getSapiV1CapitalDepositAddress(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1CapitalDepositAddressPayload,
+  payload: RequestPayload<GetSapiV1CapitalDepositAddressRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalDepositAddressRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1CapitalDepositAddressEndpointSchema,
-    }),
+    createRequest(getSapiV1CapitalDepositAddressEndpointSchema, payload),
     config
   );
 }

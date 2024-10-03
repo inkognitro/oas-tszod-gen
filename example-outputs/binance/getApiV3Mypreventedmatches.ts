@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getApiV3MypreventedmatchesEndpointSchema = {
   path: '/api/v3/myPreventedMatches',
@@ -33,8 +34,10 @@ export const getApiV3MypreventedmatchesEndpointSchema = {
   },
 };
 
-export type GetApiV3MypreventedmatchesPayload = {
-  queryParams: {
+export type GetApiV3MypreventedmatchesRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     preventedMatchId?: number; // int
     orderId?: number; // int
@@ -43,8 +46,8 @@ export type GetApiV3MypreventedmatchesPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetApiV3MypreventedmatchesResponse =
   | ResponseUnion<
@@ -68,20 +71,17 @@ export type GetApiV3MypreventedmatchesResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3MypreventedmatchesRequestResult = RequestResult<
-  Request,
+  GetApiV3MypreventedmatchesRequest,
   GetApiV3MypreventedmatchesResponse
 >;
 
 export function getApiV3Mypreventedmatches(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3MypreventedmatchesPayload,
+  payload: RequestPayload<GetApiV3MypreventedmatchesRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3MypreventedmatchesRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getApiV3MypreventedmatchesEndpointSchema,
-    }),
+    createRequest(getApiV3MypreventedmatchesEndpointSchema, payload),
     config
   );
 }

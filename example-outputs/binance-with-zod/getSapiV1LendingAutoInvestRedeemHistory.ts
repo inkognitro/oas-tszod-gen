@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1LendingAutoInvestRedeemHistoryEndpointSchema = {
@@ -63,8 +64,10 @@ export const getSapiV1LendingAutoInvestRedeemHistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1LendingAutoInvestRedeemHistoryPayload = {
-  queryParams: {
+export type GetSapiV1LendingAutoInvestRedeemHistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     requestId: number; // int
     startTime?: number; // int
     endTime?: number; // int
@@ -74,8 +77,8 @@ export type GetSapiV1LendingAutoInvestRedeemHistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LendingAutoInvestRedeemHistoryResponse =
   | ResponseUnion<
@@ -99,18 +102,24 @@ export type GetSapiV1LendingAutoInvestRedeemHistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingAutoInvestRedeemHistoryRequestResult =
-  RequestResult<Request, GetSapiV1LendingAutoInvestRedeemHistoryResponse>;
+  RequestResult<
+    GetSapiV1LendingAutoInvestRedeemHistoryRequest,
+    GetSapiV1LendingAutoInvestRedeemHistoryResponse
+  >;
 
 export function getSapiV1LendingAutoInvestRedeemHistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LendingAutoInvestRedeemHistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1LendingAutoInvestRedeemHistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestRedeemHistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LendingAutoInvestRedeemHistoryEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1LendingAutoInvestRedeemHistoryEndpointSchema,
+      payload
+    ),
     config
   );
 }

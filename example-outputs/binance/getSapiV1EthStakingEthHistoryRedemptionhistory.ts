@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1EthStakingEthHistoryRedemptionhistoryEndpointSchema = {
   path: '/sapi/v1/eth-staking/eth/history/redemptionHistory',
@@ -33,17 +34,20 @@ export const getSapiV1EthStakingEthHistoryRedemptionhistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1EthStakingEthHistoryRedemptionhistoryPayload = {
-  queryParams: {
-    startTime?: number; // int
-    endTime?: number; // int
-    current?: number; // int
-    size?: number; // int
-    recvWindow?: number; // int
-    timestamp: number; // int
-    signature: string;
-  };
-};
+export type GetSapiV1EthStakingEthHistoryRedemptionhistoryRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      startTime?: number; // int
+      endTime?: number; // int
+      current?: number; // int
+      size?: number; // int
+      recvWindow?: number; // int
+      timestamp: number; // int
+      signature: string;
+    }
+  >;
 
 export type GetSapiV1EthStakingEthHistoryRedemptionhistoryResponse =
   | ResponseUnion<
@@ -70,21 +74,23 @@ export type GetSapiV1EthStakingEthHistoryRedemptionhistoryResponse =
 
 export type GetSapiV1EthStakingEthHistoryRedemptionhistoryRequestResult =
   RequestResult<
-    Request,
+    GetSapiV1EthStakingEthHistoryRedemptionhistoryRequest,
     GetSapiV1EthStakingEthHistoryRedemptionhistoryResponse
   >;
 
 export function getSapiV1EthStakingEthHistoryRedemptionhistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1EthStakingEthHistoryRedemptionhistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1EthStakingEthHistoryRedemptionhistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1EthStakingEthHistoryRedemptionhistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1EthStakingEthHistoryRedemptionhistoryEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1EthStakingEthHistoryRedemptionhistoryEndpointSchema,
+      payload
+    ),
     config
   );
 }

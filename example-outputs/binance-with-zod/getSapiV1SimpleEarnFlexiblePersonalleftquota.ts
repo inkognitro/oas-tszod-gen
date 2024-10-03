@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1SimpleEarnFlexiblePersonalleftquotaEndpointSchema = {
@@ -48,14 +49,16 @@ export const getSapiV1SimpleEarnFlexiblePersonalleftquotaEndpointSchema = {
   },
 };
 
-export type GetSapiV1SimpleEarnFlexiblePersonalleftquotaPayload = {
-  queryParams: {
+export type GetSapiV1SimpleEarnFlexiblePersonalleftquotaRequest = RequestUnion<
+  any,
+  any,
+  {
     productId: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SimpleEarnFlexiblePersonalleftquotaResponse =
   | ResponseUnion<
@@ -71,19 +74,24 @@ export type GetSapiV1SimpleEarnFlexiblePersonalleftquotaResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnFlexiblePersonalleftquotaRequestResult =
-  RequestResult<Request, GetSapiV1SimpleEarnFlexiblePersonalleftquotaResponse>;
+  RequestResult<
+    GetSapiV1SimpleEarnFlexiblePersonalleftquotaRequest,
+    GetSapiV1SimpleEarnFlexiblePersonalleftquotaResponse
+  >;
 
 export function getSapiV1SimpleEarnFlexiblePersonalleftquota(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnFlexiblePersonalleftquotaPayload,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnFlexiblePersonalleftquotaRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexiblePersonalleftquotaRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1SimpleEarnFlexiblePersonalleftquotaEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SimpleEarnFlexiblePersonalleftquotaEndpointSchema,
+      payload
+    ),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1SimpleEarnLockedSetautosubscribeEndpointSchema = {
   path: '/sapi/v1/simple-earn/locked/setAutoSubscribe',
@@ -33,15 +34,17 @@ export const postSapiV1SimpleEarnLockedSetautosubscribeEndpointSchema = {
   },
 };
 
-export type PostSapiV1SimpleEarnLockedSetautosubscribePayload = {
-  queryParams: {
+export type PostSapiV1SimpleEarnLockedSetautosubscribeRequest = RequestUnion<
+  any,
+  any,
+  {
     positionId: string;
     autoSubscribe: boolean;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1SimpleEarnLockedSetautosubscribeResponse =
   | ResponseUnion<
@@ -57,18 +60,24 @@ export type PostSapiV1SimpleEarnLockedSetautosubscribeResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SimpleEarnLockedSetautosubscribeRequestResult =
-  RequestResult<Request, PostSapiV1SimpleEarnLockedSetautosubscribeResponse>;
+  RequestResult<
+    PostSapiV1SimpleEarnLockedSetautosubscribeRequest,
+    PostSapiV1SimpleEarnLockedSetautosubscribeResponse
+  >;
 
 export function postSapiV1SimpleEarnLockedSetautosubscribe(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1SimpleEarnLockedSetautosubscribePayload,
+  payload: RequestPayload<
+    PostSapiV1SimpleEarnLockedSetautosubscribeRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnLockedSetautosubscribeRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1SimpleEarnLockedSetautosubscribeEndpointSchema,
-    }),
+    createRequest(
+      postSapiV1SimpleEarnLockedSetautosubscribeEndpointSchema,
+      payload
+    ),
     config
   );
 }

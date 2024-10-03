@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1SimpleEarnFlexibleSetautosubscribeEndpointSchema = {
@@ -49,15 +50,17 @@ export const postSapiV1SimpleEarnFlexibleSetautosubscribeEndpointSchema = {
   },
 };
 
-export type PostSapiV1SimpleEarnFlexibleSetautosubscribePayload = {
-  queryParams: {
+export type PostSapiV1SimpleEarnFlexibleSetautosubscribeRequest = RequestUnion<
+  any,
+  any,
+  {
     productId: string;
     autoSubscribe: boolean;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1SimpleEarnFlexibleSetautosubscribeResponse =
   | ResponseUnion<
@@ -73,19 +76,24 @@ export type PostSapiV1SimpleEarnFlexibleSetautosubscribeResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SimpleEarnFlexibleSetautosubscribeRequestResult =
-  RequestResult<Request, PostSapiV1SimpleEarnFlexibleSetautosubscribeResponse>;
+  RequestResult<
+    PostSapiV1SimpleEarnFlexibleSetautosubscribeRequest,
+    PostSapiV1SimpleEarnFlexibleSetautosubscribeResponse
+  >;
 
 export function postSapiV1SimpleEarnFlexibleSetautosubscribe(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1SimpleEarnFlexibleSetautosubscribePayload,
+  payload: RequestPayload<
+    PostSapiV1SimpleEarnFlexibleSetautosubscribeRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnFlexibleSetautosubscribeRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        postSapiV1SimpleEarnFlexibleSetautosubscribeEndpointSchema,
-    }),
+    createRequest(
+      postSapiV1SimpleEarnFlexibleSetautosubscribeEndpointSchema,
+      payload
+    ),
     config
   );
 }

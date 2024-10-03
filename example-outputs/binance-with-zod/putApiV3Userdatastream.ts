@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const putApiV3UserdatastreamEndpointSchema = {
@@ -36,31 +37,30 @@ export const putApiV3UserdatastreamEndpointSchema = {
   },
 };
 
-export type PutApiV3UserdatastreamPayload = {
-  queryParams: {
+export type PutApiV3UserdatastreamRequest = RequestUnion<
+  any,
+  any,
+  {
     listenKey?: string;
-  };
-};
+  }
+>;
 
 export type PutApiV3UserdatastreamResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', {}>>
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type PutApiV3UserdatastreamRequestResult = RequestResult<
-  Request,
+  PutApiV3UserdatastreamRequest,
   PutApiV3UserdatastreamResponse
 >;
 
 export function putApiV3Userdatastream(
   requestHandler: SimpleRequestHandler,
-  payload: PutApiV3UserdatastreamPayload,
+  payload: RequestPayload<PutApiV3UserdatastreamRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PutApiV3UserdatastreamRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: putApiV3UserdatastreamEndpointSchema,
-    }),
+    createRequest(putApiV3UserdatastreamEndpointSchema, payload),
     config
   );
 }

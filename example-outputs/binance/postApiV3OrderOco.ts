@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postApiV3OrderOcoEndpointSchema = {
   path: '/api/v3/order/oco',
@@ -33,8 +34,10 @@ export const postApiV3OrderOcoEndpointSchema = {
   },
 };
 
-export type PostApiV3OrderOcoPayload = {
-  queryParams: {
+export type PostApiV3OrderOcoRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     listClientOrderId?: string;
     side: 'SELL' | 'BUY';
@@ -61,8 +64,8 @@ export type PostApiV3OrderOcoPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostApiV3OrderOcoResponse =
   | ResponseUnion<
@@ -107,20 +110,17 @@ export type PostApiV3OrderOcoResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostApiV3OrderOcoRequestResult = RequestResult<
-  Request,
+  PostApiV3OrderOcoRequest,
   PostApiV3OrderOcoResponse
 >;
 
 export function postApiV3OrderOco(
   requestHandler: SimpleRequestHandler,
-  payload: PostApiV3OrderOcoPayload,
+  payload: RequestPayload<PostApiV3OrderOcoRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3OrderOcoRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postApiV3OrderOcoEndpointSchema,
-    }),
+    createRequest(postApiV3OrderOcoEndpointSchema, payload),
     config
   );
 }

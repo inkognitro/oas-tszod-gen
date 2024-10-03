@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1FuturesTransferEndpointSchema = {
   path: '/sapi/v1/futures/transfer',
@@ -33,16 +34,18 @@ export const postSapiV1FuturesTransferEndpointSchema = {
   },
 };
 
-export type PostSapiV1FuturesTransferPayload = {
-  queryParams: {
+export type PostSapiV1FuturesTransferRequest = RequestUnion<
+  any,
+  any,
+  {
     asset: string;
     amount: number;
     type: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1FuturesTransferResponse =
   | ResponseUnion<
@@ -58,20 +61,17 @@ export type PostSapiV1FuturesTransferResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1FuturesTransferRequestResult = RequestResult<
-  Request,
+  PostSapiV1FuturesTransferRequest,
   PostSapiV1FuturesTransferResponse
 >;
 
 export function postSapiV1FuturesTransfer(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1FuturesTransferPayload,
+  payload: RequestPayload<PostSapiV1FuturesTransferRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1FuturesTransferRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1FuturesTransferEndpointSchema,
-    }),
+    createRequest(postSapiV1FuturesTransferEndpointSchema, payload),
     config
   );
 }

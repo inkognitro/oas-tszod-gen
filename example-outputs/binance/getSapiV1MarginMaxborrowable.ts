@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MarginMaxborrowableEndpointSchema = {
   path: '/sapi/v1/margin/maxBorrowable',
@@ -33,15 +34,17 @@ export const getSapiV1MarginMaxborrowableEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginMaxborrowablePayload = {
-  queryParams: {
+export type GetSapiV1MarginMaxborrowableRequest = RequestUnion<
+  any,
+  any,
+  {
     asset: string;
     isolatedSymbol?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginMaxborrowableResponse =
   | ResponseUnion<
@@ -58,20 +61,17 @@ export type GetSapiV1MarginMaxborrowableResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginMaxborrowableRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginMaxborrowableRequest,
   GetSapiV1MarginMaxborrowableResponse
 >;
 
 export function getSapiV1MarginMaxborrowable(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginMaxborrowablePayload,
+  payload: RequestPayload<GetSapiV1MarginMaxborrowableRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginMaxborrowableRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginMaxborrowableEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginMaxborrowableEndpointSchema, payload),
     config
   );
 }

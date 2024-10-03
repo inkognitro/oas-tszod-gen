@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1ManagedSubaccountAccountsnapshotEndpointSchema = {
   path: '/sapi/v1/managed-subaccount/accountSnapshot',
@@ -33,8 +34,10 @@ export const getSapiV1ManagedSubaccountAccountsnapshotEndpointSchema = {
   },
 };
 
-export type GetSapiV1ManagedSubaccountAccountsnapshotPayload = {
-  queryParams: {
+export type GetSapiV1ManagedSubaccountAccountsnapshotRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     type: string;
     startTime?: number; // int
@@ -43,8 +46,8 @@ export type GetSapiV1ManagedSubaccountAccountsnapshotPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1ManagedSubaccountAccountsnapshotResponse =
   | ResponseUnion<
@@ -73,18 +76,24 @@ export type GetSapiV1ManagedSubaccountAccountsnapshotResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ManagedSubaccountAccountsnapshotRequestResult =
-  RequestResult<Request, GetSapiV1ManagedSubaccountAccountsnapshotResponse>;
+  RequestResult<
+    GetSapiV1ManagedSubaccountAccountsnapshotRequest,
+    GetSapiV1ManagedSubaccountAccountsnapshotResponse
+  >;
 
 export function getSapiV1ManagedSubaccountAccountsnapshot(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1ManagedSubaccountAccountsnapshotPayload,
+  payload: RequestPayload<
+    GetSapiV1ManagedSubaccountAccountsnapshotRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountAccountsnapshotRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1ManagedSubaccountAccountsnapshotEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1ManagedSubaccountAccountsnapshotEndpointSchema,
+      payload
+    ),
     config
   );
 }

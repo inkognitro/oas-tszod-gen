@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1PortfolioInterestHistoryEndpointSchema = {
@@ -57,8 +58,10 @@ export const getSapiV1PortfolioInterestHistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1PortfolioInterestHistoryPayload = {
-  queryParams: {
+export type GetSapiV1PortfolioInterestHistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     asset: string;
     startTime?: number; // int
     endTime?: number; // int
@@ -66,8 +69,8 @@ export type GetSapiV1PortfolioInterestHistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1PortfolioInterestHistoryResponse =
   | ResponseUnion<
@@ -87,20 +90,20 @@ export type GetSapiV1PortfolioInterestHistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1PortfolioInterestHistoryRequestResult = RequestResult<
-  Request,
+  GetSapiV1PortfolioInterestHistoryRequest,
   GetSapiV1PortfolioInterestHistoryResponse
 >;
 
 export function getSapiV1PortfolioInterestHistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1PortfolioInterestHistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1PortfolioInterestHistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1PortfolioInterestHistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1PortfolioInterestHistoryEndpointSchema,
-    }),
+    createRequest(getSapiV1PortfolioInterestHistoryEndpointSchema, payload),
     config
   );
 }

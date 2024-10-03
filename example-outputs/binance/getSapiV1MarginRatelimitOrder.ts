@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MarginRatelimitOrderEndpointSchema = {
   path: '/sapi/v1/margin/rateLimit/order',
@@ -33,15 +34,17 @@ export const getSapiV1MarginRatelimitOrderEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginRatelimitOrderPayload = {
-  queryParams: {
+export type GetSapiV1MarginRatelimitOrderRequest = RequestUnion<
+  any,
+  any,
+  {
     isIsolated?: string;
     symbol?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginRatelimitOrderResponse =
   | ResponseUnion<
@@ -61,20 +64,17 @@ export type GetSapiV1MarginRatelimitOrderResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginRatelimitOrderRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginRatelimitOrderRequest,
   GetSapiV1MarginRatelimitOrderResponse
 >;
 
 export function getSapiV1MarginRatelimitOrder(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginRatelimitOrderPayload,
+  payload: RequestPayload<GetSapiV1MarginRatelimitOrderRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginRatelimitOrderRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginRatelimitOrderEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginRatelimitOrderEndpointSchema, payload),
     config
   );
 }

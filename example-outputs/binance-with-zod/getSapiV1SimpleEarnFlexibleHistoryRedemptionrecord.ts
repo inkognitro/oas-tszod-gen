@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1SimpleEarnFlexibleHistoryRedemptionrecordEndpointSchema =
@@ -63,17 +64,20 @@ export const getSapiV1SimpleEarnFlexibleHistoryRedemptionrecordEndpointSchema =
     },
   };
 
-export type GetSapiV1SimpleEarnFlexibleHistoryRedemptionrecordPayload = {
-  queryParams: {
-    productId?: string;
-    redeemId?: string;
-    asset?: string;
-    startTime?: number; // int
-    endTime?: number; // int
-    current?: number; // int
-    size?: number; // int
-  };
-};
+export type GetSapiV1SimpleEarnFlexibleHistoryRedemptionrecordRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      productId?: string;
+      redeemId?: string;
+      asset?: string;
+      startTime?: number; // int
+      endTime?: number; // int
+      current?: number; // int
+      size?: number; // int
+    }
+  >;
 
 export type GetSapiV1SimpleEarnFlexibleHistoryRedemptionrecordResponse =
   | ResponseUnion<
@@ -99,21 +103,23 @@ export type GetSapiV1SimpleEarnFlexibleHistoryRedemptionrecordResponse =
 
 export type GetSapiV1SimpleEarnFlexibleHistoryRedemptionrecordRequestResult =
   RequestResult<
-    Request,
+    GetSapiV1SimpleEarnFlexibleHistoryRedemptionrecordRequest,
     GetSapiV1SimpleEarnFlexibleHistoryRedemptionrecordResponse
   >;
 
 export function getSapiV1SimpleEarnFlexibleHistoryRedemptionrecord(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnFlexibleHistoryRedemptionrecordPayload,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnFlexibleHistoryRedemptionrecordRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexibleHistoryRedemptionrecordRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1SimpleEarnFlexibleHistoryRedemptionrecordEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SimpleEarnFlexibleHistoryRedemptionrecordEndpointSchema,
+      payload
+    ),
     config
   );
 }

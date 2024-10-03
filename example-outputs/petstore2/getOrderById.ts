@@ -1,13 +1,14 @@
-import {Order} from '@example-outputs/petstore2';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2/core';
+import {Order} from '@example-outputs/petstore2';
 
 export const getOrderByIdEndpointSchema = {
   path: '/store/order/{orderId}',
@@ -30,11 +31,12 @@ export const getOrderByIdEndpointSchema = {
   },
 };
 
-export type GetOrderByIdPayload = {
-  pathParams: {
+export type GetOrderByIdRequest = RequestUnion<
+  any,
+  {
     orderId: number; // int
-  };
-};
+  }
+>;
 
 export type GetOrderByIdResponse =
   | ResponseUnion<
@@ -46,17 +48,17 @@ export type GetOrderByIdResponse =
   | ResponseUnion<404>;
 
 export type GetOrderByIdRequestResult = RequestResult<
-  Request,
+  GetOrderByIdRequest,
   GetOrderByIdResponse
 >;
 
 export function getOrderById(
   requestHandler: SimpleRequestHandler,
-  payload: GetOrderByIdPayload,
+  payload: RequestPayload<GetOrderByIdRequest, 'pathParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetOrderByIdRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getOrderByIdEndpointSchema}),
+    createRequest(getOrderByIdEndpointSchema, payload),
     config
   );
 }

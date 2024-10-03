@@ -1,18 +1,19 @@
 import {
+  RequestUnion,
+  ResponseBodyData,
+  ResponseUnion,
+  RequestResult,
+  SimpleRequestHandler,
+  createRequest,
+  RequestHandlerExecutionConfig,
+  RequestPayload,
+} from '@example-outputs/binance/core';
+import {
   OrderResponseAck,
   OrderResponseResult,
   OrderResponseFull,
   Error,
 } from '@example-outputs/binance';
-import {
-  ResponseBodyData,
-  ResponseUnion,
-  RequestResult,
-  Request,
-  SimpleRequestHandler,
-  createRequest,
-  RequestHandlerExecutionConfig,
-} from '@example-outputs/binance/core';
 
 export const postApiV3OrderEndpointSchema = {
   path: '/api/v3/order',
@@ -38,8 +39,10 @@ export const postApiV3OrderEndpointSchema = {
   },
 };
 
-export type PostApiV3OrderPayload = {
-  queryParams: {
+export type PostApiV3OrderRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     side: 'SELL' | 'BUY';
     type:
@@ -69,8 +72,8 @@ export type PostApiV3OrderPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostApiV3OrderResponse =
   | ResponseUnion<
@@ -84,17 +87,17 @@ export type PostApiV3OrderResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostApiV3OrderRequestResult = RequestResult<
-  Request,
+  PostApiV3OrderRequest,
   PostApiV3OrderResponse
 >;
 
 export function postApiV3Order(
   requestHandler: SimpleRequestHandler,
-  payload: PostApiV3OrderPayload,
+  payload: RequestPayload<PostApiV3OrderRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3OrderRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: postApiV3OrderEndpointSchema}),
+    createRequest(postApiV3OrderEndpointSchema, payload),
     config
   );
 }

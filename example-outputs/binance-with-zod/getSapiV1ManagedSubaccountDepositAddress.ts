@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1ManagedSubaccountDepositAddressEndpointSchema = {
@@ -53,16 +54,18 @@ export const getSapiV1ManagedSubaccountDepositAddressEndpointSchema = {
   },
 };
 
-export type GetSapiV1ManagedSubaccountDepositAddressPayload = {
-  queryParams: {
+export type GetSapiV1ManagedSubaccountDepositAddressRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     coin: string;
     network?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1ManagedSubaccountDepositAddressResponse =
   | ResponseUnion<
@@ -81,18 +84,24 @@ export type GetSapiV1ManagedSubaccountDepositAddressResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ManagedSubaccountDepositAddressRequestResult =
-  RequestResult<Request, GetSapiV1ManagedSubaccountDepositAddressResponse>;
+  RequestResult<
+    GetSapiV1ManagedSubaccountDepositAddressRequest,
+    GetSapiV1ManagedSubaccountDepositAddressResponse
+  >;
 
 export function getSapiV1ManagedSubaccountDepositAddress(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1ManagedSubaccountDepositAddressPayload,
+  payload: RequestPayload<
+    GetSapiV1ManagedSubaccountDepositAddressRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountDepositAddressRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1ManagedSubaccountDepositAddressEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1ManagedSubaccountDepositAddressEndpointSchema,
+      payload
+    ),
     config
   );
 }

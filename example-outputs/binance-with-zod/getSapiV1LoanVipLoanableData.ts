@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1LoanVipLoanableDataEndpointSchema = {
@@ -63,15 +64,17 @@ export const getSapiV1LoanVipLoanableDataEndpointSchema = {
   },
 };
 
-export type GetSapiV1LoanVipLoanableDataPayload = {
-  queryParams: {
+export type GetSapiV1LoanVipLoanableDataRequest = RequestUnion<
+  any,
+  any,
+  {
     loanCoin?: string;
     vipLevel?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LoanVipLoanableDataResponse =
   | ResponseUnion<
@@ -99,20 +102,17 @@ export type GetSapiV1LoanVipLoanableDataResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LoanVipLoanableDataRequestResult = RequestResult<
-  Request,
+  GetSapiV1LoanVipLoanableDataRequest,
   GetSapiV1LoanVipLoanableDataResponse
 >;
 
 export function getSapiV1LoanVipLoanableData(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LoanVipLoanableDataPayload,
+  payload: RequestPayload<GetSapiV1LoanVipLoanableDataRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanVipLoanableDataRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LoanVipLoanableDataEndpointSchema,
-    }),
+    createRequest(getSapiV1LoanVipLoanableDataEndpointSchema, payload),
     config
   );
 }

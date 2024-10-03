@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postApiV3OrderTestEndpointSchema = {
@@ -68,8 +69,10 @@ export const postApiV3OrderTestEndpointSchema = {
   },
 };
 
-export type PostApiV3OrderTestPayload = {
-  queryParams: {
+export type PostApiV3OrderTestRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     side: 'SELL' | 'BUY';
     type:
@@ -95,8 +98,8 @@ export type PostApiV3OrderTestPayload = {
     computeCommissionRates?: boolean;
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostApiV3OrderTestResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', {}>>
@@ -104,20 +107,17 @@ export type PostApiV3OrderTestResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostApiV3OrderTestRequestResult = RequestResult<
-  Request,
+  PostApiV3OrderTestRequest,
   PostApiV3OrderTestResponse
 >;
 
 export function postApiV3OrderTest(
   requestHandler: SimpleRequestHandler,
-  payload: PostApiV3OrderTestPayload,
+  payload: RequestPayload<PostApiV3OrderTestRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3OrderTestRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postApiV3OrderTestEndpointSchema,
-    }),
+    createRequest(postApiV3OrderTestEndpointSchema, payload),
     config
   );
 }

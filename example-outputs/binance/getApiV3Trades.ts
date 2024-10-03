@@ -1,13 +1,14 @@
-import {Trade, Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Trade, Error} from '@example-outputs/binance';
 
 export const getApiV3TradesEndpointSchema = {
   path: '/api/v3/trades',
@@ -28,29 +29,31 @@ export const getApiV3TradesEndpointSchema = {
   },
 };
 
-export type GetApiV3TradesPayload = {
-  queryParams: {
+export type GetApiV3TradesRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     limit?: number; // int
-  };
-};
+  }
+>;
 
 export type GetApiV3TradesResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', Trade[]>>
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3TradesRequestResult = RequestResult<
-  Request,
+  GetApiV3TradesRequest,
   GetApiV3TradesResponse
 >;
 
 export function getApiV3Trades(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3TradesPayload,
+  payload: RequestPayload<GetApiV3TradesRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3TradesRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getApiV3TradesEndpointSchema}),
+    createRequest(getApiV3TradesEndpointSchema, payload),
     config
   );
 }

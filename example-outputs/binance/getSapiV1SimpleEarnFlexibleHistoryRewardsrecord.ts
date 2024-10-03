@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SimpleEarnFlexibleHistoryRewardsrecordEndpointSchema = {
   path: '/sapi/v1/simple-earn/flexible/history/rewardsRecord',
@@ -33,15 +34,18 @@ export const getSapiV1SimpleEarnFlexibleHistoryRewardsrecordEndpointSchema = {
   },
 };
 
-export type GetSapiV1SimpleEarnFlexibleHistoryRewardsrecordPayload = {
-  queryParams: {
-    productId?: string;
-    asset?: string;
-    startTime?: number; // int
-    endTime?: number; // int
-    type: string;
-  };
-};
+export type GetSapiV1SimpleEarnFlexibleHistoryRewardsrecordRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      productId?: string;
+      asset?: string;
+      startTime?: number; // int
+      endTime?: number; // int
+      type: string;
+    }
+  >;
 
 export type GetSapiV1SimpleEarnFlexibleHistoryRewardsrecordResponse =
   | ResponseUnion<
@@ -65,21 +69,23 @@ export type GetSapiV1SimpleEarnFlexibleHistoryRewardsrecordResponse =
 
 export type GetSapiV1SimpleEarnFlexibleHistoryRewardsrecordRequestResult =
   RequestResult<
-    Request,
+    GetSapiV1SimpleEarnFlexibleHistoryRewardsrecordRequest,
     GetSapiV1SimpleEarnFlexibleHistoryRewardsrecordResponse
   >;
 
 export function getSapiV1SimpleEarnFlexibleHistoryRewardsrecord(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnFlexibleHistoryRewardsrecordPayload,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnFlexibleHistoryRewardsrecordRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexibleHistoryRewardsrecordRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1SimpleEarnFlexibleHistoryRewardsrecordEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SimpleEarnFlexibleHistoryRewardsrecordEndpointSchema,
+      payload
+    ),
     config
   );
 }

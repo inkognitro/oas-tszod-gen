@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1RebateTaxqueryEndpointSchema = {
@@ -65,16 +66,18 @@ export const getSapiV1RebateTaxqueryEndpointSchema = {
   },
 };
 
-export type GetSapiV1RebateTaxqueryPayload = {
-  queryParams: {
+export type GetSapiV1RebateTaxqueryRequest = RequestUnion<
+  any,
+  any,
+  {
     startTime?: number; // int
     endTime?: number; // int
     page?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1RebateTaxqueryResponse =
   | ResponseUnion<
@@ -103,20 +106,17 @@ export type GetSapiV1RebateTaxqueryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1RebateTaxqueryRequestResult = RequestResult<
-  Request,
+  GetSapiV1RebateTaxqueryRequest,
   GetSapiV1RebateTaxqueryResponse
 >;
 
 export function getSapiV1RebateTaxquery(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1RebateTaxqueryPayload,
+  payload: RequestPayload<GetSapiV1RebateTaxqueryRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1RebateTaxqueryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1RebateTaxqueryEndpointSchema,
-    }),
+    createRequest(getSapiV1RebateTaxqueryEndpointSchema, payload),
     config
   );
 }

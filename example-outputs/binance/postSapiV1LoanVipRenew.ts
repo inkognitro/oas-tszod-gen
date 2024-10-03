@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1LoanVipRenewEndpointSchema = {
   path: '/sapi/v1/loan/vip/renew',
@@ -33,15 +34,17 @@ export const postSapiV1LoanVipRenewEndpointSchema = {
   },
 };
 
-export type PostSapiV1LoanVipRenewPayload = {
-  queryParams: {
+export type PostSapiV1LoanVipRenewRequest = RequestUnion<
+  any,
+  any,
+  {
     orderId?: number; // int
     loanTerm?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1LoanVipRenewResponse =
   | ResponseUnion<
@@ -62,20 +65,17 @@ export type PostSapiV1LoanVipRenewResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1LoanVipRenewRequestResult = RequestResult<
-  Request,
+  PostSapiV1LoanVipRenewRequest,
   PostSapiV1LoanVipRenewResponse
 >;
 
 export function postSapiV1LoanVipRenew(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1LoanVipRenewPayload,
+  payload: RequestPayload<PostSapiV1LoanVipRenewRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LoanVipRenewRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1LoanVipRenewEndpointSchema,
-    }),
+    createRequest(postSapiV1LoanVipRenewEndpointSchema, payload),
     config
   );
 }

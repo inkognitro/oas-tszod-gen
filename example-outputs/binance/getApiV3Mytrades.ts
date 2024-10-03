@@ -1,13 +1,14 @@
-import {MyTrade, Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {MyTrade, Error} from '@example-outputs/binance';
 
 export const getApiV3MytradesEndpointSchema = {
   path: '/api/v3/myTrades',
@@ -33,8 +34,10 @@ export const getApiV3MytradesEndpointSchema = {
   },
 };
 
-export type GetApiV3MytradesPayload = {
-  queryParams: {
+export type GetApiV3MytradesRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     orderId?: number; // int
     startTime?: number; // int
@@ -44,8 +47,8 @@ export type GetApiV3MytradesPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetApiV3MytradesResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', MyTrade[]>>
@@ -53,17 +56,17 @@ export type GetApiV3MytradesResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3MytradesRequestResult = RequestResult<
-  Request,
+  GetApiV3MytradesRequest,
   GetApiV3MytradesResponse
 >;
 
 export function getApiV3Mytrades(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3MytradesPayload,
+  payload: RequestPayload<GetApiV3MytradesRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3MytradesRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getApiV3MytradesEndpointSchema}),
+    createRequest(getApiV3MytradesEndpointSchema, payload),
     config
   );
 }

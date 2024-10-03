@@ -1,13 +1,14 @@
-import {User} from '@example-outputs/petstore2';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2/core';
+import {User} from '@example-outputs/petstore2';
 
 export const getUserByNameEndpointSchema = {
   path: '/user/{username}',
@@ -30,11 +31,12 @@ export const getUserByNameEndpointSchema = {
   },
 };
 
-export type GetUserByNamePayload = {
-  pathParams: {
+export type GetUserByNameRequest = RequestUnion<
+  any,
+  {
     username: string;
-  };
-};
+  }
+>;
 
 export type GetUserByNameResponse =
   | ResponseUnion<
@@ -46,17 +48,17 @@ export type GetUserByNameResponse =
   | ResponseUnion<404>;
 
 export type GetUserByNameRequestResult = RequestResult<
-  Request,
+  GetUserByNameRequest,
   GetUserByNameResponse
 >;
 
 export function getUserByName(
   requestHandler: SimpleRequestHandler,
-  payload: GetUserByNamePayload,
+  payload: RequestPayload<GetUserByNameRequest, 'pathParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetUserByNameRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getUserByNameEndpointSchema}),
+    createRequest(getUserByNameEndpointSchema, payload),
     config
   );
 }

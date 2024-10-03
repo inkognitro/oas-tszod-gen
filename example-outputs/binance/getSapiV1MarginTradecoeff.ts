@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MarginTradecoeffEndpointSchema = {
   path: '/sapi/v1/margin/tradeCoeff',
@@ -33,14 +34,16 @@ export const getSapiV1MarginTradecoeffEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginTradecoeffPayload = {
-  queryParams: {
+export type GetSapiV1MarginTradecoeffRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginTradecoeffResponse =
   | ResponseUnion<
@@ -58,20 +61,17 @@ export type GetSapiV1MarginTradecoeffResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginTradecoeffRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginTradecoeffRequest,
   GetSapiV1MarginTradecoeffResponse
 >;
 
 export function getSapiV1MarginTradecoeff(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginTradecoeffPayload,
+  payload: RequestPayload<GetSapiV1MarginTradecoeffRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginTradecoeffRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginTradecoeffEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginTradecoeffEndpointSchema, payload),
     config
   );
 }

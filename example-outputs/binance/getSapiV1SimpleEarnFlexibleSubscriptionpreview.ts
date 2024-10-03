@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SimpleEarnFlexibleSubscriptionpreviewEndpointSchema = {
   path: '/sapi/v1/simple-earn/flexible/subscriptionPreview',
@@ -33,15 +34,18 @@ export const getSapiV1SimpleEarnFlexibleSubscriptionpreviewEndpointSchema = {
   },
 };
 
-export type GetSapiV1SimpleEarnFlexibleSubscriptionpreviewPayload = {
-  queryParams: {
-    productId: string;
-    amount: number;
-    recvWindow?: number; // int
-    timestamp: number; // int
-    signature: string;
-  };
-};
+export type GetSapiV1SimpleEarnFlexibleSubscriptionpreviewRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      productId: string;
+      amount: number;
+      recvWindow?: number; // int
+      timestamp: number; // int
+      signature: string;
+    }
+  >;
 
 export type GetSapiV1SimpleEarnFlexibleSubscriptionpreviewResponse =
   | ResponseUnion<
@@ -63,21 +67,23 @@ export type GetSapiV1SimpleEarnFlexibleSubscriptionpreviewResponse =
 
 export type GetSapiV1SimpleEarnFlexibleSubscriptionpreviewRequestResult =
   RequestResult<
-    Request,
+    GetSapiV1SimpleEarnFlexibleSubscriptionpreviewRequest,
     GetSapiV1SimpleEarnFlexibleSubscriptionpreviewResponse
   >;
 
 export function getSapiV1SimpleEarnFlexibleSubscriptionpreview(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnFlexibleSubscriptionpreviewPayload,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnFlexibleSubscriptionpreviewRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexibleSubscriptionpreviewRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1SimpleEarnFlexibleSubscriptionpreviewEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SimpleEarnFlexibleSubscriptionpreviewEndpointSchema,
+      payload
+    ),
     config
   );
 }

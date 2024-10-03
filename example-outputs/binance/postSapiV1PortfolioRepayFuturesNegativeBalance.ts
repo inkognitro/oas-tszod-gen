@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1PortfolioRepayFuturesNegativeBalanceEndpointSchema = {
   path: '/sapi/v1/portfolio/repay-futures-negative-balance',
@@ -33,13 +34,16 @@ export const postSapiV1PortfolioRepayFuturesNegativeBalanceEndpointSchema = {
   },
 };
 
-export type PostSapiV1PortfolioRepayFuturesNegativeBalancePayload = {
-  queryParams: {
-    recvWindow?: number; // int
-    timestamp: number; // int
-    signature: string;
-  };
-};
+export type PostSapiV1PortfolioRepayFuturesNegativeBalanceRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      recvWindow?: number; // int
+      timestamp: number; // int
+      signature: string;
+    }
+  >;
 
 export type PostSapiV1PortfolioRepayFuturesNegativeBalanceResponse =
   | ResponseUnion<
@@ -56,21 +60,23 @@ export type PostSapiV1PortfolioRepayFuturesNegativeBalanceResponse =
 
 export type PostSapiV1PortfolioRepayFuturesNegativeBalanceRequestResult =
   RequestResult<
-    Request,
+    PostSapiV1PortfolioRepayFuturesNegativeBalanceRequest,
     PostSapiV1PortfolioRepayFuturesNegativeBalanceResponse
   >;
 
 export function postSapiV1PortfolioRepayFuturesNegativeBalance(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1PortfolioRepayFuturesNegativeBalancePayload,
+  payload: RequestPayload<
+    PostSapiV1PortfolioRepayFuturesNegativeBalanceRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1PortfolioRepayFuturesNegativeBalanceRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        postSapiV1PortfolioRepayFuturesNegativeBalanceEndpointSchema,
-    }),
+    createRequest(
+      postSapiV1PortfolioRepayFuturesNegativeBalanceEndpointSchema,
+      payload
+    ),
     config
   );
 }

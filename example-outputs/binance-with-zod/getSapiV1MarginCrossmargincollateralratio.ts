@@ -1,10 +1,10 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -44,6 +44,8 @@ export const getSapiV1MarginCrossmargincollateralratioEndpointSchema = {
   },
 };
 
+export type GetSapiV1MarginCrossmargincollateralratioRequest = Request;
+
 export type GetSapiV1MarginCrossmargincollateralratioResponse =
   | ResponseUnion<
       200,
@@ -62,16 +64,17 @@ export type GetSapiV1MarginCrossmargincollateralratioResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginCrossmargincollateralratioRequestResult =
-  RequestResult<Request, GetSapiV1MarginCrossmargincollateralratioResponse>;
+  RequestResult<
+    GetSapiV1MarginCrossmargincollateralratioRequest,
+    GetSapiV1MarginCrossmargincollateralratioResponse
+  >;
 
 export function getSapiV1MarginCrossmargincollateralratio(
   requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginCrossmargincollateralratioRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      endpointSchema: getSapiV1MarginCrossmargincollateralratioEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginCrossmargincollateralratioEndpointSchema),
     config
   );
 }

@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postApiV3OrderCancelreplaceEndpointSchema = {
@@ -115,8 +116,10 @@ export const postApiV3OrderCancelreplaceEndpointSchema = {
   },
 };
 
-export type PostApiV3OrderCancelreplacePayload = {
-  queryParams: {
+export type PostApiV3OrderCancelreplaceRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     side: 'SELL' | 'BUY';
     type:
@@ -151,8 +154,8 @@ export type PostApiV3OrderCancelreplacePayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostApiV3OrderCancelreplaceResponse =
   | ResponseUnion<
@@ -204,20 +207,17 @@ export type PostApiV3OrderCancelreplaceResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostApiV3OrderCancelreplaceRequestResult = RequestResult<
-  Request,
+  PostApiV3OrderCancelreplaceRequest,
   PostApiV3OrderCancelreplaceResponse
 >;
 
 export function postApiV3OrderCancelreplace(
   requestHandler: SimpleRequestHandler,
-  payload: PostApiV3OrderCancelreplacePayload,
+  payload: RequestPayload<PostApiV3OrderCancelreplaceRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3OrderCancelreplaceRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postApiV3OrderCancelreplaceEndpointSchema,
-    }),
+    createRequest(postApiV3OrderCancelreplaceEndpointSchema, payload),
     config
   );
 }

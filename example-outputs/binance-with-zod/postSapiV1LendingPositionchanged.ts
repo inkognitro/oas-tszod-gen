@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1LendingPositionchangedEndpointSchema = {
@@ -52,16 +53,18 @@ export const postSapiV1LendingPositionchangedEndpointSchema = {
   },
 };
 
-export type PostSapiV1LendingPositionchangedPayload = {
-  queryParams: {
+export type PostSapiV1LendingPositionchangedRequest = RequestUnion<
+  any,
+  any,
+  {
     projectId: string;
     lot: string;
     positionId?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1LendingPositionchangedResponse =
   | ResponseUnion<
@@ -79,20 +82,20 @@ export type PostSapiV1LendingPositionchangedResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1LendingPositionchangedRequestResult = RequestResult<
-  Request,
+  PostSapiV1LendingPositionchangedRequest,
   PostSapiV1LendingPositionchangedResponse
 >;
 
 export function postSapiV1LendingPositionchanged(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1LendingPositionchangedPayload,
+  payload: RequestPayload<
+    PostSapiV1LendingPositionchangedRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingPositionchangedRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1LendingPositionchangedEndpointSchema,
-    }),
+    createRequest(postSapiV1LendingPositionchangedEndpointSchema, payload),
     config
   );
 }

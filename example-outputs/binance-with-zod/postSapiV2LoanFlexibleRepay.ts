@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV2LoanFlexibleRepayEndpointSchema = {
@@ -58,8 +59,10 @@ export const postSapiV2LoanFlexibleRepayEndpointSchema = {
   },
 };
 
-export type PostSapiV2LoanFlexibleRepayPayload = {
-  queryParams: {
+export type PostSapiV2LoanFlexibleRepayRequest = RequestUnion<
+  any,
+  any,
+  {
     loanCoin?: string;
     collateralCoin?: string;
     repayAmount: number;
@@ -68,8 +71,8 @@ export type PostSapiV2LoanFlexibleRepayPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV2LoanFlexibleRepayResponse =
   | ResponseUnion<
@@ -91,20 +94,17 @@ export type PostSapiV2LoanFlexibleRepayResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV2LoanFlexibleRepayRequestResult = RequestResult<
-  Request,
+  PostSapiV2LoanFlexibleRepayRequest,
   PostSapiV2LoanFlexibleRepayResponse
 >;
 
 export function postSapiV2LoanFlexibleRepay(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV2LoanFlexibleRepayPayload,
+  payload: RequestPayload<PostSapiV2LoanFlexibleRepayRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV2LoanFlexibleRepayRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV2LoanFlexibleRepayEndpointSchema,
-    }),
+    createRequest(postSapiV2LoanFlexibleRepayEndpointSchema, payload),
     config
   );
 }

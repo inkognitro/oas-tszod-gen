@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1ConvertLimitPlaceorderEndpointSchema = {
   path: '/sapi/v1/convert/limit/placeOrder',
@@ -33,8 +34,10 @@ export const postSapiV1ConvertLimitPlaceorderEndpointSchema = {
   },
 };
 
-export type PostSapiV1ConvertLimitPlaceorderPayload = {
-  queryParams: {
+export type PostSapiV1ConvertLimitPlaceorderRequest = RequestUnion<
+  any,
+  any,
+  {
     baseAsset: string;
     quoteAsset: string;
     limitPrice: number;
@@ -46,8 +49,8 @@ export type PostSapiV1ConvertLimitPlaceorderPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1ConvertLimitPlaceorderResponse =
   | ResponseUnion<
@@ -64,20 +67,20 @@ export type PostSapiV1ConvertLimitPlaceorderResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1ConvertLimitPlaceorderRequestResult = RequestResult<
-  Request,
+  PostSapiV1ConvertLimitPlaceorderRequest,
   PostSapiV1ConvertLimitPlaceorderResponse
 >;
 
 export function postSapiV1ConvertLimitPlaceorder(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1ConvertLimitPlaceorderPayload,
+  payload: RequestPayload<
+    PostSapiV1ConvertLimitPlaceorderRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ConvertLimitPlaceorderRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1ConvertLimitPlaceorderEndpointSchema,
-    }),
+    createRequest(postSapiV1ConvertLimitPlaceorderEndpointSchema, payload),
     config
   );
 }

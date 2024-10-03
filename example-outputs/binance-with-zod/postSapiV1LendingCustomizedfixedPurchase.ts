@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1LendingCustomizedfixedPurchaseEndpointSchema = {
@@ -49,15 +50,17 @@ export const postSapiV1LendingCustomizedfixedPurchaseEndpointSchema = {
   },
 };
 
-export type PostSapiV1LendingCustomizedfixedPurchasePayload = {
-  queryParams: {
+export type PostSapiV1LendingCustomizedfixedPurchaseRequest = RequestUnion<
+  any,
+  any,
+  {
     projectId: string;
     lot: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1LendingCustomizedfixedPurchaseResponse =
   | ResponseUnion<
@@ -73,18 +76,24 @@ export type PostSapiV1LendingCustomizedfixedPurchaseResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1LendingCustomizedfixedPurchaseRequestResult =
-  RequestResult<Request, PostSapiV1LendingCustomizedfixedPurchaseResponse>;
+  RequestResult<
+    PostSapiV1LendingCustomizedfixedPurchaseRequest,
+    PostSapiV1LendingCustomizedfixedPurchaseResponse
+  >;
 
 export function postSapiV1LendingCustomizedfixedPurchase(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1LendingCustomizedfixedPurchasePayload,
+  payload: RequestPayload<
+    PostSapiV1LendingCustomizedfixedPurchaseRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingCustomizedfixedPurchaseRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1LendingCustomizedfixedPurchaseEndpointSchema,
-    }),
+    createRequest(
+      postSapiV1LendingCustomizedfixedPurchaseEndpointSchema,
+      payload
+    ),
     config
   );
 }

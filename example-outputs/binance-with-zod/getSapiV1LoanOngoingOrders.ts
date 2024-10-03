@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1LoanOngoingOrdersEndpointSchema = {
@@ -64,8 +65,10 @@ export const getSapiV1LoanOngoingOrdersEndpointSchema = {
   },
 };
 
-export type GetSapiV1LoanOngoingOrdersPayload = {
-  queryParams: {
+export type GetSapiV1LoanOngoingOrdersRequest = RequestUnion<
+  any,
+  any,
+  {
     orderId?: number; // int
     loanCoin?: string;
     collateralCoin?: string;
@@ -74,8 +77,8 @@ export type GetSapiV1LoanOngoingOrdersPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LoanOngoingOrdersResponse =
   | ResponseUnion<
@@ -101,20 +104,17 @@ export type GetSapiV1LoanOngoingOrdersResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LoanOngoingOrdersRequestResult = RequestResult<
-  Request,
+  GetSapiV1LoanOngoingOrdersRequest,
   GetSapiV1LoanOngoingOrdersResponse
 >;
 
 export function getSapiV1LoanOngoingOrders(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LoanOngoingOrdersPayload,
+  payload: RequestPayload<GetSapiV1LoanOngoingOrdersRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanOngoingOrdersRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LoanOngoingOrdersEndpointSchema,
-    }),
+    createRequest(getSapiV1LoanOngoingOrdersEndpointSchema, payload),
     config
   );
 }

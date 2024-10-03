@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1AlgoFuturesHistoricalordersEndpointSchema = {
@@ -71,8 +72,10 @@ export const getSapiV1AlgoFuturesHistoricalordersEndpointSchema = {
   },
 };
 
-export type GetSapiV1AlgoFuturesHistoricalordersPayload = {
-  queryParams: {
+export type GetSapiV1AlgoFuturesHistoricalordersRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol?: string;
     side?: 'SELL' | 'BUY';
     startTime?: number; // int
@@ -82,8 +85,8 @@ export type GetSapiV1AlgoFuturesHistoricalordersPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AlgoFuturesHistoricalordersResponse =
   | ResponseUnion<
@@ -115,20 +118,20 @@ export type GetSapiV1AlgoFuturesHistoricalordersResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AlgoFuturesHistoricalordersRequestResult = RequestResult<
-  Request,
+  GetSapiV1AlgoFuturesHistoricalordersRequest,
   GetSapiV1AlgoFuturesHistoricalordersResponse
 >;
 
 export function getSapiV1AlgoFuturesHistoricalorders(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AlgoFuturesHistoricalordersPayload,
+  payload: RequestPayload<
+    GetSapiV1AlgoFuturesHistoricalordersRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AlgoFuturesHistoricalordersRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AlgoFuturesHistoricalordersEndpointSchema,
-    }),
+    createRequest(getSapiV1AlgoFuturesHistoricalordersEndpointSchema, payload),
     config
   );
 }

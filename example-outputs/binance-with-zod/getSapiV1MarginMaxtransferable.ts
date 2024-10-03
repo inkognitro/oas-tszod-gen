@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MarginMaxtransferableEndpointSchema = {
@@ -50,15 +51,17 @@ export const getSapiV1MarginMaxtransferableEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginMaxtransferablePayload = {
-  queryParams: {
+export type GetSapiV1MarginMaxtransferableRequest = RequestUnion<
+  any,
+  any,
+  {
     asset: string;
     isolatedSymbol?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginMaxtransferableResponse =
   | ResponseUnion<
@@ -75,20 +78,17 @@ export type GetSapiV1MarginMaxtransferableResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginMaxtransferableRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginMaxtransferableRequest,
   GetSapiV1MarginMaxtransferableResponse
 >;
 
 export function getSapiV1MarginMaxtransferable(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginMaxtransferablePayload,
+  payload: RequestPayload<GetSapiV1MarginMaxtransferableRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginMaxtransferableRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginMaxtransferableEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginMaxtransferableEndpointSchema, payload),
     config
   );
 }

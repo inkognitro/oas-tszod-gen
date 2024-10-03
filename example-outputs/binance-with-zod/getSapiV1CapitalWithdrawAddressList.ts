@@ -1,10 +1,10 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -51,6 +51,8 @@ export const getSapiV1CapitalWithdrawAddressListEndpointSchema = {
   },
 };
 
+export type GetSapiV1CapitalWithdrawAddressListRequest = Request;
+
 export type GetSapiV1CapitalWithdrawAddressListResponse =
   | ResponseUnion<
       200,
@@ -72,7 +74,7 @@ export type GetSapiV1CapitalWithdrawAddressListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1CapitalWithdrawAddressListRequestResult = RequestResult<
-  Request,
+  GetSapiV1CapitalWithdrawAddressListRequest,
   GetSapiV1CapitalWithdrawAddressListResponse
 >;
 
@@ -81,9 +83,7 @@ export function getSapiV1CapitalWithdrawAddressList(
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalWithdrawAddressListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      endpointSchema: getSapiV1CapitalWithdrawAddressListEndpointSchema,
-    }),
+    createRequest(getSapiV1CapitalWithdrawAddressListEndpointSchema),
     config
   );
 }

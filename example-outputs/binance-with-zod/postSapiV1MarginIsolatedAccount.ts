@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1MarginIsolatedAccountEndpointSchema = {
@@ -49,14 +50,16 @@ export const postSapiV1MarginIsolatedAccountEndpointSchema = {
   },
 };
 
-export type PostSapiV1MarginIsolatedAccountPayload = {
-  queryParams: {
+export type PostSapiV1MarginIsolatedAccountRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1MarginIsolatedAccountResponse =
   | ResponseUnion<
@@ -73,20 +76,20 @@ export type PostSapiV1MarginIsolatedAccountResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1MarginIsolatedAccountRequestResult = RequestResult<
-  Request,
+  PostSapiV1MarginIsolatedAccountRequest,
   PostSapiV1MarginIsolatedAccountResponse
 >;
 
 export function postSapiV1MarginIsolatedAccount(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1MarginIsolatedAccountPayload,
+  payload: RequestPayload<
+    PostSapiV1MarginIsolatedAccountRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginIsolatedAccountRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1MarginIsolatedAccountEndpointSchema,
-    }),
+    createRequest(postSapiV1MarginIsolatedAccountEndpointSchema, payload),
     config
   );
 }

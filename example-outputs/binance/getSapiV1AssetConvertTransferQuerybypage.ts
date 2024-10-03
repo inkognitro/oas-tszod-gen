@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1AssetConvertTransferQuerybypageEndpointSchema = {
   path: '/sapi/v1/asset/convert-transfer/queryByPage',
@@ -33,8 +34,10 @@ export const getSapiV1AssetConvertTransferQuerybypageEndpointSchema = {
   },
 };
 
-export type GetSapiV1AssetConvertTransferQuerybypagePayload = {
-  queryParams: {
+export type GetSapiV1AssetConvertTransferQuerybypageRequest = RequestUnion<
+  any,
+  any,
+  {
     tranId?: number; // int
     asset?: string;
     startTime: number; // int
@@ -45,8 +48,8 @@ export type GetSapiV1AssetConvertTransferQuerybypagePayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AssetConvertTransferQuerybypageResponse =
   | ResponseUnion<
@@ -73,18 +76,24 @@ export type GetSapiV1AssetConvertTransferQuerybypageResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AssetConvertTransferQuerybypageRequestResult =
-  RequestResult<Request, GetSapiV1AssetConvertTransferQuerybypageResponse>;
+  RequestResult<
+    GetSapiV1AssetConvertTransferQuerybypageRequest,
+    GetSapiV1AssetConvertTransferQuerybypageResponse
+  >;
 
 export function getSapiV1AssetConvertTransferQuerybypage(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AssetConvertTransferQuerybypagePayload,
+  payload: RequestPayload<
+    GetSapiV1AssetConvertTransferQuerybypageRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetConvertTransferQuerybypageRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AssetConvertTransferQuerybypageEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1AssetConvertTransferQuerybypageEndpointSchema,
+      payload
+    ),
     config
   );
 }

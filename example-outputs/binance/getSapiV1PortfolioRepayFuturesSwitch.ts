@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1PortfolioRepayFuturesSwitchEndpointSchema = {
   path: '/sapi/v1/portfolio/repay-futures-switch',
@@ -33,13 +34,15 @@ export const getSapiV1PortfolioRepayFuturesSwitchEndpointSchema = {
   },
 };
 
-export type GetSapiV1PortfolioRepayFuturesSwitchPayload = {
-  queryParams: {
+export type GetSapiV1PortfolioRepayFuturesSwitchRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1PortfolioRepayFuturesSwitchResponse =
   | ResponseUnion<
@@ -55,20 +58,20 @@ export type GetSapiV1PortfolioRepayFuturesSwitchResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1PortfolioRepayFuturesSwitchRequestResult = RequestResult<
-  Request,
+  GetSapiV1PortfolioRepayFuturesSwitchRequest,
   GetSapiV1PortfolioRepayFuturesSwitchResponse
 >;
 
 export function getSapiV1PortfolioRepayFuturesSwitch(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1PortfolioRepayFuturesSwitchPayload,
+  payload: RequestPayload<
+    GetSapiV1PortfolioRepayFuturesSwitchRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1PortfolioRepayFuturesSwitchRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1PortfolioRepayFuturesSwitchEndpointSchema,
-    }),
+    createRequest(getSapiV1PortfolioRepayFuturesSwitchEndpointSchema, payload),
     config
   );
 }

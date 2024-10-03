@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1AlgoSpotSubordersEndpointSchema = {
@@ -70,16 +71,18 @@ export const getSapiV1AlgoSpotSubordersEndpointSchema = {
   },
 };
 
-export type GetSapiV1AlgoSpotSubordersPayload = {
-  queryParams: {
+export type GetSapiV1AlgoSpotSubordersRequest = RequestUnion<
+  any,
+  any,
+  {
     algoId: number; // int
     page?: number; // int
     pageSize?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AlgoSpotSubordersResponse =
   | ResponseUnion<
@@ -113,20 +116,17 @@ export type GetSapiV1AlgoSpotSubordersResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AlgoSpotSubordersRequestResult = RequestResult<
-  Request,
+  GetSapiV1AlgoSpotSubordersRequest,
   GetSapiV1AlgoSpotSubordersResponse
 >;
 
 export function getSapiV1AlgoSpotSuborders(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AlgoSpotSubordersPayload,
+  payload: RequestPayload<GetSapiV1AlgoSpotSubordersRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AlgoSpotSubordersRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AlgoSpotSubordersEndpointSchema,
-    }),
+    createRequest(getSapiV1AlgoSpotSubordersEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SimpleEarnLockedHistoryRewardsrecordEndpointSchema = {
   path: '/sapi/v1/simple-earn/locked/history/rewardsRecord',
@@ -33,8 +34,10 @@ export const getSapiV1SimpleEarnLockedHistoryRewardsrecordEndpointSchema = {
   },
 };
 
-export type GetSapiV1SimpleEarnLockedHistoryRewardsrecordPayload = {
-  queryParams: {
+export type GetSapiV1SimpleEarnLockedHistoryRewardsrecordRequest = RequestUnion<
+  any,
+  any,
+  {
     positionId?: string;
     asset?: string;
     startTime?: number; // int
@@ -43,8 +46,8 @@ export type GetSapiV1SimpleEarnLockedHistoryRewardsrecordPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SimpleEarnLockedHistoryRewardsrecordResponse =
   | ResponseUnion<
@@ -67,19 +70,24 @@ export type GetSapiV1SimpleEarnLockedHistoryRewardsrecordResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnLockedHistoryRewardsrecordRequestResult =
-  RequestResult<Request, GetSapiV1SimpleEarnLockedHistoryRewardsrecordResponse>;
+  RequestResult<
+    GetSapiV1SimpleEarnLockedHistoryRewardsrecordRequest,
+    GetSapiV1SimpleEarnLockedHistoryRewardsrecordResponse
+  >;
 
 export function getSapiV1SimpleEarnLockedHistoryRewardsrecord(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnLockedHistoryRewardsrecordPayload,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnLockedHistoryRewardsrecordRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedHistoryRewardsrecordRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1SimpleEarnLockedHistoryRewardsrecordEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SimpleEarnLockedHistoryRewardsrecordEndpointSchema,
+      payload
+    ),
     config
   );
 }

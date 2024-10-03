@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MarginForceliquidationrecEndpointSchema = {
   path: '/sapi/v1/margin/forceLiquidationRec',
@@ -33,8 +34,10 @@ export const getSapiV1MarginForceliquidationrecEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginForceliquidationrecPayload = {
-  queryParams: {
+export type GetSapiV1MarginForceliquidationrecRequest = RequestUnion<
+  any,
+  any,
+  {
     startTime?: number; // int
     endTime?: number; // int
     isolatedSymbol?: string;
@@ -43,8 +46,8 @@ export type GetSapiV1MarginForceliquidationrecPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginForceliquidationrecResponse =
   | ResponseUnion<
@@ -72,20 +75,20 @@ export type GetSapiV1MarginForceliquidationrecResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginForceliquidationrecRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginForceliquidationrecRequest,
   GetSapiV1MarginForceliquidationrecResponse
 >;
 
 export function getSapiV1MarginForceliquidationrec(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginForceliquidationrecPayload,
+  payload: RequestPayload<
+    GetSapiV1MarginForceliquidationrecRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginForceliquidationrecRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginForceliquidationrecEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginForceliquidationrecEndpointSchema, payload),
     config
   );
 }

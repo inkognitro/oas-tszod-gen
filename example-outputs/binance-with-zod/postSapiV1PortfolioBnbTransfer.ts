@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1PortfolioBnbTransferEndpointSchema = {
@@ -49,15 +50,17 @@ export const postSapiV1PortfolioBnbTransferEndpointSchema = {
   },
 };
 
-export type PostSapiV1PortfolioBnbTransferPayload = {
-  queryParams: {
+export type PostSapiV1PortfolioBnbTransferRequest = RequestUnion<
+  any,
+  any,
+  {
     transferSide: 'TO_UM' | 'FROM_UM';
     amount: number;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1PortfolioBnbTransferResponse =
   | ResponseUnion<
@@ -73,20 +76,17 @@ export type PostSapiV1PortfolioBnbTransferResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1PortfolioBnbTransferRequestResult = RequestResult<
-  Request,
+  PostSapiV1PortfolioBnbTransferRequest,
   PostSapiV1PortfolioBnbTransferResponse
 >;
 
 export function postSapiV1PortfolioBnbTransfer(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1PortfolioBnbTransferPayload,
+  payload: RequestPayload<PostSapiV1PortfolioBnbTransferRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1PortfolioBnbTransferRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1PortfolioBnbTransferEndpointSchema,
-    }),
+    createRequest(postSapiV1PortfolioBnbTransferEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1FuturesHistdatalinkEndpointSchema = {
   path: '/sapi/v1/futures/histDataLink',
@@ -33,8 +34,10 @@ export const getSapiV1FuturesHistdatalinkEndpointSchema = {
   },
 };
 
-export type GetSapiV1FuturesHistdatalinkPayload = {
-  queryParams: {
+export type GetSapiV1FuturesHistdatalinkRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     dataType: 'T_DEPTH' | 'S_DEPTH';
     startTime?: number; // int
@@ -42,8 +45,8 @@ export type GetSapiV1FuturesHistdatalinkPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1FuturesHistdatalinkResponse =
   | ResponseUnion<
@@ -62,20 +65,17 @@ export type GetSapiV1FuturesHistdatalinkResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1FuturesHistdatalinkRequestResult = RequestResult<
-  Request,
+  GetSapiV1FuturesHistdatalinkRequest,
   GetSapiV1FuturesHistdatalinkResponse
 >;
 
 export function getSapiV1FuturesHistdatalink(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1FuturesHistdatalinkPayload,
+  payload: RequestPayload<GetSapiV1FuturesHistdatalinkRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1FuturesHistdatalinkRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1FuturesHistdatalinkEndpointSchema,
-    }),
+    createRequest(getSapiV1FuturesHistdatalinkEndpointSchema, payload),
     config
   );
 }

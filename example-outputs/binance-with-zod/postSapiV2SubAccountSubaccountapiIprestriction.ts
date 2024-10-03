@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV2SubAccountSubaccountapiIprestrictionEndpointSchema = {
@@ -54,17 +55,20 @@ export const postSapiV2SubAccountSubaccountapiIprestrictionEndpointSchema = {
   },
 };
 
-export type PostSapiV2SubAccountSubaccountapiIprestrictionPayload = {
-  queryParams: {
-    email: string;
-    subAccountApiKey: string;
-    status: string;
-    thirdPartyName?: string;
-    recvWindow?: number; // int
-    timestamp: number; // int
-    signature: string;
-  };
-};
+export type PostSapiV2SubAccountSubaccountapiIprestrictionRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      email: string;
+      subAccountApiKey: string;
+      status: string;
+      thirdPartyName?: string;
+      recvWindow?: number; // int
+      timestamp: number; // int
+      signature: string;
+    }
+  >;
 
 export type PostSapiV2SubAccountSubaccountapiIprestrictionResponse =
   | ResponseUnion<
@@ -84,21 +88,23 @@ export type PostSapiV2SubAccountSubaccountapiIprestrictionResponse =
 
 export type PostSapiV2SubAccountSubaccountapiIprestrictionRequestResult =
   RequestResult<
-    Request,
+    PostSapiV2SubAccountSubaccountapiIprestrictionRequest,
     PostSapiV2SubAccountSubaccountapiIprestrictionResponse
   >;
 
 export function postSapiV2SubAccountSubaccountapiIprestriction(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV2SubAccountSubaccountapiIprestrictionPayload,
+  payload: RequestPayload<
+    PostSapiV2SubAccountSubaccountapiIprestrictionRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV2SubAccountSubaccountapiIprestrictionRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        postSapiV2SubAccountSubaccountapiIprestrictionEndpointSchema,
-    }),
+    createRequest(
+      postSapiV2SubAccountSubaccountapiIprestrictionEndpointSchema,
+      payload
+    ),
     config
   );
 }

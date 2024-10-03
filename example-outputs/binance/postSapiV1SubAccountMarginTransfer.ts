@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1SubAccountMarginTransferEndpointSchema = {
   path: '/sapi/v1/sub-account/margin/transfer',
@@ -33,8 +34,10 @@ export const postSapiV1SubAccountMarginTransferEndpointSchema = {
   },
 };
 
-export type PostSapiV1SubAccountMarginTransferPayload = {
-  queryParams: {
+export type PostSapiV1SubAccountMarginTransferRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     asset: string;
     amount: number;
@@ -42,8 +45,8 @@ export type PostSapiV1SubAccountMarginTransferPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1SubAccountMarginTransferResponse =
   | ResponseUnion<
@@ -59,20 +62,20 @@ export type PostSapiV1SubAccountMarginTransferResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SubAccountMarginTransferRequestResult = RequestResult<
-  Request,
+  PostSapiV1SubAccountMarginTransferRequest,
   PostSapiV1SubAccountMarginTransferResponse
 >;
 
 export function postSapiV1SubAccountMarginTransfer(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1SubAccountMarginTransferPayload,
+  payload: RequestPayload<
+    PostSapiV1SubAccountMarginTransferRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountMarginTransferRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1SubAccountMarginTransferEndpointSchema,
-    }),
+    createRequest(postSapiV1SubAccountMarginTransferEndpointSchema, payload),
     config
   );
 }

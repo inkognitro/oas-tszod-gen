@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1LoanVipCollateralAccountEndpointSchema = {
   path: '/sapi/v1/loan/vip/collateral/account',
@@ -33,15 +34,17 @@ export const getSapiV1LoanVipCollateralAccountEndpointSchema = {
   },
 };
 
-export type GetSapiV1LoanVipCollateralAccountPayload = {
-  queryParams: {
+export type GetSapiV1LoanVipCollateralAccountRequest = RequestUnion<
+  any,
+  any,
+  {
     orderId?: number; // int
     collateralAccountId?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LoanVipCollateralAccountResponse =
   | ResponseUnion<
@@ -62,20 +65,20 @@ export type GetSapiV1LoanVipCollateralAccountResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LoanVipCollateralAccountRequestResult = RequestResult<
-  Request,
+  GetSapiV1LoanVipCollateralAccountRequest,
   GetSapiV1LoanVipCollateralAccountResponse
 >;
 
 export function getSapiV1LoanVipCollateralAccount(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LoanVipCollateralAccountPayload,
+  payload: RequestPayload<
+    GetSapiV1LoanVipCollateralAccountRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanVipCollateralAccountRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LoanVipCollateralAccountEndpointSchema,
-    }),
+    createRequest(getSapiV1LoanVipCollateralAccountEndpointSchema, payload),
     config
   );
 }

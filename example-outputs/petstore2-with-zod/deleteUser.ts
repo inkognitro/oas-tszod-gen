@@ -1,12 +1,13 @@
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2-with-zod/core';
 
 export const deleteUserEndpointSchema = {
@@ -27,26 +28,27 @@ export const deleteUserEndpointSchema = {
   },
 };
 
-export type DeleteUserPayload = {
-  pathParams: {
+export type DeleteUserRequest = RequestUnion<
+  any,
+  {
     username: string;
-  };
-};
+  }
+>;
 
 export type DeleteUserResponse = ResponseUnion<400> | ResponseUnion<404>;
 
 export type DeleteUserRequestResult = RequestResult<
-  Request,
+  DeleteUserRequest,
   DeleteUserResponse
 >;
 
 export function deleteUser(
   requestHandler: SimpleRequestHandler,
-  payload: DeleteUserPayload,
+  payload: RequestPayload<DeleteUserRequest, 'pathParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteUserRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: deleteUserEndpointSchema}),
+    createRequest(deleteUserEndpointSchema, payload),
     config
   );
 }

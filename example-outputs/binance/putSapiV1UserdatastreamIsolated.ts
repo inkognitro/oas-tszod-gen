@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const putSapiV1UserdatastreamIsolatedEndpointSchema = {
   path: '/sapi/v1/userDataStream/isolated',
@@ -28,31 +29,33 @@ export const putSapiV1UserdatastreamIsolatedEndpointSchema = {
   },
 };
 
-export type PutSapiV1UserdatastreamIsolatedPayload = {
-  queryParams: {
+export type PutSapiV1UserdatastreamIsolatedRequest = RequestUnion<
+  any,
+  any,
+  {
     listenKey?: string;
-  };
-};
+  }
+>;
 
 export type PutSapiV1UserdatastreamIsolatedResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', {}>>
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type PutSapiV1UserdatastreamIsolatedRequestResult = RequestResult<
-  Request,
+  PutSapiV1UserdatastreamIsolatedRequest,
   PutSapiV1UserdatastreamIsolatedResponse
 >;
 
 export function putSapiV1UserdatastreamIsolated(
   requestHandler: SimpleRequestHandler,
-  payload: PutSapiV1UserdatastreamIsolatedPayload,
+  payload: RequestPayload<
+    PutSapiV1UserdatastreamIsolatedRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PutSapiV1UserdatastreamIsolatedRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: putSapiV1UserdatastreamIsolatedEndpointSchema,
-    }),
+    createRequest(putSapiV1UserdatastreamIsolatedEndpointSchema, payload),
     config
   );
 }

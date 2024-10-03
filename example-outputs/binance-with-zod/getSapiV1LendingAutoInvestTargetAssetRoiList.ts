@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1LendingAutoInvestTargetAssetRoiListEndpointSchema = {
@@ -52,15 +53,17 @@ export const getSapiV1LendingAutoInvestTargetAssetRoiListEndpointSchema = {
   },
 };
 
-export type GetSapiV1LendingAutoInvestTargetAssetRoiListPayload = {
-  queryParams: {
+export type GetSapiV1LendingAutoInvestTargetAssetRoiListRequest = RequestUnion<
+  any,
+  any,
+  {
     targetAsset: string;
     hisRoiType: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LendingAutoInvestTargetAssetRoiListResponse =
   | ResponseUnion<
@@ -77,19 +80,24 @@ export type GetSapiV1LendingAutoInvestTargetAssetRoiListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingAutoInvestTargetAssetRoiListRequestResult =
-  RequestResult<Request, GetSapiV1LendingAutoInvestTargetAssetRoiListResponse>;
+  RequestResult<
+    GetSapiV1LendingAutoInvestTargetAssetRoiListRequest,
+    GetSapiV1LendingAutoInvestTargetAssetRoiListResponse
+  >;
 
 export function getSapiV1LendingAutoInvestTargetAssetRoiList(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LendingAutoInvestTargetAssetRoiListPayload,
+  payload: RequestPayload<
+    GetSapiV1LendingAutoInvestTargetAssetRoiListRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestTargetAssetRoiListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1LendingAutoInvestTargetAssetRoiListEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1LendingAutoInvestTargetAssetRoiListEndpointSchema,
+      payload
+    ),
     config
   );
 }

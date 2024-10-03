@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV2EthStakingEthStakeEndpointSchema = {
@@ -50,14 +51,16 @@ export const postSapiV2EthStakingEthStakeEndpointSchema = {
   },
 };
 
-export type PostSapiV2EthStakingEthStakePayload = {
-  queryParams: {
+export type PostSapiV2EthStakingEthStakeRequest = RequestUnion<
+  any,
+  any,
+  {
     amount: number;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV2EthStakingEthStakeResponse =
   | ResponseUnion<
@@ -75,20 +78,17 @@ export type PostSapiV2EthStakingEthStakeResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV2EthStakingEthStakeRequestResult = RequestResult<
-  Request,
+  PostSapiV2EthStakingEthStakeRequest,
   PostSapiV2EthStakingEthStakeResponse
 >;
 
 export function postSapiV2EthStakingEthStake(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV2EthStakingEthStakePayload,
+  payload: RequestPayload<PostSapiV2EthStakingEthStakeRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV2EthStakingEthStakeRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV2EthStakingEthStakeEndpointSchema,
-    }),
+    createRequest(postSapiV2EthStakingEthStakeEndpointSchema, payload),
     config
   );
 }

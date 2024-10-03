@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const deleteSapiV1SubAccountSubaccountapiIprestrictionIplistEndpointSchema =
   {
@@ -34,17 +35,20 @@ export const deleteSapiV1SubAccountSubaccountapiIprestrictionIplistEndpointSchem
     },
   };
 
-export type DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistPayload = {
-  queryParams: {
-    email: string;
-    subAccountApiKey: string;
-    ipAddress?: string;
-    thirdPartyName?: string;
-    recvWindow?: number; // int
-    timestamp: number; // int
-    signature: string;
-  };
-};
+export type DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      email: string;
+      subAccountApiKey: string;
+      ipAddress?: string;
+      thirdPartyName?: string;
+      recvWindow?: number; // int
+      timestamp: number; // int
+      signature: string;
+    }
+  >;
 
 export type DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistResponse =
   | ResponseUnion<
@@ -64,21 +68,23 @@ export type DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistResponse =
 
 export type DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistRequestResult =
   RequestResult<
-    Request,
+    DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistRequest,
     DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistResponse
   >;
 
 export function deleteSapiV1SubAccountSubaccountapiIprestrictionIplist(
   requestHandler: SimpleRequestHandler,
-  payload: DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistPayload,
+  payload: RequestPayload<
+    DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        deleteSapiV1SubAccountSubaccountapiIprestrictionIplistEndpointSchema,
-    }),
+    createRequest(
+      deleteSapiV1SubAccountSubaccountapiIprestrictionIplistEndpointSchema,
+      payload
+    ),
     config
   );
 }

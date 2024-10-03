@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1ManagedSubaccountQuerytranslogforinvestorEndpointSchema =
@@ -69,20 +70,23 @@ export const getSapiV1ManagedSubaccountQuerytranslogforinvestorEndpointSchema =
     },
   };
 
-export type GetSapiV1ManagedSubaccountQuerytranslogforinvestorPayload = {
-  queryParams: {
-    email: string;
-    startTime?: number; // int
-    endTime?: number; // int
-    page?: number; // int
-    limit?: number; // int
-    transfers?: string;
-    transferFunctionAccountType?: string;
-    recvWindow?: number; // int
-    timestamp: number; // int
-    signature: string;
-  };
-};
+export type GetSapiV1ManagedSubaccountQuerytranslogforinvestorRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      email: string;
+      startTime?: number; // int
+      endTime?: number; // int
+      page?: number; // int
+      limit?: number; // int
+      transfers?: string;
+      transferFunctionAccountType?: string;
+      recvWindow?: number; // int
+      timestamp: number; // int
+      signature: string;
+    }
+  >;
 
 export type GetSapiV1ManagedSubaccountQuerytranslogforinvestorResponse =
   | ResponseUnion<
@@ -111,21 +115,23 @@ export type GetSapiV1ManagedSubaccountQuerytranslogforinvestorResponse =
 
 export type GetSapiV1ManagedSubaccountQuerytranslogforinvestorRequestResult =
   RequestResult<
-    Request,
+    GetSapiV1ManagedSubaccountQuerytranslogforinvestorRequest,
     GetSapiV1ManagedSubaccountQuerytranslogforinvestorResponse
   >;
 
 export function getSapiV1ManagedSubaccountQuerytranslogforinvestor(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1ManagedSubaccountQuerytranslogforinvestorPayload,
+  payload: RequestPayload<
+    GetSapiV1ManagedSubaccountQuerytranslogforinvestorRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountQuerytranslogforinvestorRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1ManagedSubaccountQuerytranslogforinvestorEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1ManagedSubaccountQuerytranslogforinvestorEndpointSchema,
+      payload
+    ),
     config
   );
 }

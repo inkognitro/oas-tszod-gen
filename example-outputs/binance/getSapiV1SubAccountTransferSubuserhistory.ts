@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SubAccountTransferSubuserhistoryEndpointSchema = {
   path: '/sapi/v1/sub-account/transfer/subUserHistory',
@@ -33,8 +34,10 @@ export const getSapiV1SubAccountTransferSubuserhistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1SubAccountTransferSubuserhistoryPayload = {
-  queryParams: {
+export type GetSapiV1SubAccountTransferSubuserhistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     type?: number; // int
     startTime?: number; // int
@@ -43,8 +46,8 @@ export type GetSapiV1SubAccountTransferSubuserhistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SubAccountTransferSubuserhistoryResponse =
   | ResponseUnion<
@@ -69,18 +72,24 @@ export type GetSapiV1SubAccountTransferSubuserhistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountTransferSubuserhistoryRequestResult =
-  RequestResult<Request, GetSapiV1SubAccountTransferSubuserhistoryResponse>;
+  RequestResult<
+    GetSapiV1SubAccountTransferSubuserhistoryRequest,
+    GetSapiV1SubAccountTransferSubuserhistoryResponse
+  >;
 
 export function getSapiV1SubAccountTransferSubuserhistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SubAccountTransferSubuserhistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1SubAccountTransferSubuserhistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountTransferSubuserhistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SubAccountTransferSubuserhistoryEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SubAccountTransferSubuserhistoryEndpointSchema,
+      payload
+    ),
     config
   );
 }

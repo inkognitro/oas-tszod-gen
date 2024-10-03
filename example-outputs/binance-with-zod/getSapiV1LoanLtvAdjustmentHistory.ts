@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1LoanLtvAdjustmentHistoryEndpointSchema = {
@@ -66,8 +67,10 @@ export const getSapiV1LoanLtvAdjustmentHistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1LoanLtvAdjustmentHistoryPayload = {
-  queryParams: {
+export type GetSapiV1LoanLtvAdjustmentHistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     orderId?: number; // int
     loanCoin?: string;
     collateralCoin?: string;
@@ -78,8 +81,8 @@ export type GetSapiV1LoanLtvAdjustmentHistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LoanLtvAdjustmentHistoryResponse =
   | ResponseUnion<
@@ -105,20 +108,20 @@ export type GetSapiV1LoanLtvAdjustmentHistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LoanLtvAdjustmentHistoryRequestResult = RequestResult<
-  Request,
+  GetSapiV1LoanLtvAdjustmentHistoryRequest,
   GetSapiV1LoanLtvAdjustmentHistoryResponse
 >;
 
 export function getSapiV1LoanLtvAdjustmentHistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LoanLtvAdjustmentHistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1LoanLtvAdjustmentHistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanLtvAdjustmentHistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LoanLtvAdjustmentHistoryEndpointSchema,
-    }),
+    createRequest(getSapiV1LoanLtvAdjustmentHistoryEndpointSchema, payload),
     config
   );
 }

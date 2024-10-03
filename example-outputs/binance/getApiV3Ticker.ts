@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getApiV3TickerEndpointSchema = {
   path: '/api/v3/ticker',
@@ -28,14 +29,16 @@ export const getApiV3TickerEndpointSchema = {
   },
 };
 
-export type GetApiV3TickerPayload = {
-  queryParams: {
+export type GetApiV3TickerRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol?: string;
     symbols?: string;
     windowSize?: string;
     type?: string;
-  };
-};
+  }
+>;
 
 export type GetApiV3TickerResponse =
   | ResponseUnion<
@@ -64,17 +67,17 @@ export type GetApiV3TickerResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3TickerRequestResult = RequestResult<
-  Request,
+  GetApiV3TickerRequest,
   GetApiV3TickerResponse
 >;
 
 export function getApiV3Ticker(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3TickerPayload,
+  payload: RequestPayload<GetApiV3TickerRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3TickerRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getApiV3TickerEndpointSchema}),
+    createRequest(getApiV3TickerEndpointSchema, payload),
     config
   );
 }

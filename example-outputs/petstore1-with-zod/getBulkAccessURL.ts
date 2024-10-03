@@ -19,11 +19,13 @@ import {
   $500InternalServerErrorResponse,
 } from '@example-outputs/petstore1-with-zod';
 import {
+  RequestUnion,
+  RequestBodyData,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore1-with-zod/core';
 
 export const getBulkAccessURLEndpointSchema = {
@@ -47,12 +49,9 @@ export const getBulkAccessURLEndpointSchema = {
   },
 };
 
-export type GetBulkAccessURLRequestBody = {
-  contentType: 'application/json';
-  body: BulkObjectAccessId;
-};
-
-export type GetBulkAccessURLPayload = GetBulkAccessURLRequestBody;
+export type GetBulkAccessURLRequest = RequestUnion<
+  RequestBodyData<'application/json', BulkObjectAccessId>
+>;
 
 export type GetBulkAccessURLResponse =
   | $200OkAccessesResponse<200>
@@ -65,17 +64,17 @@ export type GetBulkAccessURLResponse =
   | $500InternalServerErrorResponse<500>;
 
 export type GetBulkAccessURLRequestResult = RequestResult<
-  Request,
+  GetBulkAccessURLRequest,
   GetBulkAccessURLResponse
 >;
 
 export function getBulkAccessURL(
   requestHandler: SimpleRequestHandler,
-  payload: GetBulkAccessURLPayload,
+  payload: RequestPayload<GetBulkAccessURLRequest, 'contentType' | 'body'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetBulkAccessURLRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getBulkAccessURLEndpointSchema}),
+    createRequest(getBulkAccessURLEndpointSchema, payload),
     config
   );
 }

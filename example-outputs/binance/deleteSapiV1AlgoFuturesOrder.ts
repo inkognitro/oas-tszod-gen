@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const deleteSapiV1AlgoFuturesOrderEndpointSchema = {
   path: '/sapi/v1/algo/futures/order',
@@ -33,14 +34,16 @@ export const deleteSapiV1AlgoFuturesOrderEndpointSchema = {
   },
 };
 
-export type DeleteSapiV1AlgoFuturesOrderPayload = {
-  queryParams: {
+export type DeleteSapiV1AlgoFuturesOrderRequest = RequestUnion<
+  any,
+  any,
+  {
     algoId: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type DeleteSapiV1AlgoFuturesOrderResponse =
   | ResponseUnion<
@@ -59,20 +62,17 @@ export type DeleteSapiV1AlgoFuturesOrderResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteSapiV1AlgoFuturesOrderRequestResult = RequestResult<
-  Request,
+  DeleteSapiV1AlgoFuturesOrderRequest,
   DeleteSapiV1AlgoFuturesOrderResponse
 >;
 
 export function deleteSapiV1AlgoFuturesOrder(
   requestHandler: SimpleRequestHandler,
-  payload: DeleteSapiV1AlgoFuturesOrderPayload,
+  payload: RequestPayload<DeleteSapiV1AlgoFuturesOrderRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1AlgoFuturesOrderRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: deleteSapiV1AlgoFuturesOrderEndpointSchema,
-    }),
+    createRequest(deleteSapiV1AlgoFuturesOrderEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1ConvertOrderstatusEndpointSchema = {
   path: '/sapi/v1/convert/orderStatus',
@@ -33,15 +34,17 @@ export const getSapiV1ConvertOrderstatusEndpointSchema = {
   },
 };
 
-export type GetSapiV1ConvertOrderstatusPayload = {
-  queryParams: {
+export type GetSapiV1ConvertOrderstatusRequest = RequestUnion<
+  any,
+  any,
+  {
     orderId?: string;
     quoteId?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1ConvertOrderstatusResponse =
   | ResponseUnion<
@@ -65,20 +68,17 @@ export type GetSapiV1ConvertOrderstatusResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ConvertOrderstatusRequestResult = RequestResult<
-  Request,
+  GetSapiV1ConvertOrderstatusRequest,
   GetSapiV1ConvertOrderstatusResponse
 >;
 
 export function getSapiV1ConvertOrderstatus(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1ConvertOrderstatusPayload,
+  payload: RequestPayload<GetSapiV1ConvertOrderstatusRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ConvertOrderstatusRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1ConvertOrderstatusEndpointSchema,
-    }),
+    createRequest(getSapiV1ConvertOrderstatusEndpointSchema, payload),
     config
   );
 }

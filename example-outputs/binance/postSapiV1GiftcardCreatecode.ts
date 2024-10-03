@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1GiftcardCreatecodeEndpointSchema = {
   path: '/sapi/v1/giftcard/createCode',
@@ -33,15 +34,17 @@ export const postSapiV1GiftcardCreatecodeEndpointSchema = {
   },
 };
 
-export type PostSapiV1GiftcardCreatecodePayload = {
-  queryParams: {
+export type PostSapiV1GiftcardCreatecodeRequest = RequestUnion<
+  any,
+  any,
+  {
     token: string;
     amount: number;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1GiftcardCreatecodeResponse =
   | ResponseUnion<
@@ -64,20 +67,17 @@ export type PostSapiV1GiftcardCreatecodeResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1GiftcardCreatecodeRequestResult = RequestResult<
-  Request,
+  PostSapiV1GiftcardCreatecodeRequest,
   PostSapiV1GiftcardCreatecodeResponse
 >;
 
 export function postSapiV1GiftcardCreatecode(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1GiftcardCreatecodePayload,
+  payload: RequestPayload<PostSapiV1GiftcardCreatecodeRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1GiftcardCreatecodeRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1GiftcardCreatecodeEndpointSchema,
-    }),
+    createRequest(postSapiV1GiftcardCreatecodeEndpointSchema, payload),
     config
   );
 }

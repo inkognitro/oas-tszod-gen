@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1AlgoSpotHistoricalordersEndpointSchema = {
   path: '/sapi/v1/algo/spot/historicalOrders',
@@ -33,8 +34,10 @@ export const getSapiV1AlgoSpotHistoricalordersEndpointSchema = {
   },
 };
 
-export type GetSapiV1AlgoSpotHistoricalordersPayload = {
-  queryParams: {
+export type GetSapiV1AlgoSpotHistoricalordersRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     side: 'SELL' | 'BUY';
     startTime?: number; // int
@@ -44,8 +47,8 @@ export type GetSapiV1AlgoSpotHistoricalordersPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AlgoSpotHistoricalordersResponse =
   | ResponseUnion<
@@ -76,20 +79,20 @@ export type GetSapiV1AlgoSpotHistoricalordersResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AlgoSpotHistoricalordersRequestResult = RequestResult<
-  Request,
+  GetSapiV1AlgoSpotHistoricalordersRequest,
   GetSapiV1AlgoSpotHistoricalordersResponse
 >;
 
 export function getSapiV1AlgoSpotHistoricalorders(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AlgoSpotHistoricalordersPayload,
+  payload: RequestPayload<
+    GetSapiV1AlgoSpotHistoricalordersRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AlgoSpotHistoricalordersRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AlgoSpotHistoricalordersEndpointSchema,
-    }),
+    createRequest(getSapiV1AlgoSpotHistoricalordersEndpointSchema, payload),
     config
   );
 }

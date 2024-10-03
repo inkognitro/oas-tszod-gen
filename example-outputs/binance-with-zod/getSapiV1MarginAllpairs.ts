@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MarginAllpairsEndpointSchema = {
@@ -46,11 +47,13 @@ export const getSapiV1MarginAllpairsEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginAllpairsPayload = {
-  queryParams: {
+export type GetSapiV1MarginAllpairsRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginAllpairsResponse =
   | ResponseUnion<
@@ -71,20 +74,17 @@ export type GetSapiV1MarginAllpairsResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginAllpairsRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginAllpairsRequest,
   GetSapiV1MarginAllpairsResponse
 >;
 
 export function getSapiV1MarginAllpairs(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginAllpairsPayload,
+  payload: RequestPayload<GetSapiV1MarginAllpairsRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginAllpairsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginAllpairsEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginAllpairsEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Pet} from '@example-outputs/petstore2';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2/core';
+import {Pet} from '@example-outputs/petstore2';
 
 export const findPetsByStatusEndpointSchema = {
   path: '/pet/findByStatus',
@@ -29,11 +30,13 @@ export const findPetsByStatusEndpointSchema = {
   },
 };
 
-export type FindPetsByStatusPayload = {
-  queryParams: {
+export type FindPetsByStatusRequest = RequestUnion<
+  any,
+  any,
+  {
     status?: 'available' | 'pending' | 'sold';
-  };
-};
+  }
+>;
 
 export type FindPetsByStatusResponse =
   | ResponseUnion<
@@ -44,17 +47,17 @@ export type FindPetsByStatusResponse =
   | ResponseUnion<400>;
 
 export type FindPetsByStatusRequestResult = RequestResult<
-  Request,
+  FindPetsByStatusRequest,
   FindPetsByStatusResponse
 >;
 
 export function findPetsByStatus(
   requestHandler: SimpleRequestHandler,
-  payload: FindPetsByStatusPayload,
+  payload: RequestPayload<FindPetsByStatusRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<FindPetsByStatusRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: findPetsByStatusEndpointSchema}),
+    createRequest(findPetsByStatusEndpointSchema, payload),
     config
   );
 }

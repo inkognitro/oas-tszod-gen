@@ -14,11 +14,13 @@ import {
   $500InternalServerErrorResponse,
 } from '@example-outputs/petstore1';
 import {
+  RequestUnion,
+  RequestBodyData,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore1/core';
 
 export const optionsBulkObjectEndpointSchema = {
@@ -39,12 +41,9 @@ export const optionsBulkObjectEndpointSchema = {
   },
 };
 
-export type OptionsBulkObjectRequestBody = {
-  contentType: 'application/json';
-  body: BulkObjectId;
-};
-
-export type OptionsBulkObjectPayload = OptionsBulkObjectRequestBody;
+export type OptionsBulkObjectRequest = RequestUnion<
+  RequestBodyData<'application/json', BulkObjectId>
+>;
 
 export type OptionsBulkObjectResponse =
   | $200OkBulkAuthorizationsResponse<200>
@@ -56,20 +55,17 @@ export type OptionsBulkObjectResponse =
   | $500InternalServerErrorResponse<500>;
 
 export type OptionsBulkObjectRequestResult = RequestResult<
-  Request,
+  OptionsBulkObjectRequest,
   OptionsBulkObjectResponse
 >;
 
 export function optionsBulkObject(
   requestHandler: SimpleRequestHandler,
-  payload: OptionsBulkObjectPayload,
+  payload: RequestPayload<OptionsBulkObjectRequest, 'contentType' | 'body'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<OptionsBulkObjectRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: optionsBulkObjectEndpointSchema,
-    }),
+    createRequest(optionsBulkObjectEndpointSchema, payload),
     config
   );
 }

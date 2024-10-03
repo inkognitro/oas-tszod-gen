@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getApiV3KlinesEndpointSchema = {
   path: '/api/v3/klines',
@@ -28,8 +29,10 @@ export const getApiV3KlinesEndpointSchema = {
   },
 };
 
-export type GetApiV3KlinesPayload = {
-  queryParams: {
+export type GetApiV3KlinesRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     interval:
       | '1s'
@@ -52,8 +55,8 @@ export type GetApiV3KlinesPayload = {
     endTime?: number; // int
     timeZone?: string;
     limit?: number; // int
-  };
-};
+  }
+>;
 
 export type GetApiV3KlinesResponse =
   | ResponseUnion<
@@ -69,17 +72,17 @@ export type GetApiV3KlinesResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3KlinesRequestResult = RequestResult<
-  Request,
+  GetApiV3KlinesRequest,
   GetApiV3KlinesResponse
 >;
 
 export function getApiV3Klines(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3KlinesPayload,
+  payload: RequestPayload<GetApiV3KlinesRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3KlinesRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getApiV3KlinesEndpointSchema}),
+    createRequest(getApiV3KlinesEndpointSchema, payload),
     config
   );
 }

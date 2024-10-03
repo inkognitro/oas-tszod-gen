@@ -11,11 +11,12 @@ import {
   $500InternalServerErrorResponse,
 } from '@example-outputs/petstore1';
 import {
+  RequestUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore1/core';
 
 export const optionsObjectEndpointSchema = {
@@ -33,11 +34,12 @@ export const optionsObjectEndpointSchema = {
   },
 };
 
-export type OptionsObjectPayload = {
-  pathParams: {
+export type OptionsObjectRequest = RequestUnion<
+  any,
+  {
     object_id: string;
-  };
-};
+  }
+>;
 
 export type OptionsObjectResponse =
   | $200OkAuthorizationsResponse<200>
@@ -48,17 +50,17 @@ export type OptionsObjectResponse =
   | $500InternalServerErrorResponse<500>;
 
 export type OptionsObjectRequestResult = RequestResult<
-  Request,
+  OptionsObjectRequest,
   OptionsObjectResponse
 >;
 
 export function optionsObject(
   requestHandler: SimpleRequestHandler,
-  payload: OptionsObjectPayload,
+  payload: RequestPayload<OptionsObjectRequest, 'pathParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<OptionsObjectRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: optionsObjectEndpointSchema}),
+    createRequest(optionsObjectEndpointSchema, payload),
     config
   );
 }

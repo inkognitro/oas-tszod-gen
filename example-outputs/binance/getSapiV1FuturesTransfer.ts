@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1FuturesTransferEndpointSchema = {
   path: '/sapi/v1/futures/transfer',
@@ -33,8 +34,10 @@ export const getSapiV1FuturesTransferEndpointSchema = {
   },
 };
 
-export type GetSapiV1FuturesTransferPayload = {
-  queryParams: {
+export type GetSapiV1FuturesTransferRequest = RequestUnion<
+  any,
+  any,
+  {
     asset: string;
     startTime: number; // int
     endTime?: number; // int
@@ -43,8 +46,8 @@ export type GetSapiV1FuturesTransferPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1FuturesTransferResponse =
   | ResponseUnion<
@@ -68,20 +71,17 @@ export type GetSapiV1FuturesTransferResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1FuturesTransferRequestResult = RequestResult<
-  Request,
+  GetSapiV1FuturesTransferRequest,
   GetSapiV1FuturesTransferResponse
 >;
 
 export function getSapiV1FuturesTransfer(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1FuturesTransferPayload,
+  payload: RequestPayload<GetSapiV1FuturesTransferRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1FuturesTransferRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1FuturesTransferEndpointSchema,
-    }),
+    createRequest(getSapiV1FuturesTransferEndpointSchema, payload),
     config
   );
 }

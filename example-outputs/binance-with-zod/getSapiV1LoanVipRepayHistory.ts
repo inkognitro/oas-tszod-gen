@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1LoanVipRepayHistoryEndpointSchema = {
@@ -63,8 +64,10 @@ export const getSapiV1LoanVipRepayHistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1LoanVipRepayHistoryPayload = {
-  queryParams: {
+export type GetSapiV1LoanVipRepayHistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     orderId?: number; // int
     loanCoin?: string;
     startTime?: number; // int
@@ -74,8 +77,8 @@ export type GetSapiV1LoanVipRepayHistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LoanVipRepayHistoryResponse =
   | ResponseUnion<
@@ -99,20 +102,17 @@ export type GetSapiV1LoanVipRepayHistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LoanVipRepayHistoryRequestResult = RequestResult<
-  Request,
+  GetSapiV1LoanVipRepayHistoryRequest,
   GetSapiV1LoanVipRepayHistoryResponse
 >;
 
 export function getSapiV1LoanVipRepayHistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LoanVipRepayHistoryPayload,
+  payload: RequestPayload<GetSapiV1LoanVipRepayHistoryRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanVipRepayHistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LoanVipRepayHistoryEndpointSchema,
-    }),
+    createRequest(getSapiV1LoanVipRepayHistoryEndpointSchema, payload),
     config
   );
 }

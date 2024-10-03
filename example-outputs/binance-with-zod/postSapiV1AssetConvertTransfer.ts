@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1AssetConvertTransferEndpointSchema = {
@@ -52,8 +53,10 @@ export const postSapiV1AssetConvertTransferEndpointSchema = {
   },
 };
 
-export type PostSapiV1AssetConvertTransferPayload = {
-  queryParams: {
+export type PostSapiV1AssetConvertTransferRequest = RequestUnion<
+  any,
+  any,
+  {
     clientTranId: string;
     asset: string;
     amount: number;
@@ -61,8 +64,8 @@ export type PostSapiV1AssetConvertTransferPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1AssetConvertTransferResponse =
   | ResponseUnion<
@@ -79,20 +82,17 @@ export type PostSapiV1AssetConvertTransferResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1AssetConvertTransferRequestResult = RequestResult<
-  Request,
+  PostSapiV1AssetConvertTransferRequest,
   PostSapiV1AssetConvertTransferResponse
 >;
 
 export function postSapiV1AssetConvertTransfer(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1AssetConvertTransferPayload,
+  payload: RequestPayload<PostSapiV1AssetConvertTransferRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AssetConvertTransferRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1AssetConvertTransferEndpointSchema,
-    }),
+    createRequest(postSapiV1AssetConvertTransferEndpointSchema, payload),
     config
   );
 }

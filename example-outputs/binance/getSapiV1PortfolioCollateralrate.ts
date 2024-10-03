@@ -1,13 +1,13 @@
-import {Error} from '@example-outputs/binance';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1PortfolioCollateralrateEndpointSchema = {
   path: '/sapi/v1/portfolio/collateralRate',
@@ -28,6 +28,8 @@ export const getSapiV1PortfolioCollateralrateEndpointSchema = {
   },
 };
 
+export type GetSapiV1PortfolioCollateralrateRequest = Request;
+
 export type GetSapiV1PortfolioCollateralrateResponse =
   | ResponseUnion<
       200,
@@ -42,7 +44,7 @@ export type GetSapiV1PortfolioCollateralrateResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1PortfolioCollateralrateRequestResult = RequestResult<
-  Request,
+  GetSapiV1PortfolioCollateralrateRequest,
   GetSapiV1PortfolioCollateralrateResponse
 >;
 
@@ -51,9 +53,7 @@ export function getSapiV1PortfolioCollateralrate(
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1PortfolioCollateralrateRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      endpointSchema: getSapiV1PortfolioCollateralrateEndpointSchema,
-    }),
+    createRequest(getSapiV1PortfolioCollateralrateEndpointSchema),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1AlgoFuturesNewordertwapEndpointSchema = {
   path: '/sapi/v1/algo/futures/newOrderTwap',
@@ -33,8 +34,10 @@ export const postSapiV1AlgoFuturesNewordertwapEndpointSchema = {
   },
 };
 
-export type PostSapiV1AlgoFuturesNewordertwapPayload = {
-  queryParams: {
+export type PostSapiV1AlgoFuturesNewordertwapRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     side: 'SELL' | 'BUY';
     positionSide?: 'BOTH' | 'LONG' | 'SHORT';
@@ -46,8 +49,8 @@ export type PostSapiV1AlgoFuturesNewordertwapPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1AlgoFuturesNewordertwapResponse =
   | ResponseUnion<
@@ -66,20 +69,20 @@ export type PostSapiV1AlgoFuturesNewordertwapResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1AlgoFuturesNewordertwapRequestResult = RequestResult<
-  Request,
+  PostSapiV1AlgoFuturesNewordertwapRequest,
   PostSapiV1AlgoFuturesNewordertwapResponse
 >;
 
 export function postSapiV1AlgoFuturesNewordertwap(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1AlgoFuturesNewordertwapPayload,
+  payload: RequestPayload<
+    PostSapiV1AlgoFuturesNewordertwapRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AlgoFuturesNewordertwapRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1AlgoFuturesNewordertwapEndpointSchema,
-    }),
+    createRequest(postSapiV1AlgoFuturesNewordertwapEndpointSchema, payload),
     config
   );
 }

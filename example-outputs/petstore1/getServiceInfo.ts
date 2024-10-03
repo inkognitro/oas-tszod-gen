@@ -5,8 +5,8 @@ import {
   $500InternalServerErrorResponse,
 } from '@example-outputs/petstore1';
 import {
-  RequestResult,
   Request,
+  RequestResult,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -23,12 +23,14 @@ export const getServiceInfoEndpointSchema = {
   },
 };
 
+export type GetServiceInfoRequest = Request;
+
 export type GetServiceInfoResponse =
   | $200ServiceInfoResponse<200>
   | $500InternalServerErrorResponse<500>;
 
 export type GetServiceInfoRequestResult = RequestResult<
-  Request,
+  GetServiceInfoRequest,
   GetServiceInfoResponse
 >;
 
@@ -37,7 +39,7 @@ export function getServiceInfo(
   config?: RequestHandlerExecutionConfig
 ): Promise<GetServiceInfoRequestResult> {
   return requestHandler.execute(
-    createRequest({endpointSchema: getServiceInfoEndpointSchema}),
+    createRequest(getServiceInfoEndpointSchema),
     config
   );
 }

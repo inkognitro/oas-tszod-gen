@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SubAccountFuturesAccountEndpointSchema = {
   path: '/sapi/v1/sub-account/futures/account',
@@ -33,14 +34,16 @@ export const getSapiV1SubAccountFuturesAccountEndpointSchema = {
   },
 };
 
-export type GetSapiV1SubAccountFuturesAccountPayload = {
-  queryParams: {
+export type GetSapiV1SubAccountFuturesAccountRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SubAccountFuturesAccountResponse =
   | ResponseUnion<
@@ -81,20 +84,20 @@ export type GetSapiV1SubAccountFuturesAccountResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountFuturesAccountRequestResult = RequestResult<
-  Request,
+  GetSapiV1SubAccountFuturesAccountRequest,
   GetSapiV1SubAccountFuturesAccountResponse
 >;
 
 export function getSapiV1SubAccountFuturesAccount(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SubAccountFuturesAccountPayload,
+  payload: RequestPayload<
+    GetSapiV1SubAccountFuturesAccountRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountFuturesAccountRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SubAccountFuturesAccountEndpointSchema,
-    }),
+    createRequest(getSapiV1SubAccountFuturesAccountEndpointSchema, payload),
     config
   );
 }

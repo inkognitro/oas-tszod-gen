@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1LoanVipRequestDataEndpointSchema = {
   path: '/sapi/v1/loan/vip/request/data',
@@ -33,15 +34,17 @@ export const getSapiV1LoanVipRequestDataEndpointSchema = {
   },
 };
 
-export type GetSapiV1LoanVipRequestDataPayload = {
-  queryParams: {
+export type GetSapiV1LoanVipRequestDataRequest = RequestUnion<
+  any,
+  any,
+  {
     current?: number; // int
     limit?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LoanVipRequestDataResponse =
   | ResponseUnion<
@@ -68,20 +71,17 @@ export type GetSapiV1LoanVipRequestDataResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LoanVipRequestDataRequestResult = RequestResult<
-  Request,
+  GetSapiV1LoanVipRequestDataRequest,
   GetSapiV1LoanVipRequestDataResponse
 >;
 
 export function getSapiV1LoanVipRequestData(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LoanVipRequestDataPayload,
+  payload: RequestPayload<GetSapiV1LoanVipRequestDataRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanVipRequestDataRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LoanVipRequestDataEndpointSchema,
-    }),
+    createRequest(getSapiV1LoanVipRequestDataEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1PortfolioAssetIndexPriceEndpointSchema = {
   path: '/sapi/v1/portfolio/asset-index-price',
@@ -28,11 +29,13 @@ export const getSapiV1PortfolioAssetIndexPriceEndpointSchema = {
   },
 };
 
-export type GetSapiV1PortfolioAssetIndexPricePayload = {
-  queryParams: {
+export type GetSapiV1PortfolioAssetIndexPriceRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1PortfolioAssetIndexPriceResponse =
   | ResponseUnion<
@@ -49,20 +52,20 @@ export type GetSapiV1PortfolioAssetIndexPriceResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1PortfolioAssetIndexPriceRequestResult = RequestResult<
-  Request,
+  GetSapiV1PortfolioAssetIndexPriceRequest,
   GetSapiV1PortfolioAssetIndexPriceResponse
 >;
 
 export function getSapiV1PortfolioAssetIndexPrice(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1PortfolioAssetIndexPricePayload,
+  payload: RequestPayload<
+    GetSapiV1PortfolioAssetIndexPriceRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1PortfolioAssetIndexPriceRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1PortfolioAssetIndexPriceEndpointSchema,
-    }),
+    createRequest(getSapiV1PortfolioAssetIndexPriceEndpointSchema, payload),
     config
   );
 }

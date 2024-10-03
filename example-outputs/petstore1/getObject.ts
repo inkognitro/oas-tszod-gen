@@ -15,11 +15,12 @@ import {
   $500InternalServerErrorResponse,
 } from '@example-outputs/petstore1';
 import {
+  RequestUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore1/core';
 
 export const getObjectEndpointSchema = {
@@ -38,14 +39,15 @@ export const getObjectEndpointSchema = {
   },
 };
 
-export type GetObjectPayload = {
-  queryParams: {
-    expand?: boolean;
-  };
-  pathParams: {
+export type GetObjectRequest = RequestUnion<
+  any,
+  {
     object_id: string;
-  };
-};
+  },
+  {
+    expand?: boolean;
+  }
+>;
 
 export type GetObjectResponse =
   | $200OkDrsObjectResponse<200>
@@ -56,15 +58,18 @@ export type GetObjectResponse =
   | $404NotFoundDrsObjectResponse<404>
   | $500InternalServerErrorResponse<500>;
 
-export type GetObjectRequestResult = RequestResult<Request, GetObjectResponse>;
+export type GetObjectRequestResult = RequestResult<
+  GetObjectRequest,
+  GetObjectResponse
+>;
 
 export function getObject(
   requestHandler: SimpleRequestHandler,
-  payload: GetObjectPayload,
+  payload: RequestPayload<GetObjectRequest, 'pathParams' | 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetObjectRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getObjectEndpointSchema}),
+    createRequest(getObjectEndpointSchema, payload),
     config
   );
 }

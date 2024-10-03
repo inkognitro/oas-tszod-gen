@@ -6,13 +6,14 @@ import {
 } from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const deleteApiV3OrderEndpointSchema = {
@@ -57,8 +58,10 @@ export const deleteApiV3OrderEndpointSchema = {
   },
 };
 
-export type DeleteApiV3OrderPayload = {
-  queryParams: {
+export type DeleteApiV3OrderRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     orderId?: number; // int
     origClientOrderId?: string;
@@ -67,8 +70,8 @@ export type DeleteApiV3OrderPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type DeleteApiV3OrderResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', Order>>
@@ -76,17 +79,17 @@ export type DeleteApiV3OrderResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteApiV3OrderRequestResult = RequestResult<
-  Request,
+  DeleteApiV3OrderRequest,
   DeleteApiV3OrderResponse
 >;
 
 export function deleteApiV3Order(
   requestHandler: SimpleRequestHandler,
-  payload: DeleteApiV3OrderPayload,
+  payload: RequestPayload<DeleteApiV3OrderRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteApiV3OrderRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: deleteApiV3OrderEndpointSchema}),
+    createRequest(deleteApiV3OrderEndpointSchema, payload),
     config
   );
 }

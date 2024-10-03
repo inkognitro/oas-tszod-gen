@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1SimpleEarnFlexibleListEndpointSchema = {
@@ -69,16 +70,18 @@ export const getSapiV1SimpleEarnFlexibleListEndpointSchema = {
   },
 };
 
-export type GetSapiV1SimpleEarnFlexibleListPayload = {
-  queryParams: {
+export type GetSapiV1SimpleEarnFlexibleListRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     current?: number; // int
     size?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SimpleEarnFlexibleListResponse =
   | ResponseUnion<
@@ -111,20 +114,20 @@ export type GetSapiV1SimpleEarnFlexibleListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnFlexibleListRequestResult = RequestResult<
-  Request,
+  GetSapiV1SimpleEarnFlexibleListRequest,
   GetSapiV1SimpleEarnFlexibleListResponse
 >;
 
 export function getSapiV1SimpleEarnFlexibleList(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnFlexibleListPayload,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnFlexibleListRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexibleListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SimpleEarnFlexibleListEndpointSchema,
-    }),
+    createRequest(getSapiV1SimpleEarnFlexibleListEndpointSchema, payload),
     config
   );
 }

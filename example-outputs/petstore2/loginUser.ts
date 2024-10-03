@@ -1,11 +1,12 @@
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2/core';
 
 export const loginUserEndpointSchema = {
@@ -26,12 +27,14 @@ export const loginUserEndpointSchema = {
   },
 };
 
-export type LoginUserPayload = {
-  queryParams: {
+export type LoginUserRequest = RequestUnion<
+  any,
+  any,
+  {
     username?: string;
     password?: string;
-  };
-};
+  }
+>;
 
 export type LoginUserResponse =
   | ResponseUnion<
@@ -45,15 +48,18 @@ export type LoginUserResponse =
     >
   | ResponseUnion<400>;
 
-export type LoginUserRequestResult = RequestResult<Request, LoginUserResponse>;
+export type LoginUserRequestResult = RequestResult<
+  LoginUserRequest,
+  LoginUserResponse
+>;
 
 export function loginUser(
   requestHandler: SimpleRequestHandler,
-  payload: LoginUserPayload,
+  payload: RequestPayload<LoginUserRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<LoginUserRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: loginUserEndpointSchema}),
+    createRequest(loginUserEndpointSchema, payload),
     config
   );
 }

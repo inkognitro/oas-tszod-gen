@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1ConvertAcceptquoteEndpointSchema = {
   path: '/sapi/v1/convert/acceptQuote',
@@ -33,14 +34,16 @@ export const postSapiV1ConvertAcceptquoteEndpointSchema = {
   },
 };
 
-export type PostSapiV1ConvertAcceptquotePayload = {
-  queryParams: {
+export type PostSapiV1ConvertAcceptquoteRequest = RequestUnion<
+  any,
+  any,
+  {
     quoteId: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1ConvertAcceptquoteResponse =
   | ResponseUnion<
@@ -58,20 +61,17 @@ export type PostSapiV1ConvertAcceptquoteResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1ConvertAcceptquoteRequestResult = RequestResult<
-  Request,
+  PostSapiV1ConvertAcceptquoteRequest,
   PostSapiV1ConvertAcceptquoteResponse
 >;
 
 export function postSapiV1ConvertAcceptquote(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1ConvertAcceptquotePayload,
+  payload: RequestPayload<PostSapiV1ConvertAcceptquoteRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ConvertAcceptquoteRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1ConvertAcceptquoteEndpointSchema,
-    }),
+    createRequest(postSapiV1ConvertAcceptquoteEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1SimpleEarnFlexibleSubscribeEndpointSchema = {
@@ -52,8 +53,10 @@ export const postSapiV1SimpleEarnFlexibleSubscribeEndpointSchema = {
   },
 };
 
-export type PostSapiV1SimpleEarnFlexibleSubscribePayload = {
-  queryParams: {
+export type PostSapiV1SimpleEarnFlexibleSubscribeRequest = RequestUnion<
+  any,
+  any,
+  {
     productId: string;
     amount: number;
     autoSubscribe?: boolean;
@@ -61,8 +64,8 @@ export type PostSapiV1SimpleEarnFlexibleSubscribePayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1SimpleEarnFlexibleSubscribeResponse =
   | ResponseUnion<
@@ -79,20 +82,20 @@ export type PostSapiV1SimpleEarnFlexibleSubscribeResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SimpleEarnFlexibleSubscribeRequestResult = RequestResult<
-  Request,
+  PostSapiV1SimpleEarnFlexibleSubscribeRequest,
   PostSapiV1SimpleEarnFlexibleSubscribeResponse
 >;
 
 export function postSapiV1SimpleEarnFlexibleSubscribe(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1SimpleEarnFlexibleSubscribePayload,
+  payload: RequestPayload<
+    PostSapiV1SimpleEarnFlexibleSubscribeRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnFlexibleSubscribeRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1SimpleEarnFlexibleSubscribeEndpointSchema,
-    }),
+    createRequest(postSapiV1SimpleEarnFlexibleSubscribeEndpointSchema, payload),
     config
   );
 }

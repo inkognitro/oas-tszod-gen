@@ -1,10 +1,10 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -47,6 +47,8 @@ export const getSapiV1MarginLeveragebracketEndpointSchema = {
   },
 };
 
+export type GetSapiV1MarginLeveragebracketRequest = Request;
+
 export type GetSapiV1MarginLeveragebracketResponse =
   | ResponseUnion<
       200,
@@ -68,7 +70,7 @@ export type GetSapiV1MarginLeveragebracketResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginLeveragebracketRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginLeveragebracketRequest,
   GetSapiV1MarginLeveragebracketResponse
 >;
 
@@ -77,9 +79,7 @@ export function getSapiV1MarginLeveragebracket(
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginLeveragebracketRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      endpointSchema: getSapiV1MarginLeveragebracketEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginLeveragebracketEndpointSchema),
     config
   );
 }

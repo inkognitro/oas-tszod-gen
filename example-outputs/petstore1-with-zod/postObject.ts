@@ -16,11 +16,12 @@ import {
 } from '@example-outputs/petstore1-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore1-with-zod/core';
 
 export const postObjectEndpointSchema = {
@@ -42,11 +43,12 @@ export const postObjectEndpointSchema = {
   },
 };
 
-export type PostObjectPayload = {
-  pathParams: {
+export type PostObjectRequest = RequestUnion<
+  any,
+  {
     object_id: string;
-  };
-};
+  }
+>;
 
 export type PostObjectResponse =
   | $200OkDrsObjectResponse<200>
@@ -58,17 +60,17 @@ export type PostObjectResponse =
   | $500InternalServerErrorResponse<500>;
 
 export type PostObjectRequestResult = RequestResult<
-  Request,
+  PostObjectRequest,
   PostObjectResponse
 >;
 
 export function postObject(
   requestHandler: SimpleRequestHandler,
-  payload: PostObjectPayload,
+  payload: RequestPayload<PostObjectRequest, 'pathParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostObjectRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: postObjectEndpointSchema}),
+    createRequest(postObjectEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1LendingProjectListEndpointSchema = {
   path: '/sapi/v1/lending/project/list',
@@ -33,8 +34,10 @@ export const getSapiV1LendingProjectListEndpointSchema = {
   },
 };
 
-export type GetSapiV1LendingProjectListPayload = {
-  queryParams: {
+export type GetSapiV1LendingProjectListRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     type: 'ACTIVITY' | 'CUSTOMIZED_FIXED';
     status?: 'ALL' | 'SUBSCRIBABLE' | 'UNSUBSCRIBABLE';
@@ -45,8 +48,8 @@ export type GetSapiV1LendingProjectListPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LendingProjectListResponse =
   | ResponseUnion<
@@ -77,20 +80,17 @@ export type GetSapiV1LendingProjectListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingProjectListRequestResult = RequestResult<
-  Request,
+  GetSapiV1LendingProjectListRequest,
   GetSapiV1LendingProjectListResponse
 >;
 
 export function getSapiV1LendingProjectList(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LendingProjectListPayload,
+  payload: RequestPayload<GetSapiV1LendingProjectListRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingProjectListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LendingProjectListEndpointSchema,
-    }),
+    createRequest(getSapiV1LendingProjectListEndpointSchema, payload),
     config
   );
 }

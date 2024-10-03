@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postApiV3SorOrderTestEndpointSchema = {
   path: '/api/v3/sor/order/test',
@@ -33,8 +34,10 @@ export const postApiV3SorOrderTestEndpointSchema = {
   },
 };
 
-export type PostApiV3SorOrderTestPayload = {
-  queryParams: {
+export type PostApiV3SorOrderTestRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     side: 'SELL' | 'BUY';
     type:
@@ -62,8 +65,8 @@ export type PostApiV3SorOrderTestPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostApiV3SorOrderTestResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', {}>>
@@ -71,20 +74,17 @@ export type PostApiV3SorOrderTestResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostApiV3SorOrderTestRequestResult = RequestResult<
-  Request,
+  PostApiV3SorOrderTestRequest,
   PostApiV3SorOrderTestResponse
 >;
 
 export function postApiV3SorOrderTest(
   requestHandler: SimpleRequestHandler,
-  payload: PostApiV3SorOrderTestPayload,
+  payload: RequestPayload<PostApiV3SorOrderTestRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3SorOrderTestRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postApiV3SorOrderTestEndpointSchema,
-    }),
+    createRequest(postApiV3SorOrderTestEndpointSchema, payload),
     config
   );
 }

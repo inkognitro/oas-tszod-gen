@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MarginIsolatedmargindataEndpointSchema = {
   path: '/sapi/v1/margin/isolatedMarginData',
@@ -33,15 +34,17 @@ export const getSapiV1MarginIsolatedmargindataEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginIsolatedmargindataPayload = {
-  queryParams: {
+export type GetSapiV1MarginIsolatedmargindataRequest = RequestUnion<
+  any,
+  any,
+  {
     vipLevel?: number; // int
     symbol?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginIsolatedmargindataResponse =
   | ResponseUnion<
@@ -64,20 +67,20 @@ export type GetSapiV1MarginIsolatedmargindataResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginIsolatedmargindataRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginIsolatedmargindataRequest,
   GetSapiV1MarginIsolatedmargindataResponse
 >;
 
 export function getSapiV1MarginIsolatedmargindata(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginIsolatedmargindataPayload,
+  payload: RequestPayload<
+    GetSapiV1MarginIsolatedmargindataRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginIsolatedmargindataRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginIsolatedmargindataEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginIsolatedmargindataEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1SubAccountUniversaltransferEndpointSchema = {
   path: '/sapi/v1/sub-account/universalTransfer',
@@ -33,8 +34,10 @@ export const postSapiV1SubAccountUniversaltransferEndpointSchema = {
   },
 };
 
-export type PostSapiV1SubAccountUniversaltransferPayload = {
-  queryParams: {
+export type PostSapiV1SubAccountUniversaltransferRequest = RequestUnion<
+  any,
+  any,
+  {
     fromEmail?: string;
     toEmail?: string;
     fromAccountType:
@@ -56,8 +59,8 @@ export type PostSapiV1SubAccountUniversaltransferPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1SubAccountUniversaltransferResponse =
   | ResponseUnion<
@@ -74,20 +77,20 @@ export type PostSapiV1SubAccountUniversaltransferResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SubAccountUniversaltransferRequestResult = RequestResult<
-  Request,
+  PostSapiV1SubAccountUniversaltransferRequest,
   PostSapiV1SubAccountUniversaltransferResponse
 >;
 
 export function postSapiV1SubAccountUniversaltransfer(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1SubAccountUniversaltransferPayload,
+  payload: RequestPayload<
+    PostSapiV1SubAccountUniversaltransferRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountUniversaltransferRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1SubAccountUniversaltransferEndpointSchema,
-    }),
+    createRequest(postSapiV1SubAccountUniversaltransferEndpointSchema, payload),
     config
   );
 }

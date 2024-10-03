@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1FiatOrdersEndpointSchema = {
@@ -68,8 +69,10 @@ export const getSapiV1FiatOrdersEndpointSchema = {
   },
 };
 
-export type GetSapiV1FiatOrdersPayload = {
-  queryParams: {
+export type GetSapiV1FiatOrdersRequest = RequestUnion<
+  any,
+  any,
+  {
     transactionType: number; // int
     beginTime?: number; // int
     endTime?: number; // int
@@ -78,8 +81,8 @@ export type GetSapiV1FiatOrdersPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1FiatOrdersResponse =
   | ResponseUnion<
@@ -109,20 +112,17 @@ export type GetSapiV1FiatOrdersResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1FiatOrdersRequestResult = RequestResult<
-  Request,
+  GetSapiV1FiatOrdersRequest,
   GetSapiV1FiatOrdersResponse
 >;
 
 export function getSapiV1FiatOrders(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1FiatOrdersPayload,
+  payload: RequestPayload<GetSapiV1FiatOrdersRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1FiatOrdersRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1FiatOrdersEndpointSchema,
-    }),
+    createRequest(getSapiV1FiatOrdersEndpointSchema, payload),
     config
   );
 }

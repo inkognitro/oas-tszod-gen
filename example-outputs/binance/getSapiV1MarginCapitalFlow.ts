@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MarginCapitalFlowEndpointSchema = {
   path: '/sapi/v1/margin/capital-flow',
@@ -33,8 +34,10 @@ export const getSapiV1MarginCapitalFlowEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginCapitalFlowPayload = {
-  queryParams: {
+export type GetSapiV1MarginCapitalFlowRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     symbol?: string;
     type?:
@@ -61,8 +64,8 @@ export type GetSapiV1MarginCapitalFlowPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginCapitalFlowResponse =
   | ResponseUnion<
@@ -84,20 +87,17 @@ export type GetSapiV1MarginCapitalFlowResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginCapitalFlowRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginCapitalFlowRequest,
   GetSapiV1MarginCapitalFlowResponse
 >;
 
 export function getSapiV1MarginCapitalFlow(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginCapitalFlowPayload,
+  payload: RequestPayload<GetSapiV1MarginCapitalFlowRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginCapitalFlowRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginCapitalFlowEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginCapitalFlowEndpointSchema, payload),
     config
   );
 }

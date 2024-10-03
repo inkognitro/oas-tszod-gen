@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1AccountDisablefastwithdrawswitchEndpointSchema = {
@@ -45,13 +46,15 @@ export const postSapiV1AccountDisablefastwithdrawswitchEndpointSchema = {
   },
 };
 
-export type PostSapiV1AccountDisablefastwithdrawswitchPayload = {
-  queryParams: {
+export type PostSapiV1AccountDisablefastwithdrawswitchRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1AccountDisablefastwithdrawswitchResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', {}>>
@@ -59,18 +62,24 @@ export type PostSapiV1AccountDisablefastwithdrawswitchResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1AccountDisablefastwithdrawswitchRequestResult =
-  RequestResult<Request, PostSapiV1AccountDisablefastwithdrawswitchResponse>;
+  RequestResult<
+    PostSapiV1AccountDisablefastwithdrawswitchRequest,
+    PostSapiV1AccountDisablefastwithdrawswitchResponse
+  >;
 
 export function postSapiV1AccountDisablefastwithdrawswitch(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1AccountDisablefastwithdrawswitchPayload,
+  payload: RequestPayload<
+    PostSapiV1AccountDisablefastwithdrawswitchRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AccountDisablefastwithdrawswitchRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1AccountDisablefastwithdrawswitchEndpointSchema,
-    }),
+    createRequest(
+      postSapiV1AccountDisablefastwithdrawswitchEndpointSchema,
+      payload
+    ),
     config
   );
 }

@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1LendingAutoInvestPlanEditStatusEndpointSchema = {
@@ -51,15 +52,17 @@ export const postSapiV1LendingAutoInvestPlanEditStatusEndpointSchema = {
   },
 };
 
-export type PostSapiV1LendingAutoInvestPlanEditStatusPayload = {
-  queryParams: {
+export type PostSapiV1LendingAutoInvestPlanEditStatusRequest = RequestUnion<
+  any,
+  any,
+  {
     planId: number; // int
     status: 'ONGOING' | 'PAUSED' | 'REMOVED';
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1LendingAutoInvestPlanEditStatusResponse =
   | ResponseUnion<
@@ -77,18 +80,24 @@ export type PostSapiV1LendingAutoInvestPlanEditStatusResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1LendingAutoInvestPlanEditStatusRequestResult =
-  RequestResult<Request, PostSapiV1LendingAutoInvestPlanEditStatusResponse>;
+  RequestResult<
+    PostSapiV1LendingAutoInvestPlanEditStatusRequest,
+    PostSapiV1LendingAutoInvestPlanEditStatusResponse
+  >;
 
 export function postSapiV1LendingAutoInvestPlanEditStatus(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1LendingAutoInvestPlanEditStatusPayload,
+  payload: RequestPayload<
+    PostSapiV1LendingAutoInvestPlanEditStatusRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingAutoInvestPlanEditStatusRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1LendingAutoInvestPlanEditStatusEndpointSchema,
-    }),
+    createRequest(
+      postSapiV1LendingAutoInvestPlanEditStatusEndpointSchema,
+      payload
+    ),
     config
   );
 }

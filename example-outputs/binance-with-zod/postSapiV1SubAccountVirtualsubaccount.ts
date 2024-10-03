@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1SubAccountVirtualsubaccountEndpointSchema = {
@@ -48,14 +49,16 @@ export const postSapiV1SubAccountVirtualsubaccountEndpointSchema = {
   },
 };
 
-export type PostSapiV1SubAccountVirtualsubaccountPayload = {
-  queryParams: {
+export type PostSapiV1SubAccountVirtualsubaccountRequest = RequestUnion<
+  any,
+  any,
+  {
     subAccountString: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1SubAccountVirtualsubaccountResponse =
   | ResponseUnion<
@@ -71,20 +74,20 @@ export type PostSapiV1SubAccountVirtualsubaccountResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SubAccountVirtualsubaccountRequestResult = RequestResult<
-  Request,
+  PostSapiV1SubAccountVirtualsubaccountRequest,
   PostSapiV1SubAccountVirtualsubaccountResponse
 >;
 
 export function postSapiV1SubAccountVirtualsubaccount(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1SubAccountVirtualsubaccountPayload,
+  payload: RequestPayload<
+    PostSapiV1SubAccountVirtualsubaccountRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountVirtualsubaccountRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1SubAccountVirtualsubaccountEndpointSchema,
-    }),
+    createRequest(postSapiV1SubAccountVirtualsubaccountEndpointSchema, payload),
     config
   );
 }

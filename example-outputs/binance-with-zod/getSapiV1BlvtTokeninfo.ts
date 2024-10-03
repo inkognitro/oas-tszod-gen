@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1BlvtTokeninfoEndpointSchema = {
@@ -60,11 +61,13 @@ export const getSapiV1BlvtTokeninfoEndpointSchema = {
   },
 };
 
-export type GetSapiV1BlvtTokeninfoPayload = {
-  queryParams: {
+export type GetSapiV1BlvtTokeninfoRequest = RequestUnion<
+  any,
+  any,
+  {
     tokenName?: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1BlvtTokeninfoResponse =
   | ResponseUnion<
@@ -97,20 +100,17 @@ export type GetSapiV1BlvtTokeninfoResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1BlvtTokeninfoRequestResult = RequestResult<
-  Request,
+  GetSapiV1BlvtTokeninfoRequest,
   GetSapiV1BlvtTokeninfoResponse
 >;
 
 export function getSapiV1BlvtTokeninfo(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1BlvtTokeninfoPayload,
+  payload: RequestPayload<GetSapiV1BlvtTokeninfoRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1BlvtTokeninfoRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1BlvtTokeninfoEndpointSchema,
-    }),
+    createRequest(getSapiV1BlvtTokeninfoEndpointSchema, payload),
     config
   );
 }

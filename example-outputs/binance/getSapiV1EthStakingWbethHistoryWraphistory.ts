@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1EthStakingWbethHistoryWraphistoryEndpointSchema = {
   path: '/sapi/v1/eth-staking/wbeth/history/wrapHistory',
@@ -33,8 +34,10 @@ export const getSapiV1EthStakingWbethHistoryWraphistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1EthStakingWbethHistoryWraphistoryPayload = {
-  queryParams: {
+export type GetSapiV1EthStakingWbethHistoryWraphistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     startTime?: number; // int
     endTime?: number; // int
     current?: number; // int
@@ -42,8 +45,8 @@ export type GetSapiV1EthStakingWbethHistoryWraphistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1EthStakingWbethHistoryWraphistoryResponse =
   | ResponseUnion<
@@ -68,18 +71,24 @@ export type GetSapiV1EthStakingWbethHistoryWraphistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1EthStakingWbethHistoryWraphistoryRequestResult =
-  RequestResult<Request, GetSapiV1EthStakingWbethHistoryWraphistoryResponse>;
+  RequestResult<
+    GetSapiV1EthStakingWbethHistoryWraphistoryRequest,
+    GetSapiV1EthStakingWbethHistoryWraphistoryResponse
+  >;
 
 export function getSapiV1EthStakingWbethHistoryWraphistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1EthStakingWbethHistoryWraphistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1EthStakingWbethHistoryWraphistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1EthStakingWbethHistoryWraphistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1EthStakingWbethHistoryWraphistoryEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1EthStakingWbethHistoryWraphistoryEndpointSchema,
+      payload
+    ),
     config
   );
 }

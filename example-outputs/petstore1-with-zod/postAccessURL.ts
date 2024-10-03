@@ -16,11 +16,12 @@ import {
 } from '@example-outputs/petstore1-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore1-with-zod/core';
 
 export const postAccessURLEndpointSchema = {
@@ -43,12 +44,13 @@ export const postAccessURLEndpointSchema = {
   },
 };
 
-export type PostAccessURLPayload = {
-  pathParams: {
+export type PostAccessURLRequest = RequestUnion<
+  any,
+  {
     object_id: string;
     access_id: string;
-  };
-};
+  }
+>;
 
 export type PostAccessURLResponse =
   | $200OkAccessResponse<200>
@@ -60,17 +62,17 @@ export type PostAccessURLResponse =
   | $500InternalServerErrorResponse<500>;
 
 export type PostAccessURLRequestResult = RequestResult<
-  Request,
+  PostAccessURLRequest,
   PostAccessURLResponse
 >;
 
 export function postAccessURL(
   requestHandler: SimpleRequestHandler,
-  payload: PostAccessURLPayload,
+  payload: RequestPayload<PostAccessURLRequest, 'pathParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostAccessURLRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: postAccessURLEndpointSchema}),
+    createRequest(postAccessURLEndpointSchema, payload),
     config
   );
 }

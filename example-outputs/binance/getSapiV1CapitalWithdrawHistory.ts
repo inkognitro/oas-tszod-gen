@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1CapitalWithdrawHistoryEndpointSchema = {
   path: '/sapi/v1/capital/withdraw/history',
@@ -33,8 +34,10 @@ export const getSapiV1CapitalWithdrawHistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1CapitalWithdrawHistoryPayload = {
-  queryParams: {
+export type GetSapiV1CapitalWithdrawHistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     coin?: string;
     withdrawOrderId?: string;
     status?: number; // int
@@ -45,8 +48,8 @@ export type GetSapiV1CapitalWithdrawHistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1CapitalWithdrawHistoryResponse =
   | ResponseUnion<
@@ -74,20 +77,20 @@ export type GetSapiV1CapitalWithdrawHistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1CapitalWithdrawHistoryRequestResult = RequestResult<
-  Request,
+  GetSapiV1CapitalWithdrawHistoryRequest,
   GetSapiV1CapitalWithdrawHistoryResponse
 >;
 
 export function getSapiV1CapitalWithdrawHistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1CapitalWithdrawHistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1CapitalWithdrawHistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalWithdrawHistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1CapitalWithdrawHistoryEndpointSchema,
-    }),
+    createRequest(getSapiV1CapitalWithdrawHistoryEndpointSchema, payload),
     config
   );
 }

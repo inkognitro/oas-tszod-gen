@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1BlvtRedeemRecordEndpointSchema = {
@@ -60,8 +61,10 @@ export const getSapiV1BlvtRedeemRecordEndpointSchema = {
   },
 };
 
-export type GetSapiV1BlvtRedeemRecordPayload = {
-  queryParams: {
+export type GetSapiV1BlvtRedeemRecordRequest = RequestUnion<
+  any,
+  any,
+  {
     tokenName?: string;
     id?: number; // int
     startTime?: number; // int
@@ -70,8 +73,8 @@ export type GetSapiV1BlvtRedeemRecordPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1BlvtRedeemRecordResponse =
   | ResponseUnion<
@@ -93,20 +96,17 @@ export type GetSapiV1BlvtRedeemRecordResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1BlvtRedeemRecordRequestResult = RequestResult<
-  Request,
+  GetSapiV1BlvtRedeemRecordRequest,
   GetSapiV1BlvtRedeemRecordResponse
 >;
 
 export function getSapiV1BlvtRedeemRecord(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1BlvtRedeemRecordPayload,
+  payload: RequestPayload<GetSapiV1BlvtRedeemRecordRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1BlvtRedeemRecordRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1BlvtRedeemRecordEndpointSchema,
-    }),
+    createRequest(getSapiV1BlvtRedeemRecordEndpointSchema, payload),
     config
   );
 }

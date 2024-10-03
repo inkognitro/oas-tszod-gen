@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const deleteApiV3UserdatastreamEndpointSchema = {
   path: '/api/v3/userDataStream',
@@ -28,31 +29,30 @@ export const deleteApiV3UserdatastreamEndpointSchema = {
   },
 };
 
-export type DeleteApiV3UserdatastreamPayload = {
-  queryParams: {
+export type DeleteApiV3UserdatastreamRequest = RequestUnion<
+  any,
+  any,
+  {
     listenKey?: string;
-  };
-};
+  }
+>;
 
 export type DeleteApiV3UserdatastreamResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', {}>>
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteApiV3UserdatastreamRequestResult = RequestResult<
-  Request,
+  DeleteApiV3UserdatastreamRequest,
   DeleteApiV3UserdatastreamResponse
 >;
 
 export function deleteApiV3Userdatastream(
   requestHandler: SimpleRequestHandler,
-  payload: DeleteApiV3UserdatastreamPayload,
+  payload: RequestPayload<DeleteApiV3UserdatastreamRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteApiV3UserdatastreamRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: deleteApiV3UserdatastreamEndpointSchema,
-    }),
+    createRequest(deleteApiV3UserdatastreamEndpointSchema, payload),
     config
   );
 }

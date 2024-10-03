@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const deleteSapiV1UserdatastreamEndpointSchema = {
@@ -36,31 +37,30 @@ export const deleteSapiV1UserdatastreamEndpointSchema = {
   },
 };
 
-export type DeleteSapiV1UserdatastreamPayload = {
-  queryParams: {
+export type DeleteSapiV1UserdatastreamRequest = RequestUnion<
+  any,
+  any,
+  {
     listenKey?: string;
-  };
-};
+  }
+>;
 
 export type DeleteSapiV1UserdatastreamResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', {}>>
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteSapiV1UserdatastreamRequestResult = RequestResult<
-  Request,
+  DeleteSapiV1UserdatastreamRequest,
   DeleteSapiV1UserdatastreamResponse
 >;
 
 export function deleteSapiV1Userdatastream(
   requestHandler: SimpleRequestHandler,
-  payload: DeleteSapiV1UserdatastreamPayload,
+  payload: RequestPayload<DeleteSapiV1UserdatastreamRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1UserdatastreamRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: deleteSapiV1UserdatastreamEndpointSchema,
-    }),
+    createRequest(deleteSapiV1UserdatastreamEndpointSchema, payload),
     config
   );
 }

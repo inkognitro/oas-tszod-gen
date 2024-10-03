@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getApiV3AllorderlistEndpointSchema = {
@@ -67,8 +68,10 @@ export const getApiV3AllorderlistEndpointSchema = {
   },
 };
 
-export type GetApiV3AllorderlistPayload = {
-  queryParams: {
+export type GetApiV3AllorderlistRequest = RequestUnion<
+  any,
+  any,
+  {
     fromId?: number; // int
     startTime?: number; // int
     endTime?: number; // int
@@ -76,8 +79,8 @@ export type GetApiV3AllorderlistPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetApiV3AllorderlistResponse =
   | ResponseUnion<
@@ -105,20 +108,17 @@ export type GetApiV3AllorderlistResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3AllorderlistRequestResult = RequestResult<
-  Request,
+  GetApiV3AllorderlistRequest,
   GetApiV3AllorderlistResponse
 >;
 
 export function getApiV3Allorderlist(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3AllorderlistPayload,
+  payload: RequestPayload<GetApiV3AllorderlistRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3AllorderlistRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getApiV3AllorderlistEndpointSchema,
-    }),
+    createRequest(getApiV3AllorderlistEndpointSchema, payload),
     config
   );
 }

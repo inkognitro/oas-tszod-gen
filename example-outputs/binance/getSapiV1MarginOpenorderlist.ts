@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MarginOpenorderlistEndpointSchema = {
   path: '/sapi/v1/margin/openOrderList',
@@ -33,15 +34,17 @@ export const getSapiV1MarginOpenorderlistEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginOpenorderlistPayload = {
-  queryParams: {
+export type GetSapiV1MarginOpenorderlistRequest = RequestUnion<
+  any,
+  any,
+  {
     isIsolated?: 'TRUE' | 'FALSE';
     symbol?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginOpenorderlistResponse =
   | ResponseUnion<
@@ -69,20 +72,17 @@ export type GetSapiV1MarginOpenorderlistResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginOpenorderlistRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginOpenorderlistRequest,
   GetSapiV1MarginOpenorderlistResponse
 >;
 
 export function getSapiV1MarginOpenorderlist(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginOpenorderlistPayload,
+  payload: RequestPayload<GetSapiV1MarginOpenorderlistRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginOpenorderlistRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginOpenorderlistEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginOpenorderlistEndpointSchema, payload),
     config
   );
 }

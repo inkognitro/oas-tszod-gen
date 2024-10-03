@@ -1,13 +1,14 @@
 import {petZodSchema, Pet} from '@example-outputs/petstore2-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2-with-zod/core';
 
 export const findPetsByStatusEndpointSchema = {
@@ -37,11 +38,13 @@ export const findPetsByStatusEndpointSchema = {
   },
 };
 
-export type FindPetsByStatusPayload = {
-  queryParams: {
+export type FindPetsByStatusRequest = RequestUnion<
+  any,
+  any,
+  {
     status?: 'available' | 'pending' | 'sold';
-  };
-};
+  }
+>;
 
 export type FindPetsByStatusResponse =
   | ResponseUnion<
@@ -52,17 +55,17 @@ export type FindPetsByStatusResponse =
   | ResponseUnion<400>;
 
 export type FindPetsByStatusRequestResult = RequestResult<
-  Request,
+  FindPetsByStatusRequest,
   FindPetsByStatusResponse
 >;
 
 export function findPetsByStatus(
   requestHandler: SimpleRequestHandler,
-  payload: FindPetsByStatusPayload,
+  payload: RequestPayload<FindPetsByStatusRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<FindPetsByStatusRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: findPetsByStatusEndpointSchema}),
+    createRequest(findPetsByStatusEndpointSchema, payload),
     config
   );
 }

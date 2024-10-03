@@ -20,11 +20,13 @@ import {
 } from '@example-outputs/petstore1-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
+  RequestBodyData,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore1-with-zod/core';
 
 export const getBulkObjectsEndpointSchema = {
@@ -51,16 +53,13 @@ export const getBulkObjectsEndpointSchema = {
   },
 };
 
-export type GetBulkObjectsRequestBody = {
-  contentType: 'application/json';
-  body: BulkObjectId;
-};
-
-export type GetBulkObjectsPayload = GetBulkObjectsRequestBody & {
-  queryParams: {
+export type GetBulkObjectsRequest = RequestUnion<
+  RequestBodyData<'application/json', BulkObjectId>,
+  any,
+  {
     expand?: boolean;
-  };
-};
+  }
+>;
 
 export type GetBulkObjectsResponse =
   | $200OkDrsObjectsResponse<200>
@@ -73,17 +72,20 @@ export type GetBulkObjectsResponse =
   | $500InternalServerErrorResponse<500>;
 
 export type GetBulkObjectsRequestResult = RequestResult<
-  Request,
+  GetBulkObjectsRequest,
   GetBulkObjectsResponse
 >;
 
 export function getBulkObjects(
   requestHandler: SimpleRequestHandler,
-  payload: GetBulkObjectsPayload,
+  payload: RequestPayload<
+    GetBulkObjectsRequest,
+    'queryParams' | 'contentType' | 'body'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetBulkObjectsRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getBulkObjectsEndpointSchema}),
+    createRequest(getBulkObjectsEndpointSchema, payload),
     config
   );
 }

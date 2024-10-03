@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getApiV3ExchangeinfoEndpointSchema = {
   path: '/api/v3/exchangeInfo',
@@ -28,13 +29,15 @@ export const getApiV3ExchangeinfoEndpointSchema = {
   },
 };
 
-export type GetApiV3ExchangeinfoPayload = {
-  queryParams: {
+export type GetApiV3ExchangeinfoRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol?: string;
     symbols?: string;
     permissions?: string;
-  };
-};
+  }
+>;
 
 export type GetApiV3ExchangeinfoResponse =
   | ResponseUnion<
@@ -86,20 +89,17 @@ export type GetApiV3ExchangeinfoResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3ExchangeinfoRequestResult = RequestResult<
-  Request,
+  GetApiV3ExchangeinfoRequest,
   GetApiV3ExchangeinfoResponse
 >;
 
 export function getApiV3Exchangeinfo(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3ExchangeinfoPayload,
+  payload: RequestPayload<GetApiV3ExchangeinfoRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3ExchangeinfoRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getApiV3ExchangeinfoEndpointSchema,
-    }),
+    createRequest(getApiV3ExchangeinfoEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1LendingAutoInvestRebalanceHistoryEndpointSchema = {
@@ -66,8 +67,10 @@ export const getSapiV1LendingAutoInvestRebalanceHistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1LendingAutoInvestRebalanceHistoryPayload = {
-  queryParams: {
+export type GetSapiV1LendingAutoInvestRebalanceHistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     startTime?: number; // int
     endTime?: number; // int
     current?: number; // int
@@ -75,8 +78,8 @@ export type GetSapiV1LendingAutoInvestRebalanceHistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LendingAutoInvestRebalanceHistoryResponse =
   | ResponseUnion<
@@ -103,18 +106,24 @@ export type GetSapiV1LendingAutoInvestRebalanceHistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingAutoInvestRebalanceHistoryRequestResult =
-  RequestResult<Request, GetSapiV1LendingAutoInvestRebalanceHistoryResponse>;
+  RequestResult<
+    GetSapiV1LendingAutoInvestRebalanceHistoryRequest,
+    GetSapiV1LendingAutoInvestRebalanceHistoryResponse
+  >;
 
 export function getSapiV1LendingAutoInvestRebalanceHistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LendingAutoInvestRebalanceHistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1LendingAutoInvestRebalanceHistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestRebalanceHistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LendingAutoInvestRebalanceHistoryEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1LendingAutoInvestRebalanceHistoryEndpointSchema,
+      payload
+    ),
     config
   );
 }

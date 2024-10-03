@@ -6,13 +6,14 @@ import {
 } from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getApiV3AggtradesEndpointSchema = {
@@ -45,35 +46,34 @@ export const getApiV3AggtradesEndpointSchema = {
   },
 };
 
-export type GetApiV3AggtradesPayload = {
-  queryParams: {
+export type GetApiV3AggtradesRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     fromId?: number; // int
     startTime?: number; // int
     endTime?: number; // int
     limit?: number; // int
-  };
-};
+  }
+>;
 
 export type GetApiV3AggtradesResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', AggTrade[]>>
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3AggtradesRequestResult = RequestResult<
-  Request,
+  GetApiV3AggtradesRequest,
   GetApiV3AggtradesResponse
 >;
 
 export function getApiV3Aggtrades(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3AggtradesPayload,
+  payload: RequestPayload<GetApiV3AggtradesRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3AggtradesRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getApiV3AggtradesEndpointSchema,
-    }),
+    createRequest(getApiV3AggtradesEndpointSchema, payload),
     config
   );
 }

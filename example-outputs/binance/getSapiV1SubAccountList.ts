@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SubAccountListEndpointSchema = {
   path: '/sapi/v1/sub-account/list',
@@ -33,8 +34,10 @@ export const getSapiV1SubAccountListEndpointSchema = {
   },
 };
 
-export type GetSapiV1SubAccountListPayload = {
-  queryParams: {
+export type GetSapiV1SubAccountListRequest = RequestUnion<
+  any,
+  any,
+  {
     email?: string;
     isFreeze?: 'true' | 'false';
     page?: number; // int
@@ -42,8 +45,8 @@ export type GetSapiV1SubAccountListPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SubAccountListResponse =
   | ResponseUnion<
@@ -65,20 +68,17 @@ export type GetSapiV1SubAccountListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountListRequestResult = RequestResult<
-  Request,
+  GetSapiV1SubAccountListRequest,
   GetSapiV1SubAccountListResponse
 >;
 
 export function getSapiV1SubAccountList(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SubAccountListPayload,
+  payload: RequestPayload<GetSapiV1SubAccountListRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SubAccountListEndpointSchema,
-    }),
+    createRequest(getSapiV1SubAccountListEndpointSchema, payload),
     config
   );
 }

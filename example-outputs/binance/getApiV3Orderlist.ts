@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getApiV3OrderlistEndpointSchema = {
   path: '/api/v3/orderList',
@@ -33,15 +34,17 @@ export const getApiV3OrderlistEndpointSchema = {
   },
 };
 
-export type GetApiV3OrderlistPayload = {
-  queryParams: {
+export type GetApiV3OrderlistRequest = RequestUnion<
+  any,
+  any,
+  {
     orderListId?: number; // int
     origClientOrderId?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetApiV3OrderlistResponse =
   | ResponseUnion<
@@ -68,20 +71,17 @@ export type GetApiV3OrderlistResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3OrderlistRequestResult = RequestResult<
-  Request,
+  GetApiV3OrderlistRequest,
   GetApiV3OrderlistResponse
 >;
 
 export function getApiV3Orderlist(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3OrderlistPayload,
+  payload: RequestPayload<GetApiV3OrderlistRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3OrderlistRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getApiV3OrderlistEndpointSchema,
-    }),
+    createRequest(getApiV3OrderlistEndpointSchema, payload),
     config
   );
 }

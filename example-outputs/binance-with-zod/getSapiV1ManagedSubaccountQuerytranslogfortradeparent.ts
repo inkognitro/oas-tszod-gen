@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1ManagedSubaccountQuerytranslogfortradeparentEndpointSchema =
@@ -69,20 +70,23 @@ export const getSapiV1ManagedSubaccountQuerytranslogfortradeparentEndpointSchema
     },
   };
 
-export type GetSapiV1ManagedSubaccountQuerytranslogfortradeparentPayload = {
-  queryParams: {
-    email: string;
-    startTime?: number; // int
-    endTime?: number; // int
-    page?: number; // int
-    limit?: number; // int
-    transfers?: string;
-    transferFunctionAccountType?: string;
-    recvWindow?: number; // int
-    timestamp: number; // int
-    signature: string;
-  };
-};
+export type GetSapiV1ManagedSubaccountQuerytranslogfortradeparentRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      email: string;
+      startTime?: number; // int
+      endTime?: number; // int
+      page?: number; // int
+      limit?: number; // int
+      transfers?: string;
+      transferFunctionAccountType?: string;
+      recvWindow?: number; // int
+      timestamp: number; // int
+      signature: string;
+    }
+  >;
 
 export type GetSapiV1ManagedSubaccountQuerytranslogfortradeparentResponse =
   | ResponseUnion<
@@ -111,21 +115,23 @@ export type GetSapiV1ManagedSubaccountQuerytranslogfortradeparentResponse =
 
 export type GetSapiV1ManagedSubaccountQuerytranslogfortradeparentRequestResult =
   RequestResult<
-    Request,
+    GetSapiV1ManagedSubaccountQuerytranslogfortradeparentRequest,
     GetSapiV1ManagedSubaccountQuerytranslogfortradeparentResponse
   >;
 
 export function getSapiV1ManagedSubaccountQuerytranslogfortradeparent(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1ManagedSubaccountQuerytranslogfortradeparentPayload,
+  payload: RequestPayload<
+    GetSapiV1ManagedSubaccountQuerytranslogfortradeparentRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountQuerytranslogfortradeparentRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1ManagedSubaccountQuerytranslogfortradeparentEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1ManagedSubaccountQuerytranslogfortradeparentEndpointSchema,
+      payload
+    ),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1LendingAutoInvestOneOffEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/one-off',
@@ -33,8 +34,10 @@ export const postSapiV1LendingAutoInvestOneOffEndpointSchema = {
   },
 };
 
-export type PostSapiV1LendingAutoInvestOneOffPayload = {
-  queryParams: {
+export type PostSapiV1LendingAutoInvestOneOffRequest = RequestUnion<
+  any,
+  any,
+  {
     sourceType: string;
     requestId?: string;
     subscriptionAmount: number;
@@ -49,8 +52,8 @@ export type PostSapiV1LendingAutoInvestOneOffPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1LendingAutoInvestOneOffResponse =
   | ResponseUnion<
@@ -67,20 +70,20 @@ export type PostSapiV1LendingAutoInvestOneOffResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1LendingAutoInvestOneOffRequestResult = RequestResult<
-  Request,
+  PostSapiV1LendingAutoInvestOneOffRequest,
   PostSapiV1LendingAutoInvestOneOffResponse
 >;
 
 export function postSapiV1LendingAutoInvestOneOff(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1LendingAutoInvestOneOffPayload,
+  payload: RequestPayload<
+    PostSapiV1LendingAutoInvestOneOffRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingAutoInvestOneOffRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1LendingAutoInvestOneOffEndpointSchema,
-    }),
+    createRequest(postSapiV1LendingAutoInvestOneOffEndpointSchema, payload),
     config
   );
 }

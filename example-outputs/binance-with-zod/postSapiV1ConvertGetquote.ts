@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1ConvertGetquoteEndpointSchema = {
@@ -58,8 +59,10 @@ export const postSapiV1ConvertGetquoteEndpointSchema = {
   },
 };
 
-export type PostSapiV1ConvertGetquotePayload = {
-  queryParams: {
+export type PostSapiV1ConvertGetquoteRequest = RequestUnion<
+  any,
+  any,
+  {
     fromAsset: string;
     toAsset: string;
     fromAmount?: number;
@@ -69,8 +72,8 @@ export type PostSapiV1ConvertGetquotePayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1ConvertGetquoteResponse =
   | ResponseUnion<
@@ -91,20 +94,17 @@ export type PostSapiV1ConvertGetquoteResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1ConvertGetquoteRequestResult = RequestResult<
-  Request,
+  PostSapiV1ConvertGetquoteRequest,
   PostSapiV1ConvertGetquoteResponse
 >;
 
 export function postSapiV1ConvertGetquote(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1ConvertGetquotePayload,
+  payload: RequestPayload<PostSapiV1ConvertGetquoteRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ConvertGetquoteRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1ConvertGetquoteEndpointSchema,
-    }),
+    createRequest(postSapiV1ConvertGetquoteEndpointSchema, payload),
     config
   );
 }

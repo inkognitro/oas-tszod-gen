@@ -1,11 +1,12 @@
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2/core';
 
 export const deletePetEndpointSchema = {
@@ -22,26 +23,31 @@ export const deletePetEndpointSchema = {
   },
 };
 
-export type DeletePetPayload = {
-  pathParams: {
+export type DeletePetRequest = RequestUnion<
+  any,
+  {
     petId: number; // int
-  };
-  headers: {
+  },
+  any,
+  {
     api_key?: string;
-  };
-};
+  }
+>;
 
 export type DeletePetResponse = ResponseUnion<400>;
 
-export type DeletePetRequestResult = RequestResult<Request, DeletePetResponse>;
+export type DeletePetRequestResult = RequestResult<
+  DeletePetRequest,
+  DeletePetResponse
+>;
 
 export function deletePet(
   requestHandler: SimpleRequestHandler,
-  payload: DeletePetPayload,
+  payload: RequestPayload<DeletePetRequest, 'pathParams' | 'headers'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeletePetRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: deletePetEndpointSchema}),
+    createRequest(deletePetEndpointSchema, payload),
     config
   );
 }

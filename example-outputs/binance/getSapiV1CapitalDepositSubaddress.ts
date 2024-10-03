@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1CapitalDepositSubaddressEndpointSchema = {
   path: '/sapi/v1/capital/deposit/subAddress',
@@ -33,16 +34,18 @@ export const getSapiV1CapitalDepositSubaddressEndpointSchema = {
   },
 };
 
-export type GetSapiV1CapitalDepositSubaddressPayload = {
-  queryParams: {
+export type GetSapiV1CapitalDepositSubaddressRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     coin: string;
     network?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1CapitalDepositSubaddressResponse =
   | ResponseUnion<
@@ -61,20 +64,20 @@ export type GetSapiV1CapitalDepositSubaddressResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1CapitalDepositSubaddressRequestResult = RequestResult<
-  Request,
+  GetSapiV1CapitalDepositSubaddressRequest,
   GetSapiV1CapitalDepositSubaddressResponse
 >;
 
 export function getSapiV1CapitalDepositSubaddress(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1CapitalDepositSubaddressPayload,
+  payload: RequestPayload<
+    GetSapiV1CapitalDepositSubaddressRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalDepositSubaddressRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1CapitalDepositSubaddressEndpointSchema,
-    }),
+    createRequest(getSapiV1CapitalDepositSubaddressEndpointSchema, payload),
     config
   );
 }

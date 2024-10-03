@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1CapitalDepositHisrecEndpointSchema = {
@@ -65,8 +66,10 @@ export const getSapiV1CapitalDepositHisrecEndpointSchema = {
   },
 };
 
-export type GetSapiV1CapitalDepositHisrecPayload = {
-  queryParams: {
+export type GetSapiV1CapitalDepositHisrecRequest = RequestUnion<
+  any,
+  any,
+  {
     coin?: string;
     status?: number; // int
     startTime?: number; // int
@@ -76,8 +79,8 @@ export type GetSapiV1CapitalDepositHisrecPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1CapitalDepositHisrecResponse =
   | ResponseUnion<
@@ -103,20 +106,17 @@ export type GetSapiV1CapitalDepositHisrecResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1CapitalDepositHisrecRequestResult = RequestResult<
-  Request,
+  GetSapiV1CapitalDepositHisrecRequest,
   GetSapiV1CapitalDepositHisrecResponse
 >;
 
 export function getSapiV1CapitalDepositHisrec(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1CapitalDepositHisrecPayload,
+  payload: RequestPayload<GetSapiV1CapitalDepositHisrecRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalDepositHisrecRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1CapitalDepositHisrecEndpointSchema,
-    }),
+    createRequest(getSapiV1CapitalDepositHisrecEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Order, OcoOrder, Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Order, OcoOrder, Error} from '@example-outputs/binance';
 
 export const deleteApiV3OpenordersEndpointSchema = {
   path: '/api/v3/openOrders',
@@ -33,14 +34,16 @@ export const deleteApiV3OpenordersEndpointSchema = {
   },
 };
 
-export type DeleteApiV3OpenordersPayload = {
-  queryParams: {
+export type DeleteApiV3OpenordersRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type DeleteApiV3OpenordersResponse =
   | ResponseUnion<
@@ -54,20 +57,17 @@ export type DeleteApiV3OpenordersResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteApiV3OpenordersRequestResult = RequestResult<
-  Request,
+  DeleteApiV3OpenordersRequest,
   DeleteApiV3OpenordersResponse
 >;
 
 export function deleteApiV3Openorders(
   requestHandler: SimpleRequestHandler,
-  payload: DeleteApiV3OpenordersPayload,
+  payload: RequestPayload<DeleteApiV3OpenordersRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteApiV3OpenordersRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: deleteApiV3OpenordersEndpointSchema,
-    }),
+    createRequest(deleteApiV3OpenordersEndpointSchema, payload),
     config
   );
 }

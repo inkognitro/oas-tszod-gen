@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MarginIsolatedAccountlimitEndpointSchema = {
@@ -48,13 +49,15 @@ export const getSapiV1MarginIsolatedAccountlimitEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginIsolatedAccountlimitPayload = {
-  queryParams: {
+export type GetSapiV1MarginIsolatedAccountlimitRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginIsolatedAccountlimitResponse =
   | ResponseUnion<
@@ -71,20 +74,20 @@ export type GetSapiV1MarginIsolatedAccountlimitResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginIsolatedAccountlimitRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginIsolatedAccountlimitRequest,
   GetSapiV1MarginIsolatedAccountlimitResponse
 >;
 
 export function getSapiV1MarginIsolatedAccountlimit(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginIsolatedAccountlimitPayload,
+  payload: RequestPayload<
+    GetSapiV1MarginIsolatedAccountlimitRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginIsolatedAccountlimitRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginIsolatedAccountlimitEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginIsolatedAccountlimitEndpointSchema, payload),
     config
   );
 }

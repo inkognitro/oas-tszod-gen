@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV2LoanFlexibleBorrowHistoryEndpointSchema = {
   path: '/sapi/v2/loan/flexible/borrow/history',
@@ -33,8 +34,10 @@ export const getSapiV2LoanFlexibleBorrowHistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV2LoanFlexibleBorrowHistoryPayload = {
-  queryParams: {
+export type GetSapiV2LoanFlexibleBorrowHistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     loanCoin?: string;
     collateralCoin?: string;
     startTime?: number; // int
@@ -44,8 +47,8 @@ export type GetSapiV2LoanFlexibleBorrowHistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV2LoanFlexibleBorrowHistoryResponse =
   | ResponseUnion<
@@ -69,20 +72,20 @@ export type GetSapiV2LoanFlexibleBorrowHistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV2LoanFlexibleBorrowHistoryRequestResult = RequestResult<
-  Request,
+  GetSapiV2LoanFlexibleBorrowHistoryRequest,
   GetSapiV2LoanFlexibleBorrowHistoryResponse
 >;
 
 export function getSapiV2LoanFlexibleBorrowHistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV2LoanFlexibleBorrowHistoryPayload,
+  payload: RequestPayload<
+    GetSapiV2LoanFlexibleBorrowHistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2LoanFlexibleBorrowHistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV2LoanFlexibleBorrowHistoryEndpointSchema,
-    }),
+    createRequest(getSapiV2LoanFlexibleBorrowHistoryEndpointSchema, payload),
     config
   );
 }

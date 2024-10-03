@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1AssetAssetdetailEndpointSchema = {
   path: '/sapi/v1/asset/assetDetail',
@@ -33,14 +34,16 @@ export const getSapiV1AssetAssetdetailEndpointSchema = {
   },
 };
 
-export type GetSapiV1AssetAssetdetailPayload = {
-  queryParams: {
+export type GetSapiV1AssetAssetdetailRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AssetAssetdetailResponse =
   | ResponseUnion<
@@ -62,20 +65,17 @@ export type GetSapiV1AssetAssetdetailResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AssetAssetdetailRequestResult = RequestResult<
-  Request,
+  GetSapiV1AssetAssetdetailRequest,
   GetSapiV1AssetAssetdetailResponse
 >;
 
 export function getSapiV1AssetAssetdetail(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AssetAssetdetailPayload,
+  payload: RequestPayload<GetSapiV1AssetAssetdetailRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetAssetdetailRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AssetAssetdetailEndpointSchema,
-    }),
+    createRequest(getSapiV1AssetAssetdetailEndpointSchema, payload),
     config
   );
 }

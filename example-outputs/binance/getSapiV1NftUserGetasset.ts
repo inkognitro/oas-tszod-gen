@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1NftUserGetassetEndpointSchema = {
   path: '/sapi/v1/nft/user/getAsset',
@@ -33,15 +34,17 @@ export const getSapiV1NftUserGetassetEndpointSchema = {
   },
 };
 
-export type GetSapiV1NftUserGetassetPayload = {
-  queryParams: {
+export type GetSapiV1NftUserGetassetRequest = RequestUnion<
+  any,
+  any,
+  {
     limit?: number; // int
     page?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1NftUserGetassetResponse =
   | ResponseUnion<
@@ -62,20 +65,17 @@ export type GetSapiV1NftUserGetassetResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1NftUserGetassetRequestResult = RequestResult<
-  Request,
+  GetSapiV1NftUserGetassetRequest,
   GetSapiV1NftUserGetassetResponse
 >;
 
 export function getSapiV1NftUserGetasset(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1NftUserGetassetPayload,
+  payload: RequestPayload<GetSapiV1NftUserGetassetRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1NftUserGetassetRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1NftUserGetassetEndpointSchema,
-    }),
+    createRequest(getSapiV1NftUserGetassetEndpointSchema, payload),
     config
   );
 }

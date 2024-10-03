@@ -1,12 +1,13 @@
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2-with-zod/core';
 
 export const updatePetWithFormEndpointSchema = {
@@ -30,33 +31,34 @@ export const updatePetWithFormEndpointSchema = {
   },
 };
 
-export type UpdatePetWithFormPayload = {
-  queryParams: {
+export type UpdatePetWithFormRequest = RequestUnion<
+  any,
+  {
+    petId: number; // int
+  },
+  {
     name?: string;
     status?: string;
-  };
-  pathParams: {
-    petId: number; // int
-  };
-};
+  }
+>;
 
 export type UpdatePetWithFormResponse = ResponseUnion<405>;
 
 export type UpdatePetWithFormRequestResult = RequestResult<
-  Request,
+  UpdatePetWithFormRequest,
   UpdatePetWithFormResponse
 >;
 
 export function updatePetWithForm(
   requestHandler: SimpleRequestHandler,
-  payload: UpdatePetWithFormPayload,
+  payload: RequestPayload<
+    UpdatePetWithFormRequest,
+    'pathParams' | 'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<UpdatePetWithFormRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: updatePetWithFormEndpointSchema,
-    }),
+    createRequest(updatePetWithFormEndpointSchema, payload),
     config
   );
 }

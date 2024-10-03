@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1CapitalDepositCreditApplyEndpointSchema = {
   path: '/sapi/v1/capital/deposit/credit-apply',
@@ -33,8 +34,10 @@ export const postSapiV1CapitalDepositCreditApplyEndpointSchema = {
   },
 };
 
-export type PostSapiV1CapitalDepositCreditApplyPayload = {
-  queryParams: {
+export type PostSapiV1CapitalDepositCreditApplyRequest = RequestUnion<
+  any,
+  any,
+  {
     depositId?: number; // int
     txId?: string;
     subAccountId?: number; // int
@@ -42,8 +45,8 @@ export type PostSapiV1CapitalDepositCreditApplyPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1CapitalDepositCreditApplyResponse =
   | ResponseUnion<
@@ -62,20 +65,20 @@ export type PostSapiV1CapitalDepositCreditApplyResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1CapitalDepositCreditApplyRequestResult = RequestResult<
-  Request,
+  PostSapiV1CapitalDepositCreditApplyRequest,
   PostSapiV1CapitalDepositCreditApplyResponse
 >;
 
 export function postSapiV1CapitalDepositCreditApply(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1CapitalDepositCreditApplyPayload,
+  payload: RequestPayload<
+    PostSapiV1CapitalDepositCreditApplyRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1CapitalDepositCreditApplyRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1CapitalDepositCreditApplyEndpointSchema,
-    }),
+    createRequest(postSapiV1CapitalDepositCreditApplyEndpointSchema, payload),
     config
   );
 }

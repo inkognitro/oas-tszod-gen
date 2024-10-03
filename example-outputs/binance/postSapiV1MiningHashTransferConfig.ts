@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1MiningHashTransferConfigEndpointSchema = {
   path: '/sapi/v1/mining/hash-transfer/config',
@@ -33,8 +34,10 @@ export const postSapiV1MiningHashTransferConfigEndpointSchema = {
   },
 };
 
-export type PostSapiV1MiningHashTransferConfigPayload = {
-  queryParams: {
+export type PostSapiV1MiningHashTransferConfigRequest = RequestUnion<
+  any,
+  any,
+  {
     userName: string;
     algo: string;
     startDate?: string;
@@ -44,8 +47,8 @@ export type PostSapiV1MiningHashTransferConfigPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1MiningHashTransferConfigResponse =
   | ResponseUnion<
@@ -63,20 +66,20 @@ export type PostSapiV1MiningHashTransferConfigResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1MiningHashTransferConfigRequestResult = RequestResult<
-  Request,
+  PostSapiV1MiningHashTransferConfigRequest,
   PostSapiV1MiningHashTransferConfigResponse
 >;
 
 export function postSapiV1MiningHashTransferConfig(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1MiningHashTransferConfigPayload,
+  payload: RequestPayload<
+    PostSapiV1MiningHashTransferConfigRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MiningHashTransferConfigRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1MiningHashTransferConfigEndpointSchema,
-    }),
+    createRequest(postSapiV1MiningHashTransferConfigEndpointSchema, payload),
     config
   );
 }

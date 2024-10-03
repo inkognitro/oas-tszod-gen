@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1GiftcardVerifyEndpointSchema = {
   path: '/sapi/v1/giftcard/verify',
@@ -33,14 +34,16 @@ export const getSapiV1GiftcardVerifyEndpointSchema = {
   },
 };
 
-export type GetSapiV1GiftcardVerifyPayload = {
-  queryParams: {
+export type GetSapiV1GiftcardVerifyRequest = RequestUnion<
+  any,
+  any,
+  {
     referenceNo: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1GiftcardVerifyResponse =
   | ResponseUnion<
@@ -63,20 +66,17 @@ export type GetSapiV1GiftcardVerifyResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1GiftcardVerifyRequestResult = RequestResult<
-  Request,
+  GetSapiV1GiftcardVerifyRequest,
   GetSapiV1GiftcardVerifyResponse
 >;
 
 export function getSapiV1GiftcardVerify(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1GiftcardVerifyPayload,
+  payload: RequestPayload<GetSapiV1GiftcardVerifyRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1GiftcardVerifyRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1GiftcardVerifyEndpointSchema,
-    }),
+    createRequest(getSapiV1GiftcardVerifyEndpointSchema, payload),
     config
   );
 }

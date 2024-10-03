@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1GiftcardBuycodeTokenLimitEndpointSchema = {
@@ -55,14 +56,16 @@ export const getSapiV1GiftcardBuycodeTokenLimitEndpointSchema = {
   },
 };
 
-export type GetSapiV1GiftcardBuycodeTokenLimitPayload = {
-  queryParams: {
+export type GetSapiV1GiftcardBuycodeTokenLimitRequest = RequestUnion<
+  any,
+  any,
+  {
     baseToken: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1GiftcardBuycodeTokenLimitResponse =
   | ResponseUnion<
@@ -85,20 +88,20 @@ export type GetSapiV1GiftcardBuycodeTokenLimitResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1GiftcardBuycodeTokenLimitRequestResult = RequestResult<
-  Request,
+  GetSapiV1GiftcardBuycodeTokenLimitRequest,
   GetSapiV1GiftcardBuycodeTokenLimitResponse
 >;
 
 export function getSapiV1GiftcardBuycodeTokenLimit(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1GiftcardBuycodeTokenLimitPayload,
+  payload: RequestPayload<
+    GetSapiV1GiftcardBuycodeTokenLimitRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1GiftcardBuycodeTokenLimitRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1GiftcardBuycodeTokenLimitEndpointSchema,
-    }),
+    createRequest(getSapiV1GiftcardBuycodeTokenLimitEndpointSchema, payload),
     config
   );
 }

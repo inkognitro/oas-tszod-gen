@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1DciProductListEndpointSchema = {
   path: '/sapi/v1/dci/product/list',
@@ -33,8 +34,10 @@ export const getSapiV1DciProductListEndpointSchema = {
   },
 };
 
-export type GetSapiV1DciProductListPayload = {
-  queryParams: {
+export type GetSapiV1DciProductListRequest = RequestUnion<
+  any,
+  any,
+  {
     optionType: 'CALL' | 'PUT';
     exercisedCoin: string;
     investCoin: string;
@@ -43,8 +46,8 @@ export type GetSapiV1DciProductListPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1DciProductListResponse =
   | ResponseUnion<
@@ -79,20 +82,17 @@ export type GetSapiV1DciProductListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1DciProductListRequestResult = RequestResult<
-  Request,
+  GetSapiV1DciProductListRequest,
   GetSapiV1DciProductListResponse
 >;
 
 export function getSapiV1DciProductList(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1DciProductListPayload,
+  payload: RequestPayload<GetSapiV1DciProductListRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1DciProductListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1DciProductListEndpointSchema,
-    }),
+    createRequest(getSapiV1DciProductListEndpointSchema, payload),
     config
   );
 }

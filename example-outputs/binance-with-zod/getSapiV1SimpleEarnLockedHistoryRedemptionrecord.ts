@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1SimpleEarnLockedHistoryRedemptionrecordEndpointSchema = {
@@ -67,20 +68,23 @@ export const getSapiV1SimpleEarnLockedHistoryRedemptionrecordEndpointSchema = {
   },
 };
 
-export type GetSapiV1SimpleEarnLockedHistoryRedemptionrecordPayload = {
-  queryParams: {
-    positionId?: string;
-    redeemId?: string;
-    asset?: string;
-    startTime?: number; // int
-    endTime?: number; // int
-    current?: number; // int
-    size?: number; // int
-    recvWindow?: number; // int
-    timestamp: number; // int
-    signature: string;
-  };
-};
+export type GetSapiV1SimpleEarnLockedHistoryRedemptionrecordRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      positionId?: string;
+      redeemId?: string;
+      asset?: string;
+      startTime?: number; // int
+      endTime?: number; // int
+      current?: number; // int
+      size?: number; // int
+      recvWindow?: number; // int
+      timestamp: number; // int
+      signature: string;
+    }
+  >;
 
 export type GetSapiV1SimpleEarnLockedHistoryRedemptionrecordResponse =
   | ResponseUnion<
@@ -108,21 +112,23 @@ export type GetSapiV1SimpleEarnLockedHistoryRedemptionrecordResponse =
 
 export type GetSapiV1SimpleEarnLockedHistoryRedemptionrecordRequestResult =
   RequestResult<
-    Request,
+    GetSapiV1SimpleEarnLockedHistoryRedemptionrecordRequest,
     GetSapiV1SimpleEarnLockedHistoryRedemptionrecordResponse
   >;
 
 export function getSapiV1SimpleEarnLockedHistoryRedemptionrecord(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnLockedHistoryRedemptionrecordPayload,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnLockedHistoryRedemptionrecordRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedHistoryRedemptionrecordRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1SimpleEarnLockedHistoryRedemptionrecordEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SimpleEarnLockedHistoryRedemptionrecordEndpointSchema,
+      payload
+    ),
     config
   );
 }

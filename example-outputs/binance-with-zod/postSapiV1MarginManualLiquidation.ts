@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1MarginManualLiquidationEndpointSchema = {
@@ -54,14 +55,16 @@ export const postSapiV1MarginManualLiquidationEndpointSchema = {
   },
 };
 
-export type PostSapiV1MarginManualLiquidationPayload = {
-  queryParams: {
+export type PostSapiV1MarginManualLiquidationRequest = RequestUnion<
+  any,
+  any,
+  {
     type: 'MARGIN' | 'ISOLATED';
     symbol?: string;
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1MarginManualLiquidationResponse =
   | ResponseUnion<
@@ -81,20 +84,20 @@ export type PostSapiV1MarginManualLiquidationResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1MarginManualLiquidationRequestResult = RequestResult<
-  Request,
+  PostSapiV1MarginManualLiquidationRequest,
   PostSapiV1MarginManualLiquidationResponse
 >;
 
 export function postSapiV1MarginManualLiquidation(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1MarginManualLiquidationPayload,
+  payload: RequestPayload<
+    PostSapiV1MarginManualLiquidationRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginManualLiquidationRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1MarginManualLiquidationEndpointSchema,
-    }),
+    createRequest(postSapiV1MarginManualLiquidationEndpointSchema, payload),
     config
   );
 }

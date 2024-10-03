@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1MarginBorrowRepayEndpointSchema = {
   path: '/sapi/v1/margin/borrow-repay',
@@ -28,8 +29,10 @@ export const postSapiV1MarginBorrowRepayEndpointSchema = {
   },
 };
 
-export type PostSapiV1MarginBorrowRepayPayload = {
-  queryParams: {
+export type PostSapiV1MarginBorrowRepayRequest = RequestUnion<
+  any,
+  any,
+  {
     asset: string;
     isIsolated: string;
     symbol: string;
@@ -38,8 +41,8 @@ export type PostSapiV1MarginBorrowRepayPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1MarginBorrowRepayResponse =
   | ResponseUnion<
@@ -54,20 +57,17 @@ export type PostSapiV1MarginBorrowRepayResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1MarginBorrowRepayRequestResult = RequestResult<
-  Request,
+  PostSapiV1MarginBorrowRepayRequest,
   PostSapiV1MarginBorrowRepayResponse
 >;
 
 export function postSapiV1MarginBorrowRepay(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1MarginBorrowRepayPayload,
+  payload: RequestPayload<PostSapiV1MarginBorrowRepayRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginBorrowRepayRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1MarginBorrowRepayEndpointSchema,
-    }),
+    createRequest(postSapiV1MarginBorrowRepayEndpointSchema, payload),
     config
   );
 }

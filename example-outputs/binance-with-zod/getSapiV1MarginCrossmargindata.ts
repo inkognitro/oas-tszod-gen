@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MarginCrossmargindataEndpointSchema = {
@@ -58,15 +59,17 @@ export const getSapiV1MarginCrossmargindataEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginCrossmargindataPayload = {
-  queryParams: {
+export type GetSapiV1MarginCrossmargindataRequest = RequestUnion<
+  any,
+  any,
+  {
     vipLevel?: number; // int
     coin?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginCrossmargindataResponse =
   | ResponseUnion<
@@ -89,20 +92,17 @@ export type GetSapiV1MarginCrossmargindataResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginCrossmargindataRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginCrossmargindataRequest,
   GetSapiV1MarginCrossmargindataResponse
 >;
 
 export function getSapiV1MarginCrossmargindata(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginCrossmargindataPayload,
+  payload: RequestPayload<GetSapiV1MarginCrossmargindataRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginCrossmargindataRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginCrossmargindataEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginCrossmargindataEndpointSchema, payload),
     config
   );
 }

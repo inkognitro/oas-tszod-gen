@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MarginExchangeSmallLiabilityEndpointSchema = {
   path: '/sapi/v1/margin/exchange-small-liability',
@@ -33,13 +34,15 @@ export const getSapiV1MarginExchangeSmallLiabilityEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginExchangeSmallLiabilityPayload = {
-  queryParams: {
+export type GetSapiV1MarginExchangeSmallLiabilityRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginExchangeSmallLiabilityResponse =
   | ResponseUnion<
@@ -59,20 +62,20 @@ export type GetSapiV1MarginExchangeSmallLiabilityResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginExchangeSmallLiabilityRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginExchangeSmallLiabilityRequest,
   GetSapiV1MarginExchangeSmallLiabilityResponse
 >;
 
 export function getSapiV1MarginExchangeSmallLiability(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginExchangeSmallLiabilityPayload,
+  payload: RequestPayload<
+    GetSapiV1MarginExchangeSmallLiabilityRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginExchangeSmallLiabilityRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginExchangeSmallLiabilityEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginExchangeSmallLiabilityEndpointSchema, payload),
     config
   );
 }

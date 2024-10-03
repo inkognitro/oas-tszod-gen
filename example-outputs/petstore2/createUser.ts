@@ -1,12 +1,14 @@
 import {User} from '@example-outputs/petstore2';
 import {
+  RequestUnion,
+  RequestBodyData,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2/core';
 
 export const createUserEndpointSchema = {
@@ -28,21 +30,11 @@ export const createUserEndpointSchema = {
   },
 };
 
-export type CreateUserRequestBody =
-  | {
-      contentType: 'application/json';
-      body: User;
-    }
-  | {
-      contentType: 'application/xml';
-      body: User;
-    }
-  | {
-      contentType: 'application/x-www-form-urlencoded';
-      body: User;
-    };
-
-export type CreateUserPayload = CreateUserRequestBody;
+export type CreateUserRequest = RequestUnion<
+  | RequestBodyData<'application/json', User>
+  | RequestBodyData<'application/xml', User>
+  | RequestBodyData<'application/x-www-form-urlencoded', User>
+>;
 
 export type CreateUserResponse = ResponseUnion<
   any,
@@ -51,17 +43,17 @@ export type CreateUserResponse = ResponseUnion<
 >;
 
 export type CreateUserRequestResult = RequestResult<
-  Request,
+  CreateUserRequest,
   CreateUserResponse
 >;
 
 export function createUser(
   requestHandler: SimpleRequestHandler,
-  payload: CreateUserPayload,
+  payload: RequestPayload<CreateUserRequest, 'contentType' | 'body'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<CreateUserRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: createUserEndpointSchema}),
+    createRequest(createUserEndpointSchema, payload),
     config
   );
 }

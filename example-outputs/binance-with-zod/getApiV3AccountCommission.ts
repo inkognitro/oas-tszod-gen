@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getApiV3AccountCommissionEndpointSchema = {
@@ -65,13 +66,15 @@ export const getApiV3AccountCommissionEndpointSchema = {
   },
 };
 
-export type GetApiV3AccountCommissionPayload = {
-  queryParams: {
+export type GetApiV3AccountCommissionRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetApiV3AccountCommissionResponse =
   | ResponseUnion<
@@ -105,20 +108,17 @@ export type GetApiV3AccountCommissionResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3AccountCommissionRequestResult = RequestResult<
-  Request,
+  GetApiV3AccountCommissionRequest,
   GetApiV3AccountCommissionResponse
 >;
 
 export function getApiV3AccountCommission(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3AccountCommissionPayload,
+  payload: RequestPayload<GetApiV3AccountCommissionRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3AccountCommissionRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getApiV3AccountCommissionEndpointSchema,
-    }),
+    createRequest(getApiV3AccountCommissionEndpointSchema, payload),
     config
   );
 }

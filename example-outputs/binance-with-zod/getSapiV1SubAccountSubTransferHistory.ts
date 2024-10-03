@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1SubAccountSubTransferHistoryEndpointSchema = {
@@ -61,8 +62,10 @@ export const getSapiV1SubAccountSubTransferHistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1SubAccountSubTransferHistoryPayload = {
-  queryParams: {
+export type GetSapiV1SubAccountSubTransferHistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     fromEmail?: string;
     toEmail?: string;
     startTime?: number; // int
@@ -72,8 +75,8 @@ export type GetSapiV1SubAccountSubTransferHistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SubAccountSubTransferHistoryResponse =
   | ResponseUnion<
@@ -95,20 +98,20 @@ export type GetSapiV1SubAccountSubTransferHistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountSubTransferHistoryRequestResult = RequestResult<
-  Request,
+  GetSapiV1SubAccountSubTransferHistoryRequest,
   GetSapiV1SubAccountSubTransferHistoryResponse
 >;
 
 export function getSapiV1SubAccountSubTransferHistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SubAccountSubTransferHistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1SubAccountSubTransferHistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountSubTransferHistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SubAccountSubTransferHistoryEndpointSchema,
-    }),
+    createRequest(getSapiV1SubAccountSubTransferHistoryEndpointSchema, payload),
     config
   );
 }

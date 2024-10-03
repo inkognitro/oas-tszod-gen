@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MiningHashTransferProfitDetailsEndpointSchema = {
   path: '/sapi/v1/mining/hash-transfer/profit/details',
@@ -33,8 +34,10 @@ export const getSapiV1MiningHashTransferProfitDetailsEndpointSchema = {
   },
 };
 
-export type GetSapiV1MiningHashTransferProfitDetailsPayload = {
-  queryParams: {
+export type GetSapiV1MiningHashTransferProfitDetailsRequest = RequestUnion<
+  any,
+  any,
+  {
     configId: string;
     userName: string;
     pageIndex?: number; // int
@@ -42,8 +45,8 @@ export type GetSapiV1MiningHashTransferProfitDetailsPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MiningHashTransferProfitDetailsResponse =
   | ResponseUnion<
@@ -73,18 +76,24 @@ export type GetSapiV1MiningHashTransferProfitDetailsResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MiningHashTransferProfitDetailsRequestResult =
-  RequestResult<Request, GetSapiV1MiningHashTransferProfitDetailsResponse>;
+  RequestResult<
+    GetSapiV1MiningHashTransferProfitDetailsRequest,
+    GetSapiV1MiningHashTransferProfitDetailsResponse
+  >;
 
 export function getSapiV1MiningHashTransferProfitDetails(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MiningHashTransferProfitDetailsPayload,
+  payload: RequestPayload<
+    GetSapiV1MiningHashTransferProfitDetailsRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MiningHashTransferProfitDetailsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MiningHashTransferProfitDetailsEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1MiningHashTransferProfitDetailsEndpointSchema,
+      payload
+    ),
     config
   );
 }

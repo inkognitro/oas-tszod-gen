@@ -1,10 +1,10 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -48,6 +48,8 @@ export const getSapiV1CapitalContractConvertibleCoinsEndpointSchema = {
   },
 };
 
+export type GetSapiV1CapitalContractConvertibleCoinsRequest = Request;
+
 export type GetSapiV1CapitalContractConvertibleCoinsResponse =
   | ResponseUnion<
       200,
@@ -68,16 +70,17 @@ export type GetSapiV1CapitalContractConvertibleCoinsResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1CapitalContractConvertibleCoinsRequestResult =
-  RequestResult<Request, GetSapiV1CapitalContractConvertibleCoinsResponse>;
+  RequestResult<
+    GetSapiV1CapitalContractConvertibleCoinsRequest,
+    GetSapiV1CapitalContractConvertibleCoinsResponse
+  >;
 
 export function getSapiV1CapitalContractConvertibleCoins(
   requestHandler: SimpleRequestHandler,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalContractConvertibleCoinsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      endpointSchema: getSapiV1CapitalContractConvertibleCoinsEndpointSchema,
-    }),
+    createRequest(getSapiV1CapitalContractConvertibleCoinsEndpointSchema),
     config
   );
 }

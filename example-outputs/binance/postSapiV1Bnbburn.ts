@@ -1,13 +1,14 @@
-import {BnbBurnStatus, Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {BnbBurnStatus, Error} from '@example-outputs/binance';
 
 export const postSapiV1BnbburnEndpointSchema = {
   path: '/sapi/v1/bnbBurn',
@@ -33,15 +34,17 @@ export const postSapiV1BnbburnEndpointSchema = {
   },
 };
 
-export type PostSapiV1BnbburnPayload = {
-  queryParams: {
+export type PostSapiV1BnbburnRequest = RequestUnion<
+  any,
+  any,
+  {
     spotBNBBurn?: 'true' | 'false';
     interestBNBBurn?: 'true' | 'false';
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1BnbburnResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', BnbBurnStatus>>
@@ -49,20 +52,17 @@ export type PostSapiV1BnbburnResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1BnbburnRequestResult = RequestResult<
-  Request,
+  PostSapiV1BnbburnRequest,
   PostSapiV1BnbburnResponse
 >;
 
 export function postSapiV1Bnbburn(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1BnbburnPayload,
+  payload: RequestPayload<PostSapiV1BnbburnRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1BnbburnRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1BnbburnEndpointSchema,
-    }),
+    createRequest(postSapiV1BnbburnEndpointSchema, payload),
     config
   );
 }

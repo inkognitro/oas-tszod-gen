@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1SubAccountSpotsummaryEndpointSchema = {
@@ -57,16 +58,18 @@ export const getSapiV1SubAccountSpotsummaryEndpointSchema = {
   },
 };
 
-export type GetSapiV1SubAccountSpotsummaryPayload = {
-  queryParams: {
+export type GetSapiV1SubAccountSpotsummaryRequest = RequestUnion<
+  any,
+  any,
+  {
     email?: string;
     page?: number; // int
     size?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SubAccountSpotsummaryResponse =
   | ResponseUnion<
@@ -87,20 +90,17 @@ export type GetSapiV1SubAccountSpotsummaryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountSpotsummaryRequestResult = RequestResult<
-  Request,
+  GetSapiV1SubAccountSpotsummaryRequest,
   GetSapiV1SubAccountSpotsummaryResponse
 >;
 
 export function getSapiV1SubAccountSpotsummary(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SubAccountSpotsummaryPayload,
+  payload: RequestPayload<GetSapiV1SubAccountSpotsummaryRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountSpotsummaryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SubAccountSpotsummaryEndpointSchema,
-    }),
+    createRequest(getSapiV1SubAccountSpotsummaryEndpointSchema, payload),
     config
   );
 }

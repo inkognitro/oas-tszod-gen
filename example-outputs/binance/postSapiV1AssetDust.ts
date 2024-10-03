@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1AssetDustEndpointSchema = {
   path: '/sapi/v1/asset/dust',
@@ -33,15 +34,17 @@ export const postSapiV1AssetDustEndpointSchema = {
   },
 };
 
-export type PostSapiV1AssetDustPayload = {
-  queryParams: {
+export type PostSapiV1AssetDustRequest = RequestUnion<
+  any,
+  any,
+  {
     asset: string[];
     accountType?: 'SPOT' | 'MARGIN';
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1AssetDustResponse =
   | ResponseUnion<
@@ -66,20 +69,17 @@ export type PostSapiV1AssetDustResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1AssetDustRequestResult = RequestResult<
-  Request,
+  PostSapiV1AssetDustRequest,
   PostSapiV1AssetDustResponse
 >;
 
 export function postSapiV1AssetDust(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1AssetDustPayload,
+  payload: RequestPayload<PostSapiV1AssetDustRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AssetDustRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1AssetDustEndpointSchema,
-    }),
+    createRequest(postSapiV1AssetDustEndpointSchema, payload),
     config
   );
 }

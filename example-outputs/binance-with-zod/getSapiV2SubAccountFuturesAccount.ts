@@ -8,13 +8,14 @@ import {
 } from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV2SubAccountFuturesAccountEndpointSchema = {
@@ -57,15 +58,17 @@ export const getSapiV2SubAccountFuturesAccountEndpointSchema = {
   },
 };
 
-export type GetSapiV2SubAccountFuturesAccountPayload = {
-  queryParams: {
+export type GetSapiV2SubAccountFuturesAccountRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     futuresType: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV2SubAccountFuturesAccountResponse =
   | ResponseUnion<
@@ -79,20 +82,20 @@ export type GetSapiV2SubAccountFuturesAccountResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV2SubAccountFuturesAccountRequestResult = RequestResult<
-  Request,
+  GetSapiV2SubAccountFuturesAccountRequest,
   GetSapiV2SubAccountFuturesAccountResponse
 >;
 
 export function getSapiV2SubAccountFuturesAccount(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV2SubAccountFuturesAccountPayload,
+  payload: RequestPayload<
+    GetSapiV2SubAccountFuturesAccountRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2SubAccountFuturesAccountRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV2SubAccountFuturesAccountEndpointSchema,
-    }),
+    createRequest(getSapiV2SubAccountFuturesAccountEndpointSchema, payload),
     config
   );
 }

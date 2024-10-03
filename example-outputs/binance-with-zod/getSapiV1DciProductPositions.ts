@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1DciProductPositionsEndpointSchema = {
@@ -77,8 +78,10 @@ export const getSapiV1DciProductPositionsEndpointSchema = {
   },
 };
 
-export type GetSapiV1DciProductPositionsPayload = {
-  queryParams: {
+export type GetSapiV1DciProductPositionsRequest = RequestUnion<
+  any,
+  any,
+  {
     status?:
       | 'PENDING'
       | 'PURCHASE_SUCCESS'
@@ -92,8 +95,8 @@ export type GetSapiV1DciProductPositionsPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1DciProductPositionsResponse =
   | ResponseUnion<
@@ -124,20 +127,17 @@ export type GetSapiV1DciProductPositionsResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1DciProductPositionsRequestResult = RequestResult<
-  Request,
+  GetSapiV1DciProductPositionsRequest,
   GetSapiV1DciProductPositionsResponse
 >;
 
 export function getSapiV1DciProductPositions(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1DciProductPositionsPayload,
+  payload: RequestPayload<GetSapiV1DciProductPositionsRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1DciProductPositionsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1DciProductPositionsEndpointSchema,
-    }),
+    createRequest(getSapiV1DciProductPositionsEndpointSchema, payload),
     config
   );
 }

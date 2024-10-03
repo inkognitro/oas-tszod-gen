@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1SimpleEarnFlexibleHistoryCollateralrecordEndpointSchema =
@@ -64,18 +65,21 @@ export const getSapiV1SimpleEarnFlexibleHistoryCollateralrecordEndpointSchema =
     },
   };
 
-export type GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordPayload = {
-  queryParams: {
-    productId?: string;
-    startTime?: number; // int
-    endTime?: number; // int
-    current?: number; // int
-    size?: number; // int
-    recvWindow?: number; // int
-    timestamp: number; // int
-    signature: string;
-  };
-};
+export type GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      productId?: string;
+      startTime?: number; // int
+      endTime?: number; // int
+      current?: number; // int
+      size?: number; // int
+      recvWindow?: number; // int
+      timestamp: number; // int
+      signature: string;
+    }
+  >;
 
 export type GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordResponse =
   | ResponseUnion<
@@ -101,21 +105,23 @@ export type GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordResponse =
 
 export type GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordRequestResult =
   RequestResult<
-    Request,
+    GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordRequest,
     GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordResponse
   >;
 
 export function getSapiV1SimpleEarnFlexibleHistoryCollateralrecord(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordPayload,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1SimpleEarnFlexibleHistoryCollateralrecordEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SimpleEarnFlexibleHistoryCollateralrecordEndpointSchema,
+      payload
+    ),
     config
   );
 }

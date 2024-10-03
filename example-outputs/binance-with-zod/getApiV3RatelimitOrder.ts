@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getApiV3RatelimitOrderEndpointSchema = {
@@ -53,13 +54,15 @@ export const getApiV3RatelimitOrderEndpointSchema = {
   },
 };
 
-export type GetApiV3RatelimitOrderPayload = {
-  queryParams: {
+export type GetApiV3RatelimitOrderRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetApiV3RatelimitOrderResponse =
   | ResponseUnion<
@@ -79,20 +82,17 @@ export type GetApiV3RatelimitOrderResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3RatelimitOrderRequestResult = RequestResult<
-  Request,
+  GetApiV3RatelimitOrderRequest,
   GetApiV3RatelimitOrderResponse
 >;
 
 export function getApiV3RatelimitOrder(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3RatelimitOrderPayload,
+  payload: RequestPayload<GetApiV3RatelimitOrderRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3RatelimitOrderRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getApiV3RatelimitOrderEndpointSchema,
-    }),
+    createRequest(getApiV3RatelimitOrderEndpointSchema, payload),
     config
   );
 }

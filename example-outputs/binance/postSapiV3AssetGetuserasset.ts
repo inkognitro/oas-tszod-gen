@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV3AssetGetuserassetEndpointSchema = {
   path: '/sapi/v3/asset/getUserAsset',
@@ -33,15 +34,17 @@ export const postSapiV3AssetGetuserassetEndpointSchema = {
   },
 };
 
-export type PostSapiV3AssetGetuserassetPayload = {
-  queryParams: {
+export type PostSapiV3AssetGetuserassetRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     needBtcValuation?: 'true' | 'false';
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV3AssetGetuserassetResponse =
   | ResponseUnion<
@@ -63,20 +66,17 @@ export type PostSapiV3AssetGetuserassetResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV3AssetGetuserassetRequestResult = RequestResult<
-  Request,
+  PostSapiV3AssetGetuserassetRequest,
   PostSapiV3AssetGetuserassetResponse
 >;
 
 export function postSapiV3AssetGetuserasset(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV3AssetGetuserassetPayload,
+  payload: RequestPayload<PostSapiV3AssetGetuserassetRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV3AssetGetuserassetRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV3AssetGetuserassetEndpointSchema,
-    }),
+    createRequest(postSapiV3AssetGetuserassetEndpointSchema, payload),
     config
   );
 }

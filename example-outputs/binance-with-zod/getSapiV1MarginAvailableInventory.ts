@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MarginAvailableInventoryEndpointSchema = {
@@ -53,13 +54,15 @@ export const getSapiV1MarginAvailableInventoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginAvailableInventoryPayload = {
-  queryParams: {
+export type GetSapiV1MarginAvailableInventoryRequest = RequestUnion<
+  any,
+  any,
+  {
     type: 'MARGIN' | 'ISOLATED';
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginAvailableInventoryResponse =
   | ResponseUnion<
@@ -81,20 +84,20 @@ export type GetSapiV1MarginAvailableInventoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginAvailableInventoryRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginAvailableInventoryRequest,
   GetSapiV1MarginAvailableInventoryResponse
 >;
 
 export function getSapiV1MarginAvailableInventory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginAvailableInventoryPayload,
+  payload: RequestPayload<
+    GetSapiV1MarginAvailableInventoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginAvailableInventoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginAvailableInventoryEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginAvailableInventoryEndpointSchema, payload),
     config
   );
 }

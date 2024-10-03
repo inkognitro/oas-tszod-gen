@@ -1,17 +1,18 @@
 import {
+  RequestUnion,
+  ResponseBodyData,
+  ResponseUnion,
+  RequestResult,
+  SimpleRequestHandler,
+  createRequest,
+  RequestHandlerExecutionConfig,
+  RequestPayload,
+} from '@example-outputs/binance/core';
+import {
   SubAccountUSDTFuturesPositionRisk,
   SubAccountCOINFuturesPositionRisk,
   Error,
 } from '@example-outputs/binance';
-import {
-  ResponseBodyData,
-  ResponseUnion,
-  RequestResult,
-  Request,
-  SimpleRequestHandler,
-  createRequest,
-  RequestHandlerExecutionConfig,
-} from '@example-outputs/binance/core';
 
 export const getSapiV2SubAccountFuturesPositionriskEndpointSchema = {
   path: '/sapi/v2/sub-account/futures/positionRisk',
@@ -37,15 +38,17 @@ export const getSapiV2SubAccountFuturesPositionriskEndpointSchema = {
   },
 };
 
-export type GetSapiV2SubAccountFuturesPositionriskPayload = {
-  queryParams: {
+export type GetSapiV2SubAccountFuturesPositionriskRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     futuresType: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV2SubAccountFuturesPositionriskResponse =
   | ResponseUnion<
@@ -59,20 +62,23 @@ export type GetSapiV2SubAccountFuturesPositionriskResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV2SubAccountFuturesPositionriskRequestResult = RequestResult<
-  Request,
+  GetSapiV2SubAccountFuturesPositionriskRequest,
   GetSapiV2SubAccountFuturesPositionriskResponse
 >;
 
 export function getSapiV2SubAccountFuturesPositionrisk(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV2SubAccountFuturesPositionriskPayload,
+  payload: RequestPayload<
+    GetSapiV2SubAccountFuturesPositionriskRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2SubAccountFuturesPositionriskRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV2SubAccountFuturesPositionriskEndpointSchema,
-    }),
+    createRequest(
+      getSapiV2SubAccountFuturesPositionriskEndpointSchema,
+      payload
+    ),
     config
   );
 }

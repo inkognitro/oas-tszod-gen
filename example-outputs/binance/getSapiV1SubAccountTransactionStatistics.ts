@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SubAccountTransactionStatisticsEndpointSchema = {
   path: '/sapi/v1/sub-account/transaction-statistics',
@@ -33,14 +34,16 @@ export const getSapiV1SubAccountTransactionStatisticsEndpointSchema = {
   },
 };
 
-export type GetSapiV1SubAccountTransactionStatisticsPayload = {
-  queryParams: {
+export type GetSapiV1SubAccountTransactionStatisticsRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SubAccountTransactionStatisticsResponse =
   | ResponseUnion<
@@ -71,18 +74,24 @@ export type GetSapiV1SubAccountTransactionStatisticsResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountTransactionStatisticsRequestResult =
-  RequestResult<Request, GetSapiV1SubAccountTransactionStatisticsResponse>;
+  RequestResult<
+    GetSapiV1SubAccountTransactionStatisticsRequest,
+    GetSapiV1SubAccountTransactionStatisticsResponse
+  >;
 
 export function getSapiV1SubAccountTransactionStatistics(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SubAccountTransactionStatisticsPayload,
+  payload: RequestPayload<
+    GetSapiV1SubAccountTransactionStatisticsRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountTransactionStatisticsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SubAccountTransactionStatisticsEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SubAccountTransactionStatisticsEndpointSchema,
+      payload
+    ),
     config
   );
 }

@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1ManagedSubaccountDepositEndpointSchema = {
@@ -50,16 +51,18 @@ export const postSapiV1ManagedSubaccountDepositEndpointSchema = {
   },
 };
 
-export type PostSapiV1ManagedSubaccountDepositPayload = {
-  queryParams: {
+export type PostSapiV1ManagedSubaccountDepositRequest = RequestUnion<
+  any,
+  any,
+  {
     toEmail: string;
     asset: string;
     amount: number;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1ManagedSubaccountDepositResponse =
   | ResponseUnion<
@@ -75,20 +78,20 @@ export type PostSapiV1ManagedSubaccountDepositResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1ManagedSubaccountDepositRequestResult = RequestResult<
-  Request,
+  PostSapiV1ManagedSubaccountDepositRequest,
   PostSapiV1ManagedSubaccountDepositResponse
 >;
 
 export function postSapiV1ManagedSubaccountDeposit(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1ManagedSubaccountDepositPayload,
+  payload: RequestPayload<
+    PostSapiV1ManagedSubaccountDepositRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ManagedSubaccountDepositRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1ManagedSubaccountDepositEndpointSchema,
-    }),
+    createRequest(postSapiV1ManagedSubaccountDepositEndpointSchema, payload),
     config
   );
 }

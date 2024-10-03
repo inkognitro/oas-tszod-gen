@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MarginTransferEndpointSchema = {
@@ -64,8 +65,10 @@ export const getSapiV1MarginTransferEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginTransferPayload = {
-  queryParams: {
+export type GetSapiV1MarginTransferRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     type?: 'ROLL_IN' | 'ROLL_OUT';
     startTime?: number; // int
@@ -76,8 +79,8 @@ export type GetSapiV1MarginTransferPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginTransferResponse =
   | ResponseUnion<
@@ -101,20 +104,17 @@ export type GetSapiV1MarginTransferResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginTransferRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginTransferRequest,
   GetSapiV1MarginTransferResponse
 >;
 
 export function getSapiV1MarginTransfer(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginTransferPayload,
+  payload: RequestPayload<GetSapiV1MarginTransferRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginTransferRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginTransferEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginTransferEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1CapitalWithdrawApplyEndpointSchema = {
   path: '/sapi/v1/capital/withdraw/apply',
@@ -33,8 +34,10 @@ export const postSapiV1CapitalWithdrawApplyEndpointSchema = {
   },
 };
 
-export type PostSapiV1CapitalWithdrawApplyPayload = {
-  queryParams: {
+export type PostSapiV1CapitalWithdrawApplyRequest = RequestUnion<
+  any,
+  any,
+  {
     coin: string;
     withdrawOrderId?: string;
     network?: string;
@@ -47,8 +50,8 @@ export type PostSapiV1CapitalWithdrawApplyPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1CapitalWithdrawApplyResponse =
   | ResponseUnion<
@@ -64,20 +67,17 @@ export type PostSapiV1CapitalWithdrawApplyResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1CapitalWithdrawApplyRequestResult = RequestResult<
-  Request,
+  PostSapiV1CapitalWithdrawApplyRequest,
   PostSapiV1CapitalWithdrawApplyResponse
 >;
 
 export function postSapiV1CapitalWithdrawApply(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1CapitalWithdrawApplyPayload,
+  payload: RequestPayload<PostSapiV1CapitalWithdrawApplyRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1CapitalWithdrawApplyRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1CapitalWithdrawApplyEndpointSchema,
-    }),
+    createRequest(postSapiV1CapitalWithdrawApplyEndpointSchema, payload),
     config
   );
 }

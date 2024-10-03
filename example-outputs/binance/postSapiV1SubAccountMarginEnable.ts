@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1SubAccountMarginEnableEndpointSchema = {
   path: '/sapi/v1/sub-account/margin/enable',
@@ -33,14 +34,16 @@ export const postSapiV1SubAccountMarginEnableEndpointSchema = {
   },
 };
 
-export type PostSapiV1SubAccountMarginEnablePayload = {
-  queryParams: {
+export type PostSapiV1SubAccountMarginEnableRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1SubAccountMarginEnableResponse =
   | ResponseUnion<
@@ -57,20 +60,20 @@ export type PostSapiV1SubAccountMarginEnableResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SubAccountMarginEnableRequestResult = RequestResult<
-  Request,
+  PostSapiV1SubAccountMarginEnableRequest,
   PostSapiV1SubAccountMarginEnableResponse
 >;
 
 export function postSapiV1SubAccountMarginEnable(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1SubAccountMarginEnablePayload,
+  payload: RequestPayload<
+    PostSapiV1SubAccountMarginEnableRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountMarginEnableRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1SubAccountMarginEnableEndpointSchema,
-    }),
+    createRequest(postSapiV1SubAccountMarginEnableEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1SimpleEarnFlexibleRedeemEndpointSchema = {
   path: '/sapi/v1/simple-earn/flexible/redeem',
@@ -33,8 +34,10 @@ export const postSapiV1SimpleEarnFlexibleRedeemEndpointSchema = {
   },
 };
 
-export type PostSapiV1SimpleEarnFlexibleRedeemPayload = {
-  queryParams: {
+export type PostSapiV1SimpleEarnFlexibleRedeemRequest = RequestUnion<
+  any,
+  any,
+  {
     productId: string;
     redeemAll?: boolean;
     amount?: number;
@@ -42,8 +45,8 @@ export type PostSapiV1SimpleEarnFlexibleRedeemPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1SimpleEarnFlexibleRedeemResponse =
   | ResponseUnion<
@@ -60,20 +63,20 @@ export type PostSapiV1SimpleEarnFlexibleRedeemResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SimpleEarnFlexibleRedeemRequestResult = RequestResult<
-  Request,
+  PostSapiV1SimpleEarnFlexibleRedeemRequest,
   PostSapiV1SimpleEarnFlexibleRedeemResponse
 >;
 
 export function postSapiV1SimpleEarnFlexibleRedeem(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1SimpleEarnFlexibleRedeemPayload,
+  payload: RequestPayload<
+    PostSapiV1SimpleEarnFlexibleRedeemRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnFlexibleRedeemRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1SimpleEarnFlexibleRedeemEndpointSchema,
-    }),
+    createRequest(postSapiV1SimpleEarnFlexibleRedeemEndpointSchema, payload),
     config
   );
 }

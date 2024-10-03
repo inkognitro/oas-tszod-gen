@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1CapitalConfigGetallEndpointSchema = {
@@ -83,13 +84,15 @@ export const getSapiV1CapitalConfigGetallEndpointSchema = {
   },
 };
 
-export type GetSapiV1CapitalConfigGetallPayload = {
-  queryParams: {
+export type GetSapiV1CapitalConfigGetallRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1CapitalConfigGetallResponse =
   | ResponseUnion<
@@ -137,20 +140,17 @@ export type GetSapiV1CapitalConfigGetallResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1CapitalConfigGetallRequestResult = RequestResult<
-  Request,
+  GetSapiV1CapitalConfigGetallRequest,
   GetSapiV1CapitalConfigGetallResponse
 >;
 
 export function getSapiV1CapitalConfigGetall(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1CapitalConfigGetallPayload,
+  payload: RequestPayload<GetSapiV1CapitalConfigGetallRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalConfigGetallRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1CapitalConfigGetallEndpointSchema,
-    }),
+    createRequest(getSapiV1CapitalConfigGetallEndpointSchema, payload),
     config
   );
 }

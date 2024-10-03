@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MarginInterestratehistoryEndpointSchema = {
@@ -56,8 +57,10 @@ export const getSapiV1MarginInterestratehistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginInterestratehistoryPayload = {
-  queryParams: {
+export type GetSapiV1MarginInterestratehistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     asset: string;
     vipLevel?: number; // int
     startTime?: number; // int
@@ -65,8 +68,8 @@ export type GetSapiV1MarginInterestratehistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginInterestratehistoryResponse =
   | ResponseUnion<
@@ -85,20 +88,20 @@ export type GetSapiV1MarginInterestratehistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginInterestratehistoryRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginInterestratehistoryRequest,
   GetSapiV1MarginInterestratehistoryResponse
 >;
 
 export function getSapiV1MarginInterestratehistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginInterestratehistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1MarginInterestratehistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginInterestratehistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginInterestratehistoryEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginInterestratehistoryEndpointSchema, payload),
     config
   );
 }

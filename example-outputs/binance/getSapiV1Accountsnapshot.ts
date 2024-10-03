@@ -1,18 +1,19 @@
 import {
+  RequestUnion,
+  ResponseBodyData,
+  ResponseUnion,
+  RequestResult,
+  SimpleRequestHandler,
+  createRequest,
+  RequestHandlerExecutionConfig,
+  RequestPayload,
+} from '@example-outputs/binance/core';
+import {
   SnapshotSpot,
   SnapshotMargin,
   SnapshotFutures,
   Error,
 } from '@example-outputs/binance';
-import {
-  ResponseBodyData,
-  ResponseUnion,
-  RequestResult,
-  Request,
-  SimpleRequestHandler,
-  createRequest,
-  RequestHandlerExecutionConfig,
-} from '@example-outputs/binance/core';
 
 export const getSapiV1AccountsnapshotEndpointSchema = {
   path: '/sapi/v1/accountSnapshot',
@@ -38,8 +39,10 @@ export const getSapiV1AccountsnapshotEndpointSchema = {
   },
 };
 
-export type GetSapiV1AccountsnapshotPayload = {
-  queryParams: {
+export type GetSapiV1AccountsnapshotRequest = RequestUnion<
+  any,
+  any,
+  {
     type: 'SPOT' | 'MARGIN' | 'FUTURES';
     startTime?: number; // int
     endTime?: number; // int
@@ -47,8 +50,8 @@ export type GetSapiV1AccountsnapshotPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AccountsnapshotResponse =
   | ResponseUnion<
@@ -62,20 +65,17 @@ export type GetSapiV1AccountsnapshotResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AccountsnapshotRequestResult = RequestResult<
-  Request,
+  GetSapiV1AccountsnapshotRequest,
   GetSapiV1AccountsnapshotResponse
 >;
 
 export function getSapiV1Accountsnapshot(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AccountsnapshotPayload,
+  payload: RequestPayload<GetSapiV1AccountsnapshotRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AccountsnapshotRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AccountsnapshotEndpointSchema,
-    }),
+    createRequest(getSapiV1AccountsnapshotEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MarginPriceindexEndpointSchema = {
   path: '/sapi/v1/margin/priceIndex',
@@ -28,11 +29,13 @@ export const getSapiV1MarginPriceindexEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginPriceindexPayload = {
-  queryParams: {
+export type GetSapiV1MarginPriceindexRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginPriceindexResponse =
   | ResponseUnion<
@@ -49,20 +52,17 @@ export type GetSapiV1MarginPriceindexResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginPriceindexRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginPriceindexRequest,
   GetSapiV1MarginPriceindexResponse
 >;
 
 export function getSapiV1MarginPriceindex(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginPriceindexPayload,
+  payload: RequestPayload<GetSapiV1MarginPriceindexRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginPriceindexRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginPriceindexEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginPriceindexEndpointSchema, payload),
     config
   );
 }

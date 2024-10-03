@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV2LoanFlexibleLoanableDataEndpointSchema = {
   path: '/sapi/v2/loan/flexible/loanable/data',
@@ -33,14 +34,16 @@ export const getSapiV2LoanFlexibleLoanableDataEndpointSchema = {
   },
 };
 
-export type GetSapiV2LoanFlexibleLoanableDataPayload = {
-  queryParams: {
+export type GetSapiV2LoanFlexibleLoanableDataRequest = RequestUnion<
+  any,
+  any,
+  {
     loanCoin?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV2LoanFlexibleLoanableDataResponse =
   | ResponseUnion<
@@ -62,20 +65,20 @@ export type GetSapiV2LoanFlexibleLoanableDataResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV2LoanFlexibleLoanableDataRequestResult = RequestResult<
-  Request,
+  GetSapiV2LoanFlexibleLoanableDataRequest,
   GetSapiV2LoanFlexibleLoanableDataResponse
 >;
 
 export function getSapiV2LoanFlexibleLoanableData(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV2LoanFlexibleLoanableDataPayload,
+  payload: RequestPayload<
+    GetSapiV2LoanFlexibleLoanableDataRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2LoanFlexibleLoanableDataRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV2LoanFlexibleLoanableDataEndpointSchema,
-    }),
+    createRequest(getSapiV2LoanFlexibleLoanableDataEndpointSchema, payload),
     config
   );
 }

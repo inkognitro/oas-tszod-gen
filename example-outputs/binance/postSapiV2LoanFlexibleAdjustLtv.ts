@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV2LoanFlexibleAdjustLtvEndpointSchema = {
   path: '/sapi/v2/loan/flexible/adjust/ltv',
@@ -33,8 +34,10 @@ export const postSapiV2LoanFlexibleAdjustLtvEndpointSchema = {
   },
 };
 
-export type PostSapiV2LoanFlexibleAdjustLtvPayload = {
-  queryParams: {
+export type PostSapiV2LoanFlexibleAdjustLtvRequest = RequestUnion<
+  any,
+  any,
+  {
     loanCoin?: string;
     collateralCoin?: string;
     adjustmentAmount: number;
@@ -42,8 +45,8 @@ export type PostSapiV2LoanFlexibleAdjustLtvPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV2LoanFlexibleAdjustLtvResponse =
   | ResponseUnion<
@@ -63,20 +66,20 @@ export type PostSapiV2LoanFlexibleAdjustLtvResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV2LoanFlexibleAdjustLtvRequestResult = RequestResult<
-  Request,
+  PostSapiV2LoanFlexibleAdjustLtvRequest,
   PostSapiV2LoanFlexibleAdjustLtvResponse
 >;
 
 export function postSapiV2LoanFlexibleAdjustLtv(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV2LoanFlexibleAdjustLtvPayload,
+  payload: RequestPayload<
+    PostSapiV2LoanFlexibleAdjustLtvRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV2LoanFlexibleAdjustLtvRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV2LoanFlexibleAdjustLtvEndpointSchema,
-    }),
+    createRequest(postSapiV2LoanFlexibleAdjustLtvEndpointSchema, payload),
     config
   );
 }

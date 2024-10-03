@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MiningWorkerListEndpointSchema = {
   path: '/sapi/v1/mining/worker/list',
@@ -33,8 +34,10 @@ export const getSapiV1MiningWorkerListEndpointSchema = {
   },
 };
 
-export type GetSapiV1MiningWorkerListPayload = {
-  queryParams: {
+export type GetSapiV1MiningWorkerListRequest = RequestUnion<
+  any,
+  any,
+  {
     algo: string;
     userName: string;
     pageIndex?: number; // int
@@ -44,8 +47,8 @@ export type GetSapiV1MiningWorkerListPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MiningWorkerListResponse =
   | ResponseUnion<
@@ -75,20 +78,17 @@ export type GetSapiV1MiningWorkerListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MiningWorkerListRequestResult = RequestResult<
-  Request,
+  GetSapiV1MiningWorkerListRequest,
   GetSapiV1MiningWorkerListResponse
 >;
 
 export function getSapiV1MiningWorkerList(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MiningWorkerListPayload,
+  payload: RequestPayload<GetSapiV1MiningWorkerListRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MiningWorkerListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MiningWorkerListEndpointSchema,
-    }),
+    createRequest(getSapiV1MiningWorkerListEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV2EthStakingAccountEndpointSchema = {
@@ -56,13 +57,15 @@ export const getSapiV2EthStakingAccountEndpointSchema = {
   },
 };
 
-export type GetSapiV2EthStakingAccountPayload = {
-  queryParams: {
+export type GetSapiV2EthStakingAccountRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV2EthStakingAccountResponse =
   | ResponseUnion<
@@ -87,20 +90,17 @@ export type GetSapiV2EthStakingAccountResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV2EthStakingAccountRequestResult = RequestResult<
-  Request,
+  GetSapiV2EthStakingAccountRequest,
   GetSapiV2EthStakingAccountResponse
 >;
 
 export function getSapiV2EthStakingAccount(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV2EthStakingAccountPayload,
+  payload: RequestPayload<GetSapiV2EthStakingAccountRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2EthStakingAccountRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV2EthStakingAccountEndpointSchema,
-    }),
+    createRequest(getSapiV2EthStakingAccountEndpointSchema, payload),
     config
   );
 }

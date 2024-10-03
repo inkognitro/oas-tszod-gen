@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getApiV3MyallocationsEndpointSchema = {
@@ -68,8 +69,10 @@ export const getApiV3MyallocationsEndpointSchema = {
   },
 };
 
-export type GetApiV3MyallocationsPayload = {
-  queryParams: {
+export type GetApiV3MyallocationsRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     startTime?: number; // int
     endTime?: number; // int
@@ -79,8 +82,8 @@ export type GetApiV3MyallocationsPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetApiV3MyallocationsResponse =
   | ResponseUnion<
@@ -109,20 +112,17 @@ export type GetApiV3MyallocationsResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3MyallocationsRequestResult = RequestResult<
-  Request,
+  GetApiV3MyallocationsRequest,
   GetApiV3MyallocationsResponse
 >;
 
 export function getApiV3Myallocations(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3MyallocationsPayload,
+  payload: RequestPayload<GetApiV3MyallocationsRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3MyallocationsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getApiV3MyallocationsEndpointSchema,
-    }),
+    createRequest(getApiV3MyallocationsEndpointSchema, payload),
     config
   );
 }

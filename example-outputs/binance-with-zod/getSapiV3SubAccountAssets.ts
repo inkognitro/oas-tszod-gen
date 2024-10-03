@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV3SubAccountAssetsEndpointSchema = {
@@ -54,14 +55,16 @@ export const getSapiV3SubAccountAssetsEndpointSchema = {
   },
 };
 
-export type GetSapiV3SubAccountAssetsPayload = {
-  queryParams: {
+export type GetSapiV3SubAccountAssetsRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV3SubAccountAssetsResponse =
   | ResponseUnion<
@@ -81,20 +84,17 @@ export type GetSapiV3SubAccountAssetsResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV3SubAccountAssetsRequestResult = RequestResult<
-  Request,
+  GetSapiV3SubAccountAssetsRequest,
   GetSapiV3SubAccountAssetsResponse
 >;
 
 export function getSapiV3SubAccountAssets(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV3SubAccountAssetsPayload,
+  payload: RequestPayload<GetSapiV3SubAccountAssetsRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV3SubAccountAssetsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV3SubAccountAssetsEndpointSchema,
-    }),
+    createRequest(getSapiV3SubAccountAssetsEndpointSchema, payload),
     config
   );
 }

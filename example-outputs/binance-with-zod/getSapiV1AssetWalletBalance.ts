@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1AssetWalletBalanceEndpointSchema = {
@@ -51,13 +52,15 @@ export const getSapiV1AssetWalletBalanceEndpointSchema = {
   },
 };
 
-export type GetSapiV1AssetWalletBalancePayload = {
-  queryParams: {
+export type GetSapiV1AssetWalletBalanceRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AssetWalletBalanceResponse =
   | ResponseUnion<
@@ -75,20 +78,17 @@ export type GetSapiV1AssetWalletBalanceResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AssetWalletBalanceRequestResult = RequestResult<
-  Request,
+  GetSapiV1AssetWalletBalanceRequest,
   GetSapiV1AssetWalletBalanceResponse
 >;
 
 export function getSapiV1AssetWalletBalance(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AssetWalletBalancePayload,
+  payload: RequestPayload<GetSapiV1AssetWalletBalanceRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetWalletBalanceRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AssetWalletBalanceEndpointSchema,
-    }),
+    createRequest(getSapiV1AssetWalletBalanceEndpointSchema, payload),
     config
   );
 }

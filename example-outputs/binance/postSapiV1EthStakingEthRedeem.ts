@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1EthStakingEthRedeemEndpointSchema = {
   path: '/sapi/v1/eth-staking/eth/redeem',
@@ -33,15 +34,17 @@ export const postSapiV1EthStakingEthRedeemEndpointSchema = {
   },
 };
 
-export type PostSapiV1EthStakingEthRedeemPayload = {
-  queryParams: {
+export type PostSapiV1EthStakingEthRedeemRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     amount: number;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1EthStakingEthRedeemResponse =
   | ResponseUnion<
@@ -60,20 +63,17 @@ export type PostSapiV1EthStakingEthRedeemResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1EthStakingEthRedeemRequestResult = RequestResult<
-  Request,
+  PostSapiV1EthStakingEthRedeemRequest,
   PostSapiV1EthStakingEthRedeemResponse
 >;
 
 export function postSapiV1EthStakingEthRedeem(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1EthStakingEthRedeemPayload,
+  payload: RequestPayload<PostSapiV1EthStakingEthRedeemRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1EthStakingEthRedeemRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1EthStakingEthRedeemEndpointSchema,
-    }),
+    createRequest(postSapiV1EthStakingEthRedeemEndpointSchema, payload),
     config
   );
 }

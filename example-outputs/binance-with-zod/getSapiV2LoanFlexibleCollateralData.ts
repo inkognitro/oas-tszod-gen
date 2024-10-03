@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV2LoanFlexibleCollateralDataEndpointSchema = {
@@ -57,14 +58,16 @@ export const getSapiV2LoanFlexibleCollateralDataEndpointSchema = {
   },
 };
 
-export type GetSapiV2LoanFlexibleCollateralDataPayload = {
-  queryParams: {
+export type GetSapiV2LoanFlexibleCollateralDataRequest = RequestUnion<
+  any,
+  any,
+  {
     collateralCoin?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV2LoanFlexibleCollateralDataResponse =
   | ResponseUnion<
@@ -87,20 +90,20 @@ export type GetSapiV2LoanFlexibleCollateralDataResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV2LoanFlexibleCollateralDataRequestResult = RequestResult<
-  Request,
+  GetSapiV2LoanFlexibleCollateralDataRequest,
   GetSapiV2LoanFlexibleCollateralDataResponse
 >;
 
 export function getSapiV2LoanFlexibleCollateralData(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV2LoanFlexibleCollateralDataPayload,
+  payload: RequestPayload<
+    GetSapiV2LoanFlexibleCollateralDataRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2LoanFlexibleCollateralDataRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV2LoanFlexibleCollateralDataEndpointSchema,
-    }),
+    createRequest(getSapiV2LoanFlexibleCollateralDataEndpointSchema, payload),
     config
   );
 }

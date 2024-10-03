@@ -8,13 +8,14 @@ import {
 } from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getApiV3TickerTradingdayEndpointSchema = {
@@ -46,14 +47,16 @@ export const getApiV3TickerTradingdayEndpointSchema = {
   },
 };
 
-export type GetApiV3TickerTradingdayPayload = {
-  queryParams: {
+export type GetApiV3TickerTradingdayRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol?: string;
     symbols?: string;
     timeZone?: string;
     type?: 'FULL' | 'MINI';
-  };
-};
+  }
+>;
 
 export type GetApiV3TickerTradingdayResponse =
   | ResponseUnion<
@@ -63,20 +66,17 @@ export type GetApiV3TickerTradingdayResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3TickerTradingdayRequestResult = RequestResult<
-  Request,
+  GetApiV3TickerTradingdayRequest,
   GetApiV3TickerTradingdayResponse
 >;
 
 export function getApiV3TickerTradingday(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3TickerTradingdayPayload,
+  payload: RequestPayload<GetApiV3TickerTradingdayRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3TickerTradingdayRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getApiV3TickerTradingdayEndpointSchema,
-    }),
+    createRequest(getApiV3TickerTradingdayEndpointSchema, payload),
     config
   );
 }

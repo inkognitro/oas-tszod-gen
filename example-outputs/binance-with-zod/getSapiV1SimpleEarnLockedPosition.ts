@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1SimpleEarnLockedPositionEndpointSchema = {
@@ -68,8 +69,10 @@ export const getSapiV1SimpleEarnLockedPositionEndpointSchema = {
   },
 };
 
-export type GetSapiV1SimpleEarnLockedPositionPayload = {
-  queryParams: {
+export type GetSapiV1SimpleEarnLockedPositionRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     positionId?: string;
     projectId?: string;
@@ -78,8 +81,8 @@ export type GetSapiV1SimpleEarnLockedPositionPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SimpleEarnLockedPositionResponse =
   | ResponseUnion<
@@ -109,20 +112,20 @@ export type GetSapiV1SimpleEarnLockedPositionResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnLockedPositionRequestResult = RequestResult<
-  Request,
+  GetSapiV1SimpleEarnLockedPositionRequest,
   GetSapiV1SimpleEarnLockedPositionResponse
 >;
 
 export function getSapiV1SimpleEarnLockedPosition(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnLockedPositionPayload,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnLockedPositionRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedPositionRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SimpleEarnLockedPositionEndpointSchema,
-    }),
+    createRequest(getSapiV1SimpleEarnLockedPositionEndpointSchema, payload),
     config
   );
 }

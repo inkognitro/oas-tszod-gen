@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MarginNextHourlyInterestRateEndpointSchema = {
@@ -52,15 +53,17 @@ export const getSapiV1MarginNextHourlyInterestRateEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginNextHourlyInterestRatePayload = {
-  queryParams: {
+export type GetSapiV1MarginNextHourlyInterestRateRequest = RequestUnion<
+  any,
+  any,
+  {
     assets?: string;
     isIsolated?: 'TRUE' | 'FALSE';
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginNextHourlyInterestRateResponse =
   | ResponseUnion<
@@ -77,20 +80,20 @@ export type GetSapiV1MarginNextHourlyInterestRateResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginNextHourlyInterestRateRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginNextHourlyInterestRateRequest,
   GetSapiV1MarginNextHourlyInterestRateResponse
 >;
 
 export function getSapiV1MarginNextHourlyInterestRate(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginNextHourlyInterestRatePayload,
+  payload: RequestPayload<
+    GetSapiV1MarginNextHourlyInterestRateRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginNextHourlyInterestRateRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginNextHourlyInterestRateEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginNextHourlyInterestRateEndpointSchema, payload),
     config
   );
 }

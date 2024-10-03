@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1PortfolioAutoCollectionEndpointSchema = {
@@ -47,13 +48,15 @@ export const postSapiV1PortfolioAutoCollectionEndpointSchema = {
   },
 };
 
-export type PostSapiV1PortfolioAutoCollectionPayload = {
-  queryParams: {
+export type PostSapiV1PortfolioAutoCollectionRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1PortfolioAutoCollectionResponse =
   | ResponseUnion<
@@ -69,20 +72,20 @@ export type PostSapiV1PortfolioAutoCollectionResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1PortfolioAutoCollectionRequestResult = RequestResult<
-  Request,
+  PostSapiV1PortfolioAutoCollectionRequest,
   PostSapiV1PortfolioAutoCollectionResponse
 >;
 
 export function postSapiV1PortfolioAutoCollection(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1PortfolioAutoCollectionPayload,
+  payload: RequestPayload<
+    PostSapiV1PortfolioAutoCollectionRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1PortfolioAutoCollectionRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1PortfolioAutoCollectionEndpointSchema,
-    }),
+    createRequest(postSapiV1PortfolioAutoCollectionEndpointSchema, payload),
     config
   );
 }

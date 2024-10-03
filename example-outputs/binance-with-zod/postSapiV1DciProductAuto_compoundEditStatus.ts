@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1DciProductAuto_compoundEditStatusEndpointSchema = {
@@ -50,15 +51,17 @@ export const postSapiV1DciProductAuto_compoundEditStatusEndpointSchema = {
   },
 };
 
-export type PostSapiV1DciProductAuto_compoundEditStatusPayload = {
-  queryParams: {
+export type PostSapiV1DciProductAuto_compoundEditStatusRequest = RequestUnion<
+  any,
+  any,
+  {
     positionId: number; // int
     autoCompoundPlan: 'NONE' | 'STANDARD' | 'ADVANCE';
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1DciProductAuto_compoundEditStatusResponse =
   | ResponseUnion<
@@ -75,18 +78,24 @@ export type PostSapiV1DciProductAuto_compoundEditStatusResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1DciProductAuto_compoundEditStatusRequestResult =
-  RequestResult<Request, PostSapiV1DciProductAuto_compoundEditStatusResponse>;
+  RequestResult<
+    PostSapiV1DciProductAuto_compoundEditStatusRequest,
+    PostSapiV1DciProductAuto_compoundEditStatusResponse
+  >;
 
 export function postSapiV1DciProductAuto_compoundEditStatus(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1DciProductAuto_compoundEditStatusPayload,
+  payload: RequestPayload<
+    PostSapiV1DciProductAuto_compoundEditStatusRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1DciProductAuto_compoundEditStatusRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1DciProductAuto_compoundEditStatusEndpointSchema,
-    }),
+    createRequest(
+      postSapiV1DciProductAuto_compoundEditStatusEndpointSchema,
+      payload
+    ),
     config
   );
 }

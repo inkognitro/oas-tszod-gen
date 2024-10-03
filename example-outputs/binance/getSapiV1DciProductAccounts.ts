@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1DciProductAccountsEndpointSchema = {
   path: '/sapi/v1/dci/product/accounts',
@@ -33,13 +34,15 @@ export const getSapiV1DciProductAccountsEndpointSchema = {
   },
 };
 
-export type GetSapiV1DciProductAccountsPayload = {
-  queryParams: {
+export type GetSapiV1DciProductAccountsRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1DciProductAccountsResponse =
   | ResponseUnion<
@@ -56,20 +59,17 @@ export type GetSapiV1DciProductAccountsResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1DciProductAccountsRequestResult = RequestResult<
-  Request,
+  GetSapiV1DciProductAccountsRequest,
   GetSapiV1DciProductAccountsResponse
 >;
 
 export function getSapiV1DciProductAccounts(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1DciProductAccountsPayload,
+  payload: RequestPayload<GetSapiV1DciProductAccountsRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1DciProductAccountsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1DciProductAccountsEndpointSchema,
-    }),
+    createRequest(getSapiV1DciProductAccountsEndpointSchema, payload),
     config
   );
 }

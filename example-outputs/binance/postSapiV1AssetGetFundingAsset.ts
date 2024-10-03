@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1AssetGetFundingAssetEndpointSchema = {
   path: '/sapi/v1/asset/get-funding-asset',
@@ -33,15 +34,17 @@ export const postSapiV1AssetGetFundingAssetEndpointSchema = {
   },
 };
 
-export type PostSapiV1AssetGetFundingAssetPayload = {
-  queryParams: {
+export type PostSapiV1AssetGetFundingAssetRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     needBtcValuation?: 'true' | 'false';
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1AssetGetFundingAssetResponse =
   | ResponseUnion<
@@ -62,20 +65,17 @@ export type PostSapiV1AssetGetFundingAssetResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1AssetGetFundingAssetRequestResult = RequestResult<
-  Request,
+  PostSapiV1AssetGetFundingAssetRequest,
   PostSapiV1AssetGetFundingAssetResponse
 >;
 
 export function postSapiV1AssetGetFundingAsset(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1AssetGetFundingAssetPayload,
+  payload: RequestPayload<PostSapiV1AssetGetFundingAssetRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AssetGetFundingAssetRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1AssetGetFundingAssetEndpointSchema,
-    }),
+    createRequest(postSapiV1AssetGetFundingAssetEndpointSchema, payload),
     config
   );
 }

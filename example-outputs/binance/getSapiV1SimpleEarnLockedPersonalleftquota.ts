@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SimpleEarnLockedPersonalleftquotaEndpointSchema = {
   path: '/sapi/v1/simple-earn/locked/personalLeftQuota',
@@ -33,14 +34,16 @@ export const getSapiV1SimpleEarnLockedPersonalleftquotaEndpointSchema = {
   },
 };
 
-export type GetSapiV1SimpleEarnLockedPersonalleftquotaPayload = {
-  queryParams: {
+export type GetSapiV1SimpleEarnLockedPersonalleftquotaRequest = RequestUnion<
+  any,
+  any,
+  {
     projectId: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SimpleEarnLockedPersonalleftquotaResponse =
   | ResponseUnion<
@@ -56,18 +59,24 @@ export type GetSapiV1SimpleEarnLockedPersonalleftquotaResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnLockedPersonalleftquotaRequestResult =
-  RequestResult<Request, GetSapiV1SimpleEarnLockedPersonalleftquotaResponse>;
+  RequestResult<
+    GetSapiV1SimpleEarnLockedPersonalleftquotaRequest,
+    GetSapiV1SimpleEarnLockedPersonalleftquotaResponse
+  >;
 
 export function getSapiV1SimpleEarnLockedPersonalleftquota(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnLockedPersonalleftquotaPayload,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnLockedPersonalleftquotaRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedPersonalleftquotaRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SimpleEarnLockedPersonalleftquotaEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SimpleEarnLockedPersonalleftquotaEndpointSchema,
+      payload
+    ),
     config
   );
 }

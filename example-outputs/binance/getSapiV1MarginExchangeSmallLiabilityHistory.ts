@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MarginExchangeSmallLiabilityHistoryEndpointSchema = {
   path: '/sapi/v1/margin/exchange-small-liability-history',
@@ -33,8 +34,10 @@ export const getSapiV1MarginExchangeSmallLiabilityHistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginExchangeSmallLiabilityHistoryPayload = {
-  queryParams: {
+export type GetSapiV1MarginExchangeSmallLiabilityHistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     current?: number; // int
     size?: number; // int
     startTime?: number; // int
@@ -42,8 +45,8 @@ export type GetSapiV1MarginExchangeSmallLiabilityHistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginExchangeSmallLiabilityHistoryResponse =
   | ResponseUnion<
@@ -67,19 +70,24 @@ export type GetSapiV1MarginExchangeSmallLiabilityHistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginExchangeSmallLiabilityHistoryRequestResult =
-  RequestResult<Request, GetSapiV1MarginExchangeSmallLiabilityHistoryResponse>;
+  RequestResult<
+    GetSapiV1MarginExchangeSmallLiabilityHistoryRequest,
+    GetSapiV1MarginExchangeSmallLiabilityHistoryResponse
+  >;
 
 export function getSapiV1MarginExchangeSmallLiabilityHistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginExchangeSmallLiabilityHistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1MarginExchangeSmallLiabilityHistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginExchangeSmallLiabilityHistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1MarginExchangeSmallLiabilityHistoryEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1MarginExchangeSmallLiabilityHistoryEndpointSchema,
+      payload
+    ),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1ManagedSubaccountQueryTransLogEndpointSchema = {
   path: '/sapi/v1/managed-subaccount/query-trans-log',
@@ -33,8 +34,10 @@ export const getSapiV1ManagedSubaccountQueryTransLogEndpointSchema = {
   },
 };
 
-export type GetSapiV1ManagedSubaccountQueryTransLogPayload = {
-  queryParams: {
+export type GetSapiV1ManagedSubaccountQueryTransLogRequest = RequestUnion<
+  any,
+  any,
+  {
     startTime?: number; // int
     endTime?: number; // int
     page?: number; // int
@@ -49,8 +52,8 @@ export type GetSapiV1ManagedSubaccountQueryTransLogPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1ManagedSubaccountQueryTransLogResponse =
   | ResponseUnion<
@@ -78,18 +81,24 @@ export type GetSapiV1ManagedSubaccountQueryTransLogResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ManagedSubaccountQueryTransLogRequestResult =
-  RequestResult<Request, GetSapiV1ManagedSubaccountQueryTransLogResponse>;
+  RequestResult<
+    GetSapiV1ManagedSubaccountQueryTransLogRequest,
+    GetSapiV1ManagedSubaccountQueryTransLogResponse
+  >;
 
 export function getSapiV1ManagedSubaccountQueryTransLog(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1ManagedSubaccountQueryTransLogPayload,
+  payload: RequestPayload<
+    GetSapiV1ManagedSubaccountQueryTransLogRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountQueryTransLogRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1ManagedSubaccountQueryTransLogEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1ManagedSubaccountQueryTransLogEndpointSchema,
+      payload
+    ),
     config
   );
 }

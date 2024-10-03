@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1ConvertTradeflowEndpointSchema = {
   path: '/sapi/v1/convert/tradeFlow',
@@ -33,16 +34,18 @@ export const getSapiV1ConvertTradeflowEndpointSchema = {
   },
 };
 
-export type GetSapiV1ConvertTradeflowPayload = {
-  queryParams: {
+export type GetSapiV1ConvertTradeflowRequest = RequestUnion<
+  any,
+  any,
+  {
     startTime: number; // int
     endTime: number; // int
     limit?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1ConvertTradeflowResponse =
   | ResponseUnion<
@@ -73,20 +76,17 @@ export type GetSapiV1ConvertTradeflowResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ConvertTradeflowRequestResult = RequestResult<
-  Request,
+  GetSapiV1ConvertTradeflowRequest,
   GetSapiV1ConvertTradeflowResponse
 >;
 
 export function getSapiV1ConvertTradeflow(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1ConvertTradeflowPayload,
+  payload: RequestPayload<GetSapiV1ConvertTradeflowRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ConvertTradeflowRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1ConvertTradeflowEndpointSchema,
-    }),
+    createRequest(getSapiV1ConvertTradeflowEndpointSchema, payload),
     config
   );
 }

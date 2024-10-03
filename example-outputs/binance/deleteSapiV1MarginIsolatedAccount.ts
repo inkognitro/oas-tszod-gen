@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const deleteSapiV1MarginIsolatedAccountEndpointSchema = {
   path: '/sapi/v1/margin/isolated/account',
@@ -33,14 +34,16 @@ export const deleteSapiV1MarginIsolatedAccountEndpointSchema = {
   },
 };
 
-export type DeleteSapiV1MarginIsolatedAccountPayload = {
-  queryParams: {
+export type DeleteSapiV1MarginIsolatedAccountRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type DeleteSapiV1MarginIsolatedAccountResponse =
   | ResponseUnion<
@@ -57,20 +60,20 @@ export type DeleteSapiV1MarginIsolatedAccountResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteSapiV1MarginIsolatedAccountRequestResult = RequestResult<
-  Request,
+  DeleteSapiV1MarginIsolatedAccountRequest,
   DeleteSapiV1MarginIsolatedAccountResponse
 >;
 
 export function deleteSapiV1MarginIsolatedAccount(
   requestHandler: SimpleRequestHandler,
-  payload: DeleteSapiV1MarginIsolatedAccountPayload,
+  payload: RequestPayload<
+    DeleteSapiV1MarginIsolatedAccountRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1MarginIsolatedAccountRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: deleteSapiV1MarginIsolatedAccountEndpointSchema,
-    }),
+    createRequest(deleteSapiV1MarginIsolatedAccountEndpointSchema, payload),
     config
   );
 }

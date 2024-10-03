@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1PayTransactionsEndpointSchema = {
   path: '/sapi/v1/pay/transactions',
@@ -33,16 +34,18 @@ export const getSapiV1PayTransactionsEndpointSchema = {
   },
 };
 
-export type GetSapiV1PayTransactionsPayload = {
-  queryParams: {
+export type GetSapiV1PayTransactionsRequest = RequestUnion<
+  any,
+  any,
+  {
     startTime?: number; // int
     endTime?: number; // int
     limit?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1PayTransactionsResponse =
   | ResponseUnion<
@@ -94,20 +97,17 @@ export type GetSapiV1PayTransactionsResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1PayTransactionsRequestResult = RequestResult<
-  Request,
+  GetSapiV1PayTransactionsRequest,
   GetSapiV1PayTransactionsResponse
 >;
 
 export function getSapiV1PayTransactions(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1PayTransactionsPayload,
+  payload: RequestPayload<GetSapiV1PayTransactionsRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1PayTransactionsRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1PayTransactionsEndpointSchema,
-    }),
+    createRequest(getSapiV1PayTransactionsEndpointSchema, payload),
     config
   );
 }

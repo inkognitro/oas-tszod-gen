@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SubAccountSubaccountapiIprestrictionEndpointSchema = {
   path: '/sapi/v1/sub-account/subAccountApi/ipRestriction',
@@ -33,15 +34,17 @@ export const getSapiV1SubAccountSubaccountapiIprestrictionEndpointSchema = {
   },
 };
 
-export type GetSapiV1SubAccountSubaccountapiIprestrictionPayload = {
-  queryParams: {
+export type GetSapiV1SubAccountSubaccountapiIprestrictionRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     subAccountApiKey: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SubAccountSubaccountapiIprestrictionResponse =
   | ResponseUnion<
@@ -60,19 +63,24 @@ export type GetSapiV1SubAccountSubaccountapiIprestrictionResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SubAccountSubaccountapiIprestrictionRequestResult =
-  RequestResult<Request, GetSapiV1SubAccountSubaccountapiIprestrictionResponse>;
+  RequestResult<
+    GetSapiV1SubAccountSubaccountapiIprestrictionRequest,
+    GetSapiV1SubAccountSubaccountapiIprestrictionResponse
+  >;
 
 export function getSapiV1SubAccountSubaccountapiIprestriction(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SubAccountSubaccountapiIprestrictionPayload,
+  payload: RequestPayload<
+    GetSapiV1SubAccountSubaccountapiIprestrictionRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountSubaccountapiIprestrictionRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1SubAccountSubaccountapiIprestrictionEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1SubAccountSubaccountapiIprestrictionEndpointSchema,
+      payload
+    ),
     config
   );
 }

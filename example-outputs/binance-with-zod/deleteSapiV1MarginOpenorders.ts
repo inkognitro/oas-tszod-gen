@@ -8,13 +8,14 @@ import {
 } from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const deleteSapiV1MarginOpenordersEndpointSchema = {
@@ -65,15 +66,17 @@ export const deleteSapiV1MarginOpenordersEndpointSchema = {
   },
 };
 
-export type DeleteSapiV1MarginOpenordersPayload = {
-  queryParams: {
+export type DeleteSapiV1MarginOpenordersRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     isIsolated?: 'TRUE' | 'FALSE';
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type DeleteSapiV1MarginOpenordersResponse =
   | ResponseUnion<
@@ -88,20 +91,17 @@ export type DeleteSapiV1MarginOpenordersResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteSapiV1MarginOpenordersRequestResult = RequestResult<
-  Request,
+  DeleteSapiV1MarginOpenordersRequest,
   DeleteSapiV1MarginOpenordersResponse
 >;
 
 export function deleteSapiV1MarginOpenorders(
   requestHandler: SimpleRequestHandler,
-  payload: DeleteSapiV1MarginOpenordersPayload,
+  payload: RequestPayload<DeleteSapiV1MarginOpenordersRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1MarginOpenordersRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: deleteSapiV1MarginOpenordersEndpointSchema,
-    }),
+    createRequest(deleteSapiV1MarginOpenordersEndpointSchema, payload),
     config
   );
 }

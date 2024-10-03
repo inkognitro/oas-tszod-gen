@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1ManagedSubaccountFetchFutureAssetEndpointSchema = {
@@ -72,14 +73,16 @@ export const getSapiV1ManagedSubaccountFetchFutureAssetEndpointSchema = {
   },
 };
 
-export type GetSapiV1ManagedSubaccountFetchFutureAssetPayload = {
-  queryParams: {
+export type GetSapiV1ManagedSubaccountFetchFutureAssetRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1ManagedSubaccountFetchFutureAssetResponse =
   | ResponseUnion<
@@ -113,18 +116,24 @@ export type GetSapiV1ManagedSubaccountFetchFutureAssetResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ManagedSubaccountFetchFutureAssetRequestResult =
-  RequestResult<Request, GetSapiV1ManagedSubaccountFetchFutureAssetResponse>;
+  RequestResult<
+    GetSapiV1ManagedSubaccountFetchFutureAssetRequest,
+    GetSapiV1ManagedSubaccountFetchFutureAssetResponse
+  >;
 
 export function getSapiV1ManagedSubaccountFetchFutureAsset(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1ManagedSubaccountFetchFutureAssetPayload,
+  payload: RequestPayload<
+    GetSapiV1ManagedSubaccountFetchFutureAssetRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountFetchFutureAssetRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1ManagedSubaccountFetchFutureAssetEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1ManagedSubaccountFetchFutureAssetEndpointSchema,
+      payload
+    ),
     config
   );
 }

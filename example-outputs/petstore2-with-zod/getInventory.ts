@@ -1,9 +1,9 @@
 import {z} from 'zod';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -25,6 +25,8 @@ export const getInventoryEndpointSchema = {
   },
 };
 
+export type GetInventoryRequest = Request;
+
 export type GetInventoryResponse = ResponseUnion<
   200,
   ResponseBodyData<
@@ -36,7 +38,7 @@ export type GetInventoryResponse = ResponseUnion<
 >;
 
 export type GetInventoryRequestResult = RequestResult<
-  Request,
+  GetInventoryRequest,
   GetInventoryResponse
 >;
 
@@ -45,7 +47,7 @@ export function getInventory(
   config?: RequestHandlerExecutionConfig
 ): Promise<GetInventoryRequestResult> {
   return requestHandler.execute(
-    createRequest({endpointSchema: getInventoryEndpointSchema}),
+    createRequest(getInventoryEndpointSchema),
     config
   );
 }

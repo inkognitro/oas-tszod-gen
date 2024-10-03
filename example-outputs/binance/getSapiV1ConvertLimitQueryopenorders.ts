@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1ConvertLimitQueryopenordersEndpointSchema = {
   path: '/sapi/v1/convert/limit/queryOpenOrders',
@@ -33,13 +34,15 @@ export const getSapiV1ConvertLimitQueryopenordersEndpointSchema = {
   },
 };
 
-export type GetSapiV1ConvertLimitQueryopenordersPayload = {
-  queryParams: {
+export type GetSapiV1ConvertLimitQueryopenordersRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1ConvertLimitQueryopenordersResponse =
   | ResponseUnion<
@@ -67,20 +70,20 @@ export type GetSapiV1ConvertLimitQueryopenordersResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1ConvertLimitQueryopenordersRequestResult = RequestResult<
-  Request,
+  GetSapiV1ConvertLimitQueryopenordersRequest,
   GetSapiV1ConvertLimitQueryopenordersResponse
 >;
 
 export function getSapiV1ConvertLimitQueryopenorders(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1ConvertLimitQueryopenordersPayload,
+  payload: RequestPayload<
+    GetSapiV1ConvertLimitQueryopenordersRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ConvertLimitQueryopenordersRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1ConvertLimitQueryopenordersEndpointSchema,
-    }),
+    createRequest(getSapiV1ConvertLimitQueryopenordersEndpointSchema, payload),
     config
   );
 }

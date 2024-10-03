@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1SubAccountBlvtEnableEndpointSchema = {
@@ -50,15 +51,17 @@ export const postSapiV1SubAccountBlvtEnableEndpointSchema = {
   },
 };
 
-export type PostSapiV1SubAccountBlvtEnablePayload = {
-  queryParams: {
+export type PostSapiV1SubAccountBlvtEnableRequest = RequestUnion<
+  any,
+  any,
+  {
     email: string;
     enableBlvt: boolean;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1SubAccountBlvtEnableResponse =
   | ResponseUnion<
@@ -75,20 +78,17 @@ export type PostSapiV1SubAccountBlvtEnableResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1SubAccountBlvtEnableRequestResult = RequestResult<
-  Request,
+  PostSapiV1SubAccountBlvtEnableRequest,
   PostSapiV1SubAccountBlvtEnableResponse
 >;
 
 export function postSapiV1SubAccountBlvtEnable(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1SubAccountBlvtEnablePayload,
+  payload: RequestPayload<PostSapiV1SubAccountBlvtEnableRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountBlvtEnableRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1SubAccountBlvtEnableEndpointSchema,
-    }),
+    createRequest(postSapiV1SubAccountBlvtEnableEndpointSchema, payload),
     config
   );
 }

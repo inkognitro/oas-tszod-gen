@@ -1,13 +1,14 @@
 import {orderZodSchema, Order} from '@example-outputs/petstore2-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2-with-zod/core';
 
 export const getOrderByIdEndpointSchema = {
@@ -38,11 +39,12 @@ export const getOrderByIdEndpointSchema = {
   },
 };
 
-export type GetOrderByIdPayload = {
-  pathParams: {
+export type GetOrderByIdRequest = RequestUnion<
+  any,
+  {
     orderId: number; // int
-  };
-};
+  }
+>;
 
 export type GetOrderByIdResponse =
   | ResponseUnion<
@@ -54,17 +56,17 @@ export type GetOrderByIdResponse =
   | ResponseUnion<404>;
 
 export type GetOrderByIdRequestResult = RequestResult<
-  Request,
+  GetOrderByIdRequest,
   GetOrderByIdResponse
 >;
 
 export function getOrderById(
   requestHandler: SimpleRequestHandler,
-  payload: GetOrderByIdPayload,
+  payload: RequestPayload<GetOrderByIdRequest, 'pathParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetOrderByIdRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getOrderByIdEndpointSchema}),
+    createRequest(getOrderByIdEndpointSchema, payload),
     config
   );
 }

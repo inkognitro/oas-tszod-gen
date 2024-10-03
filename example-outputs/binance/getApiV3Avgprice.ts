@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getApiV3AvgpriceEndpointSchema = {
   path: '/api/v3/avgPrice',
@@ -28,11 +29,13 @@ export const getApiV3AvgpriceEndpointSchema = {
   },
 };
 
-export type GetApiV3AvgpricePayload = {
-  queryParams: {
+export type GetApiV3AvgpriceRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
-  };
-};
+  }
+>;
 
 export type GetApiV3AvgpriceResponse =
   | ResponseUnion<
@@ -49,17 +52,17 @@ export type GetApiV3AvgpriceResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3AvgpriceRequestResult = RequestResult<
-  Request,
+  GetApiV3AvgpriceRequest,
   GetApiV3AvgpriceResponse
 >;
 
 export function getApiV3Avgprice(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3AvgpricePayload,
+  payload: RequestPayload<GetApiV3AvgpriceRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3AvgpriceRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getApiV3AvgpriceEndpointSchema}),
+    createRequest(getApiV3AvgpriceEndpointSchema, payload),
     config
   );
 }

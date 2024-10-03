@@ -1,12 +1,14 @@
 import {Order} from '@example-outputs/petstore2';
 import {
+  RequestUnion,
+  RequestBodyData,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/petstore2/core';
 
 export const placeOrderEndpointSchema = {
@@ -30,38 +32,28 @@ export const placeOrderEndpointSchema = {
   },
 };
 
-export type PlaceOrderRequestBody =
-  | {
-      contentType: 'application/json';
-      body: Order;
-    }
-  | {
-      contentType: 'application/xml';
-      body: Order;
-    }
-  | {
-      contentType: 'application/x-www-form-urlencoded';
-      body: Order;
-    };
-
-export type PlaceOrderPayload = PlaceOrderRequestBody;
+export type PlaceOrderRequest = RequestUnion<
+  | RequestBodyData<'application/json', Order>
+  | RequestBodyData<'application/xml', Order>
+  | RequestBodyData<'application/x-www-form-urlencoded', Order>
+>;
 
 export type PlaceOrderResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', Order>>
   | ResponseUnion<405>;
 
 export type PlaceOrderRequestResult = RequestResult<
-  Request,
+  PlaceOrderRequest,
   PlaceOrderResponse
 >;
 
 export function placeOrder(
   requestHandler: SimpleRequestHandler,
-  payload: PlaceOrderPayload,
+  payload: RequestPayload<PlaceOrderRequest, 'contentType' | 'body'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PlaceOrderRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: placeOrderEndpointSchema}),
+    createRequest(placeOrderEndpointSchema, payload),
     config
   );
 }

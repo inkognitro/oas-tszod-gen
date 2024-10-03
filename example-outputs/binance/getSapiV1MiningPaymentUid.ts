@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MiningPaymentUidEndpointSchema = {
   path: '/sapi/v1/mining/payment/uid',
@@ -33,8 +34,10 @@ export const getSapiV1MiningPaymentUidEndpointSchema = {
   },
 };
 
-export type GetSapiV1MiningPaymentUidPayload = {
-  queryParams: {
+export type GetSapiV1MiningPaymentUidRequest = RequestUnion<
+  any,
+  any,
+  {
     algo: string;
     startDate?: string;
     endDate?: string;
@@ -43,8 +46,8 @@ export type GetSapiV1MiningPaymentUidPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MiningPaymentUidResponse =
   | ResponseUnion<
@@ -73,20 +76,17 @@ export type GetSapiV1MiningPaymentUidResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MiningPaymentUidRequestResult = RequestResult<
-  Request,
+  GetSapiV1MiningPaymentUidRequest,
   GetSapiV1MiningPaymentUidResponse
 >;
 
 export function getSapiV1MiningPaymentUid(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MiningPaymentUidPayload,
+  payload: RequestPayload<GetSapiV1MiningPaymentUidRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MiningPaymentUidRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MiningPaymentUidEndpointSchema,
-    }),
+    createRequest(getSapiV1MiningPaymentUidEndpointSchema, payload),
     config
   );
 }

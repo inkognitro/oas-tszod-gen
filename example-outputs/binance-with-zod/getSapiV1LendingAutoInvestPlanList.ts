@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1LendingAutoInvestPlanListEndpointSchema = {
@@ -77,14 +78,16 @@ export const getSapiV1LendingAutoInvestPlanListEndpointSchema = {
   },
 };
 
-export type GetSapiV1LendingAutoInvestPlanListPayload = {
-  queryParams: {
+export type GetSapiV1LendingAutoInvestPlanListRequest = RequestUnion<
+  any,
+  any,
+  {
     planType: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LendingAutoInvestPlanListResponse =
   | ResponseUnion<
@@ -127,20 +130,20 @@ export type GetSapiV1LendingAutoInvestPlanListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingAutoInvestPlanListRequestResult = RequestResult<
-  Request,
+  GetSapiV1LendingAutoInvestPlanListRequest,
   GetSapiV1LendingAutoInvestPlanListResponse
 >;
 
 export function getSapiV1LendingAutoInvestPlanList(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LendingAutoInvestPlanListPayload,
+  payload: RequestPayload<
+    GetSapiV1LendingAutoInvestPlanListRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestPlanListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LendingAutoInvestPlanListEndpointSchema,
-    }),
+    createRequest(getSapiV1LendingAutoInvestPlanListEndpointSchema, payload),
     config
   );
 }

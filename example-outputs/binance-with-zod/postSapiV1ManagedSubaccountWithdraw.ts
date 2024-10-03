@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1ManagedSubaccountWithdrawEndpointSchema = {
@@ -51,8 +52,10 @@ export const postSapiV1ManagedSubaccountWithdrawEndpointSchema = {
   },
 };
 
-export type PostSapiV1ManagedSubaccountWithdrawPayload = {
-  queryParams: {
+export type PostSapiV1ManagedSubaccountWithdrawRequest = RequestUnion<
+  any,
+  any,
+  {
     fromEmail: string;
     asset: string;
     amount: number;
@@ -60,8 +63,8 @@ export type PostSapiV1ManagedSubaccountWithdrawPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1ManagedSubaccountWithdrawResponse =
   | ResponseUnion<
@@ -77,20 +80,20 @@ export type PostSapiV1ManagedSubaccountWithdrawResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1ManagedSubaccountWithdrawRequestResult = RequestResult<
-  Request,
+  PostSapiV1ManagedSubaccountWithdrawRequest,
   PostSapiV1ManagedSubaccountWithdrawResponse
 >;
 
 export function postSapiV1ManagedSubaccountWithdraw(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1ManagedSubaccountWithdrawPayload,
+  payload: RequestPayload<
+    PostSapiV1ManagedSubaccountWithdrawRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ManagedSubaccountWithdrawRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1ManagedSubaccountWithdrawEndpointSchema,
-    }),
+    createRequest(postSapiV1ManagedSubaccountWithdrawEndpointSchema, payload),
     config
   );
 }

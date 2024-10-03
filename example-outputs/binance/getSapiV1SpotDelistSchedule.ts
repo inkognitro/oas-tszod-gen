@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SpotDelistScheduleEndpointSchema = {
   path: '/sapi/v1/spot/delist-schedule',
@@ -33,13 +34,15 @@ export const getSapiV1SpotDelistScheduleEndpointSchema = {
   },
 };
 
-export type GetSapiV1SpotDelistSchedulePayload = {
-  queryParams: {
+export type GetSapiV1SpotDelistScheduleRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SpotDelistScheduleResponse =
   | ResponseUnion<
@@ -56,20 +59,17 @@ export type GetSapiV1SpotDelistScheduleResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SpotDelistScheduleRequestResult = RequestResult<
-  Request,
+  GetSapiV1SpotDelistScheduleRequest,
   GetSapiV1SpotDelistScheduleResponse
 >;
 
 export function getSapiV1SpotDelistSchedule(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SpotDelistSchedulePayload,
+  payload: RequestPayload<GetSapiV1SpotDelistScheduleRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SpotDelistScheduleRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SpotDelistScheduleEndpointSchema,
-    }),
+    createRequest(getSapiV1SpotDelistScheduleEndpointSchema, payload),
     config
   );
 }

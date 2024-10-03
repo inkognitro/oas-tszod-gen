@@ -1,10 +1,10 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -45,6 +45,8 @@ export const getSapiV1PortfolioMarginAssetLeverageEndpointSchema = {
   },
 };
 
+export type GetSapiV1PortfolioMarginAssetLeverageRequest = Request;
+
 export type GetSapiV1PortfolioMarginAssetLeverageResponse =
   | ResponseUnion<
       200,
@@ -60,7 +62,7 @@ export type GetSapiV1PortfolioMarginAssetLeverageResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1PortfolioMarginAssetLeverageRequestResult = RequestResult<
-  Request,
+  GetSapiV1PortfolioMarginAssetLeverageRequest,
   GetSapiV1PortfolioMarginAssetLeverageResponse
 >;
 
@@ -69,9 +71,7 @@ export function getSapiV1PortfolioMarginAssetLeverage(
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1PortfolioMarginAssetLeverageRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      endpointSchema: getSapiV1PortfolioMarginAssetLeverageEndpointSchema,
-    }),
+    createRequest(getSapiV1PortfolioMarginAssetLeverageEndpointSchema),
     config
   );
 }

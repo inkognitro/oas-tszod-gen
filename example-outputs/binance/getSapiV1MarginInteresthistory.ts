@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MarginInteresthistoryEndpointSchema = {
   path: '/sapi/v1/margin/interestHistory',
@@ -33,8 +34,10 @@ export const getSapiV1MarginInteresthistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginInteresthistoryPayload = {
-  queryParams: {
+export type GetSapiV1MarginInteresthistoryRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     isolatedSymbol?: string;
     startTime?: number; // int
@@ -45,8 +48,8 @@ export type GetSapiV1MarginInteresthistoryPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginInteresthistoryResponse =
   | ResponseUnion<
@@ -71,20 +74,17 @@ export type GetSapiV1MarginInteresthistoryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginInteresthistoryRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginInteresthistoryRequest,
   GetSapiV1MarginInteresthistoryResponse
 >;
 
 export function getSapiV1MarginInteresthistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginInteresthistoryPayload,
+  payload: RequestPayload<GetSapiV1MarginInteresthistoryRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginInteresthistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginInteresthistoryEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginInteresthistoryEndpointSchema, payload),
     config
   );
 }

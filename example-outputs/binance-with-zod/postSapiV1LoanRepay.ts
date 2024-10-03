@@ -8,13 +8,14 @@ import {
 } from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1LoanRepayEndpointSchema = {
@@ -56,8 +57,10 @@ export const postSapiV1LoanRepayEndpointSchema = {
   },
 };
 
-export type PostSapiV1LoanRepayPayload = {
-  queryParams: {
+export type PostSapiV1LoanRepayRequest = RequestUnion<
+  any,
+  any,
+  {
     orderId: number; // int
     amount: number;
     type?: number; // int
@@ -65,8 +68,8 @@ export type PostSapiV1LoanRepayPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1LoanRepayResponse =
   | ResponseUnion<
@@ -77,20 +80,17 @@ export type PostSapiV1LoanRepayResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1LoanRepayRequestResult = RequestResult<
-  Request,
+  PostSapiV1LoanRepayRequest,
   PostSapiV1LoanRepayResponse
 >;
 
 export function postSapiV1LoanRepay(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1LoanRepayPayload,
+  payload: RequestPayload<PostSapiV1LoanRepayRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LoanRepayRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1LoanRepayEndpointSchema,
-    }),
+    createRequest(postSapiV1LoanRepayEndpointSchema, payload),
     config
   );
 }

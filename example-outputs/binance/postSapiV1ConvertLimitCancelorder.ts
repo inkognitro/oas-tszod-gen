@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1ConvertLimitCancelorderEndpointSchema = {
   path: '/sapi/v1/convert/limit/cancelOrder',
@@ -33,14 +34,16 @@ export const postSapiV1ConvertLimitCancelorderEndpointSchema = {
   },
 };
 
-export type PostSapiV1ConvertLimitCancelorderPayload = {
-  queryParams: {
+export type PostSapiV1ConvertLimitCancelorderRequest = RequestUnion<
+  any,
+  any,
+  {
     orderId: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1ConvertLimitCancelorderResponse =
   | ResponseUnion<
@@ -57,20 +60,20 @@ export type PostSapiV1ConvertLimitCancelorderResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1ConvertLimitCancelorderRequestResult = RequestResult<
-  Request,
+  PostSapiV1ConvertLimitCancelorderRequest,
   PostSapiV1ConvertLimitCancelorderResponse
 >;
 
 export function postSapiV1ConvertLimitCancelorder(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1ConvertLimitCancelorderPayload,
+  payload: RequestPayload<
+    PostSapiV1ConvertLimitCancelorderRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ConvertLimitCancelorderRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1ConvertLimitCancelorderEndpointSchema,
-    }),
+    createRequest(postSapiV1ConvertLimitCancelorderEndpointSchema, payload),
     config
   );
 }

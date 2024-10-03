@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1PortfolioRepayFuturesSwitchEndpointSchema = {
@@ -48,14 +49,16 @@ export const postSapiV1PortfolioRepayFuturesSwitchEndpointSchema = {
   },
 };
 
-export type PostSapiV1PortfolioRepayFuturesSwitchPayload = {
-  queryParams: {
+export type PostSapiV1PortfolioRepayFuturesSwitchRequest = RequestUnion<
+  any,
+  any,
+  {
     autoRepay: boolean;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1PortfolioRepayFuturesSwitchResponse =
   | ResponseUnion<
@@ -71,20 +74,20 @@ export type PostSapiV1PortfolioRepayFuturesSwitchResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1PortfolioRepayFuturesSwitchRequestResult = RequestResult<
-  Request,
+  PostSapiV1PortfolioRepayFuturesSwitchRequest,
   PostSapiV1PortfolioRepayFuturesSwitchResponse
 >;
 
 export function postSapiV1PortfolioRepayFuturesSwitch(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1PortfolioRepayFuturesSwitchPayload,
+  payload: RequestPayload<
+    PostSapiV1PortfolioRepayFuturesSwitchRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1PortfolioRepayFuturesSwitchRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1PortfolioRepayFuturesSwitchEndpointSchema,
-    }),
+    createRequest(postSapiV1PortfolioRepayFuturesSwitchEndpointSchema, payload),
     config
   );
 }

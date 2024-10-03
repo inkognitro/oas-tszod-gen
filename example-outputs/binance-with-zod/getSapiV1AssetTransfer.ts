@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1AssetTransferEndpointSchema = {
@@ -93,8 +94,10 @@ export const getSapiV1AssetTransferEndpointSchema = {
   },
 };
 
-export type GetSapiV1AssetTransferPayload = {
-  queryParams: {
+export type GetSapiV1AssetTransferRequest = RequestUnion<
+  any,
+  any,
+  {
     type:
       | 'MAIN_C2C'
       | 'MAIN_UMFUTURE'
@@ -133,8 +136,8 @@ export type GetSapiV1AssetTransferPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AssetTransferResponse =
   | ResponseUnion<
@@ -158,20 +161,17 @@ export type GetSapiV1AssetTransferResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AssetTransferRequestResult = RequestResult<
-  Request,
+  GetSapiV1AssetTransferRequest,
   GetSapiV1AssetTransferResponse
 >;
 
 export function getSapiV1AssetTransfer(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AssetTransferPayload,
+  payload: RequestPayload<GetSapiV1AssetTransferRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetTransferRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AssetTransferEndpointSchema,
-    }),
+    createRequest(getSapiV1AssetTransferEndpointSchema, payload),
     config
   );
 }

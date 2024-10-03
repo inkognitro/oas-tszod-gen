@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1LendingAutoInvestAllAssetEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/all/asset',
@@ -33,13 +34,15 @@ export const getSapiV1LendingAutoInvestAllAssetEndpointSchema = {
   },
 };
 
-export type GetSapiV1LendingAutoInvestAllAssetPayload = {
-  queryParams: {
+export type GetSapiV1LendingAutoInvestAllAssetRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LendingAutoInvestAllAssetResponse =
   | ResponseUnion<
@@ -56,20 +59,20 @@ export type GetSapiV1LendingAutoInvestAllAssetResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingAutoInvestAllAssetRequestResult = RequestResult<
-  Request,
+  GetSapiV1LendingAutoInvestAllAssetRequest,
   GetSapiV1LendingAutoInvestAllAssetResponse
 >;
 
 export function getSapiV1LendingAutoInvestAllAsset(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LendingAutoInvestAllAssetPayload,
+  payload: RequestPayload<
+    GetSapiV1LendingAutoInvestAllAssetRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestAllAssetRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LendingAutoInvestAllAssetEndpointSchema,
-    }),
+    createRequest(getSapiV1LendingAutoInvestAllAssetEndpointSchema, payload),
     config
   );
 }

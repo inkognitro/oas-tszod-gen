@@ -8,13 +8,14 @@ import {
 } from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV2SubAccountFuturesAccountsummaryEndpointSchema = {
@@ -58,16 +59,18 @@ export const getSapiV2SubAccountFuturesAccountsummaryEndpointSchema = {
   },
 };
 
-export type GetSapiV2SubAccountFuturesAccountsummaryPayload = {
-  queryParams: {
+export type GetSapiV2SubAccountFuturesAccountsummaryRequest = RequestUnion<
+  any,
+  any,
+  {
     futuresType: number; // int
     page?: number; // int
     limit?: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV2SubAccountFuturesAccountsummaryResponse =
   | ResponseUnion<
@@ -81,18 +84,24 @@ export type GetSapiV2SubAccountFuturesAccountsummaryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV2SubAccountFuturesAccountsummaryRequestResult =
-  RequestResult<Request, GetSapiV2SubAccountFuturesAccountsummaryResponse>;
+  RequestResult<
+    GetSapiV2SubAccountFuturesAccountsummaryRequest,
+    GetSapiV2SubAccountFuturesAccountsummaryResponse
+  >;
 
 export function getSapiV2SubAccountFuturesAccountsummary(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV2SubAccountFuturesAccountsummaryPayload,
+  payload: RequestPayload<
+    GetSapiV2SubAccountFuturesAccountsummaryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2SubAccountFuturesAccountsummaryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV2SubAccountFuturesAccountsummaryEndpointSchema,
-    }),
+    createRequest(
+      getSapiV2SubAccountFuturesAccountsummaryEndpointSchema,
+      payload
+    ),
     config
   );
 }

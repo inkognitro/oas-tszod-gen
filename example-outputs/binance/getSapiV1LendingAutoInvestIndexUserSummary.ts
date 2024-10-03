@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1LendingAutoInvestIndexUserSummaryEndpointSchema = {
   path: '/sapi/v1/lending/auto-invest/index/user-summary',
@@ -33,14 +34,16 @@ export const getSapiV1LendingAutoInvestIndexUserSummaryEndpointSchema = {
   },
 };
 
-export type GetSapiV1LendingAutoInvestIndexUserSummaryPayload = {
-  queryParams: {
+export type GetSapiV1LendingAutoInvestIndexUserSummaryRequest = RequestUnion<
+  any,
+  any,
+  {
     indexId: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1LendingAutoInvestIndexUserSummaryResponse =
   | ResponseUnion<
@@ -77,18 +80,24 @@ export type GetSapiV1LendingAutoInvestIndexUserSummaryResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1LendingAutoInvestIndexUserSummaryRequestResult =
-  RequestResult<Request, GetSapiV1LendingAutoInvestIndexUserSummaryResponse>;
+  RequestResult<
+    GetSapiV1LendingAutoInvestIndexUserSummaryRequest,
+    GetSapiV1LendingAutoInvestIndexUserSummaryResponse
+  >;
 
 export function getSapiV1LendingAutoInvestIndexUserSummary(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1LendingAutoInvestIndexUserSummaryPayload,
+  payload: RequestPayload<
+    GetSapiV1LendingAutoInvestIndexUserSummaryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestIndexUserSummaryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1LendingAutoInvestIndexUserSummaryEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1LendingAutoInvestIndexUserSummaryEndpointSchema,
+      payload
+    ),
     config
   );
 }

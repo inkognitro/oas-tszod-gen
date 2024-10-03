@@ -1,13 +1,13 @@
-import {Error} from '@example-outputs/binance';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1MiningPubCoinlistEndpointSchema = {
   path: '/sapi/v1/mining/pub/coinList',
@@ -27,6 +27,8 @@ export const getSapiV1MiningPubCoinlistEndpointSchema = {
     },
   },
 };
+
+export type GetSapiV1MiningPubCoinlistRequest = Request;
 
 export type GetSapiV1MiningPubCoinlistResponse =
   | ResponseUnion<
@@ -49,7 +51,7 @@ export type GetSapiV1MiningPubCoinlistResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MiningPubCoinlistRequestResult = RequestResult<
-  Request,
+  GetSapiV1MiningPubCoinlistRequest,
   GetSapiV1MiningPubCoinlistResponse
 >;
 
@@ -58,7 +60,7 @@ export function getSapiV1MiningPubCoinlist(
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MiningPubCoinlistRequestResult> {
   return requestHandler.execute(
-    createRequest({endpointSchema: getSapiV1MiningPubCoinlistEndpointSchema}),
+    createRequest(getSapiV1MiningPubCoinlistEndpointSchema),
     config
   );
 }

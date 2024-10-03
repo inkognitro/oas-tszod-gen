@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getApiV3UiklinesEndpointSchema = {
@@ -60,8 +61,10 @@ export const getApiV3UiklinesEndpointSchema = {
   },
 };
 
-export type GetApiV3UiklinesPayload = {
-  queryParams: {
+export type GetApiV3UiklinesRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     interval:
       | '1s'
@@ -84,8 +87,8 @@ export type GetApiV3UiklinesPayload = {
     endTime?: number; // int
     timeZone?: string;
     limit?: number; // int
-  };
-};
+  }
+>;
 
 export type GetApiV3UiklinesResponse =
   | ResponseUnion<
@@ -101,17 +104,17 @@ export type GetApiV3UiklinesResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3UiklinesRequestResult = RequestResult<
-  Request,
+  GetApiV3UiklinesRequest,
   GetApiV3UiklinesResponse
 >;
 
 export function getApiV3Uiklines(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3UiklinesPayload,
+  payload: RequestPayload<GetApiV3UiklinesRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3UiklinesRequestResult> {
   return requestHandler.execute(
-    createRequest({...payload, endpointSchema: getApiV3UiklinesEndpointSchema}),
+    createRequest(getApiV3UiklinesEndpointSchema, payload),
     config
   );
 }

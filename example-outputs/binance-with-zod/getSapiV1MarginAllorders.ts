@@ -6,13 +6,14 @@ import {
 } from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MarginAllordersEndpointSchema = {
@@ -56,8 +57,10 @@ export const getSapiV1MarginAllordersEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginAllordersPayload = {
-  queryParams: {
+export type GetSapiV1MarginAllordersRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol: string;
     isIsolated?: 'TRUE' | 'FALSE';
     orderId?: number; // int
@@ -67,8 +70,8 @@ export type GetSapiV1MarginAllordersPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginAllordersResponse =
   | ResponseUnion<
@@ -79,20 +82,17 @@ export type GetSapiV1MarginAllordersResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginAllordersRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginAllordersRequest,
   GetSapiV1MarginAllordersResponse
 >;
 
 export function getSapiV1MarginAllorders(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginAllordersPayload,
+  payload: RequestPayload<GetSapiV1MarginAllordersRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginAllordersRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginAllordersEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginAllordersEndpointSchema, payload),
     config
   );
 }

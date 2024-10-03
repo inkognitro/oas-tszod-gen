@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const deleteSapiV1AlgoSpotOrderEndpointSchema = {
   path: '/sapi/v1/algo/spot/order',
@@ -33,14 +34,16 @@ export const deleteSapiV1AlgoSpotOrderEndpointSchema = {
   },
 };
 
-export type DeleteSapiV1AlgoSpotOrderPayload = {
-  queryParams: {
+export type DeleteSapiV1AlgoSpotOrderRequest = RequestUnion<
+  any,
+  any,
+  {
     algoId: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type DeleteSapiV1AlgoSpotOrderResponse =
   | ResponseUnion<
@@ -59,20 +62,17 @@ export type DeleteSapiV1AlgoSpotOrderResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type DeleteSapiV1AlgoSpotOrderRequestResult = RequestResult<
-  Request,
+  DeleteSapiV1AlgoSpotOrderRequest,
   DeleteSapiV1AlgoSpotOrderResponse
 >;
 
 export function deleteSapiV1AlgoSpotOrder(
   requestHandler: SimpleRequestHandler,
-  payload: DeleteSapiV1AlgoSpotOrderPayload,
+  payload: RequestPayload<DeleteSapiV1AlgoSpotOrderRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1AlgoSpotOrderRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: deleteSapiV1AlgoSpotOrderEndpointSchema,
-    }),
+    createRequest(deleteSapiV1AlgoSpotOrderEndpointSchema, payload),
     config
   );
 }

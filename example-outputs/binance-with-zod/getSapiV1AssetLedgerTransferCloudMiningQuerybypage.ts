@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1AssetLedgerTransferCloudMiningQuerybypageEndpointSchema =
@@ -65,20 +66,23 @@ export const getSapiV1AssetLedgerTransferCloudMiningQuerybypageEndpointSchema =
     },
   };
 
-export type GetSapiV1AssetLedgerTransferCloudMiningQuerybypagePayload = {
-  queryParams: {
-    tranId?: number; // int
-    clientTranId?: string;
-    asset?: string;
-    startTime: number; // int
-    endTime: number; // int
-    current?: number; // int
-    size?: number; // int
-    recvWindow?: number; // int
-    timestamp: number; // int
-    signature: string;
-  };
-};
+export type GetSapiV1AssetLedgerTransferCloudMiningQuerybypageRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      tranId?: number; // int
+      clientTranId?: string;
+      asset?: string;
+      startTime: number; // int
+      endTime: number; // int
+      current?: number; // int
+      size?: number; // int
+      recvWindow?: number; // int
+      timestamp: number; // int
+      signature: string;
+    }
+  >;
 
 export type GetSapiV1AssetLedgerTransferCloudMiningQuerybypageResponse =
   | ResponseUnion<
@@ -103,21 +107,23 @@ export type GetSapiV1AssetLedgerTransferCloudMiningQuerybypageResponse =
 
 export type GetSapiV1AssetLedgerTransferCloudMiningQuerybypageRequestResult =
   RequestResult<
-    Request,
+    GetSapiV1AssetLedgerTransferCloudMiningQuerybypageRequest,
     GetSapiV1AssetLedgerTransferCloudMiningQuerybypageResponse
   >;
 
 export function getSapiV1AssetLedgerTransferCloudMiningQuerybypage(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AssetLedgerTransferCloudMiningQuerybypagePayload,
+  payload: RequestPayload<
+    GetSapiV1AssetLedgerTransferCloudMiningQuerybypageRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetLedgerTransferCloudMiningQuerybypageRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1AssetLedgerTransferCloudMiningQuerybypageEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1AssetLedgerTransferCloudMiningQuerybypageEndpointSchema,
+      payload
+    ),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1BlvtSubscribeRecordEndpointSchema = {
   path: '/sapi/v1/blvt/subscribe/record',
@@ -33,8 +34,10 @@ export const getSapiV1BlvtSubscribeRecordEndpointSchema = {
   },
 };
 
-export type GetSapiV1BlvtSubscribeRecordPayload = {
-  queryParams: {
+export type GetSapiV1BlvtSubscribeRecordRequest = RequestUnion<
+  any,
+  any,
+  {
     tokenName?: string;
     id?: number; // int
     startTime?: number; // int
@@ -43,8 +46,8 @@ export type GetSapiV1BlvtSubscribeRecordPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1BlvtSubscribeRecordResponse =
   | ResponseUnion<
@@ -66,20 +69,17 @@ export type GetSapiV1BlvtSubscribeRecordResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1BlvtSubscribeRecordRequestResult = RequestResult<
-  Request,
+  GetSapiV1BlvtSubscribeRecordRequest,
   GetSapiV1BlvtSubscribeRecordResponse
 >;
 
 export function getSapiV1BlvtSubscribeRecord(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1BlvtSubscribeRecordPayload,
+  payload: RequestPayload<GetSapiV1BlvtSubscribeRecordRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1BlvtSubscribeRecordRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1BlvtSubscribeRecordEndpointSchema,
-    }),
+    createRequest(getSapiV1BlvtSubscribeRecordEndpointSchema, payload),
     config
   );
 }

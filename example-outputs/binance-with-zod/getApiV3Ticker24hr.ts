@@ -8,13 +8,14 @@ import {
 } from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getApiV3Ticker24hrEndpointSchema = {
@@ -45,13 +46,15 @@ export const getApiV3Ticker24hrEndpointSchema = {
   },
 };
 
-export type GetApiV3Ticker24hrPayload = {
-  queryParams: {
+export type GetApiV3Ticker24hrRequest = RequestUnion<
+  any,
+  any,
+  {
     symbol?: string;
     symbols?: string;
     type?: 'FULL' | 'MINI';
-  };
-};
+  }
+>;
 
 export type GetApiV3Ticker24hrResponse =
   | ResponseUnion<
@@ -61,20 +64,17 @@ export type GetApiV3Ticker24hrResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetApiV3Ticker24hrRequestResult = RequestResult<
-  Request,
+  GetApiV3Ticker24hrRequest,
   GetApiV3Ticker24hrResponse
 >;
 
 export function getApiV3Ticker24hr(
   requestHandler: SimpleRequestHandler,
-  payload: GetApiV3Ticker24hrPayload,
+  payload: RequestPayload<GetApiV3Ticker24hrRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3Ticker24hrRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getApiV3Ticker24hrEndpointSchema,
-    }),
+    createRequest(getApiV3Ticker24hrEndpointSchema, payload),
     config
   );
 }

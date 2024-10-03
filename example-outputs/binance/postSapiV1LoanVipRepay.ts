@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const postSapiV1LoanVipRepayEndpointSchema = {
   path: '/sapi/v1/loan/vip/repay',
@@ -33,15 +34,17 @@ export const postSapiV1LoanVipRepayEndpointSchema = {
   },
 };
 
-export type PostSapiV1LoanVipRepayPayload = {
-  queryParams: {
+export type PostSapiV1LoanVipRepayRequest = RequestUnion<
+  any,
+  any,
+  {
     orderId?: number; // int
     amount: number;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1LoanVipRepayResponse =
   | ResponseUnion<
@@ -63,20 +66,17 @@ export type PostSapiV1LoanVipRepayResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1LoanVipRepayRequestResult = RequestResult<
-  Request,
+  PostSapiV1LoanVipRepayRequest,
   PostSapiV1LoanVipRepayResponse
 >;
 
 export function postSapiV1LoanVipRepay(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1LoanVipRepayPayload,
+  payload: RequestPayload<PostSapiV1LoanVipRepayRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LoanVipRepayRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1LoanVipRepayEndpointSchema,
-    }),
+    createRequest(postSapiV1LoanVipRepayEndpointSchema, payload),
     config
   );
 }

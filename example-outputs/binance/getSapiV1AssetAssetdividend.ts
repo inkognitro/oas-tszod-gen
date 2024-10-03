@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1AssetAssetdividendEndpointSchema = {
   path: '/sapi/v1/asset/assetDividend',
@@ -33,8 +34,10 @@ export const getSapiV1AssetAssetdividendEndpointSchema = {
   },
 };
 
-export type GetSapiV1AssetAssetdividendPayload = {
-  queryParams: {
+export type GetSapiV1AssetAssetdividendRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     startTime?: number; // int
     endTime?: number; // int
@@ -42,8 +45,8 @@ export type GetSapiV1AssetAssetdividendPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AssetAssetdividendResponse =
   | ResponseUnion<
@@ -67,20 +70,17 @@ export type GetSapiV1AssetAssetdividendResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AssetAssetdividendRequestResult = RequestResult<
-  Request,
+  GetSapiV1AssetAssetdividendRequest,
   GetSapiV1AssetAssetdividendResponse
 >;
 
 export function getSapiV1AssetAssetdividend(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AssetAssetdividendPayload,
+  payload: RequestPayload<GetSapiV1AssetAssetdividendRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetAssetdividendRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AssetAssetdividendEndpointSchema,
-    }),
+    createRequest(getSapiV1AssetAssetdividendEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1SimpleEarnFlexiblePositionEndpointSchema = {
   path: '/sapi/v1/simple-earn/flexible/position',
@@ -33,8 +34,10 @@ export const getSapiV1SimpleEarnFlexiblePositionEndpointSchema = {
   },
 };
 
-export type GetSapiV1SimpleEarnFlexiblePositionPayload = {
-  queryParams: {
+export type GetSapiV1SimpleEarnFlexiblePositionRequest = RequestUnion<
+  any,
+  any,
+  {
     asset?: string;
     productId?: string;
     current?: number; // int
@@ -42,8 +45,8 @@ export type GetSapiV1SimpleEarnFlexiblePositionPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1SimpleEarnFlexiblePositionResponse =
   | ResponseUnion<
@@ -78,20 +81,20 @@ export type GetSapiV1SimpleEarnFlexiblePositionResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1SimpleEarnFlexiblePositionRequestResult = RequestResult<
-  Request,
+  GetSapiV1SimpleEarnFlexiblePositionRequest,
   GetSapiV1SimpleEarnFlexiblePositionResponse
 >;
 
 export function getSapiV1SimpleEarnFlexiblePosition(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1SimpleEarnFlexiblePositionPayload,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnFlexiblePositionRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexiblePositionRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1SimpleEarnFlexiblePositionEndpointSchema,
-    }),
+    createRequest(getSapiV1SimpleEarnFlexiblePositionEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1EthStakingEthHistoryWbethrewardshistoryEndpointSchema = {
   path: '/sapi/v1/eth-staking/eth/history/wbethRewardsHistory',
@@ -33,17 +34,20 @@ export const getSapiV1EthStakingEthHistoryWbethrewardshistoryEndpointSchema = {
   },
 };
 
-export type GetSapiV1EthStakingEthHistoryWbethrewardshistoryPayload = {
-  queryParams: {
-    startTime?: number; // int
-    endTime?: number; // int
-    current?: number; // int
-    size?: number; // int
-    recvWindow?: number; // int
-    timestamp: number; // int
-    signature: string;
-  };
-};
+export type GetSapiV1EthStakingEthHistoryWbethrewardshistoryRequest =
+  RequestUnion<
+    any,
+    any,
+    {
+      startTime?: number; // int
+      endTime?: number; // int
+      current?: number; // int
+      size?: number; // int
+      recvWindow?: number; // int
+      timestamp: number; // int
+      signature: string;
+    }
+  >;
 
 export type GetSapiV1EthStakingEthHistoryWbethrewardshistoryResponse =
   | ResponseUnion<
@@ -68,21 +72,23 @@ export type GetSapiV1EthStakingEthHistoryWbethrewardshistoryResponse =
 
 export type GetSapiV1EthStakingEthHistoryWbethrewardshistoryRequestResult =
   RequestResult<
-    Request,
+    GetSapiV1EthStakingEthHistoryWbethrewardshistoryRequest,
     GetSapiV1EthStakingEthHistoryWbethrewardshistoryResponse
   >;
 
 export function getSapiV1EthStakingEthHistoryWbethrewardshistory(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1EthStakingEthHistoryWbethrewardshistoryPayload,
+  payload: RequestPayload<
+    GetSapiV1EthStakingEthHistoryWbethrewardshistoryRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1EthStakingEthHistoryWbethrewardshistoryRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1EthStakingEthHistoryWbethrewardshistoryEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1EthStakingEthHistoryWbethrewardshistoryEndpointSchema,
+      payload
+    ),
     config
   );
 }

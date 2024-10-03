@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MarginBorrowRepayEndpointSchema = {
@@ -60,8 +61,10 @@ export const getSapiV1MarginBorrowRepayEndpointSchema = {
   },
 };
 
-export type GetSapiV1MarginBorrowRepayPayload = {
-  queryParams: {
+export type GetSapiV1MarginBorrowRepayRequest = RequestUnion<
+  any,
+  any,
+  {
     asset: string;
     isolatedSymbol?: string;
     txId?: number; // int
@@ -73,8 +76,8 @@ export type GetSapiV1MarginBorrowRepayPayload = {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MarginBorrowRepayResponse =
   | ResponseUnion<
@@ -99,20 +102,17 @@ export type GetSapiV1MarginBorrowRepayResponse =
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MarginBorrowRepayRequestResult = RequestResult<
-  Request,
+  GetSapiV1MarginBorrowRepayRequest,
   GetSapiV1MarginBorrowRepayResponse
 >;
 
 export function getSapiV1MarginBorrowRepay(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MarginBorrowRepayPayload,
+  payload: RequestPayload<GetSapiV1MarginBorrowRepayRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginBorrowRepayRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1MarginBorrowRepayEndpointSchema,
-    }),
+    createRequest(getSapiV1MarginBorrowRepayEndpointSchema, payload),
     config
   );
 }

@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const postSapiV1MarginMaxLeverageEndpointSchema = {
@@ -48,14 +49,16 @@ export const postSapiV1MarginMaxLeverageEndpointSchema = {
   },
 };
 
-export type PostSapiV1MarginMaxLeveragePayload = {
-  queryParams: {
+export type PostSapiV1MarginMaxLeverageRequest = RequestUnion<
+  any,
+  any,
+  {
     maxLeverage: number; // int
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type PostSapiV1MarginMaxLeverageResponse =
   | ResponseUnion<
@@ -71,20 +74,17 @@ export type PostSapiV1MarginMaxLeverageResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type PostSapiV1MarginMaxLeverageRequestResult = RequestResult<
-  Request,
+  PostSapiV1MarginMaxLeverageRequest,
   PostSapiV1MarginMaxLeverageResponse
 >;
 
 export function postSapiV1MarginMaxLeverage(
   requestHandler: SimpleRequestHandler,
-  payload: PostSapiV1MarginMaxLeveragePayload,
+  payload: RequestPayload<PostSapiV1MarginMaxLeverageRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginMaxLeverageRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: postSapiV1MarginMaxLeverageEndpointSchema,
-    }),
+    createRequest(postSapiV1MarginMaxLeverageEndpointSchema, payload),
     config
   );
 }

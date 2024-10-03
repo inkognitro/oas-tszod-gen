@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1MiningHashTransferConfigDetailsListEndpointSchema = {
@@ -66,15 +67,17 @@ export const getSapiV1MiningHashTransferConfigDetailsListEndpointSchema = {
   },
 };
 
-export type GetSapiV1MiningHashTransferConfigDetailsListPayload = {
-  queryParams: {
+export type GetSapiV1MiningHashTransferConfigDetailsListRequest = RequestUnion<
+  any,
+  any,
+  {
     pageIndex?: number; // int
     pageSize?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1MiningHashTransferConfigDetailsListResponse =
   | ResponseUnion<
@@ -105,19 +108,24 @@ export type GetSapiV1MiningHashTransferConfigDetailsListResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1MiningHashTransferConfigDetailsListRequestResult =
-  RequestResult<Request, GetSapiV1MiningHashTransferConfigDetailsListResponse>;
+  RequestResult<
+    GetSapiV1MiningHashTransferConfigDetailsListRequest,
+    GetSapiV1MiningHashTransferConfigDetailsListResponse
+  >;
 
 export function getSapiV1MiningHashTransferConfigDetailsList(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1MiningHashTransferConfigDetailsListPayload,
+  payload: RequestPayload<
+    GetSapiV1MiningHashTransferConfigDetailsListRequest,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MiningHashTransferConfigDetailsListRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema:
-        getSapiV1MiningHashTransferConfigDetailsListEndpointSchema,
-    }),
+    createRequest(
+      getSapiV1MiningHashTransferConfigDetailsListEndpointSchema,
+      payload
+    ),
     config
   );
 }

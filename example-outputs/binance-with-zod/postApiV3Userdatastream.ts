@@ -1,9 +1,9 @@
 import {z} from 'zod';
 import {
+  Request,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
@@ -27,6 +27,8 @@ export const postApiV3UserdatastreamEndpointSchema = {
   },
 };
 
+export type PostApiV3UserdatastreamRequest = Request;
+
 export type PostApiV3UserdatastreamResponse = ResponseUnion<
   200,
   ResponseBodyData<
@@ -38,7 +40,7 @@ export type PostApiV3UserdatastreamResponse = ResponseUnion<
 >;
 
 export type PostApiV3UserdatastreamRequestResult = RequestResult<
-  Request,
+  PostApiV3UserdatastreamRequest,
   PostApiV3UserdatastreamResponse
 >;
 
@@ -47,7 +49,7 @@ export function postApiV3Userdatastream(
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3UserdatastreamRequestResult> {
   return requestHandler.execute(
-    createRequest({endpointSchema: postApiV3UserdatastreamEndpointSchema}),
+    createRequest(postApiV3UserdatastreamEndpointSchema),
     config
   );
 }

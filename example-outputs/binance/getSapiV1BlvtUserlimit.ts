@@ -1,13 +1,14 @@
-import {Error} from '@example-outputs/binance';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance/core';
+import {Error} from '@example-outputs/binance';
 
 export const getSapiV1BlvtUserlimitEndpointSchema = {
   path: '/sapi/v1/blvt/userLimit',
@@ -33,14 +34,16 @@ export const getSapiV1BlvtUserlimitEndpointSchema = {
   },
 };
 
-export type GetSapiV1BlvtUserlimitPayload = {
-  queryParams: {
+export type GetSapiV1BlvtUserlimitRequest = RequestUnion<
+  any,
+  any,
+  {
     tokenName?: string;
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1BlvtUserlimitResponse =
   | ResponseUnion<
@@ -58,20 +61,17 @@ export type GetSapiV1BlvtUserlimitResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1BlvtUserlimitRequestResult = RequestResult<
-  Request,
+  GetSapiV1BlvtUserlimitRequest,
   GetSapiV1BlvtUserlimitResponse
 >;
 
 export function getSapiV1BlvtUserlimit(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1BlvtUserlimitPayload,
+  payload: RequestPayload<GetSapiV1BlvtUserlimitRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1BlvtUserlimitRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1BlvtUserlimitEndpointSchema,
-    }),
+    createRequest(getSapiV1BlvtUserlimitEndpointSchema, payload),
     config
   );
 }

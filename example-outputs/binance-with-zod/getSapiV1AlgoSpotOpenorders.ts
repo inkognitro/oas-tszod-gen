@@ -1,13 +1,14 @@
 import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
+  RequestUnion,
   ResponseBodyData,
   ResponseUnion,
   RequestResult,
-  Request,
   SimpleRequestHandler,
   createRequest,
   RequestHandlerExecutionConfig,
+  RequestPayload,
 } from '@example-outputs/binance-with-zod/core';
 
 export const getSapiV1AlgoSpotOpenordersEndpointSchema = {
@@ -64,13 +65,15 @@ export const getSapiV1AlgoSpotOpenordersEndpointSchema = {
   },
 };
 
-export type GetSapiV1AlgoSpotOpenordersPayload = {
-  queryParams: {
+export type GetSapiV1AlgoSpotOpenordersRequest = RequestUnion<
+  any,
+  any,
+  {
     recvWindow?: number; // int
     timestamp: number; // int
     signature: string;
-  };
-};
+  }
+>;
 
 export type GetSapiV1AlgoSpotOpenordersResponse =
   | ResponseUnion<
@@ -101,20 +104,17 @@ export type GetSapiV1AlgoSpotOpenordersResponse =
   | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
 export type GetSapiV1AlgoSpotOpenordersRequestResult = RequestResult<
-  Request,
+  GetSapiV1AlgoSpotOpenordersRequest,
   GetSapiV1AlgoSpotOpenordersResponse
 >;
 
 export function getSapiV1AlgoSpotOpenorders(
   requestHandler: SimpleRequestHandler,
-  payload: GetSapiV1AlgoSpotOpenordersPayload,
+  payload: RequestPayload<GetSapiV1AlgoSpotOpenordersRequest, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AlgoSpotOpenordersRequestResult> {
   return requestHandler.execute(
-    createRequest({
-      ...payload,
-      endpointSchema: getSapiV1AlgoSpotOpenordersEndpointSchema,
-    }),
+    createRequest(getSapiV1AlgoSpotOpenordersEndpointSchema, payload),
     config
   );
 }
