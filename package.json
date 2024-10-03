@@ -1,6 +1,6 @@
 {
   "name": "@inkognitro/oas-tszod-gen",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "files": [
     "./dist",
     "./LICENSE",
