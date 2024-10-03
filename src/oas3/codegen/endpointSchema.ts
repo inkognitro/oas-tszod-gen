@@ -18,7 +18,7 @@ import {
 } from '@/oas3/specification';
 import {applyZodSchema} from './zodSchema';
 import {applyResponseSchema} from './responseSchema';
-import {findObjectSchemaFromLocationParameters} from './endpointPayloadUtils';
+import {findObjectSchemaFromLocationParameters} from './endpointUtils';
 
 type ApplyRequestBodyResult = {
   contentType: string;

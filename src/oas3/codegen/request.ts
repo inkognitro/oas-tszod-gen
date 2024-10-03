@@ -1,4 +1,7 @@
 import {
+  ConcreteParameterLocation,
+  Endpoint,
+  Parameter,
   RequestBodyContent,
   RequestBodyContentByTypeMap,
 } from '@/oas3/specification';
@@ -8,10 +11,17 @@ import {
   containsOutputPath,
   DefinitionOutput,
   OutputPath,
+  OutputType,
 } from './core';
 import {Context} from './generator';
-import {applySchema} from './schema';
+import {applyObjectSchema, applySchema} from './schema';
 import {applyNullableFormDataTypeDefinition} from './formData';
+import {findObjectSchemaFromLocationParameters} from '@/oas3/codegen/endpointUtils';
+import {
+  templateRequestBodyDataType,
+  templateRequestType,
+  templateRequestUnionType,
+} from '@/oas3/codegen/template';
 
 type ApplyRequestBodyResult = {
   contentType: string;
@@ -66,16 +76,16 @@ function applyRequestBodyContent(
   };
 }
 
-export function applyRequestBodyByContentTypeMap(
+function applyNullableRequestBodyByContentTypeMap(
   codeGenerator: CodeGenerator,
   schema: RequestBodyContentByTypeMap,
   path: OutputPath,
   ctx: Context
-): CodeGenerationOutput {
-  const bodyResults: ApplyRequestBodyResult[] = [];
+): null | CodeGenerationOutput {
+  const bodyCodeOutputs: ApplyRequestBodyResult[] = [];
   for (const contentType in schema) {
     const contentSchema = schema[contentType];
-    bodyResults.push(
+    bodyCodeOutputs.push(
       applyRequestBodyContent(
         codeGenerator,
         contentType,
@@ -85,22 +95,24 @@ export function applyRequestBodyByContentTypeMap(
       )
     );
   }
+  if (!bodyCodeOutputs.length) {
+    return null;
+  }
   return {
     path,
     createCode: referencingPath => {
-      if (!bodyResults.length) {
-        return 'any';
-      }
-      const responseBodyCodeParts: string[] = bodyResults.map(bodyResult => {
-        return `{\ncontentType: '${
-          bodyResult.contentType
-        }',\nbody: ${bodyResult.codeOutput.createCode(referencingPath)}\n}`;
+      const bodyCodeParts: string[] = bodyCodeOutputs.map(output => {
+        const parts = [
+          `'${output.contentType}'`,
+          output.codeOutput.createCode(referencingPath),
+        ];
+        return `${templateRequestBodyDataType.createName(referencingPath)}<${parts.join(',')}>`;
       });
-      return responseBodyCodeParts.join(' | ');
+      return bodyCodeParts.join(' | ');
     },
     getRequiredOutputPaths: () => {
-      const outputPaths: OutputPath[] = [];
-      bodyResults.forEach(r => {
+      const outputPaths: OutputPath[] = [templateRequestBodyDataType.path];
+      bodyCodeOutputs.forEach(r => {
         r.codeOutput.getRequiredOutputPaths().forEach(path => {
           if (!containsOutputPath(outputPaths, path)) {
             outputPaths.push(path);
@@ -109,5 +121,178 @@ export function applyRequestBodyByContentTypeMap(
       });
       return outputPaths;
     },
+  };
+}
+
+function applyNullableRequestLocationParameters(
+  codeGenerator: CodeGenerator,
+  requestParameters: Parameter[],
+  path: OutputPath,
+  ctx: Context,
+  parameterLocation: ConcreteParameterLocation
+): null | CodeGenerationOutput {
+  const objectSchema = findObjectSchemaFromLocationParameters(
+    codeGenerator,
+    requestParameters,
+    parameterLocation
+  );
+  if (!objectSchema) {
+    return null;
+  }
+  return applyObjectSchema(codeGenerator, objectSchema, path, ctx);
+}
+
+export type RequestPayloadField =
+  | 'pathParams'
+  | 'queryParams'
+  | 'headers'
+  | 'cookies'
+  | 'contentType'
+  | 'body';
+
+export type ApplyRequestTypeDefinitionResult = {
+  payloadFields: RequestPayloadField[];
+  typeDefinition: DefinitionOutput;
+};
+
+export function applyRequestTypeDefinition(
+  codeGenerator: CodeGenerator,
+  schema: Endpoint,
+  path: OutputPath,
+  ctx: Context
+): ApplyRequestTypeDefinitionResult {
+  const pathParamsCodeOutput = applyNullableRequestLocationParameters(
+    codeGenerator,
+    schema.parameters ?? [],
+    [...path, 'pathParams'],
+    ctx,
+    'path'
+  );
+  const queryParamsCodeOutput = applyNullableRequestLocationParameters(
+    codeGenerator,
+    schema.parameters ?? [],
+    [...path, 'queryParams'],
+    ctx,
+    'query'
+  );
+  const headersCodeOutput = applyNullableRequestLocationParameters(
+    codeGenerator,
+    schema.parameters ?? [],
+    [...path, 'headers'],
+    ctx,
+    'header'
+  );
+  const cookiesCodeOutput = applyNullableRequestLocationParameters(
+    codeGenerator,
+    schema.parameters ?? [],
+    [...path, 'cookies'],
+    ctx,
+    'cookie'
+  );
+  let bodyCodeOutput: CodeGenerationOutput | null = null;
+  if (schema.requestBody?.content) {
+    bodyCodeOutput = applyNullableRequestBodyByContentTypeMap(
+      codeGenerator,
+      schema.requestBody.content,
+      path,
+      ctx
+    );
+  }
+  const hasNoSpecificRequestProperties =
+    !pathParamsCodeOutput &&
+    !queryParamsCodeOutput &&
+    !headersCodeOutput &&
+    !cookiesCodeOutput &&
+    !bodyCodeOutput;
+  const typeDefinition: DefinitionOutput = {
+    type: OutputType.DEFINITION,
+    definitionType: 'type',
+    createName: referencingPath => {
+      return codeGenerator.createTypeName(path, referencingPath);
+    },
+    createCode: () => {
+      if (hasNoSpecificRequestProperties) {
+        return templateRequestType.createName(path);
+      }
+      const codeParts = [
+        bodyCodeOutput ? bodyCodeOutput.createCode(path) : 'any',
+      ];
+      if (pathParamsCodeOutput) {
+        codeParts.push(pathParamsCodeOutput.createCode(path));
+      } else if (
+        queryParamsCodeOutput ||
+        headersCodeOutput ||
+        cookiesCodeOutput
+      ) {
+        codeParts.push('any');
+      }
+      if (queryParamsCodeOutput) {
+        codeParts.push(queryParamsCodeOutput.createCode(path));
+      } else if (headersCodeOutput || cookiesCodeOutput) {
+        codeParts.push('any');
+      }
+      if (headersCodeOutput) {
+        codeParts.push(headersCodeOutput.createCode(path));
+      } else if (cookiesCodeOutput) {
+        codeParts.push('any');
+      }
+      if (cookiesCodeOutput) {
+        codeParts.push(cookiesCodeOutput.createCode(path));
+      }
+      return `${templateRequestUnionType.createName(path)}<${codeParts.join(',\n')}>`;
+    },
+    path,
+    getRequiredOutputPaths: () => {
+      if (hasNoSpecificRequestProperties) {
+        return [templateRequestType.path];
+      }
+      const outputPaths: OutputPath[] = [templateRequestUnionType.path];
+      const codeOutputsToInclude: CodeGenerationOutput[] = [];
+      if (pathParamsCodeOutput) {
+        codeOutputsToInclude.push(pathParamsCodeOutput);
+      }
+      if (queryParamsCodeOutput) {
+        codeOutputsToInclude.push(queryParamsCodeOutput);
+      }
+      if (headersCodeOutput) {
+        codeOutputsToInclude.push(headersCodeOutput);
+      }
+      if (cookiesCodeOutput) {
+        codeOutputsToInclude.push(cookiesCodeOutput);
+      }
+      if (bodyCodeOutput) {
+        codeOutputsToInclude.push(bodyCodeOutput);
+      }
+      codeOutputsToInclude.forEach(codeOutput => {
+        codeOutput.getRequiredOutputPaths().forEach(path => {
+          if (!containsOutputPath(outputPaths, path)) {
+            outputPaths.push(path);
+          }
+        });
+      });
+      return outputPaths;
+    },
+  };
+  codeGenerator.addOutput(typeDefinition, ctx);
+  const includedFields: RequestPayloadField[] = [];
+  if (pathParamsCodeOutput) {
+    includedFields.push('pathParams');
+  }
+  if (queryParamsCodeOutput) {
+    includedFields.push('queryParams');
+  }
+  if (headersCodeOutput) {
+    includedFields.push('headers');
+  }
+  if (cookiesCodeOutput) {
+    includedFields.push('cookies');
+  }
+  if (bodyCodeOutput) {
+    includedFields.push('contentType');
+    includedFields.push('body');
+  }
+  return {
+    typeDefinition,
+    payloadFields: includedFields,
   };
 }

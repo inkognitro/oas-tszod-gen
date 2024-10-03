@@ -44,6 +44,98 @@ const templateCreateRequestUrlFunction: TemplateDefinitionOutput = {
   getRequiredOutputPaths: () => [templatePathParamsType.path],
 };
 
+const templateRequestPayloadTypePath = ['core', 'core', 'requestPayload'];
+export const templateRequestPayloadType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: templateRequestPayloadTypePath,
+  createName: () => {
+    return 'RequestPayload';
+  },
+  createGenericsDeclarationCode: () => {
+    const codeParts = [
+      `TRequest extends  ${templateRequestType.createName(
+        templateRequestPayloadTypePath
+      )} = any,`,
+      'TFields extends "cookies" | "headers" | "pathParams" | "queryParams" | "contentType" | "body" = any,',
+    ];
+    return codeParts.join('\n');
+  },
+  createCode: () => {
+    const fieldCodeParts = [
+      'requestId?: string; // always optional',
+      'headers?: TRequest["headers"]; // always optional',
+      'cookies?: TRequest["cookies"]; // always optional',
+      'pathParams: TRequest["pathParams"];',
+      'queryParams: TRequest["queryParams"];',
+      'contentType: TRequest["contentType"];',
+      'body: TRequest["body"];',
+    ];
+    return `Pick<{${fieldCodeParts.join('\n')}}, "requestId" | TFields>`;
+  },
+  getRequiredOutputPaths: () => {
+    return [templateRequestType.path];
+  },
+};
+
+const templateRequestFromPayloadTypePath = [
+  'core',
+  'core',
+  'requestFromPayload',
+];
+const templateRequestFromPayloadType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: templateRequestFromPayloadTypePath,
+  createName: () => {
+    return 'RequestFromPayload';
+  },
+  createGenericsDeclarationCode: () => {
+    return `TPayload extends ${templateRequestPayloadType.createName(
+      templateRequestFromPayloadTypePath
+    )}`;
+  },
+  createCode: () => {
+    const fieldCodeParts = [
+      'TPayload["pathParams"]',
+      'TPayload["queryParams"]',
+      'TPayload["headers"]',
+      'TPayload["cookies"]',
+      'TPayload["contentType"]',
+      'TPayload["body"]',
+    ];
+    return `${templateRequestType.createName(
+      templateRequestFromPayloadTypePath
+    )}<\n${fieldCodeParts.join(',\n')}\n>`;
+  },
+  getRequiredOutputPaths: () => {
+    return [templateRequestType.path, templateRequestPayloadType.path];
+  },
+};
+
+const templateCreateRequestIdFunction: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'function',
+  path: ['core', 'core', 'createRequestId'],
+  createName: () => {
+    return 'createRequestId';
+  },
+  createCode: () => {
+    const fieldCodeParts = [
+      'const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split("");',
+      'let requestId = "";',
+      'for (let i = 32; i > 0; i--) {',
+      'requestId += chars[Math.floor(Math.random() * chars.length)];',
+      '}',
+      'return requestId;',
+    ];
+    return `(): string {${fieldCodeParts.join('\n')}}`;
+  },
+  getRequiredOutputPaths: () => {
+    return [templateRequestPayloadType.path];
+  },
+};
+
 const templateRequestTypePath = ['core', 'core', 'request'];
 export const templateRequestType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
@@ -52,30 +144,97 @@ export const templateRequestType: TemplateDefinitionOutput = {
   createName: () => {
     return 'Request';
   },
+  createGenericsDeclarationCode: () => {
+    const parts = [
+      'Ct extends string | undefined = any,',
+      `TBody extends ${templateRequestBodyType.createName(templateRequestTypePath)} | undefined = any,`,
+      `TPathParams extends ${templatePathParamsType.createName(
+        templateRequestTypePath
+      )} | undefined = any,`,
+      `TQueryParams extends ${templateQueryParamsType.createName(
+        templateRequestTypePath
+      )} | undefined = any,`,
+      `THeaders extends ${templateRequestHeadersType.createName(
+        templateRequestTypePath
+      )} | undefined = any,`,
+      `TCookies extends ${templateRequestCookiesType.createName(
+        templateRequestTypePath
+      )} | undefined = any,`,
+    ];
+    return parts.join('\n');
+  },
   createCode: () => {
     const bodyCodeParts: string[] = [
-      'id: string;',
-      'url: string;',
-      `headers?: ${templateRequestHeadersType.createName(
-        templateRequestTypePath
-      )};`,
-      `cookies?: ${templateRequestCookiesType.createName(
-        templateRequestTypePath
-      )};`,
-      `pathParams?: ${templatePathParamsType.createName(
-        templateRequestTypePath
-      )};`,
-      `queryParams?: ${templateQueryParamsType.createName(
-        templateRequestTypePath
-      )};`,
-      '// According to given OAS3 specs; used as default for the "content-type" request header',
-      'contentType: string | null;',
-      `body?: ${templateRequestBodyType.createName(templateRequestTypePath)};`,
       `endpointSchema: ${templateEndpointSchemaType.createName(
         templateRequestTypePath
       )};`,
+      'id: string;',
+      'url: string;',
+      'headers: THeaders;',
+      'cookies: TCookies',
+      'pathParams: TPathParams',
+      'queryParams: TQueryParams',
+      '// According to given OAS3 specs; used as default for the "content-type" request header',
+      'contentType: Ct;',
+      'body: TBody;',
     ];
-    return `{${bodyCodeParts.join('\n')}}`;
+    return `{\n${bodyCodeParts.join('\n')}\n}`;
+  },
+  getRequiredOutputPaths: ctx => {
+    const requiredOutputPaths = [
+      templatePathParamsType.path,
+      templateQueryParamsType.path,
+      templateRequestBodyType.path,
+      templateEndpointSchemaType.path,
+      templateRequestHeadersType.path,
+      templateRequestCookiesType.path,
+      templateResponseSchemaType.path,
+    ];
+    if (ctx.config.withZod) {
+      requiredOutputPaths.push(templateZodSchemaOfZodLibrary.path);
+    }
+    return requiredOutputPaths;
+  },
+};
+
+const templateRequestUnionTypePath = ['core', 'core', 'requestUnion'];
+export const templateRequestUnionType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: templateRequestUnionTypePath,
+  createName: () => {
+    return 'RequestUnion';
+  },
+  createGenericsDeclarationCode: () => {
+    const parts = [
+      `TBodyData extends ${templateRequestBodyDataType.createName(
+        templateRequestTypePath
+      )},`,
+      `TPathParams extends ${templatePathParamsType.createName(
+        templateRequestTypePath
+      )} | undefined = any,`,
+      `TQueryParams extends ${templateQueryParamsType.createName(
+        templateRequestTypePath
+      )} | undefined = any,`,
+      `THeaders extends ${templateRequestHeadersType.createName(
+        templateRequestTypePath
+      )} | undefined = any,`,
+      `TCookies extends ${templateRequestCookiesType.createName(
+        templateRequestTypePath
+      )} | undefined = any,`,
+    ];
+    return parts.join('\n');
+  },
+  createCode: () => {
+    const codeParts: string[] = [
+      'TBodyData["contentType"],',
+      'TBodyData["body"],',
+      'TPathParams,',
+      'TQueryParams,',
+      'THeaders,',
+      'TCookies',
+    ];
+    return `TBodyData extends any ? Request<${codeParts.join('\n')}> : never`;
   },
   getRequiredOutputPaths: ctx => {
     const requiredOutputPaths = [
@@ -606,53 +765,6 @@ export const templateRequestHandlerExecutionConfigType: TemplateDefinitionOutput
     getRequiredOutputPaths: () => [],
   };
 
-const templateRequestCreationSettingsTypePath = [
-  'core',
-  'core',
-  'requestCreationSettings',
-];
-
-const templateRequestCreationSettingsType: TemplateDefinitionOutput = {
-  type: OutputType.TEMPLATE_DEFINITION,
-  definitionType: 'type',
-  path: templateRequestCreationSettingsTypePath,
-  createName: () => {
-    return 'RequestCreationSettings';
-  },
-  createCode: () => {
-    const codeParts: string[] = [
-      `headers?: ${templateRequestHeadersType.createName(
-        templateRequestCreationSettingsTypePath
-      )};`,
-      `cookies?: ${templateRequestCookiesType.createName(
-        templateRequestCreationSettingsTypePath
-      )};`,
-      `pathParams?: ${templatePathParamsType.createName(
-        templateRequestCreationSettingsTypePath
-      )};`,
-      `queryParams?: ${templateQueryParamsType.createName(
-        templateRequestCreationSettingsTypePath
-      )};`,
-      'contentType?: string;',
-      `body?: ${templateRequestBodyType.createName(
-        templateRequestCreationSettingsTypePath
-      )};`,
-      `endpointSchema: ${templateEndpointSchemaType.createName(
-        templateRequestCreationSettingsTypePath
-      )};`,
-    ];
-    return `{\n${codeParts.join('\n')}\n}`;
-  },
-  getRequiredOutputPaths: () => [
-    templateRequestHeadersType.path,
-    templateRequestCookiesType.path,
-    templatePathParamsType.path,
-    templateQueryParamsType.path,
-    templateResponseSchemaType.path,
-    templateEndpointSchemaType.path,
-  ],
-};
-
 const templateFindMatchingSchemaContentTypeFunctionPath = [
   'core',
   'core',
@@ -707,39 +819,71 @@ export const templateCreateRequestFunction: TemplateDefinitionOutput = {
   createName: () => {
     return 'createRequest';
   },
+  createGenericsDeclarationCode: () => {
+    return `TPayload extends ${templateRequestPayloadType.createName(
+      templateCreateRequestFunctionPath
+    )}`;
+  },
   createCode: () => {
-    const requestIdParts: string[] = [
-      "const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');",
-      "let requestId = '';",
-      'for (let i = 32; i > 0; i--) {',
-      'requestId += chars[Math.floor(Math.random() * chars.length)];',
+    const argumentCodeParts = [
+      `endpointSchema: ${templateEndpointSchemaType.createName(
+        templateCreateRequestFunctionPath
+      )}`,
+      `payload?: ${templateRequestPayloadType.createName(
+        templateCreateRequestFunctionPath
+      )}`,
+    ];
+    const bodyCodeParts = [
+      'const p = payload ?? {};',
+      'return {',
+      '...payload,',
+      'id: p.requestId ?? createRequestId(),',
+      'url: createRequestUrl(endpointSchema.path, p.pathParams ?? {}),',
+      'contentType: p.contentType,',
+      'body: p.body,',
+      'pathParams: p.pathParams,',
+      'queryParams: p.queryParams,',
+      'headers: p.headers,',
+      'cookies: p.cookies,',
+      'endpointSchema: endpointSchema,',
       '}',
     ];
-    const objectCodeParts: string[] = [
-      '...settings',
-      'id: requestId',
-      `url: ${templateCreateRequestUrlFunction.createName(
-        templateCreateRequestFunctionPath
-      )}(settings.endpointSchema.path, settings.pathParams ?? {})`,
-      'contentType: settings.contentType ?? null',
-    ];
-    return `(settings: ${templateRequestCreationSettingsType.createName(
+    return `(${argumentCodeParts.join(', ')}): ${templateRequestFromPayloadType.createName(
       templateCreateRequestFunctionPath
-    )}): ${templateRequestType.createName(
-      templateCreateRequestFunctionPath
-    )} {\n${requestIdParts.join('\n')}\nreturn {\n${objectCodeParts.join(
-      ',\n'
-    )}\n}\n}`;
+    )}<TPayload> {\n${bodyCodeParts.join('\n')}\n}`;
   },
-  getRequiredOutputPaths: ctx => {
-    const requiredOutputPaths = [
-      templateRequestCreationSettingsType.path,
-      templateCreateRequestUrlFunction.path,
+  getRequiredOutputPaths: () => {
+    return [
+      templateCreateRequestIdFunction.path,
+      templateEndpointSchemaType.path,
+      templateRequestPayloadType.path,
     ];
-    if (ctx.config.withZod) {
-      requiredOutputPaths.push(templateZodSchemaOfZodLibrary.path);
-    }
-    return requiredOutputPaths;
+  },
+};
+
+const templateRequestBodyDataTypePath = ['core', 'core', 'requestBodyData'];
+export const templateRequestBodyDataType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: templateRequestBodyDataTypePath,
+  createName: () => {
+    return 'RequestBodyData';
+  },
+  createGenericsDeclarationCode: () => {
+    const parts = [
+      'TContentType extends string = any,',
+      `TBody extends ${templateRequestBodyType.createName(
+        templateRequestBodyDataTypePath
+      )} = any,`,
+    ];
+    return parts.join('\n');
+  },
+  createCode: () => {
+    const parts = ['contentType: TContentType;', 'body: TBody;'];
+    return `{${parts.join('\n')}}`;
+  },
+  getRequiredOutputPaths: () => {
+    return [templateRequestBodyType.path];
   },
 };
 
@@ -768,25 +912,29 @@ export const templateZodSchemaOfZodLibrary: TemplateDefinitionOutput = {
 };
 
 export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
-  templateRequestHeadersType,
-  templateResponseHeadersType,
-  templatePathParamsType,
-  templateQueryParamsType,
-  templateRequestCookiesType,
-  templateRequestBodyType,
-  templatePlainObjectType,
-  templateFormDataObjectType,
-  templateIsPlainObjectType,
-  templateFindMatchingSchemaContentTypeFunction,
-  templateRequestCreationSettingsType,
-  templateCreateRequestUrlFunction,
-  templateEndpointSecuritySchemaType,
-  templateEndpointSchemaType,
   templateZOfZodLibrary,
   templateZodSchemaOfZodLibrary,
-  templateCreateRequestFunction,
-  templateRequestType,
+  templatePlainObjectType,
+  templateIsPlainObjectType,
+  templateFormDataObjectType,
+  templateFindMatchingSchemaContentTypeFunction,
+  templateEndpointSecuritySchemaType,
   templateResponseSchemaType,
+  templateEndpointSchemaType,
+  templatePathParamsType,
+  templateQueryParamsType,
+  templateRequestHeadersType,
+  templateRequestCookiesType,
+  templateRequestBodyType,
+  templateRequestBodyDataType,
+  templateRequestType,
+  templateRequestUnionType,
+  templateRequestPayloadType,
+  templateRequestFromPayloadType,
+  templateCreateRequestIdFunction,
+  templateCreateRequestUrlFunction,
+  templateCreateRequestFunction,
+  templateResponseHeadersType,
   templateResponseSetCookiesType,
   templateResponseBodyType,
   templateResponseBodyDataType,
