@@ -190,7 +190,7 @@ function applyArraySchema(
     : undefined;
   return {
     createCode: () => {
-      let code = `(${itemSummary.createCode(itemOutputPath)})[]`;
+      let code = `(\n${itemSummary.createCode(itemOutputPath)}\n)[]`;
       if (schema.nullable) {
         code += ' | null';
       }
