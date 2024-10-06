@@ -32,7 +32,7 @@ export type $200ServiceInfoResponse<S extends number = any> = ResponseUnion<
 export const $200ServiceInfoResponseSchema = {
   bodyByContentType: {
     'application/json': {
-      zodSchema: z.intersection([serviceZodSchema, drsServiceZodSchema]),
+      zodSchema: z.intersection(serviceZodSchema, drsServiceZodSchema),
     },
   },
 };
