@@ -82,7 +82,7 @@ export type $202AcceptedResponse<S extends number = any> = ResponseUnion<
   S,
   any,
   {
-    'Retry-After': string;
+    'Retry-After'?: string;
   }
 >;
 

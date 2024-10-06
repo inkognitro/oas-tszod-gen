@@ -22,8 +22,8 @@ export const loginUserEndpointSchema = {
   responseByStatus: {
     '200': {
       headersZodSchema: z.object({
-        'X-Rate-Limit': z.number().int().safe().finite(),
-        'X-Expires-After': z.string().datetime(), // date-time
+        'X-Rate-Limit': z.string().optional(),
+        'X-Expires-After': z.string().datetime().optional(), // date-time
       }),
       bodyByContentType: {
         'application/xml': {
@@ -55,8 +55,8 @@ export type LoginUserResponse =
       | ResponseBodyData<'application/xml', string>
       | ResponseBodyData<'application/json', string>,
       {
-        'X-Rate-Limit': string;
-        'X-Expires-After': string; // date-time
+        'X-Rate-Limit'?: string;
+        'X-Expires-After'?: string; // date-time
       }
     >
   | ResponseUnion<400>;

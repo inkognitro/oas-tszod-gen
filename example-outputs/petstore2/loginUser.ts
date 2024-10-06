@@ -42,8 +42,8 @@ export type LoginUserResponse =
       | ResponseBodyData<'application/xml', string>
       | ResponseBodyData<'application/json', string>,
       {
-        'X-Rate-Limit': string;
-        'X-Expires-After': string; // date-time
+        'X-Rate-Limit'?: string;
+        'X-Expires-After'?: string; // date-time
       }
     >
   | ResponseUnion<400>;

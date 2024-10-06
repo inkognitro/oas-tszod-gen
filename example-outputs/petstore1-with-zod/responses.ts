@@ -107,13 +107,13 @@ export type $202AcceptedResponse<S extends number = any> = ResponseUnion<
   S,
   any,
   {
-    'Retry-After': string;
+    'Retry-After'?: string;
   }
 >;
 
 export const $202AcceptedResponseSchema = {
   headersZodSchema: z.object({
-    'Retry-After': z.number().int().safe().finite(),
+    'Retry-After': z.string().optional(),
   }),
   bodyByContentType: {},
 };

@@ -97,6 +97,8 @@ export type PathParams = {
 
 export type QueryParams = {
   [paramName: string]:
+    | undefined
+    | null
     | QueryParams
     | QueryParams[]
     | string
@@ -112,7 +114,7 @@ export type RequestHeaders = {
 };
 
 export type RequestCookies = {
-  [cookieName: string]: string;
+  [cookieName: string]: string | number;
 };
 
 export type RequestBody =
