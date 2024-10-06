@@ -22,7 +22,7 @@ jobs:
       - name: Run tests
         run: npm run test:withCoverage
 
-      - name: Type checks of generated code outputs
+      - name: Type checks including generated code
         run: npm run tsc
 
       - name: Generating coverage badges

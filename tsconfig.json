@@ -1,11 +1,12 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "rootDir": "./src",
+    "rootDir": ".",
     "outDir": "dist",
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"],
+      "@example-outputs/*": ["./example-outputs/*"]
     },
     "lib": [
       "ES2021.String",
@@ -18,6 +19,7 @@
   },
   "include": [
     "src/**/*.ts",
+    "example-outputs/**/*.ts",
     "test/**/*.ts"
   ],
   "exclude": [

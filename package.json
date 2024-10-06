@@ -18,11 +18,10 @@
   "main": "dist/index.js",
   "description": "A code generator to convert OpenApi version 3 (OAS3) specifications into endpoint caller functions for TS and Zod.",
   "scripts": {
-    "build": "tspc && npm run copyTemplateFiles",
-    "copyTemplateFiles": "node ./copy-template-files.js",
+    "build": "tspc && npm run optimizeBuildFiles",
+    "optimizeBuildFiles": "node ./optimize-build-files.js",
     "lint": "gts lint",
     "lint:fix": "tsc --noEmit && gts fix",
-    "start": "npm run copyTemplateFiles && tspc -w",
     "test": "jest",
     "test:withCoverage": "jest --ci --coverage",
     "tsc": "tsc --noEmit"

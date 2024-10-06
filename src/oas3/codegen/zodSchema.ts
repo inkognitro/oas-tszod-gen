@@ -530,7 +530,7 @@ function applyZodAllOfSchema(
       if (codeRows.length === 1) {
         return codeRows[0];
       }
-      return `z.intersection([${codeRows.join(',')}])`;
+      return `z.intersection(${codeRows.join(',')})`;
     },
     path,
     getRequiredOutputPaths: () => {
