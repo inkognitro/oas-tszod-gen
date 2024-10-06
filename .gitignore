@@ -7,5 +7,6 @@ example-outputs/other1
 example-outputs/other1-with-zod
 example-outputs/other2
 example-outputs/other2-with-zod
+src/oas3/specification/specification.other.test.ts
 src/oas3/codegen/generate.other.test.ts
 coverage
