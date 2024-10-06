@@ -23,7 +23,7 @@ import {
   templateResponseUnionType,
 } from './template';
 import {applyNullableFormDataTypeDefinition} from './formData';
-import {createHeadersObjectSchema} from './endpointUtils';
+import {createResponseHeadersObjectSchema} from './endpointUtils';
 
 function applyResponseHeaders(
   codeGenerator: CodeGenerator,
@@ -31,7 +31,10 @@ function applyResponseHeaders(
   path: OutputPath,
   ctx: Context
 ): CodeGenerationOutput {
-  const objectSchema = createHeadersObjectSchema(codeGenerator, headersSchema);
+  const objectSchema = createResponseHeadersObjectSchema(
+    codeGenerator,
+    headersSchema
+  );
   return applyObjectSchema(codeGenerator, objectSchema, path, ctx);
 }
 
@@ -102,6 +105,12 @@ function applyConcreteResponse(
   const bodyResults: ApplyResponseBodyResult[] = [];
   for (const contentType in schema.content) {
     const contentSchema = schema.content[contentType];
+    if (
+      ctx.config.shouldAddResponseBodyContent &&
+      !ctx.config.shouldAddResponseBodyContent(contentType, contentSchema)
+    ) {
+      continue;
+    }
     const bodyPath = [...path, 'body'];
     bodyResults.push(
       applyResponseBodyContent(

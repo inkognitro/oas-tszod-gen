@@ -23,6 +23,9 @@ import {
   findComponentParameterByRef,
   findComponentResponseByRef,
   findComponentSchemaByRef,
+  Endpoint as Oas3Endpoint,
+  RequestBodyContent,
+  ResponseBodyContent,
 } from '@/oas3/specification';
 import {
   applyEndpointCallerFunction,
@@ -174,7 +177,19 @@ export type GenerateConfig = {
   predefinedFolderOutputPaths?: OutputPath[];
   withZod?: boolean;
   templates?: TemplateName[];
-  ignoreEndpointsWithoutOperationId?: boolean;
+  shouldAddOperation?: (
+    path: string,
+    method: string,
+    schema: Oas3Endpoint
+  ) => boolean;
+  shouldAddRequestBodyContent?: (
+    contentType: string,
+    schema: RequestBodyContent
+  ) => boolean;
+  shouldAddResponseBodyContent?: (
+    contentType: string,
+    schema: ResponseBodyContent
+  ) => boolean;
   findCustomStringPatternByFormat?: (format: string) => null | string;
 };
 
@@ -229,15 +244,16 @@ export class DefaultCodeGenerator implements CodeGenerator {
     for (const path in this.oas3Specs.paths) {
       const requestByMethodMap = this.oas3Specs.paths[path];
       for (const method in requestByMethodMap) {
-        const request = requestByMethodMap[method];
+        const endpointSchema = requestByMethodMap[method];
         if (
-          !request.operationId &&
-          ctx.config.ignoreEndpointsWithoutOperationId
+          ctx.config.shouldAddOperation &&
+          !ctx.config.shouldAddOperation(path, method, endpointSchema)
         ) {
           continue;
         }
         const operationId =
-          request.operationId ?? this.generateEndpointOperationId(method, path);
+          endpointSchema.operationId ??
+          this.generateEndpointOperationId(method, path);
         const outputPath = this.createOperationOutputPath(operationId);
         if (outputPath.length < 2) {
           continue;
@@ -300,7 +316,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       fs.cpSync(
         path.resolve(
           __dirname,
-          '../../templates/ts',
+          '../../templates',
           cleanUpFolderPath(fileInfo.folderPath),
           fileInfo.fileName
         ),
@@ -601,8 +617,14 @@ export class DefaultCodeGenerator implements CodeGenerator {
     ctx: Context
   ) {
     for (const method in requestByMethodMap) {
-      const requestSchema = requestByMethodMap[method];
-      applyEndpointCallerFunction(this, path, method, requestSchema, ctx);
+      const endpointSchema = requestByMethodMap[method];
+      if (
+        ctx.config.shouldAddOperation &&
+        !ctx.config.shouldAddOperation(path, method, endpointSchema)
+      ) {
+        continue;
+      }
+      applyEndpointCallerFunction(this, path, method, endpointSchema, ctx);
     }
   }
 

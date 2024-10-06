@@ -3,14 +3,15 @@ import {
   ConcreteParameterLocation,
   findConcreteParameter,
   findConcreteResponseHeader,
+  isStringSchema,
   ObjectSchema,
   ObjectSchemaProps,
   Parameter,
   ResponseHeaderByNameMap,
+  StringSchema,
 } from '@/oas3/specification';
 
-// todo: rename to createResponseHeadersObjectSchema
-export function createHeadersObjectSchema(
+export function createResponseHeadersObjectSchema(
   codeGenerator: CodeGenerator,
   responseHeaderByName: ResponseHeaderByNameMap
 ): ObjectSchema {
@@ -26,6 +27,13 @@ export function createHeadersObjectSchema(
       throw new Error(
         `could not find concrete response header from: ${JSON.stringify(responseHeader)}`
       );
+    }
+    if (!isStringSchema(concreteResponseHeader.schema)) {
+      const strSchema: StringSchema = {
+        type: 'string',
+      };
+      props[headerName] = strSchema;
+      continue;
     }
     if (concreteResponseHeader.required) {
       requiredProps.push(headerName);

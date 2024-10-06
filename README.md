@@ -60,13 +60,13 @@ generateOas3ToTs({
   outputFolderPath: './generated-api',
   
   predefinedFolderOutputPaths: [
-    ['core'],
     // For outputs having an `OutputPath` starting with ['core']:
     // Variables and type definitions are put in the `{outputFolderPath}/core` folder
+    ['core'],
     
-    ['util', 'foo'],
     // For outputs having an `OutputPath` starting with ['util', 'foo']:
     // Variables and type definitions are put in the `{outputFolderPath}/util/foo` folder
+    ['util', 'foo'],
   ],
   
   logger: {
@@ -75,21 +75,39 @@ generateOas3ToTs({
     },
   },
   
-  withZod: true, // optional
   // By default or in case of `false`, only TypeScript types are generated without Zod schemas
-  
+  // [optional]
+  withZod: true,
+
+
+  // This will add only the defined templates.
+  // An empty array results in no added templates.
+  // By default, all available templates will be added to your codebase.
+  // [optional]
   templates: [
     'AxiosRequestHandler',
     'AuthRequestHandler',
     'ResponseExtractors',
     'ZodValidationRequestHandler'
-  ], // optional
-  // This will add only the defined templates.
-  // An empty array results in no added templates.
-  // By default, all available templates will be added to your codebase.
+  ],
 
-  ignoreEndpointsWithoutOperationId: false, // optional
-  // In case of `true`, endpoints whithout an "operationId" are ignored for code output. Default is `false`.
+  // Whether a specific operation - or endpoint respectively - should be added
+  // [optional]
+  shouldAddOperation: (path, method, endpointSchema) => {
+    return true; // adjust according to your needs
+  },
+  
+  // Whether a specific content type request body should be added
+  // [optional]
+  shouldAddRequestBodyContent: (contentType, requestBodyContentSchema) => {
+    return ['multipart/form-data', 'application/json'].includes(contentType);
+  },
+  
+  // Whether a specific content type response body should be added
+  // [optional]
+  shouldAddResponseBodyContent: (contentType, responseBodyContentSchema) => {
+    return ['multipart/form-data', 'application/json'].includes(contentType);
+  },
 });
 ```
 

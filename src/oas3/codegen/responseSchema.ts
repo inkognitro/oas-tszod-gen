@@ -17,7 +17,7 @@ import {
 } from './core';
 import {Context} from './generator';
 import {applyZodSchema} from './zodSchema';
-import {createHeadersObjectSchema} from './endpointUtils';
+import {createResponseHeadersObjectSchema} from './endpointUtils';
 
 type ApplyResponseBodyResult = {
   contentType: string;
@@ -124,7 +124,7 @@ function applyConcreteResponseSchema(
 ): CodeGenerationOutput {
   let headersZodSchemaCodeOutput: undefined | CodeGenerationOutput;
   if (ctx.config.withZod && schema.headers) {
-    const headersObjectSchema = createHeadersObjectSchema(
+    const headersObjectSchema = createResponseHeadersObjectSchema(
       codeGenerator,
       schema.headers
     );

@@ -506,6 +506,8 @@ const templateQueryParamsType: TemplateDefinitionOutput = {
   },
   createCode: () => {
     const propTypes: string[] = [
+      'undefined',
+      'null',
       'QueryParams',
       'QueryParams[]',
       'string',
@@ -746,7 +748,7 @@ const templateRequestCookiesType: TemplateDefinitionOutput = {
     return 'RequestCookies';
   },
   createCode: () => {
-    return '{\n[cookieName: string]: string;\n}';
+    return '{\n[cookieName: string]: string | number;\n}';
   },
   getRequiredOutputPaths: () => [],
 };

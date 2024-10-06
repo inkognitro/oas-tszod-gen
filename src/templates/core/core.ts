@@ -13,7 +13,14 @@ export type PathParams = {
 };
 
 export type QueryParams = {
-  [paramName: string]: QueryParams | QueryParams[] | string | number | boolean;
+  [paramName: string]:
+    | null
+    | undefined
+    | QueryParams
+    | QueryParams[]
+    | string
+    | number
+    | boolean;
 };
 
 export type RequestCookies = {

@@ -85,6 +85,12 @@ function applyNullableRequestBodyByContentTypeMap(
   const bodyCodeOutputs: ApplyRequestBodyResult[] = [];
   for (const contentType in schema) {
     const contentSchema = schema[contentType];
+    if (
+      ctx.config.shouldAddRequestBodyContent &&
+      !ctx.config.shouldAddRequestBodyContent(contentType, contentSchema)
+    ) {
+      continue;
+    }
     bodyCodeOutputs.push(
       applyRequestBodyContent(
         codeGenerator,

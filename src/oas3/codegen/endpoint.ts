@@ -87,9 +87,6 @@ export function applyEndpointCallerFunction(
   schema: Endpoint,
   ctx: Context
 ) {
-  if (!schema.operationId && ctx.config.ignoreEndpointsWithoutOperationId) {
-    return;
-  }
   const localCtx: Context = {
     ...ctx,
     operationType: requestMethod.toLowerCase() === 'get' ? 'read' : 'write',
