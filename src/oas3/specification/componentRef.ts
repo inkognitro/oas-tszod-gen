@@ -55,3 +55,19 @@ export function isSecuritySchemesComponentRef(
 ): anyValue is SecurityComponentRef {
   return zSecuritySchemeComponentRef.safeParse(anyValue).success;
 }
+
+export const responseHeaderComponentRefPrefix = '#/components/headers/';
+
+export const zResponseHeaderComponentRef = z.object({
+  $ref: z.string().startsWith(responseHeaderComponentRefPrefix),
+});
+
+export type ResponseHeaderComponentRef = z.infer<
+  typeof zResponseHeaderComponentRef
+>;
+
+export function isResponseHeaderComponentRef(
+  anyValue: unknown
+): anyValue is ResponseHeaderComponentRef {
+  return zResponseHeaderComponentRef.safeParse(anyValue).success;
+}

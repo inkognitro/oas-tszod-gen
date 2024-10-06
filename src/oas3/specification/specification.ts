@@ -1,4 +1,4 @@
-import {zConcreteResponse} from './response';
+import {zResponse, zResponseHeaderByNameMap} from './response';
 import {zSchema} from './schema';
 import {zSecurityScheme} from './security';
 import {zEndpoint} from './endpoint';
@@ -10,7 +10,7 @@ export type RequestByMethodMap = z.infer<typeof zRequestByMethodMap>;
 
 const zRequestDefinitionsByPathMap = z.record(zRequestByMethodMap);
 
-const zResponseByNameMap = z.record(zConcreteResponse);
+const zResponseByNameMap = z.record(zResponse);
 
 const zSchemaByNameMap = z.record(zSchema);
 
@@ -21,6 +21,7 @@ const zRequestParameterByNameMap = z.record(zParameter);
 const zComponentDefinitions = z.object({
   parameters: zRequestParameterByNameMap.optional(),
   responses: zResponseByNameMap.optional(),
+  headers: zResponseHeaderByNameMap.optional(),
   schemas: zSchemaByNameMap.optional(),
   securitySchemes: zSecuritySchemeByNameMap.optional(),
 });

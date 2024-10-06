@@ -1,14 +1,10 @@
 import {
-  ObjectSchema,
-  ObjectSchemaProps,
   ConcreteResponse,
   ResponseBodyContent,
   ResponseHeaderByNameMap,
-  isStringSchema,
   Response,
   isResponseComponentRef,
   isConcreteResponse,
-  findConcreteSchema,
   ResponseComponentRef,
 } from '@/oas3/specification';
 import {
@@ -27,34 +23,7 @@ import {
   templateResponseUnionType,
 } from './template';
 import {applyNullableFormDataTypeDefinition} from './formData';
-
-function createHeadersObjectSchema(
-  codeGenerator: CodeGenerator,
-  headersSchema: ResponseHeaderByNameMap
-): ObjectSchema {
-  const requiredProps: string[] = [];
-  const props: ObjectSchemaProps = {};
-  for (const headerName in headersSchema) {
-    requiredProps.push(headerName);
-    const headerSchema = headersSchema[headerName].schema;
-    const concreteHeaderSchema = findConcreteSchema(
-      codeGenerator.getSpecification(),
-      headerSchema
-    );
-    if (isStringSchema(concreteHeaderSchema)) {
-      props[headerName] = headerSchema;
-      continue;
-    }
-    props[headerName] = {
-      type: 'string',
-    };
-  }
-  return {
-    type: 'object',
-    properties: props,
-    required: requiredProps,
-  };
-}
+import {createHeadersObjectSchema} from './endpointUtils';
 
 function applyResponseHeaders(
   codeGenerator: CodeGenerator,

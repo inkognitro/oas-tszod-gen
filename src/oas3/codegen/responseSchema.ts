@@ -2,13 +2,10 @@ import {
   ConcreteResponse,
   isConcreteResponse,
   isResponseComponentRef,
-  ObjectSchema,
-  ObjectSchemaProps,
   RequestBodyContent,
   Response,
   ResponseBodyContentByContentTypeMap,
   ResponseComponentRef,
-  ResponseHeaderByNameMap,
 } from '@/oas3/specification';
 import {
   CodeGenerationOutput,
@@ -20,6 +17,7 @@ import {
 } from './core';
 import {Context} from './generator';
 import {applyZodSchema} from './zodSchema';
+import {createHeadersObjectSchema} from './endpointUtils';
 
 type ApplyResponseBodyResult = {
   contentType: string;
@@ -118,22 +116,6 @@ function applyResponseBodyByContentTypeMap(
   };
 }
 
-function createHeadersObjectSchema(
-  headersSchema: ResponseHeaderByNameMap
-): ObjectSchema {
-  const requiredProps: string[] = [];
-  const props: ObjectSchemaProps = {};
-  for (const headerName in headersSchema) {
-    requiredProps.push(headerName);
-    props[headerName] = headersSchema[headerName].schema;
-  }
-  return {
-    type: 'object',
-    properties: props,
-    required: requiredProps,
-  };
-}
-
 function applyConcreteResponseSchema(
   codeGenerator: CodeGenerator,
   schema: ConcreteResponse,
@@ -142,7 +124,10 @@ function applyConcreteResponseSchema(
 ): CodeGenerationOutput {
   let headersZodSchemaCodeOutput: undefined | CodeGenerationOutput;
   if (ctx.config.withZod && schema.headers) {
-    const headersObjectSchema = createHeadersObjectSchema(schema.headers);
+    const headersObjectSchema = createHeadersObjectSchema(
+      codeGenerator,
+      schema.headers
+    );
     headersZodSchemaCodeOutput = applyZodSchema(
       codeGenerator,
       headersObjectSchema,

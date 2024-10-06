@@ -1,14 +1,23 @@
 import {
   isParameterComponentRef,
   isResponseComponentRef,
+  isResponseHeaderComponentRef,
   isSchemaComponentRef,
   parameterComponentRefPrefix,
   responseComponentRefPrefix,
+  responseHeaderComponentRefPrefix,
   schemaComponentRefPrefix,
 } from './componentRef';
 import {ConcreteSchema, isConcreteSchema, Schema} from './schema';
 import {ConcreteParameter, isConcreteParameter, Parameter} from './endpoint';
-import {ConcreteResponse, isConcreteResponse, Response} from './response';
+import {
+  ConcreteResponse,
+  ConcreteResponseHeader,
+  isConcreteResponse,
+  isConcreteResponseHeader,
+  Response,
+  ResponseHeader,
+} from './response';
 import {Specification} from './specification';
 
 export function findComponentSchemaByRef(
@@ -105,4 +114,40 @@ export function findConcreteResponse(
     return null;
   }
   return findConcreteResponse(spec, componentResponse);
+}
+
+export function findComponentResponseHeaderByRef(
+  spec: Specification,
+  componentRef: string
+): null | ResponseHeader {
+  const components = spec.components;
+  if (
+    componentRef.startsWith(responseHeaderComponentRefPrefix) &&
+    components.headers
+  ) {
+    const name = componentRef.replace(responseHeaderComponentRefPrefix, '');
+    const responseHeader = components.headers[name];
+    return responseHeader ?? null;
+  }
+  return null;
+}
+
+export function findConcreteResponseHeader(
+  spec: Specification,
+  responseHeader: ResponseHeader
+): null | ConcreteResponseHeader {
+  if (isConcreteResponseHeader(responseHeader)) {
+    return responseHeader;
+  }
+  if (!isResponseHeaderComponentRef(responseHeader)) {
+    return null;
+  }
+  const componentResponseHeader = findComponentResponseHeaderByRef(
+    spec,
+    responseHeader.$ref
+  );
+  if (!componentResponseHeader) {
+    return null;
+  }
+  return findConcreteResponseHeader(spec, componentResponseHeader);
 }
