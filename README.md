@@ -118,7 +118,7 @@ Let's consider some example endpoints which might be defined in your OAS3 specif
 2. The generated code for the endpoint with the operationId `userManagement.getUsers` will be put into `./user-management/getUsers.ts`
 3. The generated code for the endpoint with the operationId `userManagement.admin.getUsers` will be put into `./user-management/admin/getUsers.ts`
 
-The same principles that apply to dots `.` do also apply to slashes `/`.
+The same principles that apply to dots `.` do also apply to slashes `/` and backslashes `\`.
 
 After generating endpoint caller functions from an OAS3 specification into your codebase,
 it's time to understand how the generated code can be used. The following sections should bring some clarity.

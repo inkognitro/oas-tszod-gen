@@ -935,9 +935,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   createOperationOutputPath(operationId: string): OutputPath {
     return operationId
+      .split('\\')
+      .join('.')
       .split('/')
       .join('.')
       .split('.')
+      .filter(p => !!p.length)
       .map(p => lowerCaseFirstLetter(p));
   }
 
