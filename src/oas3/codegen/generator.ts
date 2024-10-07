@@ -177,6 +177,7 @@ export type GenerateConfig = {
   predefinedFolderOutputPaths?: OutputPath[];
   withZod?: boolean;
   templates?: TemplateName[];
+  createModifiedOperationOutputPath?: (outputPath: OutputPath) => OutputPath;
   shouldAddOperation?: (
     path: string,
     method: string,
@@ -184,11 +185,11 @@ export type GenerateConfig = {
   ) => boolean;
   shouldAddRequestBodyContent?: (
     contentType: string,
-    schema: RequestBodyContentByContentTypeMap
+    bodyByContentTypeMap: RequestBodyContentByContentTypeMap
   ) => boolean;
   shouldAddResponseBodyContent?: (
     contentType: string,
-    schema: ResponseBodyContentByContentTypeMap
+    bodyByContentTypeMap: ResponseBodyContentByContentTypeMap
   ) => boolean;
   findCustomStringPatternByFormat?: (format: string) => null | string;
 };
@@ -255,7 +256,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
         const operationId =
           endpointSchema.operationId ??
           this.generateEndpointOperationId(method, path);
-        const outputPath = this.createOperationOutputPath(operationId);
+        const outputPath = this.createOperationOutputPath(operationId, ctx);
         if (outputPath.length < 2) {
           continue;
         }
@@ -956,8 +957,8 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return outputPath.slice(folderOutputPath.length);
   }
 
-  createOperationOutputPath(operationId: string): OutputPath {
-    return operationId
+  createOperationOutputPath(operationId: string, ctx: Context): OutputPath {
+    const outputPath = operationId
       .split('\\')
       .join('.')
       .split('/')
@@ -965,6 +966,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
       .split('.')
       .filter(p => !!p.length)
       .map(p => lowerCaseFirstLetter(p));
+    if (ctx.config.createModifiedOperationOutputPath) {
+      return ctx.config.createModifiedOperationOutputPath(outputPath);
+    }
+    return outputPath;
   }
 
   private isResponseOutputPath(outputPath: OutputPath): boolean {

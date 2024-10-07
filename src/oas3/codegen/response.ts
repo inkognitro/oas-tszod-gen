@@ -107,7 +107,7 @@ function applyConcreteResponse(
     const contentSchema = schema.content[contentType];
     if (
       ctx.config.shouldAddResponseBodyContent &&
-      !ctx.config.shouldAddResponseBodyContent(contentType, contentSchema)
+      !ctx.config.shouldAddResponseBodyContent(contentType, schema.content)
     ) {
       continue;
     }

@@ -23,7 +23,7 @@ export interface CodeGenerator {
     outputPath: OutputPath,
     referencingPath: OutputPath
   ): string;
-  createOperationOutputPath(operationId: string): OutputPath;
+  createOperationOutputPath(operationId: string, ctx: Context): OutputPath;
   createOutputPathByComponentRefForType(componentRef: string): OutputPath;
   createOutputPathByComponentRefForConst(componentRef: string): OutputPath;
   createOutputPathByComponentRefForResponseSchemaConst(
