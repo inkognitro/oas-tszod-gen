@@ -66,7 +66,7 @@ export interface CodeGenerator {
     outputPath: OutputPath,
     referencingPath: OutputPath
   ): string;
-  createOperationOutputPath(operationId: string, ctx: Context): OutputPath;
+  createOutputPathForOperationId(operationId: string, ctx: Context): OutputPath;
   createOutputPathByComponentRefForType(componentRef: string): OutputPath;
   createOutputPathByComponentRefForConst(componentRef: string): OutputPath;
   createOutputPathByComponentRefForResponseSchemaConst(

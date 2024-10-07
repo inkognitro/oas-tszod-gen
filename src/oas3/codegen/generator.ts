@@ -217,7 +217,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
         const operationId =
           endpointSchema.operationId ??
           this.generateEndpointOperationId(method, path);
-        const outputPath = this.createOperationOutputPath(operationId, ctx);
+        const outputPath = this.createOutputPathForOperationId(
+          operationId,
+          ctx
+        );
         if (outputPath.length < 2) {
           continue;
         }
@@ -918,7 +921,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return outputPath.slice(folderOutputPath.length);
   }
 
-  createOperationOutputPath(operationId: string, ctx: Context): OutputPath {
+  createOutputPathForOperationId(
+    operationId: string,
+    ctx: Context
+  ): OutputPath {
     const outputPath = operationId
       .split('\\')
       .join('.')
