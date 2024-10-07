@@ -87,7 +87,7 @@ function applyNullableRequestBodyByContentTypeMap(
     const contentSchema = schema[contentType];
     if (
       ctx.config.shouldAddRequestBodyContent &&
-      !ctx.config.shouldAddRequestBodyContent(contentType, contentSchema)
+      !ctx.config.shouldAddRequestBodyContent(contentType, schema)
     ) {
       continue;
     }

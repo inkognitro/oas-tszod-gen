@@ -123,9 +123,7 @@ function applyConcreteResponse(
     );
   }
   const hasNoSpecificResponseProperties =
-    !bodyResults.length &&
-    !headersCodeOutput &&
-    !ctx.response?.genericStatusVariableValue;
+    !bodyResults.length && !headersCodeOutput;
   return {
     path,
     createCode: () => {
@@ -135,7 +133,10 @@ function applyConcreteResponse(
         }', ${bodyResult.codeOutput.createCode(path)}>`;
       });
       if (hasNoSpecificResponseProperties) {
-        return templateResponseType.createName(path);
+        const statusCodePart = ctx.response?.genericStatusVariableValue
+          ? `<${ctx.response?.genericStatusVariableValue}>`
+          : '';
+        return `${templateResponseType.createName(path)}${statusCodePart}`;
       }
       const codeParts: string[] = [];
       if (ctx.response?.genericStatusVariableValue) {
@@ -169,13 +170,15 @@ function applyConcreteResponse(
           }
         });
       });
-      return [
-        ...outputPaths,
-        templateResponseBodyDataType.path,
-        hasNoSpecificResponseProperties
-          ? templateResponseType.path
-          : templateResponseUnionType.path,
-      ];
+      if (bodyResults.length) {
+        outputPaths.push(templateResponseBodyDataType.path);
+      }
+      if (hasNoSpecificResponseProperties) {
+        outputPaths.push(templateResponseType.path);
+      } else {
+        outputPaths.push(templateResponseUnionType.path);
+      }
+      return outputPaths;
     },
   };
 }
