@@ -14,7 +14,6 @@ import {
   TemplateDefinitionOutput,
 } from './core';
 import {
-  isSpecification,
   parameterComponentRefPrefix,
   RequestByMethodMap,
   responseComponentRefPrefix,
@@ -24,8 +23,9 @@ import {
   findComponentResponseByRef,
   findComponentSchemaByRef,
   Endpoint as Oas3Endpoint,
-  RequestBodyContent,
-  ResponseBodyContent,
+  zSpecification,
+  RequestBodyContentByContentTypeMap,
+  ResponseBodyContentByContentTypeMap,
 } from '@/oas3/specification';
 import {
   applyEndpointCallerFunction,
@@ -184,11 +184,11 @@ export type GenerateConfig = {
   ) => boolean;
   shouldAddRequestBodyContent?: (
     contentType: string,
-    schema: RequestBodyContent
+    schema: RequestBodyContentByContentTypeMap
   ) => boolean;
   shouldAddResponseBodyContent?: (
     contentType: string,
-    schema: ResponseBodyContent
+    schema: ResponseBodyContentByContentTypeMap
   ) => boolean;
   findCustomStringPatternByFormat?: (format: string) => null | string;
 };
@@ -201,10 +201,11 @@ export class DefaultCodeGenerator implements CodeGenerator {
   private outputPathsWithZodSchemaRecursion: OutputPath[];
 
   constructor(oas3Specs: object, logger: Logger) {
-    if (!isSpecification(oas3Specs)) {
-      throw new Error('invalid oas3 specification given');
+    const result = zSpecification.safeParse(oas3Specs);
+    if (!result.success) {
+      throw result.error;
     }
-    this.oas3Specs = oas3Specs;
+    this.oas3Specs = result.data;
     this.logger = logger;
     this.outputs = [];
     this.operationFolderOutputPaths = [];

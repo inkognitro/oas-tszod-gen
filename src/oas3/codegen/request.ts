@@ -3,7 +3,7 @@ import {
   Endpoint,
   Parameter,
   RequestBodyContent,
-  RequestBodyContentByTypeMap,
+  RequestBodyContentByContentTypeMap,
 } from '@/oas3/specification';
 import {
   CodeGenerationOutput,
@@ -78,7 +78,7 @@ function applyRequestBodyContent(
 
 function applyNullableRequestBodyByContentTypeMap(
   codeGenerator: CodeGenerator,
-  schema: RequestBodyContentByTypeMap,
+  schema: RequestBodyContentByContentTypeMap,
   path: OutputPath,
   ctx: Context
 ): null | CodeGenerationOutput {

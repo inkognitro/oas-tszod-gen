@@ -33,7 +33,3 @@ export const zSpecification = z.object({
 });
 
 export type Specification = z.infer<typeof zSpecification>;
-
-export function isSpecification(anyValue: unknown): anyValue is Specification {
-  return zSpecification.safeParse(anyValue).success;
-}

@@ -13,7 +13,7 @@ import {
   Endpoint,
   Parameter,
   RequestBodyContent,
-  RequestBodyContentByTypeMap,
+  RequestBodyContentByContentTypeMap,
   ResponseByStatusCodeMap,
 } from '@/oas3/specification';
 import {applyZodSchema} from './zodSchema';
@@ -68,7 +68,7 @@ function applyRequestBodyContent(
 
 function applyRequestBodyByContentTypeMap(
   codeGenerator: CodeGenerator,
-  schema: RequestBodyContentByTypeMap,
+  schema: RequestBodyContentByContentTypeMap,
   path: OutputPath,
   ctx: Context
 ): CodeGenerationOutput {

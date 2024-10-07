@@ -11,14 +11,15 @@ export const zRequestBodyContent = z.object({
 
 export type RequestBodyContent = z.infer<typeof zRequestBodyContent>;
 
-export const zRequestBodyContentByTypeMap = z.record(zRequestBodyContent);
+export const zRequestBodyContentByContentTypeMap =
+  z.record(zRequestBodyContent);
 
-export type RequestBodyContentByTypeMap = z.infer<
-  typeof zRequestBodyContentByTypeMap
+export type RequestBodyContentByContentTypeMap = z.infer<
+  typeof zRequestBodyContentByContentTypeMap
 >;
 
 export const zRequestBody = z.object({
-  content: zRequestBodyContentByTypeMap.optional(),
+  content: zRequestBodyContentByContentTypeMap.optional(),
 });
 
 export type RequestBody = z.infer<typeof zRequestBody>;
