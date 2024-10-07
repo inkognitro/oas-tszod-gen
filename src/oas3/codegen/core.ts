@@ -24,6 +24,7 @@ export type GenerateConfigTemplateName =
 export type GenerateConfig = {
   outputFolderPath: string;
   importRootAlias?: string;
+  outputPathSeparators?: string[];
   predefinedFolderOutputPaths?: OutputPath[];
   withZod?: boolean;
   templates?: GenerateConfigTemplateName[];
@@ -48,15 +49,18 @@ export interface CodeGenerator {
   getSpecification(): Specification;
   createComponentNameForType(
     componentRef: string,
-    referencingPath: OutputPath
+    referencingPath: OutputPath,
+    ctx: Context
   ): string;
   createComponentNameForResponseSchemaConst(
     componentRef: string,
-    referencingPath: OutputPath
+    referencingPath: OutputPath,
+    ctx: Context
   ): string;
   createComponentNameForZodSchemaConst(
     componentRef: string,
-    referencingPath: OutputPath
+    referencingPath: OutputPath,
+    ctx: Context
   ): string;
   generateEndpointOperationId(method: string, path: string): string;
   createEnumName(outputPath: OutputPath, referencingPath: OutputPath): string;
@@ -67,13 +71,21 @@ export interface CodeGenerator {
     referencingPath: OutputPath
   ): string;
   createOutputPathForOperationId(operationId: string, ctx: Context): OutputPath;
-  createOutputPathByComponentRefForType(componentRef: string): OutputPath;
-  createOutputPathByComponentRefForConst(componentRef: string): OutputPath;
+  createOutputPathByComponentRefForType(
+    componentRef: string,
+    ctx: Context
+  ): OutputPath;
+  createOutputPathByComponentRefForConst(
+    componentRef: string,
+    ctx: Context
+  ): OutputPath;
   createOutputPathByComponentRefForResponseSchemaConst(
-    componentRef: string
+    componentRef: string,
+    ctx: Context
   ): OutputPath;
   createOutputPathByComponentRefForZodSchemaConst(
-    componentRef: string
+    componentRef: string,
+    ctx: Context
   ): OutputPath;
   addOutput(
     output: Output,
@@ -89,9 +101,10 @@ export enum OutputType {
   COMPONENT_REF = 'COMPONENT_REF',
 }
 
-export const arraySchemaItemOutputPathPart = 'array-schema-item-5acf7fae';
-export const objectSchemaAdditionalPropsOutputPathPart =
-  'object-schema-additionalProps-5acf7fae';
+export const endpointSchemaOutputPathPart = 'endpointSchema6b3a7814';
+export const requestOutputPathPart = 'request6b3a7814';
+export const responseOutputPathPart = 'response6b3a7814';
+export const requestResultOutputPathPart = 'requestResult6b3a7814';
 
 export type OutputPath = string[];
 

@@ -1,19 +1,21 @@
 import {
   AnyDefinitionOutput,
   areOutputPathsEqual,
-  arraySchemaItemOutputPathPart,
   capitalizeFirstLetter,
   CodeGenerator,
   Context,
   DefinitionOutput,
   doesOutputPathStartWithOtherOutputPath,
+  endpointSchemaOutputPathPart,
   GenerateConfig,
   GenerateConfigTemplateName,
   lowerCaseFirstLetter,
-  objectSchemaAdditionalPropsOutputPathPart,
   Output,
   OutputPath,
   OutputType,
+  requestOutputPathPart,
+  requestResultOutputPathPart,
+  responseOutputPathPart,
   TemplateDefinitionOutput,
 } from './core';
 import {
@@ -23,15 +25,12 @@ import {
   parameterComponentRefPrefix,
   RequestByMethodMap,
   responseComponentRefPrefix,
+  responseHeaderComponentRefPrefix,
   schemaComponentRefPrefix,
   Specification,
   zSpecification,
 } from '@/oas3/specification';
-import {
-  applyEndpointCallerFunction,
-  requestResultOutputPathPart,
-  responseOutputPathPart,
-} from './endpoint';
+import {applyEndpointCallerFunction} from './endpoint';
 import {templateDefinitionOutputs} from './template';
 import {applySchema} from './schema';
 import {applyZodSchema} from './zodSchema';
@@ -111,6 +110,8 @@ function cleanUpFolderPath(path: string): string {
 const componentParametersFileNameOutputPathPart = 'parameters6b3a7814';
 const componentResponsesFileNameOutputPathPart = 'responses6b3a7814';
 const componentSchemasFileNameOutputPathPart = 'schemas6b3a7814';
+const componentResponseHeadersFileNameOutputPathPart =
+  'responseHeaders6b3a7814';
 
 export interface Logger {
   log(...data: unknown[]): void;
@@ -466,8 +467,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
     if (!response) {
       throw new Error(`could not find component "${componentRef}" in specs`);
     }
-    const typeOutputPath =
-      this.createOutputPathByComponentRefForType(componentRef);
+    const typeOutputPath = this.createOutputPathByComponentRefForType(
+      componentRef,
+      ctx
+    );
     if (this.findOutputByOutputPath(typeOutputPath)) {
       return;
     }
@@ -488,12 +491,15 @@ export class DefaultCodeGenerator implements CodeGenerator {
         return 'S extends number = any';
       },
       createName: referencingPath =>
-        this.createComponentNameForType(componentRef, referencingPath),
+        this.createComponentNameForType(componentRef, referencingPath, ctx),
     };
     this.addOutput(typeOutput, ctx);
 
     const schemaConstOutputPath =
-      this.createOutputPathByComponentRefForResponseSchemaConst(componentRef);
+      this.createOutputPathByComponentRefForResponseSchemaConst(
+        componentRef,
+        ctx
+      );
     const schemaConstOutput: AnyDefinitionOutput = {
       type: OutputType.DEFINITION,
       ...applyResponseSchema(this, response, schemaConstOutputPath, ctx, [
@@ -503,19 +509,22 @@ export class DefaultCodeGenerator implements CodeGenerator {
       createName: referencingPath =>
         this.createComponentNameForResponseSchemaConst(
           componentRef,
-          referencingPath
+          referencingPath,
+          ctx
         ),
     };
     this.addOutput(schemaConstOutput, ctx);
   }
 
-  private addOutputByParameterComponentRef(componentRef: string) {
+  private addOutputByParameterComponentRef(componentRef: string, ctx: Context) {
     const parameter = findComponentParameterByRef(this.oas3Specs, componentRef);
     if (!parameter) {
       throw new Error(`could not find component "${componentRef}" in specs`);
     }
-    const typeOutputPath =
-      this.createOutputPathByComponentRefForType(componentRef);
+    const typeOutputPath = this.createOutputPathByComponentRefForType(
+      componentRef,
+      ctx
+    );
     if (this.findOutputByOutputPath(typeOutputPath)) {
       return;
     }
@@ -529,8 +538,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
     if (!schema) {
       throw new Error(`could not find component "${componentRef}" in specs`);
     }
-    const typeOutputPath =
-      this.createOutputPathByComponentRefForType(componentRef);
+    const typeOutputPath = this.createOutputPathByComponentRefForType(
+      componentRef,
+      ctx
+    );
     if (this.findOutputByOutputPath(typeOutputPath)) {
       return;
     }
@@ -539,12 +550,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
       ...applySchema(this, schema, typeOutputPath, ctx, [componentRef]),
       definitionType: 'type',
       createName: referencingPath =>
-        this.createComponentNameForType(componentRef, referencingPath),
+        this.createComponentNameForType(componentRef, referencingPath, ctx),
     };
     this.addOutput(output, ctx);
     if (ctx.config.withZod) {
       const zodSchemaOutputPath =
-        this.createOutputPathByComponentRefForZodSchemaConst(componentRef);
+        this.createOutputPathByComponentRefForZodSchemaConst(componentRef, ctx);
       const zodSchemaOutput: AnyDefinitionOutput = {
         ...applyZodSchema(this, schema, zodSchemaOutputPath, ctx, [
           componentRef,
@@ -554,7 +565,8 @@ export class DefaultCodeGenerator implements CodeGenerator {
         createName: referencingPath =>
           this.createComponentNameForZodSchemaConst(
             componentRef,
-            referencingPath
+            referencingPath,
+            ctx
           ),
       };
       this.addOutput(zodSchemaOutput, ctx);
@@ -567,7 +579,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       return;
     }
     if (componentRef.startsWith(parameterComponentRefPrefix)) {
-      this.addOutputByParameterComponentRef(componentRef);
+      this.addOutputByParameterComponentRef(componentRef, ctx);
       return;
     }
     if (componentRef.startsWith(schemaComponentRefPrefix)) {
@@ -617,6 +629,8 @@ export class DefaultCodeGenerator implements CodeGenerator {
       fileName = 'parameters';
     } else if (fileName === componentResponsesFileNameOutputPathPart) {
       fileName = 'responses';
+    } else if (fileName === componentResponseHeadersFileNameOutputPathPart) {
+      fileName = 'responseHeaders';
     } else if (fileName === componentSchemasFileNameOutputPathPart) {
       fileName = 'schemas';
     }
@@ -718,7 +732,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
         if (output.type === OutputType.COMPONENT_REF) {
           const componentOutputPath =
-            this.createOutputPathByComponentRefForType(output.componentRef);
+            this.createOutputPathByComponentRefForType(
+              output.componentRef,
+              ctx
+            );
           requiredOutput = availableOutputs.find(o =>
             areOutputPathsEqual(o.path, componentOutputPath)
           );
@@ -939,53 +956,23 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return outputPath;
   }
 
-  private isResponseOutputPath(outputPath: OutputPath): boolean {
-    if (outputPath[outputPath.length - 2] !== responseOutputPathPart) {
-      return false;
-    }
-    return outputPath.includes(requestResultOutputPathPart);
+  private isEndpointSchemaOutputPath(outputPath: OutputPath): boolean {
+    return outputPath[outputPath.length - 1] === endpointSchemaOutputPathPart;
   }
 
-  private isUnionResponseOutputPath(outputPath: OutputPath): boolean {
-    return outputPath[outputPath.length - 1] === responseOutputPathPart;
+  private isRequestOutputPath(outputPath: OutputPath): boolean {
+    return outputPath[outputPath.length - 1] === requestOutputPathPart;
   }
 
   private isRequestResultOutputPath(outputPath: OutputPath): boolean {
     return outputPath[outputPath.length - 1] === requestResultOutputPathPart;
   }
 
-  private createResponseStatusCodeName(statusCode: number): string {
-    switch (statusCode) {
-      case 200:
-        return 'Ok';
-      case 201:
-        return 'Created';
-      case 202:
-        return 'Accepted';
-      case 203:
-        return 'NonAuthoritativeInformation';
-      case 204:
-        return 'NoContent';
-      case 400:
-        return 'BadRequest';
-      case 401:
-        return 'Unauthorized';
-      case 403:
-        return 'Forbidden';
-      case 404:
-        return 'NotFound';
-      case 405:
-        return 'MethodNotAllowed';
-      case 413:
-        return 'ContentTooLarge';
-      case 500:
-        return 'InternalServerError';
-      default:
-        return `${statusCode}`;
-    }
+  private isResponseOutputPath(outputPath: OutputPath): boolean {
+    return outputPath[outputPath.length - 1] === responseOutputPathPart;
   }
 
-  private createPascalCaseNamedTypeName(
+  private createPascalCaseOutputName(
     outputPath: OutputPath,
     referencingPath: OutputPath
   ): string {
@@ -996,68 +983,38 @@ export class DefaultCodeGenerator implements CodeGenerator {
       p =>
         p !== componentSchemasFileNameOutputPathPart &&
         p !== componentParametersFileNameOutputPathPart &&
-        p !== componentResponsesFileNameOutputPathPart
+        p !== componentResponsesFileNameOutputPathPart &&
+        p !== componentResponseHeadersFileNameOutputPathPart
     );
-    parts = parts.map(p => {
-      if (p === arraySchemaItemOutputPathPart) {
-        return 'item';
-      }
-      if (p === objectSchemaAdditionalPropsOutputPathPart) {
-        return 'additionalProps';
-      }
-      return p;
-    });
-    if (this.isUnionResponseOutputPath(parts)) {
-      parts = parts.filter(
-        p => p !== requestResultOutputPathPart && p !== responseOutputPathPart
-      );
-      parts = [...parts, 'response'];
-      return parts.map(p => capitalizeFirstLetter(p)).join('');
-    }
-    if (this.isResponseOutputPath(parts)) {
-      const responseOutputPathPartIndex = parts.findIndex(
-        p => p === responseOutputPathPart
-      );
-      if (responseOutputPathPartIndex === -1) {
-        throw new Error(
-          'this case should have been caught by the parent if condition'
-        );
-      }
-      const statusCodeIndex = responseOutputPathPartIndex + 1;
-      const statusCode = parseInt(parts[statusCodeIndex]);
-      const statusCodeOutputPathPart = isNaN(statusCode)
-        ? `${statusCode}`
-        : this.createResponseStatusCodeName(statusCode);
-      parts = [
-        ...parts.slice(0, statusCodeIndex),
-        statusCodeOutputPathPart,
-        'response',
-      ];
-      parts = parts.filter(
-        p => p !== requestResultOutputPathPart && p !== responseOutputPathPart
-      );
-      return parts.map(p => capitalizeFirstLetter(p)).join('');
-    }
     if (this.isRequestResultOutputPath(parts)) {
       parts = [...parts.slice(0, -1), 'requestResult'];
       return parts.map(p => capitalizeFirstLetter(p)).join('');
+    } else if (this.isEndpointSchemaOutputPath(parts)) {
+      parts = [...parts.slice(0, -1), 'endpointSchema'];
+      return parts.map(p => capitalizeFirstLetter(p)).join('');
+    } else if (this.isRequestOutputPath(parts)) {
+      parts = [...parts.slice(0, -1), 'request'];
+      return parts.map(p => capitalizeFirstLetter(p)).join('');
+    } else if (this.isResponseOutputPath(parts)) {
+      parts = [...parts.slice(0, -1), 'response'];
+      return parts.map(p => capitalizeFirstLetter(p)).join('');
     }
-    return parts.map(p => capitalizeFirstLetter(p)).join('');
+    return parts.map(p => capitalizeFirstLetter(p)).join('_');
   }
 
   createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    const n = this.createPascalCaseNamedTypeName(outputPath, referencingPath);
+    const n = this.createPascalCaseOutputName(outputPath, referencingPath);
     return n.match(/^\d/) ? `$${n}` : n;
   }
 
   createEnumName(outputPath: OutputPath, referencingPath: OutputPath): string {
-    const n = this.createPascalCaseNamedTypeName(outputPath, referencingPath);
+    const n = this.createPascalCaseOutputName(outputPath, referencingPath);
     return n.match(/^\d/) ? `$${n}` : n;
   }
 
   createConstName(outputPath: OutputPath, referencingPath: OutputPath): string {
     const n = lowerCaseFirstLetter(
-      this.createPascalCaseNamedTypeName(outputPath, referencingPath)
+      this.createPascalCaseOutputName(outputPath, referencingPath)
     );
     return n.match(/^\d/) ? `$${n}` : n;
   }
@@ -1067,7 +1024,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     referencingPath: OutputPath
   ): string {
     const n = lowerCaseFirstLetter(
-      this.createPascalCaseNamedTypeName(outputPath, referencingPath)
+      this.createPascalCaseOutputName(outputPath, referencingPath)
     );
     return n.match(/^\d/) ? `$${n}` : n;
   }
@@ -1093,15 +1050,37 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return mostAccurateFolderOutputPath;
   }
 
-  createOutputPathByComponentRefForType(componentRef: string): OutputPath {
-    const outputPathParts: OutputPath = componentRef
+  createOutputPathFromString(str: string, ctx: Context): OutputPath {
+    function createSeparated(parts: string[], separators: string[]): string[] {
+      let nextParts: string[] = [];
+      const [currentSeparator, ...nextSeparators] = separators;
+      parts.forEach(p => {
+        let subParts = p.split(currentSeparator);
+        if (nextSeparators.length > 0) {
+          subParts = createSeparated(subParts, nextSeparators);
+        }
+        nextParts = [...nextParts, ...subParts];
+      });
+      return nextParts;
+    }
+    const separators = ctx.config.outputPathSeparators ?? ['.', '/', '\\'];
+    const parts = createSeparated([str], separators);
+    return parts.filter(p => !!p.length).map(p => lowerCaseFirstLetter(p));
+  }
+
+  createOutputPathByComponentRefForType(
+    componentRef: string,
+    ctx: Context
+  ): OutputPath {
+    const componentRefWithoutPrefix = componentRef
       .replace(parameterComponentRefPrefix, '')
       .replace(responseComponentRefPrefix, '')
-      .replace(schemaComponentRefPrefix, '')
-      .split('/')
-      .join('.')
-      .split('.')
-      .map(p => lowerCaseFirstLetter(p));
+      .replace(responseHeaderComponentRefPrefix, '')
+      .replace(schemaComponentRefPrefix, '');
+    const outputPathParts: OutputPath = this.createOutputPathFromString(
+      componentRefWithoutPrefix,
+      ctx
+    );
     let folderOutputPathParts: OutputPath = [];
     if (outputPathParts.length >= 2) {
       const mostAccurateOperationFolderOutputPath =
@@ -1118,6 +1097,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
     } else if (componentRef.startsWith(responseComponentRefPrefix)) {
       fileNameOutputPathPart = componentResponsesFileNameOutputPathPart;
       typeNamePathParts.push('response');
+    } else if (componentRef.startsWith(responseHeaderComponentRefPrefix)) {
+      fileNameOutputPathPart = componentResponseHeadersFileNameOutputPathPart;
+      typeNamePathParts.push('header');
     } else if (componentRef.startsWith(schemaComponentRefPrefix)) {
       fileNameOutputPathPart = componentSchemasFileNameOutputPathPart;
     }
@@ -1131,51 +1113,67 @@ export class DefaultCodeGenerator implements CodeGenerator {
     ];
   }
 
-  createOutputPathByComponentRefForConst(componentRef: string): OutputPath {
-    return this.createOutputPathByComponentRefForType(componentRef);
+  createOutputPathByComponentRefForConst(
+    componentRef: string,
+    ctx: Context
+  ): OutputPath {
+    return this.createOutputPathByComponentRefForType(componentRef, ctx);
   }
 
   createOutputPathByComponentRefForZodSchemaConst(
-    componentRef: string
+    componentRef: string,
+    ctx: Context
   ): OutputPath {
     return [
-      ...this.createOutputPathByComponentRefForConst(componentRef),
+      ...this.createOutputPathByComponentRefForConst(componentRef, ctx),
       'zodSchema',
     ];
   }
 
   createOutputPathByComponentRefForResponseSchemaConst(
-    componentRef: string
+    componentRef: string,
+    ctx: Context
   ): OutputPath {
     return [
-      ...this.createOutputPathByComponentRefForConst(componentRef),
+      ...this.createOutputPathByComponentRefForConst(componentRef, ctx),
       'schema',
     ];
   }
 
   createComponentNameForType(
     componentRef: string,
-    referencingPath: OutputPath
+    referencingPath: OutputPath,
+    ctx: Context
   ): string {
-    const outputPath = this.createOutputPathByComponentRefForType(componentRef);
+    const outputPath = this.createOutputPathByComponentRefForType(
+      componentRef,
+      ctx
+    );
     return this.createTypeName(outputPath, referencingPath);
   }
 
   createComponentNameForResponseSchemaConst(
     componentRef: string,
-    referencingPath: OutputPath
+    referencingPath: OutputPath,
+    ctx: Context
   ): string {
     const outputPath =
-      this.createOutputPathByComponentRefForResponseSchemaConst(componentRef);
+      this.createOutputPathByComponentRefForResponseSchemaConst(
+        componentRef,
+        ctx
+      );
     return `${this.createConstName(outputPath, referencingPath)}`;
   }
 
   createComponentNameForZodSchemaConst(
     componentRef: string,
-    referencingPath: OutputPath
+    referencingPath: OutputPath,
+    ctx: Context
   ): string {
-    const outputPath =
-      this.createOutputPathByComponentRefForZodSchemaConst(componentRef);
+    const outputPath = this.createOutputPathByComponentRefForZodSchemaConst(
+      componentRef,
+      ctx
+    );
     return `${this.createConstName(outputPath, referencingPath)}`;
   }
 }

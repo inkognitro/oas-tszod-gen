@@ -1,12 +1,10 @@
 import {
-  arraySchemaItemOutputPathPart,
   CodeGenerationOutput,
   CodeGenerator,
   ComponentRefOutput,
   containsOutputPath,
   Context,
   CreateCodeFunc,
-  objectSchemaAdditionalPropsOutputPathPart,
   OutputPath,
   OutputType,
 } from './core';
@@ -176,7 +174,7 @@ function applyArraySchema(
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const requiredOutputPaths: OutputPath[] = [];
-  const itemOutputPath = [...path, arraySchemaItemOutputPathPart];
+  const itemOutputPath = [...path, 'item'];
   const itemSummary = applySchema(
     codeGenerator,
     schema.items,
@@ -249,20 +247,25 @@ export function applyComponentRefSchema(
     createName: referencingPath => {
       return codeGenerator.createComponentNameForType(
         schema.$ref,
-        referencingPath
+        referencingPath,
+        ctx
       );
     },
     componentRef: schema.$ref,
     path,
     getRequiredOutputPaths: () => [
-      codeGenerator.createOutputPathByComponentRefForType(schema.$ref),
+      codeGenerator.createOutputPathByComponentRefForType(schema.$ref, ctx),
     ],
   };
   codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
   return {
     ...output,
     createCode: referencingPath =>
-      codeGenerator.createComponentNameForType(schema.$ref, referencingPath),
+      codeGenerator.createComponentNameForType(
+        schema.$ref,
+        referencingPath,
+        ctx
+      ),
   };
 }
 
@@ -297,7 +300,7 @@ export function applyObjectSchema(
     additionalPropertiesDirectOutput = applySchema(
       codeGenerator,
       schema.additionalProperties,
-      [...path, objectSchemaAdditionalPropsOutputPathPart],
+      [...path, 'additionalProps'],
       ctx,
       preventFromAddingComponentRefs
     );

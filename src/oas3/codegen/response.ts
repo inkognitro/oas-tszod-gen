@@ -195,13 +195,14 @@ function applyComponentRefResponse(
     createName: referencingPath => {
       return codeGenerator.createComponentNameForType(
         schema.$ref,
-        referencingPath
+        referencingPath,
+        ctx
       );
     },
     componentRef: schema.$ref,
     path,
     getRequiredOutputPaths: () => [
-      codeGenerator.createOutputPathByComponentRefForType(schema.$ref),
+      codeGenerator.createOutputPathByComponentRefForType(schema.$ref, ctx),
     ],
   };
   codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
@@ -210,7 +211,8 @@ function applyComponentRefResponse(
     createCode: referencingPath => {
       const code = codeGenerator.createComponentNameForType(
         schema.$ref,
-        referencingPath
+        referencingPath,
+        ctx
       );
       const statusCode = ctx.response?.genericStatusVariableValue;
       if (!statusCode) {

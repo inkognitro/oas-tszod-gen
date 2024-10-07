@@ -209,14 +209,16 @@ function applyComponentRefResponseSchema(
     createName: referencingPath => {
       return codeGenerator.createComponentNameForResponseSchemaConst(
         schema.$ref,
-        referencingPath
+        referencingPath,
+        ctx
       );
     },
     componentRef: schema.$ref,
     path,
     getRequiredOutputPaths: () => [
       codeGenerator.createOutputPathByComponentRefForResponseSchemaConst(
-        schema.$ref
+        schema.$ref,
+        ctx
       ),
     ],
   };
@@ -226,7 +228,8 @@ function applyComponentRefResponseSchema(
     createCode: referencingPath =>
       codeGenerator.createComponentNameForResponseSchemaConst(
         schema.$ref,
-        referencingPath
+        referencingPath,
+        ctx
       ),
   };
 }

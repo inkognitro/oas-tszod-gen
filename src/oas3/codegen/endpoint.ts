@@ -2,8 +2,12 @@ import {
   CodeGenerator,
   Context,
   DefinitionOutput,
+  endpointSchemaOutputPathPart,
   OutputPath,
   OutputType,
+  requestOutputPathPart,
+  requestResultOutputPathPart,
+  responseOutputPathPart,
 } from './core';
 import {Endpoint} from '@/oas3/specification';
 import {
@@ -19,9 +23,6 @@ import {
   applyRequestTypeDefinition,
   ApplyRequestTypeDefinitionResult,
 } from './request';
-
-export const responseOutputPathPart = 'response6b3a7814';
-export const requestResultOutputPathPart = 'requestResult6b3a7814';
 
 function applyRequestResult(
   codeGenerator: CodeGenerator,
@@ -105,13 +106,13 @@ export function applyEndpointCallerFunction(
     urlPath,
     requestMethod,
     schema,
-    [...path, 'endpointSchema'],
+    [...path, endpointSchemaOutputPathPart],
     localCtx
   );
   const applyRequestTypeDefinitionResult = applyRequestTypeDefinition(
     codeGenerator,
     schema,
-    [...path, 'request'],
+    [...path, requestOutputPathPart],
     localCtx
   );
   const requestTypeDefinition = applyRequestTypeDefinitionResult.typeDefinition;

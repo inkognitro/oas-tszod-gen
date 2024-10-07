@@ -51,15 +51,21 @@ import { generateOas3ToTs } from 'oas-tszod-gen';
 const oas3Specification = require('./api.specs.json');
 
 generateOas3ToTs({
-  // required
+  // required:
   getSpecification: () => {
     return new Promise(resolve => {
       resolve(oas3Specification);
     });
   },
   
-  // required
+  // required:
   outputFolderPath: './generated-api',
+
+  // optional:
+  // The list of separators which should be considered for the outputPath creation from a string
+  // The outputPath itself is an array of strings (see explanation in one of the sections below)
+  // By default the following configuration is taken: ['.', '/', '\\']
+  outputPathSeparators: ['.', '/', '\\', '_'],
   
   // optional:
   // The folder structure is generated from resulting outputPaths of the given operationIds.
@@ -74,7 +80,7 @@ generateOas3ToTs({
     // Variables and type definitions are put in the `{outputFolderPath}/util/foo` folder
   ],
   
-  // required
+  // required:
   logger: {
     log: (content) => {
       console.log(content);
@@ -143,7 +149,8 @@ Let's consider some example endpoints which might be defined in your OAS3 specif
 2. The generated code for the endpoint with the operationId `userManagement.getUsers` will be put into `./user-management/getUsers.ts`
 3. The generated code for the endpoint with the operationId `userManagement.admin.getUsers` will be put into `./user-management/admin/getUsers.ts`
 
-The same principles that apply to dots `.` do also apply to slashes `/` and backslashes `\`.
+The same principles that apply to dots `.` do also apply to slashes `/` and backslashes `\` by default.
+This can be configured by the `outputPathSeparators` configuration (see above).
 
 After generating endpoint caller functions from an OAS3 specification into your codebase,
 it's time to understand how the generated code can be used. The following sections should bring some clarity.

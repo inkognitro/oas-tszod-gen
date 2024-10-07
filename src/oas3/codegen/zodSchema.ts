@@ -1,12 +1,10 @@
 import {
-  arraySchemaItemOutputPathPart,
   CodeGenerationOutput,
   CodeGenerator,
   ComponentRefOutput,
   containsOutputPath,
   Context,
   CreateCodeFunc,
-  objectSchemaAdditionalPropsOutputPathPart,
   OutputPath,
   OutputType,
 } from './core';
@@ -225,7 +223,7 @@ function applyZodArraySchema(
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
-  const itemOutputPath = [...path, arraySchemaItemOutputPathPart];
+  const itemOutputPath = [...path, 'item'];
   const itemSummary = applyZodSchema(
     codeGenerator,
     schema.items,
@@ -329,14 +327,16 @@ export function applyZodComponentRefSchema(
     createName: referencingPath => {
       return codeGenerator.createComponentNameForZodSchemaConst(
         schema.$ref,
-        referencingPath
+        referencingPath,
+        ctx
       );
     },
     componentRef: schema.$ref,
     path,
     getRequiredOutputPaths: () => [
       codeGenerator.createOutputPathByComponentRefForZodSchemaConst(
-        schema.$ref
+        schema.$ref,
+        ctx
       ),
     ],
   };
@@ -344,7 +344,10 @@ export function applyZodComponentRefSchema(
   const isRecursive = preventFromAddingComponentRefs.includes(schema.$ref);
   if (isRecursive) {
     codeGenerator.addOutputPathWithZodSchemaRecursion(
-      codeGenerator.createOutputPathByComponentRefForZodSchemaConst(schema.$ref)
+      codeGenerator.createOutputPathByComponentRefForZodSchemaConst(
+        schema.$ref,
+        ctx
+      )
     );
   }
   return {
@@ -352,7 +355,8 @@ export function applyZodComponentRefSchema(
     createCode: referencingPath => {
       const constName = codeGenerator.createComponentNameForZodSchemaConst(
         schema.$ref,
-        referencingPath
+        referencingPath,
+        ctx
       );
       if (isRecursive) {
         return `z.lazy(() => ${constName})`;
@@ -400,7 +404,7 @@ export function applyZodObjectSchema(
     additionalPropertiesDirectOutput = applyZodSchema(
       codeGenerator,
       schema.additionalProperties,
-      [...path, objectSchemaAdditionalPropsOutputPathPart],
+      [...path, 'additionalProps'],
       ctx,
       preventFromAddingComponentRefs
     );
