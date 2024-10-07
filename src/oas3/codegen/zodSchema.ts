@@ -4,6 +4,7 @@ import {
   CodeGenerator,
   ComponentRefOutput,
   containsOutputPath,
+  Context,
   CreateCodeFunc,
   objectSchemaAdditionalPropsOutputPathPart,
   OutputPath,
@@ -36,7 +37,6 @@ import {
   StringSchema,
 } from '@/oas3/specification';
 import {templateZOfZodLibrary} from './template';
-import {Context} from './generator';
 
 export function applyZodSchema(
   codeGenerator: CodeGenerator,

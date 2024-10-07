@@ -1,4 +1,10 @@
-import {CodeGenerator, DefinitionOutput, OutputPath, OutputType} from './core';
+import {
+  CodeGenerator,
+  Context,
+  DefinitionOutput,
+  OutputPath,
+  OutputType,
+} from './core';
 import {Endpoint} from '@/oas3/specification';
 import {
   templateCreateRequestFunction,
@@ -7,7 +13,6 @@ import {
   templateRequestResultType,
   templateRequestPayloadType,
 } from './template';
-import {Context} from './generator';
 import {applyEndpointResponse} from './endpointResponse';
 import {applyEndpointSchemaConstDefinition} from './endpointSchema';
 import {

@@ -1,12 +1,12 @@
 import {
   AnyDefinitionOutput,
   CodeGenerator,
+  Context,
   DefinitionOutput,
   OutputPath,
   OutputType,
 } from './core';
 import {isObjectSchema, isStringSchema, Schema} from '@/oas3/specification';
-import {Context} from './generator';
 
 export function applyNullableFormDataTypeDefinition(
   codeGenerator: CodeGenerator,

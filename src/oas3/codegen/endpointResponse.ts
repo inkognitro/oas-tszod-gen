@@ -2,12 +2,12 @@ import {
   CodeGenerationOutput,
   CodeGenerator,
   containsOutputPath,
+  Context,
   DefinitionOutput,
   OutputPath,
   OutputType,
 } from './core';
 import {ResponseByStatusCodeMap} from '@/oas3/specification';
-import {Context} from './generator';
 import {applyResponse} from './response';
 import {templateResponseType} from './template';
 

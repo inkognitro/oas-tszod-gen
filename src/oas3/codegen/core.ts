@@ -1,5 +1,48 @@
-import {Specification} from '@/oas3/specification';
-import {Context} from './generator';
+import {
+  Endpoint as Oas3Endpoint,
+  RequestBodyContentByContentTypeMap,
+  ResponseBodyContentByContentTypeMap,
+  Specification,
+} from '@/oas3/specification';
+
+export type Context = {
+  operationType: null | 'read' | 'write';
+  response: null | {
+    genericStatusVariableValue: null | string;
+  };
+  config: GenerateConfig;
+};
+
+export type GenerateConfigTemplateName =
+  | 'AuthRequestHandler'
+  | 'AxiosRequestHandler'
+  | 'FetchApiRequestHandler'
+  | 'ScopedRequestHandler'
+  | 'ZodValidationRequestHandler'
+  | 'ResponseExtractors';
+
+export type GenerateConfig = {
+  outputFolderPath: string;
+  importRootAlias?: string;
+  predefinedFolderOutputPaths?: OutputPath[];
+  withZod?: boolean;
+  templates?: GenerateConfigTemplateName[];
+  createModifiedOperationOutputPath?: (outputPath: OutputPath) => OutputPath;
+  shouldAddOperation?: (
+    path: string,
+    method: string,
+    schema: Oas3Endpoint
+  ) => boolean;
+  shouldAddRequestBodyContent?: (
+    contentType: string,
+    bodyByContentTypeMap: RequestBodyContentByContentTypeMap
+  ) => boolean;
+  shouldAddResponseBodyContent?: (
+    contentType: string,
+    bodyByContentTypeMap: ResponseBodyContentByContentTypeMap
+  ) => boolean;
+  findCustomStringPatternByFormat?: (format: string) => null | string;
+};
 
 export interface CodeGenerator {
   getSpecification(): Specification;

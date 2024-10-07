@@ -4,6 +4,7 @@ import {
   CodeGenerator,
   ComponentRefOutput,
   containsOutputPath,
+  Context,
   CreateCodeFunc,
   objectSchemaAdditionalPropsOutputPathPart,
   OutputPath,
@@ -35,7 +36,6 @@ import {
   SchemaComponentRef,
   StringSchema,
 } from '@/oas3/specification';
-import {Context} from './generator';
 
 export function applySchema(
   codeGenerator: CodeGenerator,

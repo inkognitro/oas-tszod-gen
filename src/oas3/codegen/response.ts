@@ -12,10 +12,10 @@ import {
   CodeGenerator,
   ComponentRefOutput,
   containsOutputPath,
+  Context,
   OutputPath,
   OutputType,
 } from './core';
-import {Context} from './generator';
 import {applyObjectSchema, applySchema} from './schema';
 import {
   templateResponseBodyDataType,

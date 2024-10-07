@@ -9,11 +9,11 @@ import {
   CodeGenerationOutput,
   CodeGenerator,
   containsOutputPath,
+  Context,
   DefinitionOutput,
   OutputPath,
   OutputType,
 } from './core';
-import {Context} from './generator';
 import {applyObjectSchema, applySchema} from './schema';
 import {applyNullableFormDataTypeDefinition} from './formData';
 import {findObjectSchemaFromLocationParameters} from '@/oas3/codegen/endpointUtils';

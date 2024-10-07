@@ -1,11 +1,14 @@
 import {
+  AnyDefinitionOutput,
   areOutputPathsEqual,
   arraySchemaItemOutputPathPart,
   capitalizeFirstLetter,
   CodeGenerator,
-  AnyDefinitionOutput,
-  doesOutputPathStartWithOtherOutputPath,
+  Context,
   DefinitionOutput,
+  doesOutputPathStartWithOtherOutputPath,
+  GenerateConfig,
+  GenerateConfigTemplateName,
   lowerCaseFirstLetter,
   objectSchemaAdditionalPropsOutputPathPart,
   Output,
@@ -14,18 +17,15 @@ import {
   TemplateDefinitionOutput,
 } from './core';
 import {
+  findComponentParameterByRef,
+  findComponentResponseByRef,
+  findComponentSchemaByRef,
   parameterComponentRefPrefix,
   RequestByMethodMap,
   responseComponentRefPrefix,
   schemaComponentRefPrefix,
   Specification,
-  findComponentParameterByRef,
-  findComponentResponseByRef,
-  findComponentSchemaByRef,
-  Endpoint as Oas3Endpoint,
   zSpecification,
-  RequestBodyContentByContentTypeMap,
-  ResponseBodyContentByContentTypeMap,
 } from '@/oas3/specification';
 import {
   applyEndpointCallerFunction,
@@ -116,18 +116,10 @@ export interface Logger {
   log(...data: unknown[]): void;
 }
 
-type TemplateName =
-  | 'AuthRequestHandler'
-  | 'AxiosRequestHandler'
-  | 'FetchApiRequestHandler'
-  | 'ScopedRequestHandler'
-  | 'ZodValidationRequestHandler'
-  | 'ResponseExtractors';
-
 type TemplateFileInfo = {
   fileName: string;
   folderPath: string;
-  templateName: TemplateName;
+  templateName: GenerateConfigTemplateName;
 };
 
 const templateCoreFileInfos: TemplateFileInfo[] = [
@@ -162,37 +154,6 @@ const templateCoreFileInfos: TemplateFileInfo[] = [
     templateName: 'ResponseExtractors',
   },
 ];
-
-export type Context = {
-  operationType: null | 'read' | 'write';
-  response: null | {
-    genericStatusVariableValue: null | string;
-  };
-  config: GenerateConfig;
-};
-
-export type GenerateConfig = {
-  outputFolderPath: string;
-  importRootAlias?: string;
-  predefinedFolderOutputPaths?: OutputPath[];
-  withZod?: boolean;
-  templates?: TemplateName[];
-  createModifiedOperationOutputPath?: (outputPath: OutputPath) => OutputPath;
-  shouldAddOperation?: (
-    path: string,
-    method: string,
-    schema: Oas3Endpoint
-  ) => boolean;
-  shouldAddRequestBodyContent?: (
-    contentType: string,
-    bodyByContentTypeMap: RequestBodyContentByContentTypeMap
-  ) => boolean;
-  shouldAddResponseBodyContent?: (
-    contentType: string,
-    bodyByContentTypeMap: ResponseBodyContentByContentTypeMap
-  ) => boolean;
-  findCustomStringPatternByFormat?: (format: string) => null | string;
-};
 
 export class DefaultCodeGenerator implements CodeGenerator {
   private readonly oas3Specs: Specification;

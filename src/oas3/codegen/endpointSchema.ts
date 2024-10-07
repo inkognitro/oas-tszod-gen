@@ -2,11 +2,11 @@ import {
   CodeGenerationOutput,
   CodeGenerator,
   containsOutputPath,
+  Context,
   DefinitionOutput,
   OutputPath,
   OutputType,
 } from './core';
-import {Context} from './generator';
 import {
   ConcreteParameterLocation,
   concreteParameterLocations,

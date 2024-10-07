@@ -1,4 +1,5 @@
-import {DefaultCodeGenerator, GenerateConfig, Logger} from './generator';
+import {DefaultCodeGenerator, Logger} from './generator';
+import {GenerateConfig} from '@/oas3/codegen/core';
 
 export type Oas3ToTsConfig = GenerateConfig & {
   getSpecification: () => Promise<object>;
