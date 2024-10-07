@@ -84,7 +84,8 @@ export function deleteSapiV1MarginIsolatedAccount(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     DeleteSapiV1MarginIsolatedAccountRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1MarginIsolatedAccountRequestResult> {

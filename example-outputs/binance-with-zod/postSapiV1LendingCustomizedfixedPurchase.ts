@@ -85,7 +85,8 @@ export function postSapiV1LendingCustomizedfixedPurchase(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1LendingCustomizedfixedPurchaseRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingCustomizedfixedPurchaseRequestResult> {

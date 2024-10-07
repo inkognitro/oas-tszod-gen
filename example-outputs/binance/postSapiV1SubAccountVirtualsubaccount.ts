@@ -67,7 +67,8 @@ export function postSapiV1SubAccountVirtualsubaccount(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1SubAccountVirtualsubaccountRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountVirtualsubaccountRequestResult> {

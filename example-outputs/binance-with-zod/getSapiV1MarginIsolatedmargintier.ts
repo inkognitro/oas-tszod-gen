@@ -98,7 +98,8 @@ export function getSapiV1MarginIsolatedmargintier(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1MarginIsolatedmargintierRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginIsolatedmargintierRequestResult> {

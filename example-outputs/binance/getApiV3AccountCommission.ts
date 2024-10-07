@@ -82,7 +82,11 @@ export type GetApiV3AccountCommissionRequestResult = RequestResult<
 
 export function getApiV3AccountCommission(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3AccountCommissionRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetApiV3AccountCommissionRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3AccountCommissionRequestResult> {
   return requestHandler.execute(

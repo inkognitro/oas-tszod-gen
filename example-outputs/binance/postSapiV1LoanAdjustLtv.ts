@@ -71,7 +71,7 @@ export type PostSapiV1LoanAdjustLtvRequestResult = RequestResult<
 
 export function postSapiV1LoanAdjustLtv(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1LoanAdjustLtvRequest, 'queryParams'>,
+  payload: RequestPayload<PostSapiV1LoanAdjustLtvRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LoanAdjustLtvRequestResult> {
   return requestHandler.execute(

@@ -96,7 +96,11 @@ export type PostSapiV1AlgoSpotNewordertwapRequestResult = RequestResult<
 
 export function postSapiV1AlgoSpotNewordertwap(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1AlgoSpotNewordertwapRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1AlgoSpotNewordertwapRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AlgoSpotNewordertwapRequestResult> {
   return requestHandler.execute(

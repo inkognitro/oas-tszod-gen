@@ -83,7 +83,8 @@ export function getSapiV1SimpleEarnFlexibleHistoryCollateralrecord(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexibleHistoryCollateralrecordRequestResult> {

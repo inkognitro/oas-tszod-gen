@@ -79,7 +79,8 @@ export function getSapiV1SimpleEarnLockedHistoryRewardsrecord(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SimpleEarnLockedHistoryRewardsrecordRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedHistoryRewardsrecordRequestResult> {

@@ -68,7 +68,8 @@ export function postSapiV1SimpleEarnLockedRedeem(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1SimpleEarnLockedRedeemRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnLockedRedeemRequestResult> {

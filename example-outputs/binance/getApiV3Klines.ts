@@ -78,7 +78,7 @@ export type GetApiV3KlinesRequestResult = RequestResult<
 
 export function getApiV3Klines(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3KlinesRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3KlinesRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3KlinesRequestResult> {
   return requestHandler.execute(

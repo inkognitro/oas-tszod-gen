@@ -106,7 +106,8 @@ export function getSapiV1ConvertLimitQueryopenorders(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1ConvertLimitQueryopenordersRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ConvertLimitQueryopenordersRequestResult> {

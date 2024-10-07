@@ -82,7 +82,11 @@ export type GetSapiV1LoanBorrowHistoryRequestResult = RequestResult<
 
 export function getSapiV1LoanBorrowHistory(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1LoanBorrowHistoryRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1LoanBorrowHistoryRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanBorrowHistoryRequestResult> {
   return requestHandler.execute(

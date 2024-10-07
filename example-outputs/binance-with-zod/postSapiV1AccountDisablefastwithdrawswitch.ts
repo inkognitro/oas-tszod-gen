@@ -71,7 +71,8 @@ export function postSapiV1AccountDisablefastwithdrawswitch(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1AccountDisablefastwithdrawswitchRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AccountDisablefastwithdrawswitchRequestResult> {

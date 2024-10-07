@@ -107,7 +107,8 @@ export function getSapiV1MarginExchangeSmallLiabilityHistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1MarginExchangeSmallLiabilityHistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginExchangeSmallLiabilityHistoryRequestResult> {

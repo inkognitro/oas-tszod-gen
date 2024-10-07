@@ -78,7 +78,11 @@ export type GetSapiV1MarginOpenorderlistRequestResult = RequestResult<
 
 export function getSapiV1MarginOpenorderlist(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginOpenorderlistRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginOpenorderlistRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginOpenorderlistRequestResult> {
   return requestHandler.execute(

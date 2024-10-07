@@ -66,7 +66,11 @@ export type GetSapiV1AssetWalletBalanceRequestResult = RequestResult<
 
 export function getSapiV1AssetWalletBalance(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1AssetWalletBalanceRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1AssetWalletBalanceRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetWalletBalanceRequestResult> {
   return requestHandler.execute(

@@ -92,7 +92,8 @@ export function postSapiV1SimpleEarnLockedSubscribe(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1SimpleEarnLockedSubscribeRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnLockedSubscribeRequestResult> {

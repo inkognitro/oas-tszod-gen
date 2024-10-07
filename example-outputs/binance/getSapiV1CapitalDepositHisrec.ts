@@ -80,7 +80,11 @@ export type GetSapiV1CapitalDepositHisrecRequestResult = RequestResult<
 
 export function getSapiV1CapitalDepositHisrec(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1CapitalDepositHisrecRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1CapitalDepositHisrecRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalDepositHisrecRequestResult> {
   return requestHandler.execute(

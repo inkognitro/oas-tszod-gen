@@ -69,7 +69,8 @@ export function getSapiV1MarginNextHourlyInterestRate(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1MarginNextHourlyInterestRateRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginNextHourlyInterestRateRequestResult> {

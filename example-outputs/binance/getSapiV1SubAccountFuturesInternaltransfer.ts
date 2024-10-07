@@ -82,7 +82,8 @@ export function getSapiV1SubAccountFuturesInternaltransfer(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SubAccountFuturesInternaltransferRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountFuturesInternaltransferRequestResult> {

@@ -94,7 +94,8 @@ export function getSapiV1MarginIsolatedAllpairs(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1MarginIsolatedAllpairsRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginIsolatedAllpairsRequestResult> {

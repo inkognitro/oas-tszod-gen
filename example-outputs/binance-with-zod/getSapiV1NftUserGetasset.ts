@@ -94,7 +94,11 @@ export type GetSapiV1NftUserGetassetRequestResult = RequestResult<
 
 export function getSapiV1NftUserGetasset(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1NftUserGetassetRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1NftUserGetassetRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1NftUserGetassetRequestResult> {
   return requestHandler.execute(

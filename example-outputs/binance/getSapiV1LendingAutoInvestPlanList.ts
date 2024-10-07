@@ -94,7 +94,8 @@ export function getSapiV1LendingAutoInvestPlanList(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1LendingAutoInvestPlanListRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestPlanListRequestResult> {

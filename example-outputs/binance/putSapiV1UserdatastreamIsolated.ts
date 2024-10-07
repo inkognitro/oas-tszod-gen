@@ -50,6 +50,7 @@ export function putSapiV1UserdatastreamIsolated(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PutSapiV1UserdatastreamIsolatedRequest,
+    never,
     'queryParams'
   >,
   config?: RequestHandlerExecutionConfig

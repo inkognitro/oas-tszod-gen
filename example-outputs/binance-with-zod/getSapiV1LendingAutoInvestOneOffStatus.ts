@@ -86,7 +86,8 @@ export function getSapiV1LendingAutoInvestOneOffStatus(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1LendingAutoInvestOneOffStatusRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestOneOffStatusRequestResult> {

@@ -76,7 +76,8 @@ export function getSapiV1EthStakingEthHistoryRatehistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1EthStakingEthHistoryRatehistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1EthStakingEthHistoryRatehistoryRequestResult> {

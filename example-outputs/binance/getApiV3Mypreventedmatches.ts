@@ -77,7 +77,11 @@ export type GetApiV3MypreventedmatchesRequestResult = RequestResult<
 
 export function getApiV3Mypreventedmatches(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3MypreventedmatchesRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetApiV3MypreventedmatchesRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3MypreventedmatchesRequestResult> {
   return requestHandler.execute(

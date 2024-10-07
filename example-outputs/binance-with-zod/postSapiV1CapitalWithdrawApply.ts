@@ -96,7 +96,11 @@ export type PostSapiV1CapitalWithdrawApplyRequestResult = RequestResult<
 
 export function postSapiV1CapitalWithdrawApply(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1CapitalWithdrawApplyRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1CapitalWithdrawApplyRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1CapitalWithdrawApplyRequestResult> {
   return requestHandler.execute(

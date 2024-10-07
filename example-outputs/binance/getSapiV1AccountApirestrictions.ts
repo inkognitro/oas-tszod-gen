@@ -77,7 +77,8 @@ export function getSapiV1AccountApirestrictions(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1AccountApirestrictionsRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AccountApirestrictionsRequestResult> {

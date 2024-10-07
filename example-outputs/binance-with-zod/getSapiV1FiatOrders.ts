@@ -118,7 +118,7 @@ export type GetSapiV1FiatOrdersRequestResult = RequestResult<
 
 export function getSapiV1FiatOrders(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1FiatOrdersRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1FiatOrdersRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1FiatOrdersRequestResult> {
   return requestHandler.execute(

@@ -80,7 +80,7 @@ export type GetApiV3AllorderlistRequestResult = RequestResult<
 
 export function getApiV3Allorderlist(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3AllorderlistRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3AllorderlistRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3AllorderlistRequestResult> {
   return requestHandler.execute(

@@ -100,7 +100,7 @@ export type GetApiV3TickerRequestResult = RequestResult<
 
 export function getApiV3Ticker(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3TickerRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3TickerRequest, never, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3TickerRequestResult> {
   return requestHandler.execute(

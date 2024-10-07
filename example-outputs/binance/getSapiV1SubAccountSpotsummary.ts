@@ -72,7 +72,11 @@ export type GetSapiV1SubAccountSpotsummaryRequestResult = RequestResult<
 
 export function getSapiV1SubAccountSpotsummary(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1SubAccountSpotsummaryRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1SubAccountSpotsummaryRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountSpotsummaryRequestResult> {
   return requestHandler.execute(

@@ -81,7 +81,8 @@ export function getSapiV1LendingAutoInvestRedeemHistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1LendingAutoInvestRedeemHistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestRedeemHistoryRequestResult> {

@@ -96,7 +96,11 @@ export type GetSapiV2EthStakingAccountRequestResult = RequestResult<
 
 export function getSapiV2EthStakingAccount(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV2EthStakingAccountRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV2EthStakingAccountRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2EthStakingAccountRequestResult> {
   return requestHandler.execute(

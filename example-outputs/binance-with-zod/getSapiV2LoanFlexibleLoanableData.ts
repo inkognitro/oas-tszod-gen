@@ -96,7 +96,8 @@ export function getSapiV2LoanFlexibleLoanableData(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV2LoanFlexibleLoanableDataRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2LoanFlexibleLoanableDataRequestResult> {

@@ -87,7 +87,8 @@ export function postSapiV1DciProductAuto_compoundEditStatus(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1DciProductAuto_compoundEditStatusRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1DciProductAuto_compoundEditStatusRequestResult> {

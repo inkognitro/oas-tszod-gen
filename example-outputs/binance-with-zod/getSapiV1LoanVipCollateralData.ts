@@ -104,7 +104,11 @@ export type GetSapiV1LoanVipCollateralDataRequestResult = RequestResult<
 
 export function getSapiV1LoanVipCollateralData(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1LoanVipCollateralDataRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1LoanVipCollateralDataRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanVipCollateralDataRequestResult> {
   return requestHandler.execute(

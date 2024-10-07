@@ -70,7 +70,8 @@ export function getSapiV1MarginExchangeSmallLiability(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1MarginExchangeSmallLiabilityRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginExchangeSmallLiabilityRequestResult> {

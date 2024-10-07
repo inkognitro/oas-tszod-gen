@@ -120,7 +120,8 @@ export function getSapiV1SimpleEarnLockedHistoryRedemptionrecord(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SimpleEarnLockedHistoryRedemptionrecordRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedHistoryRedemptionrecordRequestResult> {

@@ -112,7 +112,7 @@ export type PostApiV3SorOrderRequestResult = RequestResult<
 
 export function postApiV3SorOrder(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostApiV3SorOrderRequest, 'queryParams'>,
+  payload: RequestPayload<PostApiV3SorOrderRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3SorOrderRequestResult> {
   return requestHandler.execute(

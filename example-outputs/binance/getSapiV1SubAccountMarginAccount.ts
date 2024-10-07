@@ -84,7 +84,8 @@ export function getSapiV1SubAccountMarginAccount(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SubAccountMarginAccountRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountMarginAccountRequestResult> {

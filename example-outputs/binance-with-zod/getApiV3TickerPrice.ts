@@ -68,7 +68,7 @@ export type GetApiV3TickerPriceRequestResult = RequestResult<
 
 export function getApiV3TickerPrice(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3TickerPriceRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3TickerPriceRequest, never, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3TickerPriceRequestResult> {
   return requestHandler.execute(

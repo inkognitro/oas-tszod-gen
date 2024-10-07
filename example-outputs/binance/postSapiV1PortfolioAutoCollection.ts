@@ -66,7 +66,8 @@ export function postSapiV1PortfolioAutoCollection(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1PortfolioAutoCollectionRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1PortfolioAutoCollectionRequestResult> {

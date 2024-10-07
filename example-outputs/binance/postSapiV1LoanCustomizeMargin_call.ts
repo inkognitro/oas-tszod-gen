@@ -76,7 +76,8 @@ export function postSapiV1LoanCustomizeMargin_call(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1LoanCustomizeMargin_callRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LoanCustomizeMargin_callRequestResult> {

@@ -106,7 +106,8 @@ export function getSapiV1SubAccountSubTransferHistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SubAccountSubTransferHistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountSubTransferHistoryRequestResult> {

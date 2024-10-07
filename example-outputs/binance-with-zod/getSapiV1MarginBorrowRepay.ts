@@ -108,7 +108,11 @@ export type GetSapiV1MarginBorrowRepayRequestResult = RequestResult<
 
 export function getSapiV1MarginBorrowRepay(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginBorrowRepayRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginBorrowRepayRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginBorrowRepayRequestResult> {
   return requestHandler.execute(

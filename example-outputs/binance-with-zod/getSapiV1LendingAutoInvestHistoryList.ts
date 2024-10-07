@@ -130,7 +130,8 @@ export function getSapiV1LendingAutoInvestHistoryList(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1LendingAutoInvestHistoryListRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestHistoryListRequestResult> {

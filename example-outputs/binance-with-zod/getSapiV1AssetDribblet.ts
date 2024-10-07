@@ -116,7 +116,7 @@ export type GetSapiV1AssetDribbletRequestResult = RequestResult<
 
 export function getSapiV1AssetDribblet(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1AssetDribbletRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1AssetDribbletRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetDribbletRequestResult> {
   return requestHandler.execute(

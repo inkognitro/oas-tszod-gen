@@ -86,7 +86,8 @@ export function getSapiV1SimpleEarnFlexibleList(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SimpleEarnFlexibleListRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexibleListRequestResult> {

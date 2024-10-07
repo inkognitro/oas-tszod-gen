@@ -62,7 +62,11 @@ export type OptionsBulkObjectRequestResult = RequestResult<
 
 export function optionsBulkObject(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<OptionsBulkObjectRequest, 'contentType' | 'body'>,
+  payload: RequestPayload<
+    OptionsBulkObjectRequest,
+    'contentType' | 'body',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<OptionsBulkObjectRequestResult> {
   return requestHandler.execute(

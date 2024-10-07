@@ -69,7 +69,11 @@ export type GetSapiV1SimpleEarnAccountRequestResult = RequestResult<
 
 export function getSapiV1SimpleEarnAccount(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1SimpleEarnAccountRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnAccountRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnAccountRequestResult> {
   return requestHandler.execute(

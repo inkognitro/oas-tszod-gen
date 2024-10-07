@@ -74,7 +74,7 @@ export type GetSapiV1SubAccountListRequestResult = RequestResult<
 
 export function getSapiV1SubAccountList(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1SubAccountListRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1SubAccountListRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountListRequestResult> {
   return requestHandler.execute(

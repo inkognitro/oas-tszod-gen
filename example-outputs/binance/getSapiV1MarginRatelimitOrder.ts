@@ -70,7 +70,11 @@ export type GetSapiV1MarginRatelimitOrderRequestResult = RequestResult<
 
 export function getSapiV1MarginRatelimitOrder(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginRatelimitOrderRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginRatelimitOrderRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginRatelimitOrderRequestResult> {
   return requestHandler.execute(

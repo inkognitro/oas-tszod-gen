@@ -65,7 +65,11 @@ export type PostSapiV1MarginMaxLeverageRequestResult = RequestResult<
 
 export function postSapiV1MarginMaxLeverage(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1MarginMaxLeverageRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1MarginMaxLeverageRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginMaxLeverageRequestResult> {
   return requestHandler.execute(

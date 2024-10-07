@@ -52,7 +52,7 @@ export type GetApiV3AggtradesRequestResult = RequestResult<
 
 export function getApiV3Aggtrades(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3AggtradesRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3AggtradesRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3AggtradesRequestResult> {
   return requestHandler.execute(

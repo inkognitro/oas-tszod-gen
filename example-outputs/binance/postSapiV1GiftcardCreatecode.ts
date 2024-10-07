@@ -73,7 +73,11 @@ export type PostSapiV1GiftcardCreatecodeRequestResult = RequestResult<
 
 export function postSapiV1GiftcardCreatecode(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1GiftcardCreatecodeRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1GiftcardCreatecodeRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1GiftcardCreatecodeRequestResult> {
   return requestHandler.execute(

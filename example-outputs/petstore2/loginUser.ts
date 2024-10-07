@@ -56,7 +56,7 @@ export type LoginUserRequestResult = RequestResult<
 
 export function loginUser(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<LoginUserRequest, 'queryParams'>,
+  payload: RequestPayload<LoginUserRequest, never, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<LoginUserRequestResult> {
   return requestHandler.execute(

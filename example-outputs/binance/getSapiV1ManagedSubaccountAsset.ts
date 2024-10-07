@@ -72,7 +72,8 @@ export function getSapiV1ManagedSubaccountAsset(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1ManagedSubaccountAssetRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountAssetRequestResult> {

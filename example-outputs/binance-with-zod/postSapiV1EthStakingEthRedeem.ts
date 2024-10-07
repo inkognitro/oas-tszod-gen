@@ -88,7 +88,11 @@ export type PostSapiV1EthStakingEthRedeemRequestResult = RequestResult<
 
 export function postSapiV1EthStakingEthRedeem(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1EthStakingEthRedeemRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1EthStakingEthRedeemRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1EthStakingEthRedeemRequestResult> {
   return requestHandler.execute(

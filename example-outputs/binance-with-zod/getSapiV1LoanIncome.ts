@@ -115,7 +115,7 @@ export type GetSapiV1LoanIncomeRequestResult = RequestResult<
 
 export function getSapiV1LoanIncome(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1LoanIncomeRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1LoanIncomeRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanIncomeRequestResult> {
   return requestHandler.execute(

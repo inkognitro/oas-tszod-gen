@@ -68,7 +68,11 @@ export type GetSapiV1ConvertExchangeinfoRequestResult = RequestResult<
 
 export function getSapiV1ConvertExchangeinfo(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1ConvertExchangeinfoRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1ConvertExchangeinfoRequest,
+    never,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ConvertExchangeinfoRequestResult> {
   return requestHandler.execute(

@@ -75,7 +75,8 @@ export function getSapiV1SimpleEarnFlexibleSubscriptionpreview(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SimpleEarnFlexibleSubscriptionpreviewRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexibleSubscriptionpreviewRequestResult> {

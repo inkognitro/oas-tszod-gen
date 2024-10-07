@@ -94,7 +94,7 @@ export type GetSapiV1GiftcardVerifyRequestResult = RequestResult<
 
 export function getSapiV1GiftcardVerify(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1GiftcardVerifyRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1GiftcardVerifyRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1GiftcardVerifyRequestResult> {
   return requestHandler.execute(

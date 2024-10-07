@@ -39,7 +39,7 @@ export type DeleteOrderRequestResult = RequestResult<
 
 export function deleteOrder(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<DeleteOrderRequest, 'pathParams'>,
+  payload: RequestPayload<DeleteOrderRequest, 'pathParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteOrderRequestResult> {
   return requestHandler.execute(

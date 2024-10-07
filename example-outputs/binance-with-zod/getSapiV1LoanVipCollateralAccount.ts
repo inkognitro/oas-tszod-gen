@@ -96,7 +96,8 @@ export function getSapiV1LoanVipCollateralAccount(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1LoanVipCollateralAccountRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanVipCollateralAccountRequestResult> {

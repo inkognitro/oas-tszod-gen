@@ -123,7 +123,8 @@ export function getSapiV1ManagedSubaccountQuerytranslogfortradeparent(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1ManagedSubaccountQuerytranslogfortradeparentRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountQuerytranslogfortradeparentRequestResult> {

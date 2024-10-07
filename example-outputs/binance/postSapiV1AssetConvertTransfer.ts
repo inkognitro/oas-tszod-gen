@@ -69,7 +69,11 @@ export type PostSapiV1AssetConvertTransferRequestResult = RequestResult<
 
 export function postSapiV1AssetConvertTransfer(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1AssetConvertTransferRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1AssetConvertTransferRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AssetConvertTransferRequestResult> {
   return requestHandler.execute(

@@ -98,7 +98,11 @@ export type PostSapiV1GiftcardRedeemcodeRequestResult = RequestResult<
 
 export function postSapiV1GiftcardRedeemcode(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1GiftcardRedeemcodeRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1GiftcardRedeemcodeRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1GiftcardRedeemcodeRequestResult> {
   return requestHandler.execute(

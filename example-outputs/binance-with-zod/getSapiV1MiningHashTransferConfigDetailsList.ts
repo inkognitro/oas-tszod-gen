@@ -117,7 +117,8 @@ export function getSapiV1MiningHashTransferConfigDetailsList(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1MiningHashTransferConfigDetailsListRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MiningHashTransferConfigDetailsListRequestResult> {

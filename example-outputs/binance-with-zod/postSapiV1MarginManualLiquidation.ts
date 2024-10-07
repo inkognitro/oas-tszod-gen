@@ -92,7 +92,8 @@ export function postSapiV1MarginManualLiquidation(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1MarginManualLiquidationRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginManualLiquidationRequestResult> {

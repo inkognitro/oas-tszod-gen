@@ -116,7 +116,8 @@ export function getSapiV1AccountApitradingstatus(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1AccountApitradingstatusRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AccountApitradingstatusRequestResult> {

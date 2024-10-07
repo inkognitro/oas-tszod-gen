@@ -110,7 +110,7 @@ export type GetSapiV1MarginTransferRequestResult = RequestResult<
 
 export function getSapiV1MarginTransfer(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginTransferRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1MarginTransferRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginTransferRequestResult> {
   return requestHandler.execute(

@@ -102,7 +102,8 @@ export function postSapiV1AlgoFuturesNewordervp(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1AlgoFuturesNewordervpRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AlgoFuturesNewordervpRequestResult> {

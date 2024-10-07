@@ -80,7 +80,8 @@ export function getSapiV1AssetCustodyTransferHistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1AssetCustodyTransferHistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetCustodyTransferHistoryRequestResult> {

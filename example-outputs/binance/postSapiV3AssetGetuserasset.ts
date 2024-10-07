@@ -72,7 +72,11 @@ export type PostSapiV3AssetGetuserassetRequestResult = RequestResult<
 
 export function postSapiV3AssetGetuserasset(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV3AssetGetuserassetRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV3AssetGetuserassetRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV3AssetGetuserassetRequestResult> {
   return requestHandler.execute(

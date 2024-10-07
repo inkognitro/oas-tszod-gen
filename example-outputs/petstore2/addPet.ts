@@ -54,7 +54,7 @@ export type AddPetRequestResult = RequestResult<AddPetRequest, AddPetResponse>;
 
 export function addPet(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<AddPetRequest, 'contentType' | 'body'>,
+  payload: RequestPayload<AddPetRequest, 'contentType' | 'body', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<AddPetRequestResult> {
   return requestHandler.execute(

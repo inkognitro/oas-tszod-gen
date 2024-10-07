@@ -94,7 +94,11 @@ export type PostSapiV1AssetGetFundingAssetRequestResult = RequestResult<
 
 export function postSapiV1AssetGetFundingAsset(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1AssetGetFundingAssetRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1AssetGetFundingAssetRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AssetGetFundingAssetRequestResult> {
   return requestHandler.execute(

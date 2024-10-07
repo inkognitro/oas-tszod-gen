@@ -96,7 +96,8 @@ export function postSapiV1MiningHashTransferConfig(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1MiningHashTransferConfigRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MiningHashTransferConfigRequestResult> {

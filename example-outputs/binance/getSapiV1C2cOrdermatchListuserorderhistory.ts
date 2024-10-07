@@ -91,7 +91,8 @@ export function getSapiV1C2cOrdermatchListuserorderhistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1C2cOrdermatchListuserorderhistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1C2cOrdermatchListuserorderhistoryRequestResult> {

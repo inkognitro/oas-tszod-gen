@@ -93,7 +93,8 @@ export function postSapiV1SubAccountFuturesInternaltransfer(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1SubAccountFuturesInternaltransferRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountFuturesInternaltransferRequestResult> {

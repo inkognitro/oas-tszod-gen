@@ -116,7 +116,8 @@ export function getSapiV1MarginForceliquidationrec(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1MarginForceliquidationrecRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginForceliquidationrecRequestResult> {

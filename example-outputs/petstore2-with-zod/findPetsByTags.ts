@@ -62,7 +62,7 @@ export type FindPetsByTagsRequestResult = RequestResult<
 
 export function findPetsByTags(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<FindPetsByTagsRequest, 'queryParams'>,
+  payload: RequestPayload<FindPetsByTagsRequest, never, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<FindPetsByTagsRequestResult> {
   return requestHandler.execute(

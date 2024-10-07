@@ -96,7 +96,8 @@ export function getSapiV1GiftcardBuycodeTokenLimit(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1GiftcardBuycodeTokenLimitRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1GiftcardBuycodeTokenLimitRequestResult> {

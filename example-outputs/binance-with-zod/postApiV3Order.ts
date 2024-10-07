@@ -138,7 +138,7 @@ export type PostApiV3OrderRequestResult = RequestResult<
 
 export function postApiV3Order(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostApiV3OrderRequest, 'queryParams'>,
+  payload: RequestPayload<PostApiV3OrderRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3OrderRequestResult> {
   return requestHandler.execute(

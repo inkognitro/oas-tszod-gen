@@ -102,7 +102,11 @@ export type GetSapiV1NftHistoryDepositRequestResult = RequestResult<
 
 export function getSapiV1NftHistoryDeposit(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1NftHistoryDepositRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1NftHistoryDepositRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1NftHistoryDepositRequestResult> {
   return requestHandler.execute(

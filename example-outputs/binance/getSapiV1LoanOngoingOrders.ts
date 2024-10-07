@@ -79,7 +79,11 @@ export type GetSapiV1LoanOngoingOrdersRequestResult = RequestResult<
 
 export function getSapiV1LoanOngoingOrders(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1LoanOngoingOrdersRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1LoanOngoingOrdersRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanOngoingOrdersRequestResult> {
   return requestHandler.execute(

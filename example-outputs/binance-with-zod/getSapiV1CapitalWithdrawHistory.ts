@@ -120,7 +120,8 @@ export function getSapiV1CapitalWithdrawHistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1CapitalWithdrawHistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalWithdrawHistoryRequestResult> {

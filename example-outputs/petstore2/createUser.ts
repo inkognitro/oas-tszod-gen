@@ -49,7 +49,7 @@ export type CreateUserRequestResult = RequestResult<
 
 export function createUser(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<CreateUserRequest, 'contentType' | 'body'>,
+  payload: RequestPayload<CreateUserRequest, 'contentType' | 'body', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<CreateUserRequestResult> {
   return requestHandler.execute(

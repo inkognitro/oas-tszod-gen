@@ -70,7 +70,8 @@ export function getSapiV1LoanVipRequestInterestrate(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1LoanVipRequestInterestrateRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanVipRequestInterestrateRequestResult> {

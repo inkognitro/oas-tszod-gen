@@ -83,7 +83,8 @@ export function getSapiV1SubAccountTransactionStatistics(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SubAccountTransactionStatisticsRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountTransactionStatisticsRequestResult> {

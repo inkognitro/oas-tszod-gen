@@ -106,7 +106,7 @@ export type GetApiV3OrderlistRequestResult = RequestResult<
 
 export function getApiV3Orderlist(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3OrderlistRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3OrderlistRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3OrderlistRequestResult> {
   return requestHandler.execute(

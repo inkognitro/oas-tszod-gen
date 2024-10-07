@@ -92,7 +92,11 @@ export type GetSapiV1AssetAssetdetailRequestResult = RequestResult<
 
 export function getSapiV1AssetAssetdetail(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1AssetAssetdetailRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1AssetAssetdetailRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetAssetdetailRequestResult> {
   return requestHandler.execute(

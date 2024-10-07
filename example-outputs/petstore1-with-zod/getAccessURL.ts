@@ -67,7 +67,7 @@ export type GetAccessURLRequestResult = RequestResult<
 
 export function getAccessURL(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetAccessURLRequest, 'pathParams'>,
+  payload: RequestPayload<GetAccessURLRequest, 'pathParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetAccessURLRequestResult> {
   return requestHandler.execute(

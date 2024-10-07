@@ -95,7 +95,11 @@ export type GetSapiV1AccountsnapshotRequestResult = RequestResult<
 
 export function getSapiV1Accountsnapshot(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1AccountsnapshotRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1AccountsnapshotRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AccountsnapshotRequestResult> {
   return requestHandler.execute(

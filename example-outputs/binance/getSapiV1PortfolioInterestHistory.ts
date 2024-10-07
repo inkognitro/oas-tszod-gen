@@ -74,7 +74,8 @@ export function getSapiV1PortfolioInterestHistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1PortfolioInterestHistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1PortfolioInterestHistoryRequestResult> {

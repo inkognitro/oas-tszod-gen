@@ -72,7 +72,7 @@ export type PostSapiV1LoanVipRepayRequestResult = RequestResult<
 
 export function postSapiV1LoanVipRepay(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1LoanVipRepayRequest, 'queryParams'>,
+  payload: RequestPayload<PostSapiV1LoanVipRepayRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LoanVipRepayRequestResult> {
   return requestHandler.execute(

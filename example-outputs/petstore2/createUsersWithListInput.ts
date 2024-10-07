@@ -53,7 +53,8 @@ export function createUsersWithListInput(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     CreateUsersWithListInputRequest,
-    'contentType' | 'body'
+    'contentType' | 'body',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<CreateUsersWithListInputRequestResult> {

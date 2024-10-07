@@ -90,7 +90,11 @@ export type GetSapiV4SubAccountAssetsRequestResult = RequestResult<
 
 export function getSapiV4SubAccountAssets(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV4SubAccountAssetsRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV4SubAccountAssetsRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV4SubAccountAssetsRequestResult> {
   return requestHandler.execute(

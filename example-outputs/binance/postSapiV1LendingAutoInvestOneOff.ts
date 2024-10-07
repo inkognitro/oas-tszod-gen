@@ -78,7 +78,8 @@ export function postSapiV1LendingAutoInvestOneOff(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1LendingAutoInvestOneOffRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingAutoInvestOneOffRequestResult> {

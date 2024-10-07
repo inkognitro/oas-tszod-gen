@@ -56,7 +56,7 @@ export type GetApiV3AccountRequestResult = RequestResult<
 
 export function getApiV3Account(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3AccountRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3AccountRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3AccountRequestResult> {
   return requestHandler.execute(

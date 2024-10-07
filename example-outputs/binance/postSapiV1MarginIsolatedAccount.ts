@@ -68,7 +68,8 @@ export function postSapiV1MarginIsolatedAccount(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1MarginIsolatedAccountRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginIsolatedAccountRequestResult> {

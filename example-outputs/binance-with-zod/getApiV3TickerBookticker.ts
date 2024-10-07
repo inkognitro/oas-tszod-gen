@@ -68,7 +68,11 @@ export type GetApiV3TickerBooktickerRequestResult = RequestResult<
 
 export function getApiV3TickerBookticker(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3TickerBooktickerRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetApiV3TickerBooktickerRequest,
+    never,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3TickerBooktickerRequestResult> {
   return requestHandler.execute(

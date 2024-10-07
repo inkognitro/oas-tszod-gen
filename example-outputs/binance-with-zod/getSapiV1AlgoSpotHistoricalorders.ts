@@ -124,7 +124,8 @@ export function getSapiV1AlgoSpotHistoricalorders(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1AlgoSpotHistoricalordersRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AlgoSpotHistoricalordersRequestResult> {

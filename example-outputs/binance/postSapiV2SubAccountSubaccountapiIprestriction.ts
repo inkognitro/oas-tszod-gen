@@ -75,7 +75,8 @@ export function postSapiV2SubAccountSubaccountapiIprestriction(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV2SubAccountSubaccountapiIprestrictionRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV2SubAccountSubaccountapiIprestrictionRequestResult> {

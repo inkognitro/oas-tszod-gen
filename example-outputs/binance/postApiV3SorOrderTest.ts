@@ -80,7 +80,7 @@ export type PostApiV3SorOrderTestRequestResult = RequestResult<
 
 export function postApiV3SorOrderTest(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostApiV3SorOrderTestRequest, 'queryParams'>,
+  payload: RequestPayload<PostApiV3SorOrderTestRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3SorOrderTestRequestResult> {
   return requestHandler.execute(

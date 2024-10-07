@@ -97,7 +97,8 @@ export function postSapiV1LendingAutoInvestPlanAdd(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1LendingAutoInvestPlanAddRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingAutoInvestPlanAddRequestResult> {

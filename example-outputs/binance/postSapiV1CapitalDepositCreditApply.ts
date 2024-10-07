@@ -73,7 +73,8 @@ export function postSapiV1CapitalDepositCreditApply(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1CapitalDepositCreditApplyRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1CapitalDepositCreditApplyRequestResult> {

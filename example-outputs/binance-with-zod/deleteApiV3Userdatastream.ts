@@ -56,7 +56,11 @@ export type DeleteApiV3UserdatastreamRequestResult = RequestResult<
 
 export function deleteApiV3Userdatastream(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<DeleteApiV3UserdatastreamRequest, 'queryParams'>,
+  payload: RequestPayload<
+    DeleteApiV3UserdatastreamRequest,
+    never,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteApiV3UserdatastreamRequestResult> {
   return requestHandler.execute(

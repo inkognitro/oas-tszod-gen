@@ -88,7 +88,8 @@ export function getSapiV1AlgoFuturesHistoricalorders(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1AlgoFuturesHistoricalordersRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AlgoFuturesHistoricalordersRequestResult> {

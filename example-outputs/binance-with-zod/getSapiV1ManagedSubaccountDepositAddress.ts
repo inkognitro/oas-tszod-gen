@@ -93,7 +93,8 @@ export function getSapiV1ManagedSubaccountDepositAddress(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1ManagedSubaccountDepositAddressRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountDepositAddressRequestResult> {

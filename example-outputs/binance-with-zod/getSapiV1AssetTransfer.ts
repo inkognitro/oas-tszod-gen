@@ -167,7 +167,7 @@ export type GetSapiV1AssetTransferRequestResult = RequestResult<
 
 export function getSapiV1AssetTransfer(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1AssetTransferRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1AssetTransferRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetTransferRequestResult> {
   return requestHandler.execute(

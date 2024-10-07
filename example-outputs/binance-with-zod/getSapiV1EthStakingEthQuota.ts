@@ -80,7 +80,11 @@ export type GetSapiV1EthStakingEthQuotaRequestResult = RequestResult<
 
 export function getSapiV1EthStakingEthQuota(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1EthStakingEthQuotaRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1EthStakingEthQuotaRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1EthStakingEthQuotaRequestResult> {
   return requestHandler.execute(

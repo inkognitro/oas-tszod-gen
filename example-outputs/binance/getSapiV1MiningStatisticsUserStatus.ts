@@ -88,7 +88,8 @@ export function getSapiV1MiningStatisticsUserStatus(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1MiningStatisticsUserStatusRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MiningStatisticsUserStatusRequestResult> {

@@ -55,7 +55,7 @@ export type GetOrderByIdRequestResult = RequestResult<
 
 export function getOrderById(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetOrderByIdRequest, 'pathParams'>,
+  payload: RequestPayload<GetOrderByIdRequest, 'pathParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetOrderByIdRequestResult> {
   return requestHandler.execute(

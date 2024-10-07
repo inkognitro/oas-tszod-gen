@@ -85,7 +85,8 @@ export function getSapiV1AssetConvertTransferQuerybypage(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1AssetConvertTransferQuerybypageRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetConvertTransferQuerybypageRequestResult> {

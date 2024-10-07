@@ -112,7 +112,11 @@ export type GetSapiV1ManagedSubaccountInfoRequestResult = RequestResult<
 
 export function getSapiV1ManagedSubaccountInfo(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1ManagedSubaccountInfoRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1ManagedSubaccountInfoRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountInfoRequestResult> {
   return requestHandler.execute(

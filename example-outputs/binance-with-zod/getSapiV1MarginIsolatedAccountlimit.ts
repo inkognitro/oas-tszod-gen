@@ -82,7 +82,8 @@ export function getSapiV1MarginIsolatedAccountlimit(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1MarginIsolatedAccountlimitRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginIsolatedAccountlimitRequestResult> {

@@ -77,7 +77,11 @@ export type GetSapiV1NftHistoryWithdrawRequestResult = RequestResult<
 
 export function getSapiV1NftHistoryWithdraw(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1NftHistoryWithdrawRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1NftHistoryWithdrawRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1NftHistoryWithdrawRequestResult> {
   return requestHandler.execute(

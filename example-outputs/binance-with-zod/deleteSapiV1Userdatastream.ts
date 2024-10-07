@@ -56,7 +56,11 @@ export type DeleteSapiV1UserdatastreamRequestResult = RequestResult<
 
 export function deleteSapiV1Userdatastream(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<DeleteSapiV1UserdatastreamRequest, 'queryParams'>,
+  payload: RequestPayload<
+    DeleteSapiV1UserdatastreamRequest,
+    never,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1UserdatastreamRequestResult> {
   return requestHandler.execute(

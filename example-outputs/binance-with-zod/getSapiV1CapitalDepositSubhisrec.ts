@@ -114,7 +114,8 @@ export function getSapiV1CapitalDepositSubhisrec(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1CapitalDepositSubhisrecRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalDepositSubhisrecRequestResult> {

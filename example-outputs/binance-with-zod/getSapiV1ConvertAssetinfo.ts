@@ -82,7 +82,11 @@ export type GetSapiV1ConvertAssetinfoRequestResult = RequestResult<
 
 export function getSapiV1ConvertAssetinfo(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1ConvertAssetinfoRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1ConvertAssetinfoRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ConvertAssetinfoRequestResult> {
   return requestHandler.execute(

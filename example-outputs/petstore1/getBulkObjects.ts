@@ -72,7 +72,8 @@ export function getBulkObjects(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetBulkObjectsRequest,
-    'queryParams' | 'contentType' | 'body'
+    'contentType' | 'body',
+    'queryParams'
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetBulkObjectsRequestResult> {

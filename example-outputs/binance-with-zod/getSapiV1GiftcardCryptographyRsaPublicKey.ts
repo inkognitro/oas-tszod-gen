@@ -87,7 +87,8 @@ export function getSapiV1GiftcardCryptographyRsaPublicKey(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1GiftcardCryptographyRsaPublicKeyRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1GiftcardCryptographyRsaPublicKeyRequestResult> {

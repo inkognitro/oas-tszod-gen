@@ -67,7 +67,11 @@ export type GetSapiV1MarginMaxborrowableRequestResult = RequestResult<
 
 export function getSapiV1MarginMaxborrowable(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginMaxborrowableRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginMaxborrowableRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginMaxborrowableRequestResult> {
   return requestHandler.execute(

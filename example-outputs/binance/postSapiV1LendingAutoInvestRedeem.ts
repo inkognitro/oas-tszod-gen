@@ -69,7 +69,8 @@ export function postSapiV1LendingAutoInvestRedeem(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1LendingAutoInvestRedeemRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingAutoInvestRedeemRequestResult> {

@@ -90,7 +90,8 @@ export function getSapiV1ManagedSubaccountQueryTransLog(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1ManagedSubaccountQueryTransLogRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountQueryTransLogRequestResult> {

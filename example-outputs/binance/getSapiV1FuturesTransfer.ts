@@ -77,7 +77,11 @@ export type GetSapiV1FuturesTransferRequestResult = RequestResult<
 
 export function getSapiV1FuturesTransfer(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1FuturesTransferRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1FuturesTransferRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1FuturesTransferRequestResult> {
   return requestHandler.execute(

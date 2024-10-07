@@ -50,6 +50,7 @@ export function deleteSapiV1UserdatastreamIsolated(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     DeleteSapiV1UserdatastreamIsolatedRequest,
+    never,
     'queryParams'
   >,
   config?: RequestHandlerExecutionConfig

@@ -65,7 +65,11 @@ export type GetSapiV1SpotDelistScheduleRequestResult = RequestResult<
 
 export function getSapiV1SpotDelistSchedule(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1SpotDelistScheduleRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1SpotDelistScheduleRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SpotDelistScheduleRequestResult> {
   return requestHandler.execute(

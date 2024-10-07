@@ -61,7 +61,11 @@ export type GetSapiV1MarginAllassetsRequestResult = RequestResult<
 
 export function getSapiV1MarginAllassets(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginAllassetsRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginAllassetsRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginAllassetsRequestResult> {
   return requestHandler.execute(

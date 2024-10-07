@@ -83,7 +83,7 @@ export type GetApiV3MyallocationsRequestResult = RequestResult<
 
 export function getApiV3Myallocations(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3MyallocationsRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3MyallocationsRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3MyallocationsRequestResult> {
   return requestHandler.execute(

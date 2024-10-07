@@ -70,7 +70,7 @@ export type GetApiV3Ticker24hrRequestResult = RequestResult<
 
 export function getApiV3Ticker24hr(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3Ticker24hrRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3Ticker24hrRequest, never, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3Ticker24hrRequestResult> {
   return requestHandler.execute(

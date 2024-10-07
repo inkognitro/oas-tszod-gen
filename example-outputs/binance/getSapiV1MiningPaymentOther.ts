@@ -83,7 +83,11 @@ export type GetSapiV1MiningPaymentOtherRequestResult = RequestResult<
 
 export function getSapiV1MiningPaymentOther(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MiningPaymentOtherRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MiningPaymentOtherRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MiningPaymentOtherRequestResult> {
   return requestHandler.execute(

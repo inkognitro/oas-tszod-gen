@@ -90,7 +90,8 @@ export function postSapiV1SimpleEarnFlexibleSubscribe(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1SimpleEarnFlexibleSubscribeRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnFlexibleSubscribeRequestResult> {

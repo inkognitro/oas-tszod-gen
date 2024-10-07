@@ -131,7 +131,11 @@ export type PostApiV3OrderCancelreplaceRequestResult = RequestResult<
 
 export function postApiV3OrderCancelreplace(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostApiV3OrderCancelreplaceRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostApiV3OrderCancelreplaceRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3OrderCancelreplaceRequestResult> {
   return requestHandler.execute(

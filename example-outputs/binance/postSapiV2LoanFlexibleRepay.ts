@@ -75,7 +75,11 @@ export type PostSapiV2LoanFlexibleRepayRequestResult = RequestResult<
 
 export function postSapiV2LoanFlexibleRepay(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV2LoanFlexibleRepayRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV2LoanFlexibleRepayRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV2LoanFlexibleRepayRequestResult> {
   return requestHandler.execute(

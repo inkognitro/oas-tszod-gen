@@ -82,7 +82,8 @@ export function getSapiV1NftHistoryTransactions(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1NftHistoryTransactionsRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1NftHistoryTransactionsRequestResult> {

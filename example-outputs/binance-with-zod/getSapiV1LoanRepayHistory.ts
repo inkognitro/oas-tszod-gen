@@ -116,7 +116,11 @@ export type GetSapiV1LoanRepayHistoryRequestResult = RequestResult<
 
 export function getSapiV1LoanRepayHistory(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1LoanRepayHistoryRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1LoanRepayHistoryRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanRepayHistoryRequestResult> {
   return requestHandler.execute(

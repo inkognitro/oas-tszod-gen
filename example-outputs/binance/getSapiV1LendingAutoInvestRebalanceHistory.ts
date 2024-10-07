@@ -82,7 +82,8 @@ export function getSapiV1LendingAutoInvestRebalanceHistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1LendingAutoInvestRebalanceHistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestRebalanceHistoryRequestResult> {

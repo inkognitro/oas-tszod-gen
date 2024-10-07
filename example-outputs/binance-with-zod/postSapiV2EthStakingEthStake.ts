@@ -84,7 +84,11 @@ export type PostSapiV2EthStakingEthStakeRequestResult = RequestResult<
 
 export function postSapiV2EthStakingEthStake(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV2EthStakingEthStakeRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV2EthStakingEthStakeRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV2EthStakingEthStakeRequestResult> {
   return requestHandler.execute(

@@ -70,7 +70,7 @@ export type GetApiV3AvgpriceRequestResult = RequestResult<
 
 export function getApiV3Avgprice(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3AvgpriceRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3AvgpriceRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3AvgpriceRequestResult> {
   return requestHandler.execute(

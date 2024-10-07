@@ -60,7 +60,11 @@ export type GetSapiV1MarginIsolatedAccountRequestResult = RequestResult<
 
 export function getSapiV1MarginIsolatedAccount(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginIsolatedAccountRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginIsolatedAccountRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginIsolatedAccountRequestResult> {
   return requestHandler.execute(

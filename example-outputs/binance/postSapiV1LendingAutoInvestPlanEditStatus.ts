@@ -71,7 +71,8 @@ export function postSapiV1LendingAutoInvestPlanEditStatus(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1LendingAutoInvestPlanEditStatusRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingAutoInvestPlanEditStatusRequestResult> {

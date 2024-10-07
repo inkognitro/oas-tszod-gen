@@ -80,7 +80,8 @@ export function getSapiV2LoanFlexibleBorrowHistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV2LoanFlexibleBorrowHistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2LoanFlexibleBorrowHistoryRequestResult> {

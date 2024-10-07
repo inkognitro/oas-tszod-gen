@@ -104,7 +104,8 @@ export function getSapiV2LoanFlexibleOngoingOrders(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV2LoanFlexibleOngoingOrdersRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2LoanFlexibleOngoingOrdersRequestResult> {

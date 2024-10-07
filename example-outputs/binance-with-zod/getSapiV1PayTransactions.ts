@@ -164,7 +164,11 @@ export type GetSapiV1PayTransactionsRequestResult = RequestResult<
 
 export function getSapiV1PayTransactions(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1PayTransactionsRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1PayTransactionsRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1PayTransactionsRequestResult> {
   return requestHandler.execute(

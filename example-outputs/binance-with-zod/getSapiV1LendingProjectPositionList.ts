@@ -120,7 +120,8 @@ export function getSapiV1LendingProjectPositionList(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1LendingProjectPositionListRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingProjectPositionListRequestResult> {

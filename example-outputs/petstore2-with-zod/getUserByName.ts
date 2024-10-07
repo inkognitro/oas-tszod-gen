@@ -63,7 +63,7 @@ export type GetUserByNameRequestResult = RequestResult<
 
 export function getUserByName(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetUserByNameRequest, 'pathParams'>,
+  payload: RequestPayload<GetUserByNameRequest, 'pathParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetUserByNameRequestResult> {
   return requestHandler.execute(

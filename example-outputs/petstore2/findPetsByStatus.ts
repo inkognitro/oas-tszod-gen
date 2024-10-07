@@ -54,7 +54,7 @@ export type FindPetsByStatusRequestResult = RequestResult<
 
 export function findPetsByStatus(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<FindPetsByStatusRequest, 'queryParams'>,
+  payload: RequestPayload<FindPetsByStatusRequest, never, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<FindPetsByStatusRequestResult> {
   return requestHandler.execute(

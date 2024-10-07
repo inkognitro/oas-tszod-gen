@@ -69,7 +69,8 @@ export function postSapiV1SubAccountTransferSubtomaster(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1SubAccountTransferSubtomasterRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountTransferSubtomasterRequestResult> {

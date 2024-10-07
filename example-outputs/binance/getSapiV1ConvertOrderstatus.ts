@@ -74,7 +74,11 @@ export type GetSapiV1ConvertOrderstatusRequestResult = RequestResult<
 
 export function getSapiV1ConvertOrderstatus(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1ConvertOrderstatusRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1ConvertOrderstatusRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ConvertOrderstatusRequestResult> {
   return requestHandler.execute(

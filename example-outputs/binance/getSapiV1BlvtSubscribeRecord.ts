@@ -75,7 +75,11 @@ export type GetSapiV1BlvtSubscribeRecordRequestResult = RequestResult<
 
 export function getSapiV1BlvtSubscribeRecord(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1BlvtSubscribeRecordRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1BlvtSubscribeRecordRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1BlvtSubscribeRecordRequestResult> {
   return requestHandler.execute(

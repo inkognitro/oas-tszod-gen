@@ -108,7 +108,11 @@ export type GetSapiV1MiningWorkerDetailRequestResult = RequestResult<
 
 export function getSapiV1MiningWorkerDetail(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MiningWorkerDetailRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MiningWorkerDetailRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MiningWorkerDetailRequestResult> {
   return requestHandler.execute(

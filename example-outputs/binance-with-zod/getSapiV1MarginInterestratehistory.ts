@@ -96,7 +96,8 @@ export function getSapiV1MarginInterestratehistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1MarginInterestratehistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginInterestratehistoryRequestResult> {

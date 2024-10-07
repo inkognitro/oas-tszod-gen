@@ -39,7 +39,7 @@ export type DeleteUserRequestResult = RequestResult<
 
 export function deleteUser(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<DeleteUserRequest, 'pathParams'>,
+  payload: RequestPayload<DeleteUserRequest, 'pathParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteUserRequestResult> {
   return requestHandler.execute(

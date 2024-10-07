@@ -123,7 +123,8 @@ export function getSapiV1ManagedSubaccountQuerytranslogforinvestor(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1ManagedSubaccountQuerytranslogforinvestorRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountQuerytranslogforinvestorRequestResult> {

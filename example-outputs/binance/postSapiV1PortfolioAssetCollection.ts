@@ -67,7 +67,8 @@ export function postSapiV1PortfolioAssetCollection(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1PortfolioAssetCollectionRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1PortfolioAssetCollectionRequestResult> {

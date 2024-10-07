@@ -113,7 +113,7 @@ export type PostApiV3OrderTestRequestResult = RequestResult<
 
 export function postApiV3OrderTest(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostApiV3OrderTestRequest, 'queryParams'>,
+  payload: RequestPayload<PostApiV3OrderTestRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3OrderTestRequestResult> {
   return requestHandler.execute(

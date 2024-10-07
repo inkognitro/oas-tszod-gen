@@ -86,7 +86,8 @@ export function getSapiV1ManagedSubaccountFetchFutureAsset(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1ManagedSubaccountFetchFutureAssetRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountFetchFutureAssetRequestResult> {

@@ -102,7 +102,7 @@ export type PostSapiV1AssetDustRequestResult = RequestResult<
 
 export function postSapiV1AssetDust(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1AssetDustRequest, 'queryParams'>,
+  payload: RequestPayload<PostSapiV1AssetDustRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AssetDustRequestResult> {
   return requestHandler.execute(

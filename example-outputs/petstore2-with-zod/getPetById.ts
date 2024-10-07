@@ -66,7 +66,7 @@ export type GetPetByIdRequestResult = RequestResult<
 
 export function getPetById(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetPetByIdRequest, 'pathParams'>,
+  payload: RequestPayload<GetPetByIdRequest, 'pathParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetPetByIdRequestResult> {
   return requestHandler.execute(

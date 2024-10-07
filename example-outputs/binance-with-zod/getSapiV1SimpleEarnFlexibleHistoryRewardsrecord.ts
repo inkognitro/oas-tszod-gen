@@ -102,7 +102,8 @@ export function getSapiV1SimpleEarnFlexibleHistoryRewardsrecord(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SimpleEarnFlexibleHistoryRewardsrecordRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexibleHistoryRewardsrecordRequestResult> {

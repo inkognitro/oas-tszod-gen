@@ -120,7 +120,8 @@ export function postSapiV1SubAccountUniversaltransfer(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1SubAccountUniversaltransferRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountUniversaltransferRequestResult> {

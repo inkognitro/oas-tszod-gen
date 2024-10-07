@@ -82,7 +82,8 @@ export function getSapiV1SubAccountUniversaltransfer(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SubAccountUniversaltransferRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountUniversaltransferRequestResult> {

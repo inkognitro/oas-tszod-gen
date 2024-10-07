@@ -97,7 +97,8 @@ export function deleteSapiV1SubAccountSubaccountapiIprestrictionIplist(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1SubAccountSubaccountapiIprestrictionIplistRequestResult> {

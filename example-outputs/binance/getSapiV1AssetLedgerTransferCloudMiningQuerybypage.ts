@@ -84,7 +84,8 @@ export function getSapiV1AssetLedgerTransferCloudMiningQuerybypage(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1AssetLedgerTransferCloudMiningQuerybypageRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetLedgerTransferCloudMiningQuerybypageRequestResult> {

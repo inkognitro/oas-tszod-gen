@@ -114,7 +114,11 @@ export type PostSapiV1MarginOrderOcoRequestResult = RequestResult<
 
 export function postSapiV1MarginOrderOco(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1MarginOrderOcoRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1MarginOrderOcoRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginOrderOcoRequestResult> {
   return requestHandler.execute(

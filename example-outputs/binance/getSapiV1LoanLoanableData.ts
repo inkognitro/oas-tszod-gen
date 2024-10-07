@@ -82,7 +82,11 @@ export type GetSapiV1LoanLoanableDataRequestResult = RequestResult<
 
 export function getSapiV1LoanLoanableData(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1LoanLoanableDataRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1LoanLoanableDataRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanLoanableDataRequestResult> {
   return requestHandler.execute(

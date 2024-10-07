@@ -82,7 +82,8 @@ export function getSapiV1EthStakingEthHistoryRedemptionhistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1EthStakingEthHistoryRedemptionhistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1EthStakingEthHistoryRedemptionhistoryRequestResult> {

@@ -56,7 +56,7 @@ export type GetSapiV1BnbburnRequestResult = RequestResult<
 
 export function getSapiV1Bnbburn(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1BnbburnRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1BnbburnRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1BnbburnRequestResult> {
   return requestHandler.execute(

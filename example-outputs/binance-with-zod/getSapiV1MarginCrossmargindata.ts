@@ -98,7 +98,11 @@ export type GetSapiV1MarginCrossmargindataRequestResult = RequestResult<
 
 export function getSapiV1MarginCrossmargindata(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginCrossmargindataRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginCrossmargindataRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginCrossmargindataRequestResult> {
   return requestHandler.execute(

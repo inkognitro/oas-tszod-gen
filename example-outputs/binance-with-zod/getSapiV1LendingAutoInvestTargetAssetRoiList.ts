@@ -89,7 +89,8 @@ export function getSapiV1LendingAutoInvestTargetAssetRoiList(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1LendingAutoInvestTargetAssetRoiListRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestTargetAssetRoiListRequestResult> {

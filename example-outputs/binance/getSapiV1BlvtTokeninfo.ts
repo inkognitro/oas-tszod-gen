@@ -74,7 +74,7 @@ export type GetSapiV1BlvtTokeninfoRequestResult = RequestResult<
 
 export function getSapiV1BlvtTokeninfo(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1BlvtTokeninfoRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1BlvtTokeninfoRequest, never, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1BlvtTokeninfoRequestResult> {
   return requestHandler.execute(

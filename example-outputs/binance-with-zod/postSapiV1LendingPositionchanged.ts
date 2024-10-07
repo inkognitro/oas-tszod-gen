@@ -90,7 +90,8 @@ export function postSapiV1LendingPositionchanged(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1LendingPositionchangedRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LendingPositionchangedRequestResult> {

@@ -65,7 +65,11 @@ export type GetSapiV1PortfolioPmloanRequestResult = RequestResult<
 
 export function getSapiV1PortfolioPmloan(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1PortfolioPmloanRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1PortfolioPmloanRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1PortfolioPmloanRequestResult> {
   return requestHandler.execute(

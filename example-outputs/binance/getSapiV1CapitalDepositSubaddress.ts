@@ -72,7 +72,8 @@ export function getSapiV1CapitalDepositSubaddress(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1CapitalDepositSubaddressRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalDepositSubaddressRequestResult> {

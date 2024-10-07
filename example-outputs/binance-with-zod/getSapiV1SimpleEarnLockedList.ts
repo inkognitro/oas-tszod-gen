@@ -124,7 +124,11 @@ export type GetSapiV1SimpleEarnLockedListRequestResult = RequestResult<
 
 export function getSapiV1SimpleEarnLockedList(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1SimpleEarnLockedListRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1SimpleEarnLockedListRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedListRequestResult> {
   return requestHandler.execute(

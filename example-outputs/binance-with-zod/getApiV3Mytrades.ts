@@ -85,7 +85,7 @@ export type GetApiV3MytradesRequestResult = RequestResult<
 
 export function getApiV3Mytrades(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3MytradesRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3MytradesRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3MytradesRequestResult> {
   return requestHandler.execute(

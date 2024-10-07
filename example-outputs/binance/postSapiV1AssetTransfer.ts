@@ -97,7 +97,7 @@ export type PostSapiV1AssetTransferRequestResult = RequestResult<
 
 export function postSapiV1AssetTransfer(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1AssetTransferRequest, 'queryParams'>,
+  payload: RequestPayload<PostSapiV1AssetTransferRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AssetTransferRequestResult> {
   return requestHandler.execute(

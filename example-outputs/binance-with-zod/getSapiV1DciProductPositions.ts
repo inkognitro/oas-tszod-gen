@@ -133,7 +133,11 @@ export type GetSapiV1DciProductPositionsRequestResult = RequestResult<
 
 export function getSapiV1DciProductPositions(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1DciProductPositionsRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1DciProductPositionsRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1DciProductPositionsRequestResult> {
   return requestHandler.execute(

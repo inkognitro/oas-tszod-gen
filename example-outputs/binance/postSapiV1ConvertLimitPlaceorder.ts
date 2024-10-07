@@ -75,7 +75,8 @@ export function postSapiV1ConvertLimitPlaceorder(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1ConvertLimitPlaceorderRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ConvertLimitPlaceorderRequestResult> {

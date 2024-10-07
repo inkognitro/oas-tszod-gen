@@ -93,7 +93,11 @@ export type GetSapiV1MarginCapitalFlowRequestResult = RequestResult<
 
 export function getSapiV1MarginCapitalFlow(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginCapitalFlowRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginCapitalFlowRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginCapitalFlowRequestResult> {
   return requestHandler.execute(

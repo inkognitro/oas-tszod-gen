@@ -67,7 +67,8 @@ export function getSapiV1LendingAutoInvestAllAsset(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1LendingAutoInvestAllAssetRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestAllAssetRequestResult> {

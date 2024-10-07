@@ -89,7 +89,8 @@ export function getSapiV1SimpleEarnFlexiblePosition(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SimpleEarnFlexiblePositionRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnFlexiblePositionRequestResult> {

@@ -80,7 +80,7 @@ export type GetSapiV1RebateTaxqueryRequestResult = RequestResult<
 
 export function getSapiV1RebateTaxquery(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1RebateTaxqueryRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1RebateTaxqueryRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1RebateTaxqueryRequestResult> {
   return requestHandler.execute(

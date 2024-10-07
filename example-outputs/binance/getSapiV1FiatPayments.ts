@@ -84,7 +84,7 @@ export type GetSapiV1FiatPaymentsRequestResult = RequestResult<
 
 export function getSapiV1FiatPayments(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1FiatPaymentsRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1FiatPaymentsRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1FiatPaymentsRequestResult> {
   return requestHandler.execute(

@@ -62,7 +62,7 @@ export type GetSapiV1MarginAllpairsRequestResult = RequestResult<
 
 export function getSapiV1MarginAllpairs(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginAllpairsRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1MarginAllpairsRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginAllpairsRequestResult> {
   return requestHandler.execute(

@@ -67,7 +67,7 @@ export type GetSapiV1BlvtUserlimitRequestResult = RequestResult<
 
 export function getSapiV1BlvtUserlimit(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1BlvtUserlimitRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1BlvtUserlimitRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1BlvtUserlimitRequestResult> {
   return requestHandler.execute(

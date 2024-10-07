@@ -56,7 +56,7 @@ export type PutApiV3UserdatastreamRequestResult = RequestResult<
 
 export function putApiV3Userdatastream(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PutApiV3UserdatastreamRequest, 'queryParams'>,
+  payload: RequestPayload<PutApiV3UserdatastreamRequest, never, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PutApiV3UserdatastreamRequestResult> {
   return requestHandler.execute(

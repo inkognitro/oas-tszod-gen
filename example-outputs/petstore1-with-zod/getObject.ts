@@ -71,7 +71,7 @@ export type GetObjectRequestResult = RequestResult<
 
 export function getObject(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetObjectRequest, 'pathParams' | 'queryParams'>,
+  payload: RequestPayload<GetObjectRequest, 'pathParams', 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetObjectRequestResult> {
   return requestHandler.execute(

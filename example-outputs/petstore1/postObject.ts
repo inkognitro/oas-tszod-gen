@@ -61,7 +61,7 @@ export type PostObjectRequestResult = RequestResult<
 
 export function postObject(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostObjectRequest, 'pathParams'>,
+  payload: RequestPayload<PostObjectRequest, 'pathParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostObjectRequestResult> {
   return requestHandler.execute(

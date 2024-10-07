@@ -123,7 +123,8 @@ export function getSapiV1SimpleEarnLockedHistorySubscriptionrecord(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SimpleEarnLockedHistorySubscriptionrecordRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedHistorySubscriptionrecordRequestResult> {

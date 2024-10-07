@@ -71,7 +71,11 @@ export type GetBulkAccessURLRequestResult = RequestResult<
 
 export function getBulkAccessURL(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetBulkAccessURLRequest, 'contentType' | 'body'>,
+  payload: RequestPayload<
+    GetBulkAccessURLRequest,
+    'contentType' | 'body',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetBulkAccessURLRequestResult> {
   return requestHandler.execute(

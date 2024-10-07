@@ -80,7 +80,11 @@ export type PostSapiV1DciProductSubscribeRequestResult = RequestResult<
 
 export function postSapiV1DciProductSubscribe(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1DciProductSubscribeRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1DciProductSubscribeRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1DciProductSubscribeRequestResult> {
   return requestHandler.execute(

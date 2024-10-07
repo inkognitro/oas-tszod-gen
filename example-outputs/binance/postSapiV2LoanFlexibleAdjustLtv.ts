@@ -74,7 +74,8 @@ export function postSapiV2LoanFlexibleAdjustLtv(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV2LoanFlexibleAdjustLtvRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV2LoanFlexibleAdjustLtvRequestResult> {

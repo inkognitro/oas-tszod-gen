@@ -166,26 +166,28 @@ export type RequestUnion<
     >
   : never;
 
+export type RequiredAndPartial<
+  T extends object = any,
+  RFields extends keyof T = any,
+  OFields extends keyof T = any,
+> = Required<Pick<T, RFields>> & Partial<Pick<T, OFields>>;
+
 export type RequestPayload<
   TRequest extends Request = any,
-  TFields extends
-    | 'cookies'
-    | 'headers'
-    | 'pathParams'
-    | 'queryParams'
-    | 'contentType'
-    | 'body' = any,
-> = Pick<
+  RFields extends 'pathParams' | 'queryParams' | 'contentType' | 'body' = any,
+  OFields extends 'cookies' | 'headers' | 'queryParams' = any,
+> = RequiredAndPartial<
   {
-    requestId?: string; // always optional
-    headers?: TRequest['headers']; // always optional
-    cookies?: TRequest['cookies']; // always optional
+    requestId: string;
+    headers: TRequest['headers'];
+    cookies: TRequest['cookies'];
     pathParams: TRequest['pathParams'];
     queryParams: TRequest['queryParams'];
     contentType: TRequest['contentType'];
     body: TRequest['body'];
   },
-  'requestId' | TFields
+  RFields,
+  'requestId' | OFields
 >;
 
 export type RequestFromPayload<TPayload extends RequestPayload> = Request<

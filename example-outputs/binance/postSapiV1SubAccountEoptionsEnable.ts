@@ -68,7 +68,8 @@ export function postSapiV1SubAccountEoptionsEnable(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1SubAccountEoptionsEnableRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountEoptionsEnableRequestResult> {

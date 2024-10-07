@@ -108,7 +108,7 @@ export type GetSapiV1MarginAccountRequestResult = RequestResult<
 
 export function getSapiV1MarginAccount(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginAccountRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1MarginAccountRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginAccountRequestResult> {
   return requestHandler.execute(

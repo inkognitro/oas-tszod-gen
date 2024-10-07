@@ -67,7 +67,11 @@ export type PostSapiV1EthStakingWbethWrapRequestResult = RequestResult<
 
 export function postSapiV1EthStakingWbethWrap(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1EthStakingWbethWrapRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1EthStakingWbethWrapRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1EthStakingWbethWrapRequestResult> {
   return requestHandler.execute(

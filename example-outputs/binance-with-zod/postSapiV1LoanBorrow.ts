@@ -98,7 +98,7 @@ export type PostSapiV1LoanBorrowRequestResult = RequestResult<
 
 export function postSapiV1LoanBorrow(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1LoanBorrowRequest, 'queryParams'>,
+  payload: RequestPayload<PostSapiV1LoanBorrowRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LoanBorrowRequestResult> {
   return requestHandler.execute(

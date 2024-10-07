@@ -72,7 +72,11 @@ export type PostSapiV2LoanFlexibleBorrowRequestResult = RequestResult<
 
 export function postSapiV2LoanFlexibleBorrow(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV2LoanFlexibleBorrowRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV2LoanFlexibleBorrowRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV2LoanFlexibleBorrowRequestResult> {
   return requestHandler.execute(

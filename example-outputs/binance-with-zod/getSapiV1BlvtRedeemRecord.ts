@@ -102,7 +102,11 @@ export type GetSapiV1BlvtRedeemRecordRequestResult = RequestResult<
 
 export function getSapiV1BlvtRedeemRecord(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1BlvtRedeemRecordRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1BlvtRedeemRecordRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1BlvtRedeemRecordRequestResult> {
   return requestHandler.execute(

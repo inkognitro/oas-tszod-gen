@@ -71,7 +71,8 @@ export function postSapiV1SimpleEarnFlexibleRedeem(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1SimpleEarnFlexibleRedeemRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnFlexibleRedeemRequestResult> {

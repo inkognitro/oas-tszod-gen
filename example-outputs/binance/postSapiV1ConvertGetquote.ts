@@ -75,7 +75,11 @@ export type PostSapiV1ConvertGetquoteRequestResult = RequestResult<
 
 export function postSapiV1ConvertGetquote(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1ConvertGetquoteRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1ConvertGetquoteRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ConvertGetquoteRequestResult> {
   return requestHandler.execute(

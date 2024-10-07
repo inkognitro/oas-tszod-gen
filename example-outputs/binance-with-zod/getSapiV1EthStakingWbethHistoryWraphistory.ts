@@ -109,7 +109,8 @@ export function getSapiV1EthStakingWbethHistoryWraphistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1EthStakingWbethHistoryWraphistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1EthStakingWbethHistoryWraphistoryRequestResult> {

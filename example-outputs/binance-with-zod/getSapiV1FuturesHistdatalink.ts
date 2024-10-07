@@ -94,7 +94,11 @@ export type GetSapiV1FuturesHistdatalinkRequestResult = RequestResult<
 
 export function getSapiV1FuturesHistdatalink(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1FuturesHistdatalinkRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1FuturesHistdatalinkRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1FuturesHistdatalinkRequestResult> {
   return requestHandler.execute(

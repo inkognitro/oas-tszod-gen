@@ -116,7 +116,8 @@ export function getSapiV1LoanLtvAdjustmentHistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1LoanLtvAdjustmentHistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanLtvAdjustmentHistoryRequestResult> {

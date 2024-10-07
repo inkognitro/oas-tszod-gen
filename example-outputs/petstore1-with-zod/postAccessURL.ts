@@ -67,7 +67,7 @@ export type PostAccessURLRequestResult = RequestResult<
 
 export function postAccessURL(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostAccessURLRequest, 'pathParams'>,
+  payload: RequestPayload<PostAccessURLRequest, 'pathParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostAccessURLRequestResult> {
   return requestHandler.execute(

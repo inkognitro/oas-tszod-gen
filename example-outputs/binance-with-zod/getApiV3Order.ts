@@ -79,7 +79,7 @@ export type GetApiV3OrderRequestResult = RequestResult<
 
 export function getApiV3Order(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3OrderRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3OrderRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3OrderRequestResult> {
   return requestHandler.execute(

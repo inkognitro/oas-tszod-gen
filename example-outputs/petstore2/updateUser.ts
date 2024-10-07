@@ -46,7 +46,8 @@ export function updateUser(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     UpdateUserRequest,
-    'pathParams' | 'contentType' | 'body'
+    'pathParams' | 'contentType' | 'body',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<UpdateUserRequestResult> {

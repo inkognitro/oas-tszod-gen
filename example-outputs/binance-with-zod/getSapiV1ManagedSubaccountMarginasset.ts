@@ -106,7 +106,8 @@ export function getSapiV1ManagedSubaccountMarginasset(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1ManagedSubaccountMarginassetRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountMarginassetRequestResult> {

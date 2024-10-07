@@ -120,7 +120,8 @@ export function getSapiV1SimpleEarnLockedPosition(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SimpleEarnLockedPositionRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedPositionRequestResult> {

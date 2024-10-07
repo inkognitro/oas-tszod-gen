@@ -95,7 +95,7 @@ export type PostSapiV1MarginOrderRequestResult = RequestResult<
 
 export function postSapiV1MarginOrder(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1MarginOrderRequest, 'queryParams'>,
+  payload: RequestPayload<PostSapiV1MarginOrderRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MarginOrderRequestResult> {
   return requestHandler.execute(

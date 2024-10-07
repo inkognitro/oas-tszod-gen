@@ -83,7 +83,8 @@ export function getSapiV1SimpleEarnLockedPersonalleftquota(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SimpleEarnLockedPersonalleftquotaRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedPersonalleftquotaRequestResult> {

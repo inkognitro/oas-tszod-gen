@@ -121,7 +121,8 @@ export function getSapiV1ManagedSubaccountAccountsnapshot(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1ManagedSubaccountAccountsnapshotRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ManagedSubaccountAccountsnapshotRequestResult> {

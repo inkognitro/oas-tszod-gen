@@ -82,7 +82,8 @@ export function postSapiV1PortfolioRepayFuturesNegativeBalance(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1PortfolioRepayFuturesNegativeBalanceRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1PortfolioRepayFuturesNegativeBalanceRequestResult> {

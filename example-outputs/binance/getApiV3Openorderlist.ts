@@ -75,7 +75,7 @@ export type GetApiV3OpenorderlistRequestResult = RequestResult<
 
 export function getApiV3Openorderlist(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3OpenorderlistRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3OpenorderlistRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3OpenorderlistRequestResult> {
   return requestHandler.execute(

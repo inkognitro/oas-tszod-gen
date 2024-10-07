@@ -58,7 +58,7 @@ export type PlaceOrderRequestResult = RequestResult<
 
 export function placeOrder(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PlaceOrderRequest, 'contentType' | 'body'>,
+  payload: RequestPayload<PlaceOrderRequest, 'contentType' | 'body', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PlaceOrderRequestResult> {
   return requestHandler.execute(

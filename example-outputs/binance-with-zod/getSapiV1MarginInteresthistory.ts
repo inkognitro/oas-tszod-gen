@@ -112,7 +112,11 @@ export type GetSapiV1MarginInteresthistoryRequestResult = RequestResult<
 
 export function getSapiV1MarginInteresthistory(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginInteresthistoryRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginInteresthistoryRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginInteresthistoryRequestResult> {
   return requestHandler.execute(

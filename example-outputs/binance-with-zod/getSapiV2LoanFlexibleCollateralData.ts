@@ -98,7 +98,8 @@ export function getSapiV2LoanFlexibleCollateralData(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV2LoanFlexibleCollateralDataRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV2LoanFlexibleCollateralDataRequestResult> {

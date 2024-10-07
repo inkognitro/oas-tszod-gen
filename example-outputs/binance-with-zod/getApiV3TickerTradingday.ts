@@ -72,7 +72,11 @@ export type GetApiV3TickerTradingdayRequestResult = RequestResult<
 
 export function getApiV3TickerTradingday(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3TickerTradingdayRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetApiV3TickerTradingdayRequest,
+    never,
+    'queryParams'
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3TickerTradingdayRequestResult> {
   return requestHandler.execute(

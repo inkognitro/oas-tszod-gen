@@ -92,7 +92,8 @@ export function getSapiV1MarginAvailableInventory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1MarginAvailableInventoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginAvailableInventoryRequestResult> {

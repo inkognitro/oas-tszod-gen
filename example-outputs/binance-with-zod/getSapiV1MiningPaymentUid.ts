@@ -116,7 +116,11 @@ export type GetSapiV1MiningPaymentUidRequestResult = RequestResult<
 
 export function getSapiV1MiningPaymentUid(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MiningPaymentUidRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MiningPaymentUidRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MiningPaymentUidRequestResult> {
   return requestHandler.execute(

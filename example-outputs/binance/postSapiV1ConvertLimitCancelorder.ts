@@ -68,7 +68,8 @@ export function postSapiV1ConvertLimitCancelorder(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1ConvertLimitCancelorderRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ConvertLimitCancelorderRequestResult> {

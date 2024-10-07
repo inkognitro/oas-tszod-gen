@@ -67,7 +67,11 @@ export type GetSapiV1MarginMaxtransferableRequestResult = RequestResult<
 
 export function getSapiV1MarginMaxtransferable(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginMaxtransferableRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginMaxtransferableRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginMaxtransferableRequestResult> {
   return requestHandler.execute(

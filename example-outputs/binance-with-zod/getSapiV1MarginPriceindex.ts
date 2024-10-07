@@ -70,7 +70,11 @@ export type GetSapiV1MarginPriceindexRequestResult = RequestResult<
 
 export function getSapiV1MarginPriceindex(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginPriceindexRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginPriceindexRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginPriceindexRequestResult> {
   return requestHandler.execute(

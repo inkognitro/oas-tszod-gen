@@ -84,7 +84,11 @@ export type GetSapiV1MarginDelistScheduleRequestResult = RequestResult<
 
 export function getSapiV1MarginDelistSchedule(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginDelistScheduleRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginDelistScheduleRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginDelistScheduleRequestResult> {
   return requestHandler.execute(

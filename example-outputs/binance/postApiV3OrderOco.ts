@@ -116,7 +116,7 @@ export type PostApiV3OrderOcoRequestResult = RequestResult<
 
 export function postApiV3OrderOco(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostApiV3OrderOcoRequest, 'queryParams'>,
+  payload: RequestPayload<PostApiV3OrderOcoRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostApiV3OrderOcoRequestResult> {
   return requestHandler.execute(

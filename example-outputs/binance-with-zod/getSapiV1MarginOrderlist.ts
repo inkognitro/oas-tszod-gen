@@ -112,7 +112,11 @@ export type GetSapiV1MarginOrderlistRequestResult = RequestResult<
 
 export function getSapiV1MarginOrderlist(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginOrderlistRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginOrderlistRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginOrderlistRequestResult> {
   return requestHandler.execute(

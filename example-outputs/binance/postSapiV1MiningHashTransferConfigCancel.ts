@@ -71,7 +71,8 @@ export function postSapiV1MiningHashTransferConfigCancel(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1MiningHashTransferConfigCancelRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1MiningHashTransferConfigCancelRequestResult> {

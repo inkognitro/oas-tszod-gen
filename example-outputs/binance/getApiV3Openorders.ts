@@ -57,7 +57,7 @@ export type GetApiV3OpenordersRequestResult = RequestResult<
 
 export function getApiV3Openorders(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3OpenordersRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3OpenordersRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3OpenordersRequestResult> {
   return requestHandler.execute(

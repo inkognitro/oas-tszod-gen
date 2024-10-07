@@ -80,7 +80,11 @@ export type GetSapiV1DciProductAccountsRequestResult = RequestResult<
 
 export function getSapiV1DciProductAccounts(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1DciProductAccountsRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1DciProductAccountsRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1DciProductAccountsRequestResult> {
   return requestHandler.execute(

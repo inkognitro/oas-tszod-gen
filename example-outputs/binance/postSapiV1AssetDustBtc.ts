@@ -76,7 +76,7 @@ export type PostSapiV1AssetDustBtcRequestResult = RequestResult<
 
 export function postSapiV1AssetDustBtc(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1AssetDustBtcRequest, 'queryParams'>,
+  payload: RequestPayload<PostSapiV1AssetDustBtcRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AssetDustBtcRequestResult> {
   return requestHandler.execute(

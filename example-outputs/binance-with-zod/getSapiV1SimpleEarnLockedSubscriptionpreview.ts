@@ -107,7 +107,8 @@ export function getSapiV1SimpleEarnLockedSubscriptionpreview(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SimpleEarnLockedSubscriptionpreviewRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SimpleEarnLockedSubscriptionpreviewRequestResult> {

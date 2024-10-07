@@ -88,7 +88,8 @@ export function postSapiV1ManagedSubaccountWithdraw(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1ManagedSubaccountWithdrawRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ManagedSubaccountWithdrawRequestResult> {

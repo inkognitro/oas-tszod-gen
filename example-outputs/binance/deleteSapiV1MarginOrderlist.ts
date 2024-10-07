@@ -61,7 +61,11 @@ export type DeleteSapiV1MarginOrderlistRequestResult = RequestResult<
 
 export function deleteSapiV1MarginOrderlist(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<DeleteSapiV1MarginOrderlistRequest, 'queryParams'>,
+  payload: RequestPayload<
+    DeleteSapiV1MarginOrderlistRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1MarginOrderlistRequestResult> {
   return requestHandler.execute(

@@ -80,7 +80,8 @@ export function getSapiV1EthStakingEthHistoryWbethrewardshistory(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1EthStakingEthHistoryWbethrewardshistoryRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1EthStakingEthHistoryWbethrewardshistoryRequestResult> {

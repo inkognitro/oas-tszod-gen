@@ -74,7 +74,8 @@ export function getSapiV1SubAccountFuturesPositionrisk(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SubAccountFuturesPositionriskRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountFuturesPositionriskRequestResult> {

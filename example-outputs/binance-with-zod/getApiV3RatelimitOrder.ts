@@ -88,7 +88,7 @@ export type GetApiV3RatelimitOrderRequestResult = RequestResult<
 
 export function getApiV3RatelimitOrder(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3RatelimitOrderRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3RatelimitOrderRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3RatelimitOrderRequestResult> {
   return requestHandler.execute(

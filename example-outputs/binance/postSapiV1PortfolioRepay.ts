@@ -65,7 +65,11 @@ export type PostSapiV1PortfolioRepayRequestResult = RequestResult<
 
 export function postSapiV1PortfolioRepay(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1PortfolioRepayRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1PortfolioRepayRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1PortfolioRepayRequestResult> {
   return requestHandler.execute(

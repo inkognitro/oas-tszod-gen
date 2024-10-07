@@ -126,7 +126,11 @@ export type GetSapiV1LendingProjectListRequestResult = RequestResult<
 
 export function getSapiV1LendingProjectList(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1LendingProjectListRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1LendingProjectListRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingProjectListRequestResult> {
   return requestHandler.execute(

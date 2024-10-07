@@ -67,7 +67,8 @@ export function postSapiV1PortfolioRepayFuturesSwitch(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1PortfolioRepayFuturesSwitchRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1PortfolioRepayFuturesSwitchRequestResult> {

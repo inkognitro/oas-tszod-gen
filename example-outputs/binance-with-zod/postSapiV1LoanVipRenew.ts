@@ -92,7 +92,7 @@ export type PostSapiV1LoanVipRenewRequestResult = RequestResult<
 
 export function postSapiV1LoanVipRenew(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1LoanVipRenewRequest, 'queryParams'>,
+  payload: RequestPayload<PostSapiV1LoanVipRenewRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1LoanVipRenewRequestResult> {
   return requestHandler.execute(

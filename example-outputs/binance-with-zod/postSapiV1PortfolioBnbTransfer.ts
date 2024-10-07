@@ -82,7 +82,11 @@ export type PostSapiV1PortfolioBnbTransferRequestResult = RequestResult<
 
 export function postSapiV1PortfolioBnbTransfer(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1PortfolioBnbTransferRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1PortfolioBnbTransferRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1PortfolioBnbTransferRequestResult> {
   return requestHandler.execute(

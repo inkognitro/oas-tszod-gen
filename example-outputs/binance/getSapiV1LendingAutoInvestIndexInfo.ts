@@ -73,7 +73,8 @@ export function getSapiV1LendingAutoInvestIndexInfo(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1LendingAutoInvestIndexInfoRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LendingAutoInvestIndexInfoRequestResult> {

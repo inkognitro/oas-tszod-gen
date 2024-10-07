@@ -96,7 +96,11 @@ export type GetSapiV1CapitalConfigGetallRequestResult = RequestResult<
 
 export function getSapiV1CapitalConfigGetall(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1CapitalConfigGetallRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1CapitalConfigGetallRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalConfigGetallRequestResult> {
   return requestHandler.execute(

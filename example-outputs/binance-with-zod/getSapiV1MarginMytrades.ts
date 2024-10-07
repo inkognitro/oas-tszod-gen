@@ -85,7 +85,7 @@ export type GetSapiV1MarginMytradesRequestResult = RequestResult<
 
 export function getSapiV1MarginMytrades(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginMytradesRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1MarginMytradesRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginMytradesRequestResult> {
   return requestHandler.execute(

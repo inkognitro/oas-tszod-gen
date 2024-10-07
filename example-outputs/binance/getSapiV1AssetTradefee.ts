@@ -67,7 +67,7 @@ export type GetSapiV1AssetTradefeeRequestResult = RequestResult<
 
 export function getSapiV1AssetTradefee(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1AssetTradefeeRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1AssetTradefeeRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetTradefeeRequestResult> {
   return requestHandler.execute(

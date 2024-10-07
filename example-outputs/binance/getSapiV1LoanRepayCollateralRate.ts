@@ -72,7 +72,8 @@ export function getSapiV1LoanRepayCollateralRate(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1LoanRepayCollateralRateRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1LoanRepayCollateralRateRequestResult> {

@@ -68,7 +68,8 @@ export function postSapiV1SubAccountMarginEnable(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1SubAccountMarginEnableRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountMarginEnableRequestResult> {

@@ -69,7 +69,8 @@ export function postSapiV1SimpleEarnFlexibleSetautosubscribe(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1SimpleEarnFlexibleSetautosubscribeRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SimpleEarnFlexibleSetautosubscribeRequestResult> {

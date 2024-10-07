@@ -91,7 +91,8 @@ export function getSapiV1SubAccountSubaccountapiIprestriction(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SubAccountSubaccountapiIprestrictionRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountSubaccountapiIprestrictionRequestResult> {

@@ -150,7 +150,7 @@ export type GetApiV3ExchangeinfoRequestResult = RequestResult<
 
 export function getApiV3Exchangeinfo(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3ExchangeinfoRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3ExchangeinfoRequest, never, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3ExchangeinfoRequestResult> {
   return requestHandler.execute(

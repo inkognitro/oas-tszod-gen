@@ -82,7 +82,7 @@ export type GetSapiV1AccountInfoRequestResult = RequestResult<
 
 export function getSapiV1AccountInfo(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1AccountInfoRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1AccountInfoRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AccountInfoRequestResult> {
   return requestHandler.execute(

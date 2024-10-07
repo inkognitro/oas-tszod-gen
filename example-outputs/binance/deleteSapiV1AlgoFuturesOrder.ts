@@ -68,7 +68,11 @@ export type DeleteSapiV1AlgoFuturesOrderRequestResult = RequestResult<
 
 export function deleteSapiV1AlgoFuturesOrder(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<DeleteSapiV1AlgoFuturesOrderRequest, 'queryParams'>,
+  payload: RequestPayload<
+    DeleteSapiV1AlgoFuturesOrderRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteSapiV1AlgoFuturesOrderRequestResult> {
   return requestHandler.execute(

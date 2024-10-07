@@ -42,7 +42,7 @@ export type DeletePetRequestResult = RequestResult<
 
 export function deletePet(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<DeletePetRequest, 'pathParams' | 'headers'>,
+  payload: RequestPayload<DeletePetRequest, 'pathParams', 'headers'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeletePetRequestResult> {
   return requestHandler.execute(

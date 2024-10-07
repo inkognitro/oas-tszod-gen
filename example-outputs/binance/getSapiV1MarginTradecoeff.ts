@@ -67,7 +67,11 @@ export type GetSapiV1MarginTradecoeffRequestResult = RequestResult<
 
 export function getSapiV1MarginTradecoeff(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginTradecoeffRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginTradecoeffRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginTradecoeffRequestResult> {
   return requestHandler.execute(

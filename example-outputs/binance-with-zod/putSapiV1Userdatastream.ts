@@ -56,7 +56,7 @@ export type PutSapiV1UserdatastreamRequestResult = RequestResult<
 
 export function putSapiV1Userdatastream(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PutSapiV1UserdatastreamRequest, 'queryParams'>,
+  payload: RequestPayload<PutSapiV1UserdatastreamRequest, never, 'queryParams'>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PutSapiV1UserdatastreamRequestResult> {
   return requestHandler.execute(

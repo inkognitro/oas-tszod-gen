@@ -76,7 +76,11 @@ export type GetSapiV1AssetAssetdividendRequestResult = RequestResult<
 
 export function getSapiV1AssetAssetdividend(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1AssetAssetdividendRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1AssetAssetdividendRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AssetAssetdividendRequestResult> {
   return requestHandler.execute(

@@ -63,7 +63,7 @@ export type DeleteApiV3OpenordersRequestResult = RequestResult<
 
 export function deleteApiV3Openorders(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<DeleteApiV3OpenordersRequest, 'queryParams'>,
+  payload: RequestPayload<DeleteApiV3OpenordersRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<DeleteApiV3OpenordersRequestResult> {
   return requestHandler.execute(

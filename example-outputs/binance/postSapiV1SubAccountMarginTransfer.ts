@@ -70,7 +70,8 @@ export function postSapiV1SubAccountMarginTransfer(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1SubAccountMarginTransferRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountMarginTransferRequestResult> {

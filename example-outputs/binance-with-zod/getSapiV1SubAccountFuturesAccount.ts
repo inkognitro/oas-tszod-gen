@@ -134,7 +134,8 @@ export function getSapiV1SubAccountFuturesAccount(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SubAccountFuturesAccountRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1SubAccountFuturesAccountRequestResult> {

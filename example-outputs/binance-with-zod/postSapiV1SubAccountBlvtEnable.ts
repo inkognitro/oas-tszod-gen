@@ -84,7 +84,11 @@ export type PostSapiV1SubAccountBlvtEnableRequestResult = RequestResult<
 
 export function postSapiV1SubAccountBlvtEnable(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1SubAccountBlvtEnableRequest, 'queryParams'>,
+  payload: RequestPayload<
+    PostSapiV1SubAccountBlvtEnableRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1SubAccountBlvtEnableRequestResult> {
   return requestHandler.execute(

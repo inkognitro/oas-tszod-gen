@@ -69,7 +69,8 @@ export function postSapiV1CapitalContractConvertibleCoins(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1CapitalContractConvertibleCoinsRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1CapitalContractConvertibleCoinsRequestResult> {

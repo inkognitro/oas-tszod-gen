@@ -111,6 +111,7 @@ export function getSapiV1SimpleEarnFlexibleHistoryRedemptionrecord(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1SimpleEarnFlexibleHistoryRedemptionrecordRequest,
+    never,
     'queryParams'
   >,
   config?: RequestHandlerExecutionConfig

@@ -75,7 +75,7 @@ export type UpdatePetRequestResult = RequestResult<
 
 export function updatePet(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<UpdatePetRequest, 'contentType' | 'body'>,
+  payload: RequestPayload<UpdatePetRequest, 'contentType' | 'body', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<UpdatePetRequestResult> {
   return requestHandler.execute(

@@ -82,7 +82,11 @@ export type GetSapiV1ConvertTradeflowRequestResult = RequestResult<
 
 export function getSapiV1ConvertTradeflow(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1ConvertTradeflowRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1ConvertTradeflowRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1ConvertTradeflowRequestResult> {
   return requestHandler.execute(

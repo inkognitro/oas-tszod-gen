@@ -78,7 +78,7 @@ export type GetApiV3UiklinesRequestResult = RequestResult<
 
 export function getApiV3Uiklines(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3UiklinesRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3UiklinesRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3UiklinesRequestResult> {
   return requestHandler.execute(

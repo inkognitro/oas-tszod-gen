@@ -71,7 +71,7 @@ export type PostSapiV1BlvtRedeemRequestResult = RequestResult<
 
 export function postSapiV1BlvtRedeem(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostSapiV1BlvtRedeemRequest, 'queryParams'>,
+  payload: RequestPayload<PostSapiV1BlvtRedeemRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1BlvtRedeemRequestResult> {
   return requestHandler.execute(

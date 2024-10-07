@@ -54,7 +54,11 @@ export type GetApiV3HistoricaltradesRequestResult = RequestResult<
 
 export function getApiV3Historicaltrades(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3HistoricaltradesRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetApiV3HistoricaltradesRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3HistoricaltradesRequestResult> {
   return requestHandler.execute(

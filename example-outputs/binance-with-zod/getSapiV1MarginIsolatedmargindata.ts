@@ -104,7 +104,8 @@ export function getSapiV1MarginIsolatedmargindata(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1MarginIsolatedmargindataRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginIsolatedmargindataRequestResult> {

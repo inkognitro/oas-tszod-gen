@@ -74,6 +74,7 @@ export function getSapiV1PortfolioAssetIndexPrice(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1PortfolioAssetIndexPriceRequest,
+    never,
     'queryParams'
   >,
   config?: RequestHandlerExecutionConfig

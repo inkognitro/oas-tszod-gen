@@ -77,7 +77,8 @@ export function postSapiV1AlgoFuturesNewordertwap(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1AlgoFuturesNewordertwapRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1AlgoFuturesNewordertwapRequestResult> {

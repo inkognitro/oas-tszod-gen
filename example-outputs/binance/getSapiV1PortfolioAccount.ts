@@ -69,7 +69,11 @@ export type GetSapiV1PortfolioAccountRequestResult = RequestResult<
 
 export function getSapiV1PortfolioAccount(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1PortfolioAccountRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1PortfolioAccountRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1PortfolioAccountRequestResult> {
   return requestHandler.execute(

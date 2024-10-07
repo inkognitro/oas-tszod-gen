@@ -61,7 +61,7 @@ export type OptionsObjectRequestResult = RequestResult<
 
 export function optionsObject(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<OptionsObjectRequest, 'pathParams'>,
+  payload: RequestPayload<OptionsObjectRequest, 'pathParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<OptionsObjectRequestResult> {
   return requestHandler.execute(

@@ -90,7 +90,8 @@ export function getSapiV1CapitalDepositAddressList(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     GetSapiV1CapitalDepositAddressListRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalDepositAddressListRequestResult> {

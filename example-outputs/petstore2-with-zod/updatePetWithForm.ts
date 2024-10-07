@@ -52,7 +52,8 @@ export function updatePetWithForm(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     UpdatePetWithFormRequest,
-    'pathParams' | 'queryParams'
+    'pathParams',
+    'queryParams'
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<UpdatePetWithFormRequestResult> {

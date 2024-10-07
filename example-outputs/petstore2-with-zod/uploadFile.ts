@@ -64,7 +64,8 @@ export function uploadFile(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     UploadFileRequest,
-    'pathParams' | 'queryParams' | 'contentType' | 'body'
+    'pathParams' | 'contentType' | 'body',
+    'queryParams'
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<UploadFileRequestResult> {

@@ -69,7 +69,11 @@ export type GetSapiV1CapitalDepositAddressRequestResult = RequestResult<
 
 export function getSapiV1CapitalDepositAddress(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1CapitalDepositAddressRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1CapitalDepositAddressRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1CapitalDepositAddressRequestResult> {
   return requestHandler.execute(

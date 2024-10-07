@@ -59,7 +59,7 @@ export type GetApiV3DepthRequestResult = RequestResult<
 
 export function getApiV3Depth(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetApiV3DepthRequest, 'queryParams'>,
+  payload: RequestPayload<GetApiV3DepthRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetApiV3DepthRequestResult> {
   return requestHandler.execute(

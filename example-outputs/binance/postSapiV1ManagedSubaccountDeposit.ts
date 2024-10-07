@@ -69,7 +69,8 @@ export function postSapiV1ManagedSubaccountDeposit(
   requestHandler: SimpleRequestHandler,
   payload: RequestPayload<
     PostSapiV1ManagedSubaccountDepositRequest,
-    'queryParams'
+    'queryParams',
+    never
   >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostSapiV1ManagedSubaccountDepositRequestResult> {

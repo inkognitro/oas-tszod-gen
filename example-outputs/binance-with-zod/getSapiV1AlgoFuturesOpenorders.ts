@@ -114,7 +114,11 @@ export type GetSapiV1AlgoFuturesOpenordersRequestResult = RequestResult<
 
 export function getSapiV1AlgoFuturesOpenorders(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1AlgoFuturesOpenordersRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1AlgoFuturesOpenordersRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1AlgoFuturesOpenordersRequestResult> {
   return requestHandler.execute(

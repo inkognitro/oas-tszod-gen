@@ -88,7 +88,11 @@ export type GetSapiV1MarginAllordersRequestResult = RequestResult<
 
 export function getSapiV1MarginAllorders(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1MarginAllordersRequest, 'queryParams'>,
+  payload: RequestPayload<
+    GetSapiV1MarginAllordersRequest,
+    'queryParams',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1MarginAllordersRequestResult> {
   return requestHandler.execute(

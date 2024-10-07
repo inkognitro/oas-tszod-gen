@@ -88,7 +88,7 @@ export type GetSapiV1DciProductListRequestResult = RequestResult<
 
 export function getSapiV1DciProductList(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<GetSapiV1DciProductListRequest, 'queryParams'>,
+  payload: RequestPayload<GetSapiV1DciProductListRequest, 'queryParams', never>,
   config?: RequestHandlerExecutionConfig
 ): Promise<GetSapiV1DciProductListRequestResult> {
   return requestHandler.execute(
