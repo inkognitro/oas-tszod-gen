@@ -47,17 +47,17 @@ export type GenerateConfig = {
 
 export interface CodeGenerator {
   getSpecification(): Specification;
-  createComponentNameForType(
+  createComponentTypeName(
     componentRef: string,
     referencingPath: OutputPath,
     ctx: Context
   ): string;
-  createComponentNameForResponseSchemaConst(
+  createResponseComponentConstName(
     componentRef: string,
     referencingPath: OutputPath,
     ctx: Context
   ): string;
-  createComponentNameForZodSchemaConst(
+  createZodSchemaComponentConstName(
     componentRef: string,
     referencingPath: OutputPath,
     ctx: Context
@@ -71,19 +71,15 @@ export interface CodeGenerator {
     referencingPath: OutputPath
   ): string;
   createOutputPathForOperationId(operationId: string, ctx: Context): OutputPath;
-  createOutputPathByComponentRefForType(
+  createOutputPathByTypeComponentRef(
     componentRef: string,
     ctx: Context
   ): OutputPath;
-  createOutputPathByComponentRefForConst(
+  createOutputPathByResponseComponentRefConst(
     componentRef: string,
     ctx: Context
   ): OutputPath;
-  createOutputPathByComponentRefForResponseSchemaConst(
-    componentRef: string,
-    ctx: Context
-  ): OutputPath;
-  createOutputPathByComponentRefForZodSchemaConst(
+  createOutputPathByZodSchemaComponentRefConst(
     componentRef: string,
     ctx: Context
   ): OutputPath;
@@ -105,6 +101,7 @@ export const endpointSchemaOutputPathPart = 'endpointSchema6b3a7814';
 export const requestOutputPathPart = 'request6b3a7814';
 export const responseOutputPathPart = 'response6b3a7814';
 export const requestResultOutputPathPart = 'requestResult6b3a7814';
+export const zodSchemaOutputPathPart = 'zodSchema6b3a7814';
 
 export type OutputPath = string[];
 

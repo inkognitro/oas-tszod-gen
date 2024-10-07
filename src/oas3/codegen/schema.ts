@@ -43,7 +43,7 @@ export function applySchema(
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   if (isSchemaComponentRef(schema)) {
-    return applyComponentRefSchema(
+    return applySchemaComponentRef(
       codeGenerator,
       schema,
       path,
@@ -235,7 +235,7 @@ function applyIntegerSchema(
   };
 }
 
-export function applyComponentRefSchema(
+export function applySchemaComponentRef(
   codeGenerator: CodeGenerator,
   schema: SchemaComponentRef,
   path: OutputPath,
@@ -245,7 +245,7 @@ export function applyComponentRefSchema(
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
     createName: referencingPath => {
-      return codeGenerator.createComponentNameForType(
+      return codeGenerator.createComponentTypeName(
         schema.$ref,
         referencingPath,
         ctx
@@ -254,18 +254,14 @@ export function applyComponentRefSchema(
     componentRef: schema.$ref,
     path,
     getRequiredOutputPaths: () => [
-      codeGenerator.createOutputPathByComponentRefForType(schema.$ref, ctx),
+      codeGenerator.createOutputPathByTypeComponentRef(schema.$ref, ctx),
     ],
   };
   codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
   return {
     ...output,
     createCode: referencingPath =>
-      codeGenerator.createComponentNameForType(
-        schema.$ref,
-        referencingPath,
-        ctx
-      ),
+      codeGenerator.createComponentTypeName(schema.$ref, referencingPath, ctx),
   };
 }
 

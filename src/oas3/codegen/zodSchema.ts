@@ -325,7 +325,7 @@ export function applyZodComponentRefSchema(
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
     createName: referencingPath => {
-      return codeGenerator.createComponentNameForZodSchemaConst(
+      return codeGenerator.createZodSchemaComponentConstName(
         schema.$ref,
         referencingPath,
         ctx
@@ -334,7 +334,7 @@ export function applyZodComponentRefSchema(
     componentRef: schema.$ref,
     path,
     getRequiredOutputPaths: () => [
-      codeGenerator.createOutputPathByComponentRefForZodSchemaConst(
+      codeGenerator.createOutputPathByZodSchemaComponentRefConst(
         schema.$ref,
         ctx
       ),
@@ -344,7 +344,7 @@ export function applyZodComponentRefSchema(
   const isRecursive = preventFromAddingComponentRefs.includes(schema.$ref);
   if (isRecursive) {
     codeGenerator.addOutputPathWithZodSchemaRecursion(
-      codeGenerator.createOutputPathByComponentRefForZodSchemaConst(
+      codeGenerator.createOutputPathByZodSchemaComponentRefConst(
         schema.$ref,
         ctx
       )
@@ -353,7 +353,7 @@ export function applyZodComponentRefSchema(
   return {
     ...output,
     createCode: referencingPath => {
-      const constName = codeGenerator.createComponentNameForZodSchemaConst(
+      const constName = codeGenerator.createZodSchemaComponentConstName(
         schema.$ref,
         referencingPath,
         ctx

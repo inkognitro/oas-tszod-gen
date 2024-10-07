@@ -197,7 +197,7 @@ function applyConcreteResponseSchema(
   };
 }
 
-function applyComponentRefResponseSchema(
+function applyResponseComponentRef(
   codeGenerator: CodeGenerator,
   schema: ResponseComponentRef,
   path: OutputPath,
@@ -207,7 +207,7 @@ function applyComponentRefResponseSchema(
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
     createName: referencingPath => {
-      return codeGenerator.createComponentNameForResponseSchemaConst(
+      return codeGenerator.createResponseComponentConstName(
         schema.$ref,
         referencingPath,
         ctx
@@ -216,7 +216,7 @@ function applyComponentRefResponseSchema(
     componentRef: schema.$ref,
     path,
     getRequiredOutputPaths: () => [
-      codeGenerator.createOutputPathByComponentRefForResponseSchemaConst(
+      codeGenerator.createOutputPathByResponseComponentRefConst(
         schema.$ref,
         ctx
       ),
@@ -226,7 +226,7 @@ function applyComponentRefResponseSchema(
   return {
     ...output,
     createCode: referencingPath =>
-      codeGenerator.createComponentNameForResponseSchemaConst(
+      codeGenerator.createResponseComponentConstName(
         schema.$ref,
         referencingPath,
         ctx
@@ -242,7 +242,7 @@ export function applyResponseSchema(
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
   if (isResponseComponentRef(response)) {
-    return applyComponentRefResponseSchema(
+    return applyResponseComponentRef(
       codeGenerator,
       response,
       path,

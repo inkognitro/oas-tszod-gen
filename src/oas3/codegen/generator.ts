@@ -17,6 +17,7 @@ import {
   requestResultOutputPathPart,
   responseOutputPathPart,
   TemplateDefinitionOutput,
+  zodSchemaOutputPathPart,
 } from './core';
 import {
   findComponentParameterByRef,
@@ -467,7 +468,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     if (!response) {
       throw new Error(`could not find component "${componentRef}" in specs`);
     }
-    const typeOutputPath = this.createOutputPathByComponentRefForType(
+    const typeOutputPath = this.createOutputPathByTypeComponentRef(
       componentRef,
       ctx
     );
@@ -491,15 +492,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
         return 'S extends number = any';
       },
       createName: referencingPath =>
-        this.createComponentNameForType(componentRef, referencingPath, ctx),
+        this.createComponentTypeName(componentRef, referencingPath, ctx),
     };
     this.addOutput(typeOutput, ctx);
 
     const schemaConstOutputPath =
-      this.createOutputPathByComponentRefForResponseSchemaConst(
-        componentRef,
-        ctx
-      );
+      this.createOutputPathByResponseComponentRefConst(componentRef, ctx);
     const schemaConstOutput: AnyDefinitionOutput = {
       type: OutputType.DEFINITION,
       ...applyResponseSchema(this, response, schemaConstOutputPath, ctx, [
@@ -507,7 +505,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       ]),
       definitionType: 'const',
       createName: referencingPath =>
-        this.createComponentNameForResponseSchemaConst(
+        this.createResponseComponentConstName(
           componentRef,
           referencingPath,
           ctx
@@ -521,7 +519,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     if (!parameter) {
       throw new Error(`could not find component "${componentRef}" in specs`);
     }
-    const typeOutputPath = this.createOutputPathByComponentRefForType(
+    const typeOutputPath = this.createOutputPathByTypeComponentRef(
       componentRef,
       ctx
     );
@@ -538,7 +536,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     if (!schema) {
       throw new Error(`could not find component "${componentRef}" in specs`);
     }
-    const typeOutputPath = this.createOutputPathByComponentRefForType(
+    const typeOutputPath = this.createOutputPathByTypeComponentRef(
       componentRef,
       ctx
     );
@@ -550,12 +548,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
       ...applySchema(this, schema, typeOutputPath, ctx, [componentRef]),
       definitionType: 'type',
       createName: referencingPath =>
-        this.createComponentNameForType(componentRef, referencingPath, ctx),
+        this.createComponentTypeName(componentRef, referencingPath, ctx),
     };
     this.addOutput(output, ctx);
     if (ctx.config.withZod) {
       const zodSchemaOutputPath =
-        this.createOutputPathByComponentRefForZodSchemaConst(componentRef, ctx);
+        this.createOutputPathByZodSchemaComponentRefConst(componentRef, ctx);
       const zodSchemaOutput: AnyDefinitionOutput = {
         ...applyZodSchema(this, schema, zodSchemaOutputPath, ctx, [
           componentRef,
@@ -563,7 +561,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
         type: OutputType.DEFINITION,
         definitionType: 'const',
         createName: referencingPath =>
-          this.createComponentNameForZodSchemaConst(
+          this.createZodSchemaComponentConstName(
             componentRef,
             referencingPath,
             ctx
@@ -731,11 +729,10 @@ export class DefaultCodeGenerator implements CodeGenerator {
         }
 
         if (output.type === OutputType.COMPONENT_REF) {
-          const componentOutputPath =
-            this.createOutputPathByComponentRefForType(
-              output.componentRef,
-              ctx
-            );
+          const componentOutputPath = this.createOutputPathByTypeComponentRef(
+            output.componentRef,
+            ctx
+          );
           requiredOutput = availableOutputs.find(o =>
             areOutputPathsEqual(o.path, componentOutputPath)
           );
@@ -942,14 +939,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     operationId: string,
     ctx: Context
   ): OutputPath {
-    const outputPath = operationId
-      .split('\\')
-      .join('.')
-      .split('/')
-      .join('.')
-      .split('.')
-      .filter(p => !!p.length)
-      .map(p => lowerCaseFirstLetter(p));
+    const outputPath = this.createOutputPathFromString(operationId, ctx);
     if (ctx.config.createModifiedOperationOutputPath) {
       return ctx.config.createModifiedOperationOutputPath(outputPath);
     }
@@ -979,24 +969,28 @@ export class DefaultCodeGenerator implements CodeGenerator {
     let parts = this.isSameOutputFolder(outputPath, referencingPath)
       ? this.getOutputPathWithoutFolderOutputPathParts(outputPath)
       : outputPath;
-    parts = parts.filter(
-      p =>
-        p !== componentSchemasFileNameOutputPathPart &&
-        p !== componentParametersFileNameOutputPathPart &&
-        p !== componentResponsesFileNameOutputPathPart &&
-        p !== componentResponseHeadersFileNameOutputPathPart
-    );
-    if (this.isRequestResultOutputPath(parts)) {
+    parts = parts
+      .map(p => (p === requestResultOutputPathPart ? 'requestResult' : p))
+      .filter(
+        p =>
+          p !== componentSchemasFileNameOutputPathPart &&
+          p !== componentSchemasFileNameOutputPathPart &&
+          p !== componentParametersFileNameOutputPathPart &&
+          p !== componentResponsesFileNameOutputPathPart &&
+          p !== componentResponseHeadersFileNameOutputPathPart &&
+          p !== zodSchemaOutputPathPart
+      );
+    if (this.isRequestResultOutputPath(outputPath)) {
       parts = [...parts.slice(0, -1), 'requestResult'];
       return parts.map(p => capitalizeFirstLetter(p)).join('');
-    } else if (this.isEndpointSchemaOutputPath(parts)) {
+    } else if (this.isEndpointSchemaOutputPath(outputPath)) {
       parts = [...parts.slice(0, -1), 'endpointSchema'];
       return parts.map(p => capitalizeFirstLetter(p)).join('');
-    } else if (this.isRequestOutputPath(parts)) {
+    } else if (this.isRequestOutputPath(outputPath)) {
       parts = [...parts.slice(0, -1), 'request'];
       return parts.map(p => capitalizeFirstLetter(p)).join('');
-    } else if (this.isResponseOutputPath(parts)) {
-      parts = [...parts.slice(0, -1), 'response'];
+    } else if (this.isResponseOutputPath(outputPath)) {
+      parts = [...parts.slice(0, -2), 'response'];
       return parts.map(p => capitalizeFirstLetter(p)).join('');
     }
     return parts.map(p => capitalizeFirstLetter(p)).join('_');
@@ -1068,7 +1062,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return parts.filter(p => !!p.length).map(p => lowerCaseFirstLetter(p));
   }
 
-  createOutputPathByComponentRefForType(
+  createOutputPathByTypeComponentRef(
     componentRef: string,
     ctx: Context
   ): OutputPath {
@@ -1099,7 +1093,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       typeNamePathParts.push('response');
     } else if (componentRef.startsWith(responseHeaderComponentRefPrefix)) {
       fileNameOutputPathPart = componentResponseHeadersFileNameOutputPathPart;
-      typeNamePathParts.push('header');
+      typeNamePathParts.push('responseHeader');
     } else if (componentRef.startsWith(schemaComponentRefPrefix)) {
       fileNameOutputPathPart = componentSchemasFileNameOutputPathPart;
     }
@@ -1113,24 +1107,24 @@ export class DefaultCodeGenerator implements CodeGenerator {
     ];
   }
 
-  createOutputPathByComponentRefForConst(
+  private createOutputPathByComponentRefForConst(
     componentRef: string,
     ctx: Context
   ): OutputPath {
-    return this.createOutputPathByComponentRefForType(componentRef, ctx);
+    return this.createOutputPathByTypeComponentRef(componentRef, ctx);
   }
 
-  createOutputPathByComponentRefForZodSchemaConst(
+  createOutputPathByZodSchemaComponentRefConst(
     componentRef: string,
     ctx: Context
   ): OutputPath {
     return [
       ...this.createOutputPathByComponentRefForConst(componentRef, ctx),
-      'zodSchema',
+      zodSchemaOutputPathPart,
     ];
   }
 
-  createOutputPathByComponentRefForResponseSchemaConst(
+  createOutputPathByResponseComponentRefConst(
     componentRef: string,
     ctx: Context
   ): OutputPath {
@@ -1140,40 +1134,39 @@ export class DefaultCodeGenerator implements CodeGenerator {
     ];
   }
 
-  createComponentNameForType(
+  createComponentTypeName(
     componentRef: string,
     referencingPath: OutputPath,
     ctx: Context
   ): string {
-    const outputPath = this.createOutputPathByComponentRefForType(
+    const outputPath = this.createOutputPathByTypeComponentRef(
       componentRef,
       ctx
     );
     return this.createTypeName(outputPath, referencingPath);
   }
 
-  createComponentNameForResponseSchemaConst(
+  createResponseComponentConstName(
     componentRef: string,
     referencingPath: OutputPath,
     ctx: Context
   ): string {
-    const outputPath =
-      this.createOutputPathByComponentRefForResponseSchemaConst(
-        componentRef,
-        ctx
-      );
-    return `${this.createConstName(outputPath, referencingPath)}`;
-  }
-
-  createComponentNameForZodSchemaConst(
-    componentRef: string,
-    referencingPath: OutputPath,
-    ctx: Context
-  ): string {
-    const outputPath = this.createOutputPathByComponentRefForZodSchemaConst(
+    const outputPath = this.createOutputPathByResponseComponentRefConst(
       componentRef,
       ctx
     );
     return `${this.createConstName(outputPath, referencingPath)}`;
+  }
+
+  createZodSchemaComponentConstName(
+    componentRef: string,
+    referencingPath: OutputPath,
+    ctx: Context
+  ): string {
+    const outputPath = this.createOutputPathByZodSchemaComponentRefConst(
+      componentRef,
+      ctx
+    );
+    return `z_${this.createTypeName(outputPath, referencingPath)}`;
   }
 }
