@@ -4,6 +4,7 @@ import {
   RequestBodyData,
   ResponseBodyData,
   ResponseUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -47,7 +48,7 @@ export type AddPetResponse =
       | ResponseBodyData<'application/xml', Pet>
       | ResponseBodyData<'application/json', Pet>
     >
-  | ResponseUnion<405>;
+  | Response<405>;
 
 export type AddPetRequestResult = RequestResult<AddPetRequest, AddPetResponse>;
 

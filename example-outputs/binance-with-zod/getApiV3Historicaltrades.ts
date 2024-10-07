@@ -1,4 +1,4 @@
-import {tradeZodSchema, Trade} from '@example-outputs/binance-with-zod';
+import {z_Trade, Trade} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   RequestUnion,
@@ -25,7 +25,7 @@ export const getApiV3HistoricaltradesEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: z.array(tradeZodSchema),
+          zodSchema: z.array(z_Trade),
         },
       },
     },

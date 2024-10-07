@@ -1,9 +1,10 @@
-import {orderZodSchema, Order} from '@example-outputs/petstore2-with-zod';
+import {z_Order, Order} from '@example-outputs/petstore2-with-zod';
 import {
   RequestUnion,
   RequestBodyData,
   ResponseBodyData,
   ResponseUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -17,20 +18,20 @@ export const placeOrderEndpointSchema = {
   supportedSecuritySchemas: [],
   bodyByContentType: {
     'application/json': {
-      zodSchema: orderZodSchema,
+      zodSchema: z_Order,
     },
     'application/xml': {
-      zodSchema: orderZodSchema,
+      zodSchema: z_Order,
     },
     'application/x-www-form-urlencoded': {
-      zodSchema: orderZodSchema,
+      zodSchema: z_Order,
     },
   },
   responseByStatus: {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: orderZodSchema,
+          zodSchema: z_Order,
         },
       },
     },
@@ -48,7 +49,7 @@ export type PlaceOrderRequest = RequestUnion<
 
 export type PlaceOrderResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', Order>>
-  | ResponseUnion<405>;
+  | Response<405>;
 
 export type PlaceOrderRequestResult = RequestResult<
   PlaceOrderRequest,

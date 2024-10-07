@@ -1,7 +1,7 @@
 import {
-  subAccountUSDTFuturesDetailsZodSchema,
-  subAccountCOINFuturesDetailsZodSchema,
-  errorZodSchema,
+  z_SubAccountUSDTFuturesDetails,
+  z_SubAccountCOINFuturesDetails,
+  z_Error,
   SubAccountUSDTFuturesDetails,
   SubAccountCOINFuturesDetails,
   Error,
@@ -35,8 +35,8 @@ export const getSapiV2SubAccountFuturesAccountEndpointSchema = {
       bodyByContentType: {
         'application/json': {
           zodSchema: z.union([
-            subAccountUSDTFuturesDetailsZodSchema,
-            subAccountCOINFuturesDetailsZodSchema,
+            z_SubAccountUSDTFuturesDetails,
+            z_SubAccountCOINFuturesDetails,
           ]),
         },
       },
@@ -44,14 +44,14 @@ export const getSapiV2SubAccountFuturesAccountEndpointSchema = {
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

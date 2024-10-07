@@ -1,7 +1,7 @@
 import {
-  bookTickerZodSchema,
-  bookTickerListZodSchema,
-  errorZodSchema,
+  z_BookTicker,
+  z_BookTickerList,
+  z_Error,
   BookTicker,
   BookTickerList,
   Error,
@@ -31,14 +31,14 @@ export const getApiV3TickerBooktickerEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: z.union([bookTickerZodSchema, bookTickerListZodSchema]),
+          zodSchema: z.union([z_BookTicker, z_BookTickerList]),
         },
       },
     },
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

@@ -1,6 +1,6 @@
 import {
-  isolatedMarginAccountInfoZodSchema,
-  errorZodSchema,
+  z_IsolatedMarginAccountInfo,
+  z_Error,
   IsolatedMarginAccountInfo,
   Error,
 } from '@example-outputs/binance-with-zod';
@@ -31,21 +31,21 @@ export const getSapiV1MarginIsolatedAccountEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: isolatedMarginAccountInfoZodSchema,
+          zodSchema: z_IsolatedMarginAccountInfo,
         },
       },
     },
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

@@ -1,6 +1,6 @@
 import {
-  ocoOrderZodSchema,
-  errorZodSchema,
+  z_OcoOrder,
+  z_Error,
   OcoOrder,
   Error,
 } from '@example-outputs/binance-with-zod';
@@ -34,21 +34,21 @@ export const deleteApiV3OrderlistEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: ocoOrderZodSchema,
+          zodSchema: z_OcoOrder,
         },
       },
     },
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

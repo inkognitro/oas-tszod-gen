@@ -4,6 +4,7 @@ import {
   RequestBodyData,
   ResponseBodyData,
   ResponseUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -40,7 +41,7 @@ export type PlaceOrderRequest = RequestUnion<
 
 export type PlaceOrderResponse =
   | ResponseUnion<200, ResponseBodyData<'application/json', Order>>
-  | ResponseUnion<405>;
+  | Response<405>;
 
 export type PlaceOrderRequestResult = RequestResult<
   PlaceOrderRequest,

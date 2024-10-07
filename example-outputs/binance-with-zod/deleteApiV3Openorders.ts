@@ -1,7 +1,7 @@
 import {
-  orderZodSchema,
-  ocoOrderZodSchema,
-  errorZodSchema,
+  z_Order,
+  z_OcoOrder,
+  z_Error,
   Order,
   OcoOrder,
   Error,
@@ -35,8 +35,8 @@ export const deleteApiV3OpenordersEndpointSchema = {
         'application/json': {
           zodSchema: z.array(
             z.intersection(
-              z.union([orderZodSchema.partial(), ocoOrderZodSchema.partial()]),
-              z.union([orderZodSchema, ocoOrderZodSchema])
+              z.union([z_Order.partial(), z_OcoOrder.partial()]),
+              z.union([z_Order, z_OcoOrder])
             )
           ),
         },
@@ -45,14 +45,14 @@ export const deleteApiV3OpenordersEndpointSchema = {
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

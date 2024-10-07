@@ -2,6 +2,7 @@ import {
   RequestUnion,
   ResponseBodyData,
   ResponseUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -44,7 +45,7 @@ export type FindPetsByStatusResponse =
       | ResponseBodyData<'application/xml', Pet[]>
       | ResponseBodyData<'application/json', Pet[]>
     >
-  | ResponseUnion<400>;
+  | Response<400>;
 
 export type FindPetsByStatusRequestResult = RequestResult<
   FindPetsByStatusRequest,

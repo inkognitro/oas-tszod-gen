@@ -1,7 +1,7 @@
 import {
-  repaymentInfoZodSchema,
-  repaymentInfo2ZodSchema,
-  errorZodSchema,
+  z_RepaymentInfo,
+  z_RepaymentInfo2,
+  z_Error,
   RepaymentInfo,
   RepaymentInfo2,
   Error,
@@ -36,21 +36,21 @@ export const postSapiV1LoanRepayEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: z.union([repaymentInfoZodSchema, repaymentInfo2ZodSchema]),
+          zodSchema: z.union([z_RepaymentInfo, z_RepaymentInfo2]),
         },
       },
     },
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

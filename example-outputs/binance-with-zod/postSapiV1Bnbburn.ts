@@ -1,6 +1,6 @@
 import {
-  bnbBurnStatusZodSchema,
-  errorZodSchema,
+  z_BnbBurnStatus,
+  z_Error,
   BnbBurnStatus,
   Error,
 } from '@example-outputs/binance-with-zod';
@@ -32,21 +32,21 @@ export const postSapiV1BnbburnEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: bnbBurnStatusZodSchema,
+          zodSchema: z_BnbBurnStatus,
         },
       },
     },
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

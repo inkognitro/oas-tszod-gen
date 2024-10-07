@@ -1,8 +1,8 @@
 import {
-  orderResponseAckZodSchema,
-  orderResponseResultZodSchema,
-  orderResponseFullZodSchema,
-  errorZodSchema,
+  z_OrderResponseAck,
+  z_OrderResponseResult,
+  z_OrderResponseFull,
+  z_Error,
   OrderResponseAck,
   OrderResponseResult,
   OrderResponseFull,
@@ -60,9 +60,9 @@ export const postApiV3OrderEndpointSchema = {
       bodyByContentType: {
         'application/json': {
           zodSchema: z.union([
-            orderResponseAckZodSchema,
-            orderResponseResultZodSchema,
-            orderResponseFullZodSchema,
+            z_OrderResponseAck,
+            z_OrderResponseResult,
+            z_OrderResponseFull,
           ]),
         },
       },
@@ -70,14 +70,14 @@ export const postApiV3OrderEndpointSchema = {
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

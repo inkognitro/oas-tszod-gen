@@ -1,8 +1,8 @@
 import {
-  snapshotSpotZodSchema,
-  snapshotMarginZodSchema,
-  snapshotFuturesZodSchema,
-  errorZodSchema,
+  z_SnapshotSpot,
+  z_SnapshotMargin,
+  z_SnapshotFutures,
+  z_Error,
   SnapshotSpot,
   SnapshotMargin,
   SnapshotFutures,
@@ -39,9 +39,9 @@ export const getSapiV1AccountsnapshotEndpointSchema = {
       bodyByContentType: {
         'application/json': {
           zodSchema: z.union([
-            snapshotSpotZodSchema,
-            snapshotMarginZodSchema,
-            snapshotFuturesZodSchema,
+            z_SnapshotSpot,
+            z_SnapshotMargin,
+            z_SnapshotFutures,
           ]),
         },
       },
@@ -49,14 +49,14 @@ export const getSapiV1AccountsnapshotEndpointSchema = {
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

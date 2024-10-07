@@ -1,6 +1,6 @@
 import {
-  orderDetailsZodSchema,
-  errorZodSchema,
+  z_OrderDetails,
+  z_Error,
   OrderDetails,
   Error,
 } from '@example-outputs/binance-with-zod';
@@ -31,21 +31,21 @@ export const getApiV3OpenordersEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: z.array(orderDetailsZodSchema),
+          zodSchema: z.array(z_OrderDetails),
         },
       },
     },
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

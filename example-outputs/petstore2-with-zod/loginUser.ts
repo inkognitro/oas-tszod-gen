@@ -3,6 +3,7 @@ import {
   RequestUnion,
   ResponseBodyData,
   ResponseUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -59,7 +60,7 @@ export type LoginUserResponse =
         'X-Expires-After'?: string; // date-time
       }
     >
-  | ResponseUnion<400>;
+  | Response<400>;
 
 export type LoginUserRequestResult = RequestResult<
   LoginUserRequest,

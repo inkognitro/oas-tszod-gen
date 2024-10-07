@@ -1,7 +1,7 @@
 import {
-  priceTickerZodSchema,
-  priceTickerListZodSchema,
-  errorZodSchema,
+  z_PriceTicker,
+  z_PriceTickerList,
+  z_Error,
   PriceTicker,
   PriceTickerList,
   Error,
@@ -31,14 +31,14 @@ export const getApiV3TickerPriceEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: z.union([priceTickerZodSchema, priceTickerListZodSchema]),
+          zodSchema: z.union([z_PriceTicker, z_PriceTickerList]),
         },
       },
     },
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

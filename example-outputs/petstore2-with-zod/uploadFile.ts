@@ -1,7 +1,4 @@
-import {
-  apiResponseZodSchema,
-  ApiResponse,
-} from '@example-outputs/petstore2-with-zod';
+import {z_ApiResponse, ApiResponse} from '@example-outputs/petstore2-with-zod';
 import {z} from 'zod';
 import {
   RequestUnion,
@@ -36,7 +33,7 @@ export const uploadFileEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: apiResponseZodSchema,
+          zodSchema: z_ApiResponse,
         },
       },
     },

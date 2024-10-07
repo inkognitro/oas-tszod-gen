@@ -1,6 +1,5 @@
 import {
   Request,
-  ResponseBodyData,
   Response,
   RequestResult,
   SimpleRequestHandler,

@@ -1,8 +1,7 @@
 import {z} from 'zod';
 import {
   RequestUnion,
-  ResponseBodyData,
-  ResponseUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -42,7 +41,7 @@ export type UpdatePetWithFormRequest = RequestUnion<
   }
 >;
 
-export type UpdatePetWithFormResponse = ResponseUnion<405>;
+export type UpdatePetWithFormResponse = Response<405>;
 
 export type UpdatePetWithFormRequestResult = RequestResult<
   UpdatePetWithFormRequest,

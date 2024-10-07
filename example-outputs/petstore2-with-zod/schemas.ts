@@ -5,7 +5,7 @@ export type Category = {
   name?: string;
 };
 
-export const categoryZodSchema = z.object({
+export const z_Category = z.object({
   id: z.number().int().safe().finite().optional(),
   name: z.string().optional(),
 });
@@ -15,7 +15,7 @@ export type Tag = {
   name?: string;
 };
 
-export const tagZodSchema = z.object({
+export const z_Tag = z.object({
   id: z.number().int().safe().finite().optional(),
   name: z.string().optional(),
 });
@@ -29,12 +29,12 @@ export type Pet = {
   status?: 'available' | 'pending' | 'sold';
 };
 
-export const petZodSchema = z.object({
+export const z_Pet = z.object({
   id: z.number().int().safe().finite().optional(),
   name: z.string(),
-  category: categoryZodSchema.optional(),
+  category: z_Category.optional(),
   photoUrls: z.array(z.string()),
-  tags: z.array(tagZodSchema).optional(),
+  tags: z.array(z_Tag).optional(),
   status: z.enum(['available', 'pending', 'sold']).optional(),
 });
 
@@ -44,7 +44,7 @@ export type ApiResponse = {
   message?: string;
 };
 
-export const apiResponseZodSchema = z.object({
+export const z_ApiResponse = z.object({
   code: z.number().int().safe().finite().optional(),
   type: z.string().optional(),
   message: z.string().optional(),
@@ -59,7 +59,7 @@ export type Order = {
   complete?: boolean;
 };
 
-export const orderZodSchema = z.object({
+export const z_Order = z.object({
   id: z.number().int().safe().finite().optional(),
   petId: z.number().int().safe().finite().optional(),
   quantity: z.number().int().safe().finite().optional(),
@@ -79,7 +79,7 @@ export type User = {
   userStatus?: number; // int
 };
 
-export const userZodSchema = z.object({
+export const z_User = z.object({
   id: z.number().int().safe().finite().optional(),
   username: z.string().optional(),
   firstName: z.string().optional(),

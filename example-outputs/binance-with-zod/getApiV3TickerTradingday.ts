@@ -1,7 +1,7 @@
 import {
-  dayTickerZodSchema,
-  dayTickerListZodSchema,
-  errorZodSchema,
+  z_DayTicker,
+  z_DayTickerList,
+  z_Error,
   DayTicker,
   DayTickerList,
   Error,
@@ -33,14 +33,14 @@ export const getApiV3TickerTradingdayEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: z.union([dayTickerZodSchema, dayTickerListZodSchema]),
+          zodSchema: z.union([z_DayTicker, z_DayTickerList]),
         },
       },
     },
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

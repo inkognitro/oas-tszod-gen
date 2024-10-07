@@ -2,6 +2,7 @@ import {
   RequestUnion,
   ResponseBodyData,
   ResponseUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -44,8 +45,8 @@ export type GetOrderByIdResponse =
       | ResponseBodyData<'application/xml', Order>
       | ResponseBodyData<'application/json', Order>
     >
-  | ResponseUnion<400>
-  | ResponseUnion<404>;
+  | Response<400>
+  | Response<404>;
 
 export type GetOrderByIdRequestResult = RequestResult<
   GetOrderByIdRequest,

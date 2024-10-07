@@ -2,6 +2,7 @@ import {
   RequestUnion,
   ResponseBodyData,
   ResponseUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -44,8 +45,8 @@ export type GetUserByNameResponse =
       | ResponseBodyData<'application/xml', User>
       | ResponseBodyData<'application/json', User>
     >
-  | ResponseUnion<400>
-  | ResponseUnion<404>;
+  | Response<400>
+  | Response<404>;
 
 export type GetUserByNameRequestResult = RequestResult<
   GetUserByNameRequest,

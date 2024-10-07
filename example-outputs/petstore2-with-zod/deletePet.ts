@@ -1,8 +1,7 @@
 import {z} from 'zod';
 import {
   RequestUnion,
-  ResponseBodyData,
-  ResponseUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -41,7 +40,7 @@ export type DeletePetRequest = RequestUnion<
   }
 >;
 
-export type DeletePetResponse = ResponseUnion<400>;
+export type DeletePetResponse = Response<400>;
 
 export type DeletePetRequestResult = RequestResult<
   DeletePetRequest,

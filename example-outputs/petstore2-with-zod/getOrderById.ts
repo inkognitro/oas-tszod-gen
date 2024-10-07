@@ -1,9 +1,10 @@
-import {orderZodSchema, Order} from '@example-outputs/petstore2-with-zod';
+import {z_Order, Order} from '@example-outputs/petstore2-with-zod';
 import {z} from 'zod';
 import {
   RequestUnion,
   ResponseBodyData,
   ResponseUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -23,10 +24,10 @@ export const getOrderByIdEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/xml': {
-          zodSchema: orderZodSchema,
+          zodSchema: z_Order,
         },
         'application/json': {
-          zodSchema: orderZodSchema,
+          zodSchema: z_Order,
         },
       },
     },
@@ -52,8 +53,8 @@ export type GetOrderByIdResponse =
       | ResponseBodyData<'application/xml', Order>
       | ResponseBodyData<'application/json', Order>
     >
-  | ResponseUnion<400>
-  | ResponseUnion<404>;
+  | Response<400>
+  | Response<404>;
 
 export type GetOrderByIdRequestResult = RequestResult<
   GetOrderByIdRequest,

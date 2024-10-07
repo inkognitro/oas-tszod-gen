@@ -1,9 +1,10 @@
-import {userZodSchema, User} from '@example-outputs/petstore2-with-zod';
+import {z_User, User} from '@example-outputs/petstore2-with-zod';
 import {z} from 'zod';
 import {
   RequestUnion,
   ResponseBodyData,
   ResponseUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -23,10 +24,10 @@ export const getUserByNameEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/xml': {
-          zodSchema: userZodSchema,
+          zodSchema: z_User,
         },
         'application/json': {
-          zodSchema: userZodSchema,
+          zodSchema: z_User,
         },
       },
     },
@@ -52,8 +53,8 @@ export type GetUserByNameResponse =
       | ResponseBodyData<'application/xml', User>
       | ResponseBodyData<'application/json', User>
     >
-  | ResponseUnion<400>
-  | ResponseUnion<404>;
+  | Response<400>
+  | Response<404>;
 
 export type GetUserByNameRequestResult = RequestResult<
   GetUserByNameRequest,

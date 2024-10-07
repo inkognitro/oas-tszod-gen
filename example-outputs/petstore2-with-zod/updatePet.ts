@@ -1,9 +1,10 @@
-import {petZodSchema, Pet} from '@example-outputs/petstore2-with-zod';
+import {z_Pet, Pet} from '@example-outputs/petstore2-with-zod';
 import {
   RequestUnion,
   RequestBodyData,
   ResponseBodyData,
   ResponseUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -19,23 +20,23 @@ export const updatePetEndpointSchema = {
   ],
   bodyByContentType: {
     'application/json': {
-      zodSchema: petZodSchema,
+      zodSchema: z_Pet,
     },
     'application/xml': {
-      zodSchema: petZodSchema,
+      zodSchema: z_Pet,
     },
     'application/x-www-form-urlencoded': {
-      zodSchema: petZodSchema,
+      zodSchema: z_Pet,
     },
   },
   responseByStatus: {
     '200': {
       bodyByContentType: {
         'application/xml': {
-          zodSchema: petZodSchema,
+          zodSchema: z_Pet,
         },
         'application/json': {
-          zodSchema: petZodSchema,
+          zodSchema: z_Pet,
         },
       },
     },
@@ -63,9 +64,9 @@ export type UpdatePetResponse =
       | ResponseBodyData<'application/xml', Pet>
       | ResponseBodyData<'application/json', Pet>
     >
-  | ResponseUnion<400>
-  | ResponseUnion<404>
-  | ResponseUnion<405>;
+  | Response<400>
+  | Response<404>
+  | Response<405>;
 
 export type UpdatePetRequestResult = RequestResult<
   UpdatePetRequest,

@@ -1,6 +1,6 @@
 import {
-  marginTradeZodSchema,
-  errorZodSchema,
+  z_MarginTrade,
+  z_Error,
   MarginTrade,
   Error,
 } from '@example-outputs/binance-with-zod';
@@ -36,21 +36,21 @@ export const getSapiV1MarginMytradesEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: z.array(marginTradeZodSchema),
+          zodSchema: z.array(z_MarginTrade),
         },
       },
     },
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

@@ -1,7 +1,7 @@
 import {
-  canceledMarginOrderDetailZodSchema,
-  marginOcoOrderZodSchema,
-  errorZodSchema,
+  z_CanceledMarginOrderDetail,
+  z_MarginOcoOrder,
+  z_Error,
   CanceledMarginOrderDetail,
   MarginOcoOrder,
   Error,
@@ -37,13 +37,10 @@ export const deleteSapiV1MarginOpenordersEndpointSchema = {
           zodSchema: z.array(
             z.intersection(
               z.union([
-                canceledMarginOrderDetailZodSchema.partial(),
-                marginOcoOrderZodSchema.partial(),
+                z_CanceledMarginOrderDetail.partial(),
+                z_MarginOcoOrder.partial(),
               ]),
-              z.union([
-                canceledMarginOrderDetailZodSchema,
-                marginOcoOrderZodSchema,
-              ])
+              z.union([z_CanceledMarginOrderDetail, z_MarginOcoOrder])
             )
           ),
         },
@@ -52,14 +49,14 @@ export const deleteSapiV1MarginOpenordersEndpointSchema = {
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

@@ -1,8 +1,8 @@
 import {
-  marginOrderResponseAckZodSchema,
-  marginOrderResponseResultZodSchema,
-  marginOrderResponseFullZodSchema,
-  errorZodSchema,
+  z_MarginOrderResponseAck,
+  z_MarginOrderResponseResult,
+  z_MarginOrderResponseFull,
+  z_Error,
   MarginOrderResponseAck,
   MarginOrderResponseResult,
   MarginOrderResponseFull,
@@ -62,9 +62,9 @@ export const postSapiV1MarginOrderEndpointSchema = {
       bodyByContentType: {
         'application/json': {
           zodSchema: z.union([
-            marginOrderResponseAckZodSchema,
-            marginOrderResponseResultZodSchema,
-            marginOrderResponseFullZodSchema,
+            z_MarginOrderResponseAck,
+            z_MarginOrderResponseResult,
+            z_MarginOrderResponseFull,
           ]),
         },
       },
@@ -72,14 +72,14 @@ export const postSapiV1MarginOrderEndpointSchema = {
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

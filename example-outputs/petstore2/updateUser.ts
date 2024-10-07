@@ -2,7 +2,6 @@ import {User} from '@example-outputs/petstore2';
 import {
   RequestUnion,
   RequestBodyData,
-  ResponseBodyData,
   Response,
   RequestResult,
   SimpleRequestHandler,

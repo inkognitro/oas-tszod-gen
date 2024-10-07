@@ -1,17 +1,6 @@
 import {
-  $200OkAuthorizationsResponseSchema,
-  authorizationsNotSupportedResponseSchema,
-  $400BadRequestResponseSchema,
-  $404NotFoundDrsObjectResponseSchema,
-  $500InternalServerErrorResponseSchema,
-  $200OkAuthorizationsResponse,
-  AuthorizationsNotSupportedResponse,
-  $400BadRequestResponse,
-  $404NotFoundDrsObjectResponse,
-  $500InternalServerErrorResponse,
-} from '@example-outputs/petstore1';
-import {
   RequestUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -25,12 +14,24 @@ export const optionsObjectEndpointSchema = {
   supportedSecuritySchemas: [],
   bodyByContentType: {},
   responseByStatus: {
-    '200': $200OkAuthorizationsResponseSchema,
-    '204': authorizationsNotSupportedResponseSchema,
-    '400': $400BadRequestResponseSchema,
-    '404': $404NotFoundDrsObjectResponseSchema,
-    '405': authorizationsNotSupportedResponseSchema,
-    '500': $500InternalServerErrorResponseSchema,
+    '200': {
+      bodyByContentType: {},
+    },
+    '204': {
+      bodyByContentType: {},
+    },
+    '400': {
+      bodyByContentType: {},
+    },
+    '404': {
+      bodyByContentType: {},
+    },
+    '405': {
+      bodyByContentType: {},
+    },
+    '500': {
+      bodyByContentType: {},
+    },
   },
 };
 
@@ -42,12 +43,12 @@ export type OptionsObjectRequest = RequestUnion<
 >;
 
 export type OptionsObjectResponse =
-  | $200OkAuthorizationsResponse<200>
-  | AuthorizationsNotSupportedResponse<204>
-  | $400BadRequestResponse<400>
-  | $404NotFoundDrsObjectResponse<404>
-  | AuthorizationsNotSupportedResponse<405>
-  | $500InternalServerErrorResponse<500>;
+  | Response<200>
+  | Response<204>
+  | Response<400>
+  | Response<404>
+  | Response<405>
+  | Response<500>;
 
 export type OptionsObjectRequestResult = RequestResult<
   OptionsObjectRequest,

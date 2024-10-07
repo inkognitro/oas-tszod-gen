@@ -1,9 +1,10 @@
-import {petZodSchema, Pet} from '@example-outputs/petstore2-with-zod';
+import {z_Pet, Pet} from '@example-outputs/petstore2-with-zod';
 import {z} from 'zod';
 import {
   RequestUnion,
   ResponseBodyData,
   ResponseUnion,
+  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -25,10 +26,10 @@ export const findPetsByTagsEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/xml': {
-          zodSchema: z.array(petZodSchema),
+          zodSchema: z.array(z_Pet),
         },
         'application/json': {
-          zodSchema: z.array(petZodSchema),
+          zodSchema: z.array(z_Pet),
         },
       },
     },
@@ -52,7 +53,7 @@ export type FindPetsByTagsResponse =
       | ResponseBodyData<'application/xml', Pet[]>
       | ResponseBodyData<'application/json', Pet[]>
     >
-  | ResponseUnion<400>;
+  | Response<400>;
 
 export type FindPetsByTagsRequestResult = RequestResult<
   FindPetsByTagsRequest,

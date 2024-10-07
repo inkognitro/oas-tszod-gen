@@ -1,6 +1,6 @@
 import {
-  accountZodSchema,
-  errorZodSchema,
+  z_Account,
+  z_Error,
   Account,
   Error,
 } from '@example-outputs/binance-with-zod';
@@ -30,21 +30,21 @@ export const getApiV3AccountEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: accountZodSchema,
+          zodSchema: z_Account,
         },
       },
     },
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

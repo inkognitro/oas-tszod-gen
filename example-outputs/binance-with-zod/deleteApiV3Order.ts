@@ -1,6 +1,6 @@
 import {
-  orderZodSchema,
-  errorZodSchema,
+  z_Order,
+  z_Error,
   Order,
   Error,
 } from '@example-outputs/binance-with-zod';
@@ -37,21 +37,21 @@ export const deleteApiV3OrderEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: orderZodSchema,
+          zodSchema: z_Order,
         },
       },
     },
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

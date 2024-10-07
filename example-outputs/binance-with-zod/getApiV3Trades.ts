@@ -1,6 +1,6 @@
 import {
-  tradeZodSchema,
-  errorZodSchema,
+  z_Trade,
+  z_Error,
   Trade,
   Error,
 } from '@example-outputs/binance-with-zod';
@@ -29,14 +29,14 @@ export const getApiV3TradesEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: z.array(tradeZodSchema),
+          zodSchema: z.array(z_Trade),
         },
       },
     },
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

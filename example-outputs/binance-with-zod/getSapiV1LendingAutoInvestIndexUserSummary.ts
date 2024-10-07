@@ -1,4 +1,4 @@
-import {errorZodSchema, Error} from '@example-outputs/binance-with-zod';
+import {z_Error, Error} from '@example-outputs/binance-with-zod';
 import {z} from 'zod';
 import {
   RequestUnion,
@@ -60,14 +60,14 @@ export const getSapiV1LendingAutoInvestIndexUserSummaryEndpointSchema = {
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },

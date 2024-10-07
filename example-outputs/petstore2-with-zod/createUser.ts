@@ -1,4 +1,4 @@
-import {userZodSchema, User} from '@example-outputs/petstore2-with-zod';
+import {z_User, User} from '@example-outputs/petstore2-with-zod';
 import {
   RequestUnion,
   RequestBodyData,
@@ -17,23 +17,23 @@ export const createUserEndpointSchema = {
   supportedSecuritySchemas: [],
   bodyByContentType: {
     'application/json': {
-      zodSchema: userZodSchema,
+      zodSchema: z_User,
     },
     'application/xml': {
-      zodSchema: userZodSchema,
+      zodSchema: z_User,
     },
     'application/x-www-form-urlencoded': {
-      zodSchema: userZodSchema,
+      zodSchema: z_User,
     },
   },
   responseByStatus: {
     default: {
       bodyByContentType: {
         'application/json': {
-          zodSchema: userZodSchema,
+          zodSchema: z_User,
         },
         'application/xml': {
-          zodSchema: userZodSchema,
+          zodSchema: z_User,
         },
       },
     },

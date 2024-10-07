@@ -5,7 +5,7 @@ export type Error = {
   msg: string;
 };
 
-export const errorZodSchema = z.object({
+export const z_Error = z.object({
   code: z.number().int().safe().finite(),
   msg: z.string(),
 });
@@ -20,7 +20,7 @@ export type Trade = {
   isBestMatch: boolean;
 };
 
-export const tradeZodSchema = z.object({
+export const z_Trade = z.object({
   id: z.number().int().safe().finite(),
   price: z.string(),
   qty: z.string(),
@@ -41,7 +41,7 @@ export type AggTrade = {
   M: boolean;
 };
 
-export const aggTradeZodSchema = z.object({
+export const z_AggTrade = z.object({
   a: z.number().int().safe().finite(),
   p: z.string(),
   q: z.string(),
@@ -74,7 +74,7 @@ export type Ticker = {
   count: number; // int
 };
 
-export const tickerZodSchema = z.object({
+export const z_Ticker = z.object({
   symbol: z.string(),
   priceChange: z.string(),
   priceChangePercent: z.string(),
@@ -98,7 +98,7 @@ export const tickerZodSchema = z.object({
 
 export type TickerList = Ticker[];
 
-export const tickerListZodSchema = z.array(tickerZodSchema);
+export const z_TickerList = z.array(z_Ticker);
 
 export type DayTicker = {
   symbol: string;
@@ -118,7 +118,7 @@ export type DayTicker = {
   count: number; // int
 };
 
-export const dayTickerZodSchema = z.object({
+export const z_DayTicker = z.object({
   symbol: z.string(),
   priceChange: z.string(),
   priceChangePercent: z.string(),
@@ -138,21 +138,21 @@ export const dayTickerZodSchema = z.object({
 
 export type DayTickerList = DayTicker[];
 
-export const dayTickerListZodSchema = z.array(dayTickerZodSchema);
+export const z_DayTickerList = z.array(z_DayTicker);
 
 export type PriceTicker = {
   symbol: string;
   price: string;
 };
 
-export const priceTickerZodSchema = z.object({
+export const z_PriceTicker = z.object({
   symbol: z.string(),
   price: z.string(),
 });
 
 export type PriceTickerList = PriceTicker[];
 
-export const priceTickerListZodSchema = z.array(priceTickerZodSchema);
+export const z_PriceTickerList = z.array(z_PriceTicker);
 
 export type BookTicker = {
   symbol: string;
@@ -162,7 +162,7 @@ export type BookTicker = {
   askQty: string;
 };
 
-export const bookTickerZodSchema = z.object({
+export const z_BookTicker = z.object({
   symbol: z.string(),
   bidPrice: z.string(),
   bidQty: z.string(),
@@ -172,7 +172,7 @@ export const bookTickerZodSchema = z.object({
 
 export type BookTickerList = BookTicker[];
 
-export const bookTickerListZodSchema = z.array(bookTickerZodSchema);
+export const z_BookTickerList = z.array(z_BookTicker);
 
 export type OrderDetails = {
   symbol: string;
@@ -199,7 +199,7 @@ export type OrderDetails = {
   preventedQuantity?: string;
 };
 
-export const orderDetailsZodSchema = z.object({
+export const z_OrderDetails = z.object({
   symbol: z.string(),
   orderId: z.number().int().safe().finite(),
   orderListId: z.number().int().safe().finite(),
@@ -232,7 +232,7 @@ export type OrderResponseAck = {
   transactTime: number; // int
 };
 
-export const orderResponseAckZodSchema = z.object({
+export const z_OrderResponseAck = z.object({
   symbol: z.string(),
   orderId: z.number().int().safe().finite(),
   orderListId: z.number().int().safe().finite(),
@@ -260,7 +260,7 @@ export type OrderResponseResult = {
   selfTradePreventionMode: string;
 };
 
-export const orderResponseResultZodSchema = z.object({
+export const z_OrderResponseResult = z.object({
   symbol: z.string(),
   orderId: z.number().int().safe().finite(),
   orderListId: z.number().int().safe().finite(),
@@ -306,7 +306,7 @@ export type OrderResponseFull = {
   }[];
 };
 
-export const orderResponseFullZodSchema = z.object({
+export const z_OrderResponseFull = z.object({
   symbol: z.string(),
   orderId: z.number().int().safe().finite(),
   orderListId: z.number().int().safe().finite(),
@@ -352,7 +352,7 @@ export type Order = {
   selfTradePreventionMode: string;
 };
 
-export const orderZodSchema = z.object({
+export const z_Order = z.object({
   symbol: z.string(),
   origClientOrderId: z.string(),
   orderId: z.number().int().safe().finite(),
@@ -403,7 +403,7 @@ export type OcoOrder = {
   }[];
 };
 
-export const ocoOrderZodSchema = z.object({
+export const z_OcoOrder = z.object({
   orderListId: z.number().int().safe().finite(),
   contingencyType: z.string(),
   listStatusType: z.string(),
@@ -468,7 +468,7 @@ export type Account = {
   uid: number; // int
 };
 
-export const accountZodSchema = z.object({
+export const z_Account = z.object({
   makerCommission: z.number().int().safe().finite(),
   takerCommission: z.number().int().safe().finite(),
   buyerCommission: z.number().int().safe().finite(),
@@ -514,7 +514,7 @@ export type MyTrade = {
   isBestMatch: boolean;
 };
 
-export const myTradeZodSchema = z.object({
+export const z_MyTrade = z.object({
   symbol: z.string(),
   id: z.number().int().safe().finite(),
   orderId: z.number().int().safe().finite(),
@@ -551,7 +551,7 @@ export type MarginOrderDetail = {
   selfTradePreventionMode: string;
 };
 
-export const marginOrderDetailZodSchema = z.object({
+export const z_MarginOrderDetail = z.object({
   clientOrderId: z.string(),
   cummulativeQuoteQty: z.string(),
   executedQty: z.string(),
@@ -580,7 +580,7 @@ export type MarginOrderResponseAck = {
   transactTime: number; // int
 };
 
-export const marginOrderResponseAckZodSchema = z.object({
+export const z_MarginOrderResponseAck = z.object({
   symbol: z.string(),
   orderId: z.number().int().safe().finite(),
   clientOrderId: z.string(),
@@ -604,7 +604,7 @@ export type MarginOrderResponseResult = {
   side: string;
 };
 
-export const marginOrderResponseResultZodSchema = z.object({
+export const z_MarginOrderResponseResult = z.object({
   symbol: z.string(),
   orderId: z.number().int().safe().finite(),
   clientOrderId: z.string(),
@@ -644,7 +644,7 @@ export type MarginOrderResponseFull = {
   }[];
 };
 
-export const marginOrderResponseFullZodSchema = z.object({
+export const z_MarginOrderResponseFull = z.object({
   symbol: z.string(),
   orderId: z.number().int().safe().finite(),
   clientOrderId: z.string(),
@@ -685,7 +685,7 @@ export type MarginOrder = {
   side: string;
 };
 
-export const marginOrderZodSchema = z.object({
+export const z_MarginOrder = z.object({
   symbol: z.string(),
   orderId: z.number().int().safe().finite(),
   origClientOrderId: z.string(),
@@ -717,7 +717,7 @@ export type CanceledMarginOrderDetail = {
   side: string;
 };
 
-export const canceledMarginOrderDetailZodSchema = z.object({
+export const z_CanceledMarginOrderDetail = z.object({
   symbol: z.string(),
   isIsolated: z.boolean(),
   origClientOrderId: z.string(),
@@ -766,7 +766,7 @@ export type MarginOcoOrder = {
   }[];
 };
 
-export const marginOcoOrderZodSchema = z.object({
+export const z_MarginOcoOrder = z.object({
   orderListId: z.number().int().safe().finite(),
   contingencyType: z.string(),
   listStatusType: z.string(),
@@ -817,7 +817,7 @@ export type MarginTrade = {
   time: number; // int
 };
 
-export const marginTradeZodSchema = z.object({
+export const z_MarginTrade = z.object({
   commission: z.string(),
   commissionAsset: z.string(),
   id: z.number().int().safe().finite(),
@@ -874,7 +874,7 @@ export type IsolatedMarginAccountInfo = {
   totalNetAssetOfBtc: string;
 };
 
-export const isolatedMarginAccountInfoZodSchema = z.object({
+export const z_IsolatedMarginAccountInfo = z.object({
   assets: z.array(
     z.object({
       baseAsset: z.object({
@@ -923,7 +923,7 @@ export type BnbBurnStatus = {
   interestBNBBurn: boolean;
 };
 
-export const bnbBurnStatusZodSchema = z.object({
+export const z_BnbBurnStatus = z.object({
   spotBNBBurn: z.boolean(),
   interestBNBBurn: z.boolean(),
 });
@@ -945,7 +945,7 @@ export type SnapshotSpot = {
   }[];
 };
 
-export const snapshotSpotZodSchema = z.object({
+export const z_SnapshotSpot = z.object({
   code: z.number().int().safe().finite(),
   msg: z.string(),
   snapshotVos: z.array(
@@ -989,7 +989,7 @@ export type SnapshotMargin = {
   }[];
 };
 
-export const snapshotMarginZodSchema = z.object({
+export const z_SnapshotMargin = z.object({
   code: z.number().int().safe().finite(),
   msg: z.string(),
   snapshotVos: z.array(
@@ -1039,7 +1039,7 @@ export type SnapshotFutures = {
   }[];
 };
 
-export const snapshotFuturesZodSchema = z.object({
+export const z_SnapshotFutures = z.object({
   code: z.number().int().safe().finite(),
   msg: z.string(),
   snapshotVos: z.array(
@@ -1098,7 +1098,7 @@ export type SubAccountUSDTFuturesDetails = {
   };
 };
 
-export const subAccountUSDTFuturesDetailsZodSchema = z.object({
+export const z_SubAccountUSDTFuturesDetails = z.object({
   futureAccountResp: z.object({
     email: z.string(),
     assets: z.array(
@@ -1150,7 +1150,7 @@ export type SubAccountCOINFuturesDetails = {
   updateTime: number; // int
 };
 
-export const subAccountCOINFuturesDetailsZodSchema = z.object({
+export const z_SubAccountCOINFuturesDetails = z.object({
   email: z.string(),
   assets: z.array(
     z.object({
@@ -1196,7 +1196,7 @@ export type SubAccountUSDTFuturesSummary = {
   };
 };
 
-export const subAccountUSDTFuturesSummaryZodSchema = z.object({
+export const z_SubAccountUSDTFuturesSummary = z.object({
   futureAccountSummaryResp: z.object({
     totalInitialMargin: z.string(),
     totalMaintenanceMargin: z.string(),
@@ -1238,7 +1238,7 @@ export type SubAccountCOINFuturesSummary = {
   };
 };
 
-export const subAccountCOINFuturesSummaryZodSchema = z.object({
+export const z_SubAccountCOINFuturesSummary = z.object({
   deliveryAccountSummaryResp: z.object({
     totalMarginBalanceOfBTC: z.string(),
     totalUnrealizedProfitOfBTC: z.string(),
@@ -1269,7 +1269,7 @@ export type SubAccountUSDTFuturesPositionRisk = {
   }[];
 };
 
-export const subAccountUSDTFuturesPositionRiskZodSchema = z.object({
+export const z_SubAccountUSDTFuturesPositionRisk = z.object({
   futurePositionRiskVos: z.array(
     z.object({
       entryPrice: z.string(),
@@ -1300,7 +1300,7 @@ export type SubAccountCOINFuturesPositionRisk = {
   }[];
 };
 
-export const subAccountCOINFuturesPositionRiskZodSchema = z.object({
+export const z_SubAccountCOINFuturesPositionRisk = z.object({
   deliveryPositionRiskVos: z.array(
     z.object({
       entryPrice: z.string(),
@@ -1328,7 +1328,7 @@ export type RepaymentInfo = {
   repayStatus: string;
 };
 
-export const repaymentInfoZodSchema = z.object({
+export const z_RepaymentInfo = z.object({
   loanCoin: z.string(),
   remainingPrincipal: z.string(),
   remainingInterest: z.string(),
@@ -1344,7 +1344,7 @@ export type RepaymentInfo2 = {
   repayStatus: string;
 };
 
-export const repaymentInfo2ZodSchema = z.object({
+export const z_RepaymentInfo2 = z.object({
   loanCoin: z.string(),
   collateralCoin: z.string(),
   repayStatus: z.string(),

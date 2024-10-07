@@ -1,6 +1,6 @@
 import {
-  marginOrderZodSchema,
-  errorZodSchema,
+  z_MarginOrder,
+  z_Error,
   MarginOrder,
   Error,
 } from '@example-outputs/binance-with-zod';
@@ -35,21 +35,21 @@ export const deleteSapiV1MarginOrderEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: marginOrderZodSchema,
+          zodSchema: z_MarginOrder,
         },
       },
     },
     '400': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
     '401': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: errorZodSchema,
+          zodSchema: z_Error,
         },
       },
     },
