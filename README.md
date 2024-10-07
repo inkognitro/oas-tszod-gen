@@ -351,7 +351,7 @@ The decision of having a `RequestHandler` interface with granular implementation
 in mind: `server` vs `client` | `prod` vs `test` | custom "middleware" behaviour.
 You can write your own implementations or just combine some of the existing ones below, according to your needs.
 The `RequestHandler` interface for custom implementations can be found
-[here](https://github.com/inkognitro/oas-tszod-gen/blob/main/src/templates/core/core.ts#L263).
+[here](https://github.com/inkognitro/oas-tszod-gen/blob/main/src/templates/core/core.ts#L343).
 
 ### AxiosRequestHandler
 This implementation is responsible for executing your requests through the http(s) protocol.

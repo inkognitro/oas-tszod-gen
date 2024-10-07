@@ -1,43 +1,5 @@
 import {ZodSchema} from 'zod';
 
-export type RequestHeaders = {
-  [headerName: string]: string | number;
-};
-
-export type ResponseHeaders = {
-  [headerName: string]: string;
-};
-
-export type PathParams = {
-  [paramName: string]: number | string;
-};
-
-export type QueryParams = {
-  [paramName: string]:
-    | null
-    | undefined
-    | QueryParams
-    | QueryParams[]
-    | string
-    | number
-    | boolean;
-};
-
-export type RequestCookies = {
-  [cookieName: string]: string;
-};
-
-export type RequestBody =
-  | Blob
-  | FormData
-  | FormDataObject
-  | PlainObject
-  | string;
-
-export type FormDataObject = {
-  [key: string]: undefined | string | number | boolean | Blob;
-};
-
 export type PlainObject =
   | null
   | (null | boolean | number | string | PlainObject)[]
@@ -79,6 +41,10 @@ export function isPlainObject(
   return true;
 }
 
+export type FormDataObject = {
+  [key: string]: undefined | string | number | boolean | Blob;
+};
+
 export function findMatchingSchemaContentType(
   actualStatus: number,
   actualContentType: string,
@@ -110,15 +76,155 @@ export function findMatchingSchemaContentType(
   }, null);
 }
 
-export type RequestCreationSettings = {
-  headers?: RequestHeaders;
-  cookies?: RequestCookies;
-  pathParams?: PathParams;
-  queryParams?: QueryParams;
-  contentType?: string;
-  body?: RequestBody;
-  endpointSchema: EndpointSchema;
+export type EndpointSecuritySchema = {
+  name: string;
+  scopes: string[];
 };
+
+export type ResponseSchema = {
+  bodyByContentType: Record<
+    string,
+    {
+      zodSchema: ZodSchema; // only defined by the generator when "withZod: true"
+    }
+  >;
+  headersZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+};
+
+export type EndpointSchema = {
+  path: string;
+  method: string;
+  supportedSecuritySchemas: EndpointSecuritySchema[];
+  bodyByContentType: Record<
+    string,
+    {
+      zodSchema: ZodSchema; // only defined by the generator when "withZod: true"
+    }
+  >;
+  headersZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  cookiesZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  pathParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  queryParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+  responseByStatus: Partial<Record<number | 'default', ResponseSchema>>;
+};
+
+export type PathParams = {
+  [paramName: string]: number | string;
+};
+
+export type QueryParams = {
+  [paramName: string]:
+    | undefined
+    | null
+    | QueryParams
+    | QueryParams[]
+    | string
+    | string[]
+    | number
+    | number[]
+    | boolean
+    | boolean[];
+};
+
+export type RequestHeaders = {
+  [headerName: string]: string | number;
+};
+
+export type RequestCookies = {
+  [cookieName: string]: string | number;
+};
+
+export type RequestBody =
+  | Blob
+  | FormData
+  | FormDataObject
+  | PlainObject
+  | string;
+
+export type RequestBodyData<
+  TContentType extends string = any,
+  TBody extends RequestBody = any,
+> = {contentType: TContentType; body: TBody};
+
+export type Request<
+  Ct extends string | undefined = any,
+  TBody extends RequestBody | undefined = any,
+  TPathParams extends PathParams | undefined = any,
+  TQueryParams extends QueryParams | undefined = any,
+  THeaders extends RequestHeaders | undefined = any,
+  TCookies extends RequestCookies | undefined = any,
+> = {
+  endpointSchema: EndpointSchema;
+  id: string;
+  url: string;
+  headers: THeaders;
+  cookies: TCookies;
+  pathParams: TPathParams;
+  queryParams: TQueryParams;
+  // According to given OAS3 specs; used as default for the "content-type" request header
+  contentType: Ct;
+  body: TBody;
+};
+
+export type RequestUnion<
+  TBodyData extends RequestBodyData,
+  TPathParams extends PathParams | undefined = any,
+  TQueryParams extends QueryParams | undefined = any,
+  THeaders extends RequestHeaders | undefined = any,
+  TCookies extends RequestCookies | undefined = any,
+> = TBodyData extends any
+  ? Request<
+      TBodyData['contentType'],
+      TBodyData['body'],
+      TPathParams,
+      TQueryParams,
+      THeaders,
+      TCookies
+    >
+  : never;
+
+export type RequiredAndPartial<
+  T extends object = any,
+  RFields extends keyof T = any,
+  OFields extends keyof T = any,
+> = Required<Pick<T, RFields>> & Partial<Pick<T, OFields>>;
+
+export type RequestPayload<
+  TRequest extends Request = any,
+  RFields extends 'pathParams' | 'queryParams' | 'contentType' | 'body' = any,
+  OFields extends 'cookies' | 'headers' | 'queryParams' = any,
+> = RequiredAndPartial<
+  {
+    requestId: string;
+    headers: TRequest['headers'];
+    cookies: TRequest['cookies'];
+    pathParams: TRequest['pathParams'];
+    queryParams: TRequest['queryParams'];
+    contentType: TRequest['contentType'];
+    body: TRequest['body'];
+  },
+  RFields,
+  'requestId' | OFields
+>;
+
+export type RequestFromPayload<TPayload extends RequestPayload> = Request<
+  TPayload['pathParams'],
+  TPayload['queryParams'],
+  TPayload['headers'],
+  TPayload['cookies'],
+  TPayload['contentType'],
+  TPayload['body']
+>;
+
+export function createRequestId(): string {
+  const chars =
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+  let requestId = '';
+  for (let i = 32; i > 0; i--) {
+    requestId += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return requestId;
+}
 
 export function createRequestUrl(
   endpointPath: string,
@@ -148,67 +254,27 @@ export function createRequestUrl(
   return url;
 }
 
-export type EndpointSecuritySchema = {
-  name: string;
-  scopes: string[];
-};
-
-export type EndpointSchema = {
-  path: string;
-  method: string;
-  supportedSecuritySchemas: EndpointSecuritySchema[];
-  bodyByContentType: Record<
-    string,
-    {
-      zodSchema: ZodSchema; // only defined by the generator when "withZod: true"
-    }
-  >;
-  headersZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  cookiesZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  pathParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  queryParamsZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
-  responseByStatus: Partial<Record<number | 'default', ResponseSchema>>;
-};
-
-export function createRequest(settings: RequestCreationSettings): Request {
-  const chars =
-    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
-  let requestId = '';
-  for (let i = 32; i > 0; i--) {
-    requestId += chars[Math.floor(Math.random() * chars.length)];
-  }
+export function createRequest<TPayload extends RequestPayload>(
+  endpointSchema: EndpointSchema,
+  payload?: RequestPayload
+): RequestFromPayload<TPayload> {
+  const p = payload ?? {};
   return {
-    ...settings,
-    id: requestId,
-    url: createRequestUrl(
-      settings.endpointSchema.path,
-      settings.pathParams ?? {}
-    ),
-    contentType: settings.contentType ?? null,
+    ...payload,
+    id: p.requestId ?? createRequestId(),
+    url: createRequestUrl(endpointSchema.path, p.pathParams ?? {}),
+    contentType: p.contentType,
+    body: p.body,
+    pathParams: p.pathParams,
+    queryParams: p.queryParams,
+    headers: p.headers,
+    cookies: p.cookies,
+    endpointSchema: endpointSchema,
   };
 }
 
-export type Request = {
-  id: string;
-  url: string;
-  headers?: RequestHeaders;
-  cookies?: RequestCookies;
-  pathParams?: PathParams;
-  queryParams?: QueryParams;
-  // according to oas3 specs; used as default for the "content-type" request header
-  contentType: string | null;
-  body?: RequestBody;
-  endpointSchema: EndpointSchema;
-};
-
-export type ResponseSchema = {
-  bodyByContentType: Record<
-    string,
-    {
-      zodSchema: ZodSchema; // only defined by the generator when "withZod: true"
-    }
-  >;
-  headersZodSchema?: ZodSchema; // only defined by the generator when "withZod: true"
+export type ResponseHeaders = {
+  [headerName: string]: string;
 };
 
 export type ResponseSetCookies = {
@@ -230,13 +296,13 @@ export type ResponseBodyData<
   body: B;
 };
 
-export type Response<
+export interface Response<
   S extends number = any,
   Ct extends string | null = any,
   B extends ResponseBody = any,
   H extends ResponseHeaders = any,
   C extends ResponseSetCookies = any,
-> = {
+> {
   status: S;
   headers: H;
   cookies: C;
@@ -244,7 +310,7 @@ export type Response<
   contentType: Ct;
   revealBody: () => Promise<B>;
   revealBodyAsArrayBuffer: () => Promise<ArrayBuffer>;
-};
+}
 
 export type ResponseUnion<
   S extends number = any,

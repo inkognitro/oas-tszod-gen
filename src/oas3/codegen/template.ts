@@ -44,6 +44,27 @@ const templateCreateRequestUrlFunction: TemplateDefinitionOutput = {
   getRequiredOutputPaths: () => [templatePathParamsType.path],
 };
 
+const templateRequiredAndPartialType: TemplateDefinitionOutput = {
+  type: OutputType.TEMPLATE_DEFINITION,
+  definitionType: 'type',
+  path: ['core', 'core', 'requiredAndPartial'],
+  createName: () => {
+    return 'RequiredAndPartial';
+  },
+  createGenericsDeclarationCode: () => {
+    const codeParts = [
+      'T extends object = any,',
+      'RFields extends keyof T = any,',
+      'OFields extends keyof T = any,',
+    ];
+    return codeParts.join('\n');
+  },
+  createCode: () => {
+    return 'Required<Pick<T, RFields>> & Partial<Pick<T, OFields>>';
+  },
+  getRequiredOutputPaths: () => [],
+};
+
 const templateRequestPayloadTypePath = ['core', 'core', 'requestPayload'];
 export const templateRequestPayloadType: TemplateDefinitionOutput = {
   type: OutputType.TEMPLATE_DEFINITION,
@@ -57,24 +78,27 @@ export const templateRequestPayloadType: TemplateDefinitionOutput = {
       `TRequest extends  ${templateRequestType.createName(
         templateRequestPayloadTypePath
       )} = any,`,
-      'TFields extends "cookies" | "headers" | "pathParams" | "queryParams" | "contentType" | "body" = any,',
+      "RFields extends 'pathParams' | 'queryParams' | 'contentType' | 'body' = any,",
+      "OFields extends 'cookies' | 'headers' | 'queryParams' = any,",
     ];
     return codeParts.join('\n');
   },
   createCode: () => {
     const fieldCodeParts = [
-      'requestId?: string; // always optional',
-      'headers?: TRequest["headers"]; // always optional',
-      'cookies?: TRequest["cookies"]; // always optional',
+      'requestId: string;',
+      'headers: TRequest["headers"];',
+      'cookies: TRequest["cookies"];',
       'pathParams: TRequest["pathParams"];',
       'queryParams: TRequest["queryParams"];',
       'contentType: TRequest["contentType"];',
       'body: TRequest["body"];',
     ];
-    return `Pick<{${fieldCodeParts.join('\n')}}, "requestId" | TFields>`;
+    return `${templateRequiredAndPartialType.createName(
+      templateRequestPayloadTypePath
+    )}<{${fieldCodeParts.join('\n')}}, RFields, "requestId" | OFields>`;
   },
   getRequiredOutputPaths: () => {
-    return [templateRequestType.path];
+    return [templateRequestType.path, templateRequiredAndPartialType.path];
   },
 };
 
@@ -931,6 +955,7 @@ export const templateDefinitionOutputs: TemplateDefinitionOutput[] = [
   templateRequestBodyDataType,
   templateRequestType,
   templateRequestUnionType,
+  templateRequiredAndPartialType,
   templateRequestPayloadType,
   templateRequestFromPayloadType,
   templateCreateRequestIdFunction,

@@ -77,13 +77,20 @@ function findPayloadParamCode(
   path: OutputPath,
   applyRequestResult: ApplyRequestTypeDefinitionResult
 ): null | string {
-  const fields = applyRequestResult.payloadFields;
-  if (!fields.length) {
+  const requiredFields = applyRequestResult.requiredPayloadFields;
+  const optionalFields = applyRequestResult.optionalPayloadFields;
+  if (!requiredFields.length && !optionalFields.length) {
     return null;
   }
+  const requiredFieldsCode = requiredFields.length
+    ? `'${requiredFields.join("' | '")}'`
+    : 'never';
+  const optionalFieldsCode = optionalFields.length
+    ? `'${optionalFields.join("' | '")}'`
+    : 'never';
   const requestPayloadTypeName = templateRequestPayloadType.createName(path);
   const requestTypeName = applyRequestResult.typeDefinition.createName(path);
-  return `payload: ${requestPayloadTypeName}<${requestTypeName}, '${fields.join("' | '")}'>`;
+  return `payload: ${requestPayloadTypeName}<${requestTypeName}, ${requiredFieldsCode}, ${optionalFieldsCode}>`;
 }
 
 export function applyEndpointCallerFunction(

@@ -130,13 +130,18 @@ function applyNullableRequestBodyByContentTypeMap(
   };
 }
 
-function applyNullableRequestLocationParameters(
+type ApplyRequestLocationParametersResult = {
+  hasAtLeastOneRequiredParameter: boolean;
+  codeOutput: CodeGenerationOutput;
+};
+
+function applyNullableRequestLocationParametersResult(
   codeGenerator: CodeGenerator,
   requestParameters: Parameter[],
   path: OutputPath,
   ctx: Context,
   parameterLocation: ConcreteParameterLocation
-): null | CodeGenerationOutput {
+): null | ApplyRequestLocationParametersResult {
   const objectSchema = findObjectSchemaFromLocationParameters(
     codeGenerator,
     requestParameters,
@@ -145,7 +150,11 @@ function applyNullableRequestLocationParameters(
   if (!objectSchema) {
     return null;
   }
-  return applyObjectSchema(codeGenerator, objectSchema, path, ctx);
+  const codeOutput = applyObjectSchema(codeGenerator, objectSchema, path, ctx);
+  return {
+    codeOutput,
+    hasAtLeastOneRequiredParameter: !!objectSchema.required?.length,
+  };
 }
 
 export type RequestPayloadField =
@@ -157,7 +166,8 @@ export type RequestPayloadField =
   | 'body';
 
 export type ApplyRequestTypeDefinitionResult = {
-  payloadFields: RequestPayloadField[];
+  requiredPayloadFields: RequestPayloadField[];
+  optionalPayloadFields: RequestPayloadField[];
   typeDefinition: DefinitionOutput;
 };
 
@@ -167,34 +177,35 @@ export function applyRequestTypeDefinition(
   path: OutputPath,
   ctx: Context
 ): ApplyRequestTypeDefinitionResult {
-  const pathParamsCodeOutput = applyNullableRequestLocationParameters(
+  const pathParamsCodeOutput = applyNullableRequestLocationParametersResult(
     codeGenerator,
     schema.parameters ?? [],
     [...path, 'pathParams'],
     ctx,
     'path'
-  );
-  const queryParamsCodeOutput = applyNullableRequestLocationParameters(
+  )?.codeOutput;
+  const queryParamsResult = applyNullableRequestLocationParametersResult(
     codeGenerator,
     schema.parameters ?? [],
     [...path, 'queryParams'],
     ctx,
     'query'
   );
-  const headersCodeOutput = applyNullableRequestLocationParameters(
+  const queryParamsCodeOutput = queryParamsResult?.codeOutput;
+  const headersCodeOutput = applyNullableRequestLocationParametersResult(
     codeGenerator,
     schema.parameters ?? [],
     [...path, 'headers'],
     ctx,
     'header'
-  );
-  const cookiesCodeOutput = applyNullableRequestLocationParameters(
+  )?.codeOutput;
+  const cookiesCodeOutput = applyNullableRequestLocationParametersResult(
     codeGenerator,
     schema.parameters ?? [],
     [...path, 'cookies'],
     ctx,
     'cookie'
-  );
+  )?.codeOutput;
   let bodyCodeOutput: CodeGenerationOutput | null = null;
   if (schema.requestBody?.content) {
     bodyCodeOutput = applyNullableRequestBodyByContentTypeMap(
@@ -280,25 +291,32 @@ export function applyRequestTypeDefinition(
     },
   };
   codeGenerator.addOutput(typeDefinition, ctx);
-  const includedFields: RequestPayloadField[] = [];
+  const requiredFields: RequestPayloadField[] = [];
+  const optionalFields: RequestPayloadField[] = [];
   if (pathParamsCodeOutput) {
-    includedFields.push('pathParams');
+    requiredFields.push('pathParams');
   }
-  if (queryParamsCodeOutput) {
-    includedFields.push('queryParams');
+  if (
+    queryParamsCodeOutput &&
+    queryParamsResult?.hasAtLeastOneRequiredParameter
+  ) {
+    requiredFields.push('queryParams');
+  } else if (queryParamsCodeOutput) {
+    optionalFields.push('queryParams');
   }
   if (headersCodeOutput) {
-    includedFields.push('headers');
+    optionalFields.push('headers');
   }
   if (cookiesCodeOutput) {
-    includedFields.push('cookies');
+    optionalFields.push('cookies');
   }
   if (bodyCodeOutput) {
-    includedFields.push('contentType');
-    includedFields.push('body');
+    requiredFields.push('contentType');
+    requiredFields.push('body');
   }
   return {
     typeDefinition,
-    payloadFields: includedFields,
+    requiredPayloadFields: requiredFields,
+    optionalPayloadFields: optionalFields,
   };
 }
