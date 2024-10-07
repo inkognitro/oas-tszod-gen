@@ -51,39 +51,44 @@ import { generateOas3ToTs } from 'oas-tszod-gen';
 const oas3Specification = require('./api.specs.json');
 
 generateOas3ToTs({
+  // required
   getSpecification: () => {
     return new Promise(resolve => {
       resolve(oas3Specification);
     });
   },
   
+  // required
   outputFolderPath: './generated-api',
   
+  // optional:
+  // The folder structure is generated from resulting outputPaths of the given operationIds.
+  // If some additional sub folders are required the configuration can be done as follow:
   predefinedFolderOutputPaths: [
+    ['core'],
     // For outputs having an `OutputPath` starting with ['core']:
     // Variables and type definitions are put in the `{outputFolderPath}/core` folder
-    ['core'],
     
+    ['util', 'foo'],
     // For outputs having an `OutputPath` starting with ['util', 'foo']:
     // Variables and type definitions are put in the `{outputFolderPath}/util/foo` folder
-    ['util', 'foo'],
   ],
   
+  // required
   logger: {
     log: (content) => {
       console.log(content);
     },
   },
   
+  // optional:
   // By default or in case of `false`, only TypeScript types are generated without Zod schemas
-  // [optional]
   withZod: true,
-
-
-  // This will add only the defined templates.
+  
+  // optional:
+  // The following will add only the defined templates.
   // An empty array results in no added templates.
   // By default, all available templates will be added to your codebase.
-  // [optional]
   templates: [
     'AxiosRequestHandler',
     'AuthRequestHandler',
@@ -91,20 +96,22 @@ generateOas3ToTs({
     'ZodValidationRequestHandler'
   ],
 
-  // Whether a specific operation - or endpoint respectively - should be added
-  // [optional]
+  // optional: Modify output paths which resulted from an operation
+  createModifiedOperationOutputPath: (outputPath) => {
+    return outputPath[0] === 'v1' ? outputPath.slice(1) : outputPath;
+  },
+  
+  // optional: Whether a specific operation (endpoint respectively) should be added
   shouldAddOperation: (path, method, endpointSchema) => {
     return true; // adjust according to your needs
   },
   
-  // Whether a specific content type request body should be added
-  // [optional]
+  // optional: Whether a specific content type request body should be added
   shouldAddRequestBodyContent: (contentType, requestBodyContentSchema) => {
     return ['multipart/form-data', 'application/json'].includes(contentType);
   },
   
-  // Whether a specific content type response body should be added
-  // [optional]
+  // optional: Whether a specific content type response body should be added
   shouldAddResponseBodyContent: (contentType, responseBodyContentSchema) => {
     return ['multipart/form-data', 'application/json'].includes(contentType);
   },
