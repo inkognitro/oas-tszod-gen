@@ -207,7 +207,7 @@ function applyComponentRefResponseSchema(
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
     createName: referencingPath => {
-      return codeGenerator.createComponentConstNameForResponseSchema(
+      return codeGenerator.createComponentNameForResponseSchemaConst(
         schema.$ref,
         referencingPath
       );
@@ -224,7 +224,7 @@ function applyComponentRefResponseSchema(
   return {
     ...output,
     createCode: referencingPath =>
-      codeGenerator.createComponentConstNameForResponseSchema(
+      codeGenerator.createComponentNameForResponseSchemaConst(
         schema.$ref,
         referencingPath
       ),

@@ -498,7 +498,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       ]),
       definitionType: 'const',
       createName: referencingPath =>
-        this.createComponentConstNameForResponseSchema(
+        this.createComponentNameForResponseSchemaConst(
           componentRef,
           referencingPath
         ),
@@ -549,7 +549,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
         type: OutputType.DEFINITION,
         definitionType: 'const',
         createName: referencingPath =>
-          this.createComponentConstNameForZodSchema(
+          this.createComponentNameForZodSchemaConst(
             componentRef,
             referencingPath
           ),
@@ -1155,7 +1155,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return this.createTypeName(outputPath, referencingPath);
   }
 
-  createComponentConstNameForResponseSchema(
+  createComponentNameForResponseSchemaConst(
     componentRef: string,
     referencingPath: OutputPath
   ): string {
@@ -1164,7 +1164,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return `${this.createConstName(outputPath, referencingPath)}`;
   }
 
-  createComponentConstNameForZodSchema(
+  createComponentNameForZodSchemaConst(
     componentRef: string,
     referencingPath: OutputPath
   ): string {

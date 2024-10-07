@@ -50,11 +50,11 @@ export interface CodeGenerator {
     componentRef: string,
     referencingPath: OutputPath
   ): string;
-  createComponentConstNameForResponseSchema(
+  createComponentNameForResponseSchemaConst(
     componentRef: string,
     referencingPath: OutputPath
   ): string;
-  createComponentConstNameForZodSchema(
+  createComponentNameForZodSchemaConst(
     componentRef: string,
     referencingPath: OutputPath
   ): string;

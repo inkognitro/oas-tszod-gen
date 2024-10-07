@@ -327,7 +327,7 @@ export function applyZodComponentRefSchema(
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
     createName: referencingPath => {
-      return codeGenerator.createComponentConstNameForZodSchema(
+      return codeGenerator.createComponentNameForZodSchemaConst(
         schema.$ref,
         referencingPath
       );
@@ -350,7 +350,7 @@ export function applyZodComponentRefSchema(
   return {
     ...output,
     createCode: referencingPath => {
-      const constName = codeGenerator.createComponentConstNameForZodSchema(
+      const constName = codeGenerator.createComponentNameForZodSchemaConst(
         schema.$ref,
         referencingPath
       );
