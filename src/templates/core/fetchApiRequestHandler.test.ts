@@ -59,9 +59,7 @@ afterAll(async () => {
 describe('FetchApiRequestHandler', () => {
   it('can receive plain text data', async () => {
     const rr = await requestHandler.execute(
-      createRequest({
-        endpointSchema: createEndpointSchema(getPlainTextEndpointSchema),
-      })
+      createRequest(createEndpointSchema(getPlainTextEndpointSchema))
     );
     expect(rr.response?.status).toBe(200);
     expect(rr.response.contentType).toContain(
@@ -73,10 +71,9 @@ describe('FetchApiRequestHandler', () => {
 
   it('can send and receive plain text data', async () => {
     const rr = await requestHandler.execute(
-      createRequest({
+      createRequest(createEndpointSchema(postPlainTextEndpointSchema), {
         contentType: 'text/plain',
         body: 'ping',
-        endpointSchema: createEndpointSchema(postPlainTextEndpointSchema),
       })
     );
     expect(rr.response?.status).toBe(200);
@@ -89,9 +86,7 @@ describe('FetchApiRequestHandler', () => {
 
   it('can receive json data', async () => {
     const rr = await requestHandler.execute(
-      createRequest({
-        endpointSchema: createEndpointSchema(getJsonEndpointSchema),
-      })
+      createRequest(createEndpointSchema(getJsonEndpointSchema))
     );
     expect(rr.response?.status).toBe(200);
     expect(rr.response.contentType).toContain(
@@ -103,10 +98,9 @@ describe('FetchApiRequestHandler', () => {
 
   it('can send and receive json data', async () => {
     const rr = await requestHandler.execute(
-      createRequest({
+      createRequest(createEndpointSchema(postJsonEndpointSchema), {
         contentType: 'application/json',
         body: {foo: 'bar'},
-        endpointSchema: createEndpointSchema(postJsonEndpointSchema),
       })
     );
     expect(rr.response?.status).toBe(200);
@@ -119,11 +113,7 @@ describe('FetchApiRequestHandler', () => {
 
   it('can receive urlencoded form data', async () => {
     const rr = await requestHandler.execute(
-      createRequest({
-        endpointSchema: createEndpointSchema(
-          getFormUrlEncodedDataEndpointSchema
-        ),
-      })
+      createRequest(createEndpointSchema(getFormUrlEncodedDataEndpointSchema))
     );
     expect(rr.response?.status).toBe(200);
     expect(rr.response.contentType).toContain(
@@ -135,13 +125,13 @@ describe('FetchApiRequestHandler', () => {
 
   it('can send and receive urlencoded form data', async () => {
     const rr = await requestHandler.execute(
-      createRequest({
-        contentType: 'application/x-www-form-urlencoded',
-        body: {foo: 'bar'},
-        endpointSchema: createEndpointSchema(
-          postFormUrlEncodedDataEndpointSchema
-        ),
-      })
+      createRequest(
+        createEndpointSchema(postFormUrlEncodedDataEndpointSchema),
+        {
+          contentType: 'application/x-www-form-urlencoded',
+          body: {foo: 'bar'},
+        }
+      )
     );
     expect(rr.response?.status).toBe(200);
     expect(rr.response.contentType).toContain(
@@ -153,9 +143,7 @@ describe('FetchApiRequestHandler', () => {
 
   it('can receive multipart form data', async () => {
     const rr = await requestHandler.execute(
-      createRequest({
-        endpointSchema: createEndpointSchema(getFormDataEndpointSchema),
-      })
+      createRequest(createEndpointSchema(getFormDataEndpointSchema))
     );
     expect(rr.response?.status).toBe(200);
     expect(rr.response.contentType).toContain(
@@ -169,10 +157,9 @@ describe('FetchApiRequestHandler', () => {
     const formData = new FormData();
     formData.append('foo', 'bar');
     const rr = await requestHandler.execute(
-      createRequest({
+      createRequest(createEndpointSchema(postFormDataEndpointSchema), {
         contentType: 'multipart/form-data',
         body: formData,
-        endpointSchema: createEndpointSchema(postFormDataEndpointSchema),
       })
     );
     expect(rr.response?.status).toBe(200);
@@ -185,12 +172,11 @@ describe('FetchApiRequestHandler', () => {
 
   it('can send from object converted form data', async () => {
     const rr = await requestHandler.execute(
-      createRequest({
+      createRequest(createEndpointSchema(postFormDataEndpointSchema), {
         contentType: 'multipart/form-data',
         body: {
           foo: 'bar',
         },
-        endpointSchema: createEndpointSchema(postFormDataEndpointSchema),
       })
     );
     expect(rr.response?.status).toBe(200);
@@ -203,9 +189,7 @@ describe('FetchApiRequestHandler', () => {
 
   it('can receive blob data', async () => {
     const rr = await requestHandler.execute(
-      createRequest({
-        endpointSchema: createEndpointSchema(getBlobEndpointSchema),
-      })
+      createRequest(createEndpointSchema(getBlobEndpointSchema))
     );
     expect(rr.response?.status).toBe(200);
     expect(rr.response.contentType).toContain(
@@ -217,10 +201,9 @@ describe('FetchApiRequestHandler', () => {
 
   it('can send and receive blob data', async () => {
     const rr = await requestHandler.execute(
-      createRequest({
+      createRequest(createEndpointSchema(postBlobEndpointSchema), {
         contentType: 'application/pdf',
         body: mockPdfBlob,
-        endpointSchema: createEndpointSchema(postBlobEndpointSchema),
       })
     );
     expect(rr.response?.status).toBe(200);

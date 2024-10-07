@@ -36,9 +36,9 @@ describe('ScopedRequestHandler', () => {
     const mockRequestHandler = new MockRequestHandler();
     const scopedRequestHandler1 = new ScopedRequestHandler(mockRequestHandler);
     const scopedRequestHandler2 = new ScopedRequestHandler(mockRequestHandler);
-    const request1_1 = createRequest({endpointSchema});
-    const request1_2 = createRequest({endpointSchema});
-    const request2_1 = createRequest({endpointSchema});
+    const request1_1 = createRequest(endpointSchema);
+    const request1_2 = createRequest(endpointSchema);
+    const request2_1 = createRequest(endpointSchema);
     scopedRequestHandler1.execute(request1_1);
     scopedRequestHandler1.execute(request1_2);
     scopedRequestHandler2.execute(request2_1);
@@ -53,9 +53,9 @@ describe('ScopedRequestHandler', () => {
     const mockRequestHandler = new MockRequestHandler();
     const scopedRequestHandler1 = new ScopedRequestHandler(mockRequestHandler);
     const scopedRequestHandler2 = new ScopedRequestHandler(mockRequestHandler);
-    const request1_1 = createRequest({endpointSchema});
-    const request1_2 = createRequest({endpointSchema});
-    const request2_1 = createRequest({endpointSchema});
+    const request1_1 = createRequest(endpointSchema);
+    const request1_2 = createRequest(endpointSchema);
+    const request2_1 = createRequest(endpointSchema);
     scopedRequestHandler1.execute(request1_1);
     scopedRequestHandler1.execute(request1_2);
     scopedRequestHandler2.execute(request2_1);
