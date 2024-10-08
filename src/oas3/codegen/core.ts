@@ -47,7 +47,22 @@ export type GenerateConfig = {
 
 export interface CodeGenerator {
   getSpecification(): Specification;
-  createComponentTypeName(
+  createSchemaComponentTypeName(
+    componentRef: string,
+    referencingPath: OutputPath,
+    ctx: Context
+  ): string;
+  createRequestBodyComponentTypeName(
+    componentRef: string,
+    referencingPath: OutputPath,
+    ctx: Context
+  ): string;
+  createResponseComponentTypeName(
+    componentRef: string,
+    referencingPath: OutputPath,
+    ctx: Context
+  ): string;
+  createRequestBodyComponentSchemaConstName(
     componentRef: string,
     referencingPath: OutputPath,
     ctx: Context
@@ -57,29 +72,40 @@ export interface CodeGenerator {
     referencingPath: OutputPath,
     ctx: Context
   ): string;
-  createZodSchemaComponentConstName(
+  createSchemaComponentZodConstName(
     componentRef: string,
     referencingPath: OutputPath,
     ctx: Context
   ): string;
   generateEndpointOperationId(method: string, path: string): string;
-  createEnumName(outputPath: OutputPath, referencingPath: OutputPath): string;
   createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string;
   createConstName(outputPath: OutputPath, referencingPath: OutputPath): string;
   createFunctionName(
     outputPath: OutputPath,
     referencingPath: OutputPath
   ): string;
-  createOutputPathForOperationId(operationId: string, ctx: Context): OutputPath;
-  createOutputPathByTypeComponentRef(
+  createOperationIdOutputPath(operationId: string, ctx: Context): OutputPath;
+  createSchemaComponentTypeOutputPath(
     componentRef: string,
     ctx: Context
   ): OutputPath;
-  createOutputPathByResponseComponentRefConst(
+  createRequestBodyComponentTypeOutputPath(
     componentRef: string,
     ctx: Context
   ): OutputPath;
-  createOutputPathByZodSchemaComponentRefConst(
+  createResponseComponentTypeOutputPath(
+    componentRef: string,
+    ctx: Context
+  ): OutputPath;
+  createRequestBodyComponentSchemaConstOutputPath(
+    componentRef: string,
+    ctx: Context
+  ): OutputPath;
+  createResponseComponentSchemaConstOutputPath(
+    componentRef: string,
+    ctx: Context
+  ): OutputPath;
+  createSchemaComponentZodConstOutputPath(
     componentRef: string,
     ctx: Context
   ): OutputPath;

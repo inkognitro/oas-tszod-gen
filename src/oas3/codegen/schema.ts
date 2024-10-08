@@ -245,7 +245,7 @@ export function applySchemaComponentRef(
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
     createName: referencingPath => {
-      return codeGenerator.createComponentTypeName(
+      return codeGenerator.createSchemaComponentTypeName(
         schema.$ref,
         referencingPath,
         ctx
@@ -254,14 +254,18 @@ export function applySchemaComponentRef(
     componentRef: schema.$ref,
     path,
     getRequiredOutputPaths: () => [
-      codeGenerator.createOutputPathByTypeComponentRef(schema.$ref, ctx),
+      codeGenerator.createSchemaComponentTypeOutputPath(schema.$ref, ctx),
     ],
   };
   codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
   return {
     ...output,
     createCode: referencingPath =>
-      codeGenerator.createComponentTypeName(schema.$ref, referencingPath, ctx),
+      codeGenerator.createSchemaComponentTypeName(
+        schema.$ref,
+        referencingPath,
+        ctx
+      ),
   };
 }
 

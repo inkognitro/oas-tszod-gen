@@ -42,20 +42,6 @@ export function isParameterComponentRef(
   return zParameterComponentRef.safeParse(anyValue).success;
 }
 
-export const securitySchemeComponentRefPrefix = '#/components/securitySchemes/';
-
-export const zSecuritySchemeComponentRef = z.object({
-  $ref: z.string().startsWith(securitySchemeComponentRefPrefix),
-});
-
-export type SecurityComponentRef = z.infer<typeof zSecuritySchemeComponentRef>;
-
-export function isSecuritySchemesComponentRef(
-  anyValue: unknown
-): anyValue is SecurityComponentRef {
-  return zSecuritySchemeComponentRef.safeParse(anyValue).success;
-}
-
 export const responseHeaderComponentRefPrefix = '#/components/headers/';
 
 export const zResponseHeaderComponentRef = z.object({
@@ -70,4 +56,18 @@ export function isResponseHeaderComponentRef(
   anyValue: unknown
 ): anyValue is ResponseHeaderComponentRef {
   return zResponseHeaderComponentRef.safeParse(anyValue).success;
+}
+
+export const requestBodyComponentRefPrefix = '#/components/requestBodies/';
+
+export const zRequestBodyComponentRef = z.object({
+  $ref: z.string().startsWith(requestBodyComponentRefPrefix),
+});
+
+export type RequestBodyComponentRef = z.infer<typeof zRequestBodyComponentRef>;
+
+export function isRequestBodyComponentRef(
+  anyValue: unknown
+): anyValue is RequestBodyComponentRef {
+  return zRequestBodyComponentRef.safeParse(anyValue).success;
 }

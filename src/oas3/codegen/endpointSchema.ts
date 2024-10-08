@@ -1,6 +1,7 @@
 import {
   CodeGenerationOutput,
   CodeGenerator,
+  ComponentRefOutput,
   containsOutputPath,
   Context,
   DefinitionOutput,
@@ -10,8 +11,13 @@ import {
 import {
   ConcreteParameterLocation,
   concreteParameterLocations,
+  ConcreteRequestBody,
   Endpoint,
+  isConcreteRequestBody,
+  isRequestBodyComponentRef,
   Parameter,
+  RequestBody,
+  RequestBodyComponentRef,
   RequestBodyContent,
   RequestBodyContentByContentTypeMap,
   ResponseByStatusCodeMap,
@@ -20,18 +26,18 @@ import {applyZodSchema} from './zodSchema';
 import {applyResponseSchema} from './responseSchema';
 import {findObjectSchemaFromLocationParameters} from './endpointUtils';
 
-type ApplyRequestBodyResult = {
+type ApplyEndpointSchemaRequestBodyContentResult = {
   contentType: string;
   codeOutput: CodeGenerationOutput;
 };
 
-function applyRequestBodyContent(
+function applyEndpointSchemaRequestBodyContent(
   codeGenerator: CodeGenerator,
   contentType: string,
   bodyContent: RequestBodyContent,
   path: OutputPath,
   ctx: Context
-): ApplyRequestBodyResult {
+): ApplyEndpointSchemaRequestBodyContentResult {
   let zodSchemaCode: undefined | CodeGenerationOutput;
   if (ctx.config.withZod) {
     const zodSchemaPath = [...path, 'zodSchema'];
@@ -66,13 +72,13 @@ function applyRequestBodyContent(
   };
 }
 
-function applyRequestBodyByContentTypeMap(
+function applyEndpointSchemaRequestBodyByContentTypeMap(
   codeGenerator: CodeGenerator,
   schema: RequestBodyContentByContentTypeMap,
   path: OutputPath,
   ctx: Context
 ): CodeGenerationOutput {
-  const bodyResults: ApplyRequestBodyResult[] = [];
+  const bodyResults: ApplyEndpointSchemaRequestBodyContentResult[] = [];
   for (const contentType in schema) {
     if (
       ctx.config.shouldAddRequestBodyContent &&
@@ -84,7 +90,7 @@ function applyRequestBodyByContentTypeMap(
     const contentTypeBodyPath = [...path, lowercaseContentType];
     const contentSchema = schema[contentType];
     bodyResults.push(
-      applyRequestBodyContent(
+      applyEndpointSchemaRequestBodyContent(
         codeGenerator,
         lowercaseContentType,
         contentSchema,
@@ -123,7 +129,95 @@ function applyRequestBodyByContentTypeMap(
   };
 }
 
-function applyResponseByStatusCodeMap(
+function applyEndpointSchemaConcreteRequestBody(
+  codeGenerator: CodeGenerator,
+  schema: ConcreteRequestBody,
+  path: OutputPath,
+  ctx: Context
+): CodeGenerationOutput {
+  if (!schema.content) {
+    return {
+      createCode: () => {
+        return '{}';
+      },
+      path,
+      getRequiredOutputPaths: () => [],
+    };
+  }
+  return applyEndpointSchemaRequestBodyByContentTypeMap(
+    codeGenerator,
+    schema.content,
+    path,
+    ctx
+  );
+}
+
+function applyEndpointSchemaRequestBodyComponentRef(
+  codeGenerator: CodeGenerator,
+  schema: RequestBodyComponentRef,
+  path: OutputPath,
+  ctx: Context,
+  preventFromAddingComponentRefs: string[] = []
+): CodeGenerationOutput {
+  const output: ComponentRefOutput = {
+    type: OutputType.COMPONENT_REF,
+    createName: referencingPath => {
+      return codeGenerator.createRequestBodyComponentTypeName(
+        schema.$ref,
+        referencingPath,
+        ctx
+      );
+    },
+    componentRef: schema.$ref,
+    path,
+    getRequiredOutputPaths: () => [
+      codeGenerator.createRequestBodyComponentSchemaConstOutputPath(
+        schema.$ref,
+        ctx
+      ),
+    ],
+  };
+  codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
+  return {
+    ...output,
+    createCode: referencingPath => {
+      return codeGenerator.createRequestBodyComponentSchemaConstName(
+        schema.$ref,
+        referencingPath,
+        ctx
+      );
+    },
+  };
+}
+
+export function applyEndpointSchemaRequestBody(
+  codeGenerator: CodeGenerator,
+  requestBody: RequestBody,
+  path: OutputPath,
+  ctx: Context,
+  preventFromAddingComponentRefs: string[] = []
+): CodeGenerationOutput {
+  if (isRequestBodyComponentRef(requestBody)) {
+    return applyEndpointSchemaRequestBodyComponentRef(
+      codeGenerator,
+      requestBody,
+      path,
+      ctx,
+      preventFromAddingComponentRefs
+    );
+  }
+  if (isConcreteRequestBody(requestBody)) {
+    return applyEndpointSchemaConcreteRequestBody(
+      codeGenerator,
+      requestBody,
+      path,
+      ctx
+    );
+  }
+  throw new Error(`requestBody not supported: ${JSON.stringify(requestBody)}`);
+}
+
+function applyEndpointSchemaResponseByStatusCodeMap(
   codeGenerator: CodeGenerator,
   schema: ResponseByStatusCodeMap,
   path: OutputPath,
@@ -146,7 +240,7 @@ function applyResponseByStatusCodeMap(
   return {
     path,
     createCode: referencingPath => {
-      if (!Object.keys(schema).length) {
+      if (!responseResults.length) {
         return '{}';
       }
       const codeParts: string[] = [];
@@ -226,20 +320,21 @@ export function applyEndpointSchemaConstDefinition(
   ctx: Context
 ): DefinitionOutput {
   let bodyByContentTypeMapCodeOutput: undefined | CodeGenerationOutput;
-  if (schema.requestBody?.content) {
-    bodyByContentTypeMapCodeOutput = applyRequestBodyByContentTypeMap(
+  if (schema.requestBody) {
+    bodyByContentTypeMapCodeOutput = applyEndpointSchemaRequestBody(
       codeGenerator,
-      schema.requestBody.content,
+      schema.requestBody,
       [...outputPath, 'body'],
       ctx
     );
   }
-  const responseByStatusCodeMapOutput = applyResponseByStatusCodeMap(
-    codeGenerator,
-    schema.responses,
-    [...outputPath, 'response'],
-    ctx
-  );
+  const responseByStatusCodeMapOutput =
+    applyEndpointSchemaResponseByStatusCodeMap(
+      codeGenerator,
+      schema.responses,
+      [...outputPath, 'response'],
+      ctx
+    );
   let parameterZodSchemaResults: undefined | ParameterZodSchemaResult[];
   if (ctx.config.withZod && schema.parameters) {
     parameterZodSchemaResults = applyParameterZodSchemas(

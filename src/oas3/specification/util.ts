@@ -1,19 +1,21 @@
 import {
   isParameterComponentRef,
-  isResponseComponentRef,
   isResponseHeaderComponentRef,
-  isSchemaComponentRef,
   parameterComponentRefPrefix,
+  requestBodyComponentRefPrefix,
   responseComponentRefPrefix,
   responseHeaderComponentRefPrefix,
   schemaComponentRefPrefix,
 } from './componentRef';
-import {ConcreteSchema, isConcreteSchema, Schema} from './schema';
-import {ConcreteParameter, isConcreteParameter, Parameter} from './endpoint';
+import {Schema} from './schema';
 import {
-  ConcreteResponse,
+  ConcreteParameter,
+  isConcreteParameter,
+  Parameter,
+  RequestBody,
+} from './endpoint';
+import {
   ConcreteResponseHeader,
-  isConcreteResponse,
   isConcreteResponseHeader,
   Response,
   ResponseHeader,
@@ -33,19 +35,34 @@ export function findComponentSchemaByRef(
   return null;
 }
 
-export function findConcreteSchema(
+export function findComponentRequestBodyByRef(
   spec: Specification,
-  schema: Schema
-): null | ConcreteSchema {
-  if (isSchemaComponentRef(schema)) {
-    const componentSchema = findComponentSchemaByRef(spec, schema.$ref);
-    if (!componentSchema) {
-      return null;
-    }
-    return findConcreteSchema(spec, componentSchema);
+  componentRef: string
+): null | RequestBody {
+  const components = spec.components;
+  if (
+    componentRef.startsWith(requestBodyComponentRefPrefix) &&
+    components.requestBodies
+  ) {
+    const name = componentRef.replace(requestBodyComponentRefPrefix, '');
+    const requestBody = components.requestBodies[name];
+    return requestBody ?? null;
   }
-  if (isConcreteSchema(schema)) {
-    return schema;
+  return null;
+}
+
+export function findComponentResponseByRef(
+  spec: Specification,
+  componentRef: string
+): null | Response {
+  const components = spec.components;
+  if (
+    componentRef.startsWith(responseComponentRefPrefix) &&
+    components.responses
+  ) {
+    const name = componentRef.replace(responseComponentRefPrefix, '');
+    const response = components.responses[name];
+    return response ?? null;
   }
   return null;
 }
@@ -81,39 +98,6 @@ export function findConcreteParameter(
     return null;
   }
   return findConcreteParameter(spec, componentParameter);
-}
-
-export function findComponentResponseByRef(
-  spec: Specification,
-  componentRef: string
-): null | Response {
-  const components = spec.components;
-  if (
-    componentRef.startsWith(responseComponentRefPrefix) &&
-    components.responses
-  ) {
-    const name = componentRef.replace(responseComponentRefPrefix, '');
-    const response = components.responses[name];
-    return response ?? null;
-  }
-  return null;
-}
-
-export function findConcreteResponse(
-  spec: Specification,
-  response: Response
-): null | ConcreteResponse {
-  if (isConcreteResponse(response)) {
-    return response;
-  }
-  if (!isResponseComponentRef(response)) {
-    return null;
-  }
-  const componentResponse = findComponentResponseByRef(spec, response.$ref);
-  if (!componentResponse) {
-    return null;
-  }
-  return findConcreteResponse(spec, componentResponse);
 }
 
 export function findComponentResponseHeaderByRef(

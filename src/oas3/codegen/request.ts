@@ -1,13 +1,19 @@
 import {
   ConcreteParameterLocation,
+  ConcreteRequestBody,
   Endpoint,
+  isConcreteRequestBody,
+  isRequestBodyComponentRef,
   Parameter,
+  RequestBody,
+  RequestBodyComponentRef,
   RequestBodyContent,
   RequestBodyContentByContentTypeMap,
 } from '@/oas3/specification';
 import {
   CodeGenerationOutput,
   CodeGenerator,
+  ComponentRefOutput,
   containsOutputPath,
   Context,
   DefinitionOutput,
@@ -23,18 +29,18 @@ import {
   templateRequestUnionType,
 } from '@/oas3/codegen/template';
 
-type ApplyRequestBodyResult = {
+type ApplyConcreteRequestBodyContentTypeResult = {
   contentType: string;
   codeOutput: CodeGenerationOutput;
 };
 
-function applyRequestBodyContent(
+function applyConcreteRequestBodyContent(
   codeGenerator: CodeGenerator,
   contentType: string,
   contentSchema: RequestBodyContent,
   parentPath: OutputPath,
   ctx: Context
-): ApplyRequestBodyResult {
+): ApplyConcreteRequestBodyContentTypeResult {
   const schemaCodeOutput = applySchema(
     codeGenerator,
     contentSchema.schema,
@@ -76,13 +82,13 @@ function applyRequestBodyContent(
   };
 }
 
-function applyNullableRequestBodyByContentTypeMap(
+function applyRequestBodyByContentTypeMap(
   codeGenerator: CodeGenerator,
   schema: RequestBodyContentByContentTypeMap,
   path: OutputPath,
   ctx: Context
-): null | CodeGenerationOutput {
-  const bodyCodeOutputs: ApplyRequestBodyResult[] = [];
+): CodeGenerationOutput {
+  const bodyCodeOutputs: ApplyConcreteRequestBodyContentTypeResult[] = [];
   for (const contentType in schema) {
     const contentSchema = schema[contentType];
     if (
@@ -92,7 +98,7 @@ function applyNullableRequestBodyByContentTypeMap(
       continue;
     }
     bodyCodeOutputs.push(
-      applyRequestBodyContent(
+      applyConcreteRequestBodyContent(
         codeGenerator,
         contentType,
         contentSchema,
@@ -102,7 +108,13 @@ function applyNullableRequestBodyByContentTypeMap(
     );
   }
   if (!bodyCodeOutputs.length) {
-    return null;
+    return {
+      path,
+      createCode: () => {
+        return 'any';
+      },
+      getRequiredOutputPaths: () => [],
+    };
   }
   return {
     path,
@@ -128,6 +140,86 @@ function applyNullableRequestBodyByContentTypeMap(
       return outputPaths;
     },
   };
+}
+
+function applyConcreteRequestBody(
+  codeGenerator: CodeGenerator,
+  schema: ConcreteRequestBody,
+  path: OutputPath,
+  ctx: Context
+): CodeGenerationOutput {
+  if (!schema.content) {
+    return {
+      createCode: () => {
+        return 'any';
+      },
+      path,
+      getRequiredOutputPaths: () => [],
+    };
+  }
+  return applyRequestBodyByContentTypeMap(
+    codeGenerator,
+    schema.content,
+    path,
+    ctx
+  );
+}
+
+function applyRequestBodyComponentRef(
+  codeGenerator: CodeGenerator,
+  schema: RequestBodyComponentRef,
+  path: OutputPath,
+  ctx: Context,
+  preventFromAddingComponentRefs: string[] = []
+): CodeGenerationOutput {
+  const output: ComponentRefOutput = {
+    type: OutputType.COMPONENT_REF,
+    createName: referencingPath => {
+      return codeGenerator.createRequestBodyComponentTypeName(
+        schema.$ref,
+        referencingPath,
+        ctx
+      );
+    },
+    componentRef: schema.$ref,
+    path,
+    getRequiredOutputPaths: () => [
+      codeGenerator.createRequestBodyComponentTypeOutputPath(schema.$ref, ctx),
+    ],
+  };
+  codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
+  return {
+    ...output,
+    createCode: referencingPath => {
+      return codeGenerator.createRequestBodyComponentTypeName(
+        schema.$ref,
+        referencingPath,
+        ctx
+      );
+    },
+  };
+}
+
+export function applyRequestBody(
+  codeGenerator: CodeGenerator,
+  requestBody: RequestBody,
+  path: OutputPath,
+  ctx: Context,
+  preventFromAddingComponentRefs: string[] = []
+): CodeGenerationOutput {
+  if (isRequestBodyComponentRef(requestBody)) {
+    return applyRequestBodyComponentRef(
+      codeGenerator,
+      requestBody,
+      path,
+      ctx,
+      preventFromAddingComponentRefs
+    );
+  }
+  if (isConcreteRequestBody(requestBody)) {
+    return applyConcreteRequestBody(codeGenerator, requestBody, path, ctx);
+  }
+  throw new Error(`requestBody not supported: ${JSON.stringify(requestBody)}`);
 }
 
 type ApplyRequestLocationParametersResult = {
@@ -207,10 +299,10 @@ export function applyRequestTypeDefinition(
     'cookie'
   )?.codeOutput;
   let bodyCodeOutput: CodeGenerationOutput | null = null;
-  if (schema.requestBody?.content) {
-    bodyCodeOutput = applyNullableRequestBodyByContentTypeMap(
+  if (schema.requestBody) {
+    bodyCodeOutput = applyRequestBody(
       codeGenerator,
-      schema.requestBody.content,
+      schema.requestBody,
       path,
       ctx
     );

@@ -1,6 +1,6 @@
 import {zSchema} from './schema';
 import {zResponseByStatusCodeMap} from './response';
-import {zParameterComponentRef} from './componentRef';
+import {zParameterComponentRef, zRequestBodyComponentRef} from './componentRef';
 import {z} from 'zod';
 
 const zScopesBySecurityName = z.record(z.array(z.string()));
@@ -18,9 +18,22 @@ export type RequestBodyContentByContentTypeMap = z.infer<
   typeof zRequestBodyContentByContentTypeMap
 >;
 
-export const zRequestBody = z.object({
+export const zConcreteRequestBody = z.object({
   content: zRequestBodyContentByContentTypeMap.optional(),
 });
+
+export type ConcreteRequestBody = z.infer<typeof zConcreteRequestBody>;
+
+export function isConcreteRequestBody(
+  anyValue: unknown
+): anyValue is ConcreteRequestBody {
+  return zConcreteRequestBody.safeParse(anyValue).success;
+}
+
+export const zRequestBody = z.union([
+  zConcreteRequestBody,
+  zRequestBodyComponentRef,
+]);
 
 export type RequestBody = z.infer<typeof zRequestBody>;
 

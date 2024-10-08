@@ -143,10 +143,7 @@ function applyZodStringSchema(
   path: OutputPath,
   ctx: Context
 ): CodeGenerationOutput {
-  let codeComment: undefined | string = undefined;
-  if (schema.format && schema.format !== 'uuid') {
-    codeComment = schema.format;
-  }
+  let codeComment: undefined | string;
   return {
     createCode: () => {
       let code = '';
@@ -201,6 +198,8 @@ function applyZodStringSchema(
             case 'emoji':
               code += '.emoji()';
               break;
+            default:
+              codeComment = schema.format;
           }
         }
       }
@@ -325,7 +324,7 @@ export function applyZodComponentRefSchema(
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
     createName: referencingPath => {
-      return codeGenerator.createZodSchemaComponentConstName(
+      return codeGenerator.createSchemaComponentZodConstName(
         schema.$ref,
         referencingPath,
         ctx
@@ -334,26 +333,20 @@ export function applyZodComponentRefSchema(
     componentRef: schema.$ref,
     path,
     getRequiredOutputPaths: () => [
-      codeGenerator.createOutputPathByZodSchemaComponentRefConst(
-        schema.$ref,
-        ctx
-      ),
+      codeGenerator.createSchemaComponentZodConstOutputPath(schema.$ref, ctx),
     ],
   };
   codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
   const isRecursive = preventFromAddingComponentRefs.includes(schema.$ref);
   if (isRecursive) {
     codeGenerator.addOutputPathWithZodSchemaRecursion(
-      codeGenerator.createOutputPathByZodSchemaComponentRefConst(
-        schema.$ref,
-        ctx
-      )
+      codeGenerator.createSchemaComponentZodConstOutputPath(schema.$ref, ctx)
     );
   }
   return {
     ...output,
     createCode: referencingPath => {
-      const constName = codeGenerator.createZodSchemaComponentConstName(
+      const constName = codeGenerator.createSchemaComponentZodConstName(
         schema.$ref,
         referencingPath,
         ctx
