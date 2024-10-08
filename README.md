@@ -487,6 +487,13 @@ It is recommended to have separate definitions for read and write objects, espec
 (see also [CQRS pattern](https://martinfowler.com/bliki/CQRS.html)).
 Anyway, this is planned to be implemented but currently has low priority to me.
 
+## Caveats
+Request `headers` and `cookies` are always optional. At the moment there is no configuration property about this.
+This is because one might avoid defining common headers for every call of an endpoint caller function and define
+those in a separate underlying request handler. However, as soon as a request `headers` object is passed in to the
+endpoint caller function, it must fulfill the definition given from the OAS3 specs
+(e.g. `required: true` of a specific header key).
+
 ## Out of scope
 Linting is out of scope of this package. The generator is responsible to generate valid TypeScript (and Zod) definitions.
 That's what it does. Your code setup should be responsible for linting your code, so it might make sense for you to run
