@@ -46,8 +46,7 @@ export function findConcreteSchema(
   if (!isSchemaComponentRef(schema)) {
     return null;
   }
-  // todo: check if this is wrong
-  //@ts-ignore
+  // @ts-ignore
   const componentSchema = findComponentSchemaByRef(spec, schema.$ref);
   if (!componentSchema) {
     return null;
