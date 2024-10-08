@@ -1,13 +1,14 @@
 import {
   isParameterComponentRef,
   isResponseHeaderComponentRef,
+  isSchemaComponentRef,
   parameterComponentRefPrefix,
   requestBodyComponentRefPrefix,
   responseComponentRefPrefix,
   responseHeaderComponentRefPrefix,
   schemaComponentRefPrefix,
 } from './componentRef';
-import {Schema} from './schema';
+import {ConcreteSchema, isConcreteSchema, Schema} from './schema';
 import {
   ConcreteParameter,
   isConcreteParameter,
@@ -33,6 +34,25 @@ export function findComponentSchemaByRef(
     return schema ?? null;
   }
   return null;
+}
+
+export function findConcreteSchema(
+  spec: Specification,
+  schema: Schema
+): null | ConcreteSchema {
+  if (isConcreteSchema(schema)) {
+    return schema;
+  }
+  if (!isSchemaComponentRef(schema)) {
+    return null;
+  }
+  // todo: check if this is wrong
+  //@ts-ignore
+  const componentSchema = findComponentSchemaByRef(spec, schema.$ref);
+  if (!componentSchema) {
+    return null;
+  }
+  return findConcreteSchema(spec, componentSchema);
 }
 
 export function findComponentRequestBodyByRef(

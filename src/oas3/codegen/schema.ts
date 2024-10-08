@@ -13,6 +13,7 @@ import {
   AnyOfSchema,
   ArraySchema,
   BooleanSchema,
+  findConcreteSchema,
   IntegerSchema,
   isAllOfSchema,
   isAnyOfSchema,
@@ -445,7 +446,11 @@ function applyAnyOfSchema(
   ctx: Context,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  const itemCodeOutputs: CodeGenerationOutput[] = [];
+  type ItemResult = {
+    codeOutput: CodeGenerationOutput;
+    hasObjectProperties: boolean;
+  };
+  const itemResults: ItemResult[] = [];
   schema.anyOf.forEach((itemSchema, index) => {
     const itemPath: OutputPath = [...path, `${index}`];
     const itemOutput = applySchema(
@@ -455,34 +460,56 @@ function applyAnyOfSchema(
       ctx,
       preventFromAddingComponentRefs
     );
-    itemCodeOutputs.push(itemOutput);
+    const concreteSchema = findConcreteSchema(
+      codeGenerator.getSpecification(),
+      itemSchema
+    );
+    itemResults.push({
+      codeOutput: itemOutput,
+      hasObjectProperties:
+        isObjectSchema(concreteSchema) &&
+        !!concreteSchema.properties &&
+        !!Object.keys(concreteSchema.properties).length,
+    });
   });
   return {
     createCode: referencingContext => {
-      const partialUnionCodeRows: string[] = [];
-      const unionCodeRows: string[] = [];
-      if (!itemCodeOutputs.length) {
+      const partialUnionItemCodes: string[] = [];
+      const unionItemCodes: string[] = [];
+      if (!itemResults.length) {
         return 'any';
       }
-      itemCodeOutputs.forEach(itemCodeOutput => {
-        const itemComment = itemCodeOutput.codeComment
-          ? ` // ${itemCodeOutput.codeComment}`
-          : '';
-        const itemCode = itemCodeOutput.createCode(referencingContext);
-        partialUnionCodeRows.push(`Partial<${itemCode}>`);
-        unionCodeRows.push(`${itemCode}${itemComment}`);
+      itemResults.forEach(itemResult => {
+        const itemCode = itemResult.codeOutput.createCode(referencingContext);
+        if (itemResult.hasObjectProperties) {
+          partialUnionItemCodes.push(`Partial<${itemCode}>`);
+        }
+        unionItemCodes.push(`${itemCode}`);
       });
-      return `(${partialUnionCodeRows.join('\n| ')}\n) & (${unionCodeRows.join('\n| ')}\n)`;
+      const unionCode =
+        unionItemCodes.length === 1
+          ? unionItemCodes[0]
+          : `(\n${unionItemCodes.join('\n| ')}\n)`;
+      if (!partialUnionItemCodes.length) {
+        return unionCode;
+      }
+      const partialUnionCode =
+        partialUnionItemCodes.length === 1
+          ? partialUnionItemCodes[0]
+          : `(\n${partialUnionItemCodes.join('\n& ')}\n)`;
+      return `${unionCode} & ${partialUnionCode}`;
     },
     path,
     getRequiredOutputPaths: () => {
       const outputPaths: OutputPath[] = [];
-      itemCodeOutputs.forEach(itemCodeOutput => {
-        itemCodeOutput.getRequiredOutputPaths().forEach(outputPath => {
-          if (!containsOutputPath(outputPaths, outputPath)) {
-            outputPaths.push(outputPath);
-          }
-        });
+      itemResults.forEach(itemCodeOutput => {
+        itemCodeOutput.codeOutput
+          .getRequiredOutputPaths()
+          .forEach(outputPath => {
+            if (!containsOutputPath(outputPaths, outputPath)) {
+              outputPaths.push(outputPath);
+            }
+          });
       });
       return outputPaths;
     },

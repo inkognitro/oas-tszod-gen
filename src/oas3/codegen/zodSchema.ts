@@ -551,7 +551,7 @@ function applyZodAnyOfSchema(
   ctx: Context,
   preventFromAddingComponentRefs: string[] = []
 ): CodeGenerationOutput {
-  const itemCodeOutputs: CodeGenerationOutput[] = [];
+  const itemResults: CodeGenerationOutput[] = [];
   schema.anyOf.forEach((itemSchema, index) => {
     const itemPath: OutputPath = [...path, `${index}`];
     const itemOutput = applyZodSchema(
@@ -561,28 +561,25 @@ function applyZodAnyOfSchema(
       ctx,
       preventFromAddingComponentRefs
     );
-    itemCodeOutputs.push(itemOutput);
+    itemResults.push(itemOutput);
   });
   return {
     createCode: referencingContext => {
-      const partialUnionCodeRows: string[] = [];
-      const unionCodeRows: string[] = [];
-      if (!itemCodeOutputs.length) {
-        return 'any';
+      const itemCodes: string[] = [];
+      if (!itemResults.length) {
+        return 'z.any()';
       }
-      itemCodeOutputs.forEach(itemCodeOutput => {
-        const itemCode = itemCodeOutput.createCode(referencingContext);
-        partialUnionCodeRows.push(`${itemCode}.partial()`);
-        unionCodeRows.push(`${itemCode}`);
+      itemResults.forEach(itemResult => {
+        itemCodes.push(itemResult.createCode(referencingContext));
       });
-      const partialUnionCode = `z.union([${partialUnionCodeRows.join(',')}])`;
-      const unionCode = `z.union([${unionCodeRows.join(',')}])`;
-      return `z.intersection(${partialUnionCode}, ${unionCode})`;
+      return itemCodes.length === 1
+        ? itemCodes[0]
+        : `z.union([\n${itemCodes.join(',\n')}\n])`;
     },
     path,
     getRequiredOutputPaths: () => {
       const outputPaths: OutputPath[] = [templateZOfZodLibrary.path];
-      itemCodeOutputs.forEach(itemCodeOutput => {
+      itemResults.forEach(itemCodeOutput => {
         itemCodeOutput.getRequiredOutputPaths().forEach(outputPath => {
           if (!containsOutputPath(outputPaths, outputPath)) {
             outputPaths.push(outputPath);

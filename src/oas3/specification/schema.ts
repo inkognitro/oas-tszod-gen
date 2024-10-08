@@ -34,10 +34,10 @@ export function isConcreteSchema(
 // @ts-ignore - due to recursion
 export const zSchema = z.union([zConcreteSchema, zSchemaComponentRef]);
 
-export type Schema = ConcreteSchema | SchemaComponentRef;
+export type Schema = z.infer<typeof zSchema>;
 
 export function isSchema(anyValue: unknown): anyValue is Schema {
-  return isSchemaComponentRef(anyValue) || isConcreteSchema(anyValue);
+  return zSchema.safeParse(anyValue).success;
 }
 
 // @ts-ignore - due to recursion
