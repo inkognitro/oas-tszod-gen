@@ -114,7 +114,17 @@ generateOas3ToTs({
   
   // optional: Whether a specific content type request body should be added
   shouldAddRequestBodyContent: (contentType, requestBodyContentSchema) => {
-    return ['multipart/form-data', 'application/json'].includes(contentType);
+    const lowerCaseContentType = contentType.toLowerCase();
+    if (lowerCaseContentType.match(/application\/[^+]*[+]?(json);?.*/)) {
+      return true;
+    }
+    const hasJsonAlternative = Object.keys(bodyByContentTypeMap).find(ct =>
+      ct.toLowerCase().match(/application\/[^+]*[+]?(json);?.*/)
+    );
+    if (hasJsonAlternative) {
+      return false;
+    }
+    return !!lowerCaseContentType.match(/multipart\/form-data;?.*/);
   },
   
   // optional: Whether a specific content type response body should be added
