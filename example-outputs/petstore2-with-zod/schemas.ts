@@ -63,7 +63,7 @@ export const z_Order = z.object({
   id: z.number().int().safe().finite().optional(),
   petId: z.number().int().safe().finite().optional(),
   quantity: z.number().int().safe().finite().optional(),
-  shipDate: z.string().datetime().optional(), // date-time
+  shipDate: z.string().datetime().optional(),
   status: z.enum(['placed', 'approved', 'delivered']).optional(),
   complete: z.boolean().optional(),
 });

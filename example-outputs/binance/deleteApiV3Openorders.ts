@@ -50,7 +50,7 @@ export type DeleteApiV3OpenordersResponse =
       200,
       ResponseBodyData<
         'application/json',
-        ((Partial<Order> | Partial<OcoOrder>) & (Order | OcoOrder))[]
+        ((Order | OcoOrder) & (Partial<Order> & Partial<OcoOrder>))[]
       >
     >
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>

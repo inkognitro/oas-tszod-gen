@@ -1,7 +1,24 @@
 import {z} from 'zod';
 import {
+  passportsRequestBodySchema,
+  $200OkAccessResponseSchema,
+  $202AcceptedResponseSchema,
+  $400BadRequestResponseSchema,
+  $401UnauthorizedResponseSchema,
+  $403ForbiddenResponseSchema,
+  $404NotFoundAccessResponseSchema,
+  $500InternalServerErrorResponseSchema,
+  PassportsRequestBody,
+  $200OkAccessResponse,
+  $202AcceptedResponse,
+  $400BadRequestResponse,
+  $401UnauthorizedResponse,
+  $403ForbiddenResponse,
+  $404NotFoundAccessResponse,
+  $500InternalServerErrorResponse,
+} from '@example-outputs/petstore1-with-zod';
+import {
   RequestUnion,
-  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -17,34 +34,20 @@ export const postAccessURLEndpointSchema = {
     object_id: z.string(),
     access_id: z.string(),
   }),
-  bodyByContentType: {},
+  bodyByContentType: passportsRequestBodySchema,
   responseByStatus: {
-    '200': {
-      bodyByContentType: {},
-    },
-    '202': {
-      bodyByContentType: {},
-    },
-    '400': {
-      bodyByContentType: {},
-    },
-    '401': {
-      bodyByContentType: {},
-    },
-    '403': {
-      bodyByContentType: {},
-    },
-    '404': {
-      bodyByContentType: {},
-    },
-    '500': {
-      bodyByContentType: {},
-    },
+    '200': $200OkAccessResponseSchema,
+    '202': $202AcceptedResponseSchema,
+    '400': $400BadRequestResponseSchema,
+    '401': $401UnauthorizedResponseSchema,
+    '403': $403ForbiddenResponseSchema,
+    '404': $404NotFoundAccessResponseSchema,
+    '500': $500InternalServerErrorResponseSchema,
   },
 };
 
 export type PostAccessURLRequest = RequestUnion<
-  any,
+  PassportsRequestBody,
   {
     object_id: string;
     access_id: string;
@@ -52,13 +55,13 @@ export type PostAccessURLRequest = RequestUnion<
 >;
 
 export type PostAccessURLResponse =
-  | Response<200>
-  | Response<202>
-  | Response<400>
-  | Response<401>
-  | Response<403>
-  | Response<404>
-  | Response<500>;
+  | $200OkAccessResponse<200>
+  | $202AcceptedResponse<202>
+  | $400BadRequestResponse<400>
+  | $401UnauthorizedResponse<401>
+  | $403ForbiddenResponse<403>
+  | $404NotFoundAccessResponse<404>
+  | $500InternalServerErrorResponse<500>;
 
 export type PostAccessURLRequestResult = RequestResult<
   PostAccessURLRequest,
@@ -67,7 +70,11 @@ export type PostAccessURLRequestResult = RequestResult<
 
 export function postAccessURL(
   requestHandler: SimpleRequestHandler,
-  payload: RequestPayload<PostAccessURLRequest, 'pathParams', never>,
+  payload: RequestPayload<
+    PostAccessURLRequest,
+    'pathParams' | 'contentType' | 'body',
+    never
+  >,
   config?: RequestHandlerExecutionConfig
 ): Promise<PostAccessURLRequestResult> {
   return requestHandler.execute(

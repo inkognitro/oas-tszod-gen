@@ -33,12 +33,7 @@ export const deleteApiV3OpenordersEndpointSchema = {
     '200': {
       bodyByContentType: {
         'application/json': {
-          zodSchema: z.array(
-            z.intersection(
-              z.union([z_Order.partial(), z_OcoOrder.partial()]),
-              z.union([z_Order, z_OcoOrder])
-            )
-          ),
+          zodSchema: z.array(z.union([z_Order, z_OcoOrder])),
         },
       },
     },
@@ -75,7 +70,7 @@ export type DeleteApiV3OpenordersResponse =
       200,
       ResponseBodyData<
         'application/json',
-        ((Partial<Order> | Partial<OcoOrder>) & (Order | OcoOrder))[]
+        ((Order | OcoOrder) & (Partial<Order> & Partial<OcoOrder>))[]
       >
     >
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>

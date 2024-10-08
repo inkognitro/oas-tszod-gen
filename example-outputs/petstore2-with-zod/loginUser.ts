@@ -24,7 +24,7 @@ export const loginUserEndpointSchema = {
     '200': {
       headersZodSchema: z.object({
         'X-Rate-Limit': z.string().optional(),
-        'X-Expires-After': z.string().datetime().optional(), // date-time
+        'X-Expires-After': z.string().datetime().optional(),
       }),
       bodyByContentType: {
         'application/xml': {

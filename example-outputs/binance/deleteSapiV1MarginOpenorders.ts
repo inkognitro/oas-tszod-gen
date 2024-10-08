@@ -55,8 +55,8 @@ export type DeleteSapiV1MarginOpenordersResponse =
       200,
       ResponseBodyData<
         'application/json',
-        ((Partial<CanceledMarginOrderDetail> | Partial<MarginOcoOrder>) &
-          (CanceledMarginOrderDetail | MarginOcoOrder))[]
+        ((CanceledMarginOrderDetail | MarginOcoOrder) &
+          (Partial<CanceledMarginOrderDetail> & Partial<MarginOcoOrder>))[]
       >
     >
   | ResponseUnion<400, ResponseBodyData<'application/json', Error>>

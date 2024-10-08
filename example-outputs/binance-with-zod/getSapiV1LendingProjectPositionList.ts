@@ -43,7 +43,7 @@ export const getSapiV1LendingProjectPositionListEndpointSchema = {
               projectId: z.string(),
               projectName: z.string(),
               purchaseTime: z.number().int().safe().finite(),
-              redeemDate: z.string().date(), // date
+              redeemDate: z.string().date(),
               startTime: z.number().int().safe().finite(),
               status: z.string(),
               type: z.string(),

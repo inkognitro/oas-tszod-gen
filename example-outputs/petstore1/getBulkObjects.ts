@@ -1,8 +1,25 @@
-import {BulkObjectId} from '@example-outputs/petstore1';
+import {
+  $200OkDrsObjectsResponseSchema,
+  $202AcceptedResponseSchema,
+  $400BadRequestResponseSchema,
+  $401UnauthorizedResponseSchema,
+  $403ForbiddenResponseSchema,
+  $404NotFoundDrsObjectResponseSchema,
+  $413RequestTooLargeResponseSchema,
+  $500InternalServerErrorResponseSchema,
+  BulkObjectId,
+  $200OkDrsObjectsResponse,
+  $202AcceptedResponse,
+  $400BadRequestResponse,
+  $401UnauthorizedResponse,
+  $403ForbiddenResponse,
+  $404NotFoundDrsObjectResponse,
+  $413RequestTooLargeResponse,
+  $500InternalServerErrorResponse,
+} from '@example-outputs/petstore1';
 import {
   RequestUnion,
   RequestBodyData,
-  Response,
   RequestResult,
   SimpleRequestHandler,
   createRequest,
@@ -18,30 +35,14 @@ export const getBulkObjectsEndpointSchema = {
     'application/json': {},
   },
   responseByStatus: {
-    '200': {
-      bodyByContentType: {},
-    },
-    '202': {
-      bodyByContentType: {},
-    },
-    '400': {
-      bodyByContentType: {},
-    },
-    '401': {
-      bodyByContentType: {},
-    },
-    '403': {
-      bodyByContentType: {},
-    },
-    '404': {
-      bodyByContentType: {},
-    },
-    '413': {
-      bodyByContentType: {},
-    },
-    '500': {
-      bodyByContentType: {},
-    },
+    '200': $200OkDrsObjectsResponseSchema,
+    '202': $202AcceptedResponseSchema,
+    '400': $400BadRequestResponseSchema,
+    '401': $401UnauthorizedResponseSchema,
+    '403': $403ForbiddenResponseSchema,
+    '404': $404NotFoundDrsObjectResponseSchema,
+    '413': $413RequestTooLargeResponseSchema,
+    '500': $500InternalServerErrorResponseSchema,
   },
 };
 
@@ -54,14 +55,14 @@ export type GetBulkObjectsRequest = RequestUnion<
 >;
 
 export type GetBulkObjectsResponse =
-  | Response<200>
-  | Response<202>
-  | Response<400>
-  | Response<401>
-  | Response<403>
-  | Response<404>
-  | Response<413>
-  | Response<500>;
+  | $200OkDrsObjectsResponse<200>
+  | $202AcceptedResponse<202>
+  | $400BadRequestResponse<400>
+  | $401UnauthorizedResponse<401>
+  | $403ForbiddenResponse<403>
+  | $404NotFoundDrsObjectResponse<404>
+  | $413RequestTooLargeResponse<413>
+  | $500InternalServerErrorResponse<500>;
 
 export type GetBulkObjectsRequestResult = RequestResult<
   GetBulkObjectsRequest,
