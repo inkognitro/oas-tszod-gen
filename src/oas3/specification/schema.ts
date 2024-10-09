@@ -75,7 +75,9 @@ export const zObjectSchema = z.object({
   type: z.literal('object'),
   required: z.array(z.string()).optional(),
   properties: zObjectSchemaProps.optional(),
-  additionalProperties: zSchema.optional(),
+  // "additionalProperties" should be zSchema.optional() only, but stripe does define a "false" boolean
+  // instead of not setting the property at all
+  additionalProperties: z.union([z.boolean(), zSchema.optional()]),
   nullable: z.boolean().optional(),
 });
 

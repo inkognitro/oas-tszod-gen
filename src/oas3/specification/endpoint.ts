@@ -66,7 +66,7 @@ export type Parameter = z.infer<typeof zParameter>;
 
 export const zEndpoint = z.object({
   operationId: z.string().optional(),
-  tags: z.array(z.string()),
+  tags: z.array(z.string()).optional(),
   parameters: z.array(zParameter).optional(),
   requestBody: zRequestBody.optional(),
   summary: z.string().optional(),

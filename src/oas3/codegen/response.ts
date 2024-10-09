@@ -187,8 +187,7 @@ function applyResponseComponentRef(
   codeGenerator: CodeGenerator,
   schema: ResponseComponentRef,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
@@ -205,7 +204,7 @@ function applyResponseComponentRef(
       codeGenerator.createResponseComponentTypeOutputPath(schema.$ref, ctx),
     ],
   };
-  codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
+  codeGenerator.addOutput(output, ctx);
   return {
     ...output,
     createCode: referencingPath => {
@@ -227,17 +226,10 @@ export function applyResponse(
   codeGenerator: CodeGenerator,
   response: Response,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   if (isResponseComponentRef(response)) {
-    return applyResponseComponentRef(
-      codeGenerator,
-      response,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyResponseComponentRef(codeGenerator, response, path, ctx);
   }
   if (isConcreteResponse(response)) {
     return applyConcreteResponse(codeGenerator, response, path, ctx);

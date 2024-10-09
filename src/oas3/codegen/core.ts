@@ -11,6 +11,7 @@ export type Context = {
     genericStatusVariableValue: null | string;
   };
   config: GenerateConfig;
+  preventFromAddingComponentRefs: string[];
 };
 
 export type GenerateConfigTemplateName =
@@ -109,11 +110,7 @@ export interface CodeGenerator {
     componentRef: string,
     ctx: Context
   ): OutputPath;
-  addOutput(
-    output: Output,
-    ctx: Context,
-    preventFromAddingComponentRefs?: string[]
-  ): void;
+  addOutput(output: Output, ctx: Context): void;
   addOutputPathWithZodSchemaRecursion(outputPath: OutputPath): void;
 }
 

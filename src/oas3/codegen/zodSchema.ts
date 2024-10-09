@@ -40,17 +40,10 @@ export function applyZodSchema(
   codeGenerator: CodeGenerator,
   schema: Schema,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   if (isSchemaComponentRef(schema)) {
-    return applyZodComponentRefSchema(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyZodComponentRefSchema(codeGenerator, schema, path, ctx);
   }
   if (isBooleanSchema(schema)) {
     return applyZodBooleanSchema(schema, path);
@@ -65,58 +58,22 @@ export function applyZodSchema(
     return applyZodIntegerSchema(schema, path);
   }
   if (isArraySchema(schema)) {
-    return applyZodArraySchema(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyZodArraySchema(codeGenerator, schema, path, ctx);
   }
   if (isObjectSchema(schema)) {
-    return applyZodObjectSchema(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyZodObjectSchema(codeGenerator, schema, path, ctx);
   }
   if (isOneOfSchema(schema)) {
-    return applyZodOneOfSchema(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyZodOneOfSchema(codeGenerator, schema, path, ctx);
   }
   if (isAllOfSchema(schema)) {
-    return applyZodAllOfSchema(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyZodAllOfSchema(codeGenerator, schema, path, ctx);
   }
   if (isAnyOfSchema(schema)) {
-    return applyZodAnyOfSchema(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyZodAnyOfSchema(codeGenerator, schema, path, ctx);
   }
   if (isNotSchema(schema)) {
-    return applyNotSchema(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyNotSchema(codeGenerator, schema, path, ctx);
   }
   throw new Error(`schema not supported: ${JSON.stringify(schema)}`);
 }
@@ -218,8 +175,7 @@ function applyZodArraySchema(
   codeGenerator: CodeGenerator,
   schema: ArraySchema,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
   const itemOutputPath = [...path, 'item'];
@@ -227,8 +183,7 @@ function applyZodArraySchema(
     codeGenerator,
     schema.items,
     itemOutputPath,
-    ctx,
-    preventFromAddingComponentRefs
+    ctx
   );
   requiredOutputPaths.push(itemOutputPath);
   const codeComment = itemSummary.codeComment
@@ -318,8 +273,7 @@ export function applyZodComponentRefSchema(
   codeGenerator: CodeGenerator,
   schema: SchemaComponentRef,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
@@ -336,8 +290,8 @@ export function applyZodComponentRefSchema(
       codeGenerator.createSchemaComponentZodConstOutputPath(schema.$ref, ctx),
     ],
   };
-  codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
-  const isRecursive = preventFromAddingComponentRefs.includes(schema.$ref);
+  codeGenerator.addOutput(output, ctx);
+  const isRecursive = ctx.preventFromAddingComponentRefs.includes(schema.$ref);
   if (isRecursive) {
     codeGenerator.addOutputPathWithZodSchemaRecursion(
       codeGenerator.createSchemaComponentZodConstOutputPath(schema.$ref, ctx)
@@ -370,8 +324,7 @@ export function applyZodObjectSchema(
   codeGenerator: CodeGenerator,
   schema: ObjectSchema,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const directOutputByPropNameMap: {
     [propName: string]: {
@@ -388,8 +341,7 @@ export function applyZodObjectSchema(
       codeGenerator,
       propSchema,
       propSchemaPath,
-      ctx,
-      preventFromAddingComponentRefs
+      ctx
     );
   }
   let additionalPropertiesDirectOutput: undefined | CodeGenerationOutput;
@@ -398,8 +350,7 @@ export function applyZodObjectSchema(
       codeGenerator,
       schema.additionalProperties,
       [...path, 'additionalProps'],
-      ctx,
-      preventFromAddingComponentRefs
+      ctx
     );
   }
   return {
@@ -445,19 +396,12 @@ function applyZodOneOfSchema(
   codeGenerator: CodeGenerator,
   schema: OneOfSchema,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const itemCodeOutputs: CodeGenerationOutput[] = [];
   schema.oneOf.forEach((itemSchema, index) => {
     const itemPath: OutputPath = [...path, `${index}`];
-    const itemOutput = applyZodSchema(
-      codeGenerator,
-      itemSchema,
-      itemPath,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    const itemOutput = applyZodSchema(codeGenerator, itemSchema, itemPath, ctx);
     itemCodeOutputs.push(itemOutput);
   });
   return {
@@ -497,8 +441,7 @@ function applyZodAllOfSchema(
   codeGenerator: CodeGenerator,
   schema: AllOfSchema,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const itemCodeOutputs: CodeGenerationOutput[] = [];
   schema.allOf.forEach((itemSchema, index) => {
@@ -506,13 +449,7 @@ function applyZodAllOfSchema(
       return;
     }
     const itemPath: OutputPath = [...path, `${index}`];
-    const itemOutput = applyZodSchema(
-      codeGenerator,
-      itemSchema,
-      itemPath,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    const itemOutput = applyZodSchema(codeGenerator, itemSchema, itemPath, ctx);
     itemCodeOutputs.push(itemOutput);
   });
   return {
@@ -548,19 +485,12 @@ function applyZodAnyOfSchema(
   codeGenerator: CodeGenerator,
   schema: AnyOfSchema,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const itemResults: CodeGenerationOutput[] = [];
   schema.anyOf.forEach((itemSchema, index) => {
     const itemPath: OutputPath = [...path, `${index}`];
-    const itemOutput = applyZodSchema(
-      codeGenerator,
-      itemSchema,
-      itemPath,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    const itemOutput = applyZodSchema(codeGenerator, itemSchema, itemPath, ctx);
     itemResults.push(itemOutput);
   });
   return {
@@ -595,8 +525,7 @@ function applyNotSchema(
   _codeGenerator: CodeGenerator,
   _schema: NotSchema,
   path: OutputPath,
-  _ctx: Context,
-  _preventFromAddingComponentRefs: string[] = []
+  _ctx: Context
 ): CodeGenerationOutput {
   return {
     createCode: () => {

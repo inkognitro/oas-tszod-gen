@@ -169,8 +169,7 @@ function applyRequestBodyComponentRef(
   codeGenerator: CodeGenerator,
   schema: RequestBodyComponentRef,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
@@ -187,7 +186,7 @@ function applyRequestBodyComponentRef(
       codeGenerator.createRequestBodyComponentTypeOutputPath(schema.$ref, ctx),
     ],
   };
-  codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
+  codeGenerator.addOutput(output, ctx);
   return {
     ...output,
     createCode: referencingPath => {
@@ -204,17 +203,10 @@ export function applyRequestBody(
   codeGenerator: CodeGenerator,
   requestBody: RequestBody,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   if (isRequestBodyComponentRef(requestBody)) {
-    return applyRequestBodyComponentRef(
-      codeGenerator,
-      requestBody,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyRequestBodyComponentRef(codeGenerator, requestBody, path, ctx);
   }
   if (isConcreteRequestBody(requestBody)) {
     return applyConcreteRequestBody(codeGenerator, requestBody, path, ctx);

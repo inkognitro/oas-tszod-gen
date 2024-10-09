@@ -40,17 +40,10 @@ export function applySchema(
   codeGenerator: CodeGenerator,
   schema: Schema,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   if (isSchemaComponentRef(schema)) {
-    return applySchemaComponentRef(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applySchemaComponentRef(codeGenerator, schema, path, ctx);
   }
   if (isBooleanSchema(schema)) {
     return applyBooleanSchema(schema, path);
@@ -65,58 +58,22 @@ export function applySchema(
     return applyIntegerSchema(schema, path);
   }
   if (isArraySchema(schema)) {
-    return applyArraySchema(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyArraySchema(codeGenerator, schema, path, ctx);
   }
   if (isObjectSchema(schema)) {
-    return applyObjectSchema(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyObjectSchema(codeGenerator, schema, path, ctx);
   }
   if (isOneOfSchema(schema)) {
-    return applyOneOfSchema(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyOneOfSchema(codeGenerator, schema, path, ctx);
   }
   if (isAllOfSchema(schema)) {
-    return applyAllOfSchema(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyAllOfSchema(codeGenerator, schema, path, ctx);
   }
   if (isAnyOfSchema(schema)) {
-    return applyAnyOfSchema(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyAnyOfSchema(codeGenerator, schema, path, ctx);
   }
   if (isNotSchema(schema)) {
-    return applyNotSchema(
-      codeGenerator,
-      schema,
-      path,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    return applyNotSchema(codeGenerator, schema, path, ctx);
   }
   throw new Error(`schema not supported: ${JSON.stringify(schema)}`);
 }
@@ -171,8 +128,7 @@ function applyArraySchema(
   codeGenerator: CodeGenerator,
   schema: ArraySchema,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const requiredOutputPaths: OutputPath[] = [];
   const itemOutputPath = [...path, 'item'];
@@ -180,8 +136,7 @@ function applyArraySchema(
     codeGenerator,
     schema.items,
     itemOutputPath,
-    ctx,
-    preventFromAddingComponentRefs
+    ctx
   );
   requiredOutputPaths.push(itemOutputPath);
   const codeComment = itemSummary.codeComment
@@ -240,8 +195,7 @@ export function applySchemaComponentRef(
   codeGenerator: CodeGenerator,
   schema: SchemaComponentRef,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
@@ -258,7 +212,7 @@ export function applySchemaComponentRef(
       codeGenerator.createSchemaComponentTypeOutputPath(schema.$ref, ctx),
     ],
   };
-  codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
+  codeGenerator.addOutput(output, ctx);
   return {
     ...output,
     createCode: referencingPath =>
@@ -274,8 +228,7 @@ export function applyObjectSchema(
   codeGenerator: CodeGenerator,
   schema: ObjectSchema,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const directOutputByPropNameMap: {
     [propName: string]: {
@@ -292,8 +245,7 @@ export function applyObjectSchema(
       codeGenerator,
       propSchema,
       propSchemaPath,
-      ctx,
-      preventFromAddingComponentRefs
+      ctx
     );
   }
   let additionalPropertiesDirectOutput: undefined | CodeGenerationOutput;
@@ -302,8 +254,7 @@ export function applyObjectSchema(
       codeGenerator,
       schema.additionalProperties,
       [...path, 'additionalProps'],
-      ctx,
-      preventFromAddingComponentRefs
+      ctx
     );
   }
   return {
@@ -346,19 +297,12 @@ function applyOneOfSchema(
   codeGenerator: CodeGenerator,
   schema: OneOfSchema,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const itemCodeOutputs: CodeGenerationOutput[] = [];
   schema.oneOf.forEach((itemSchema, index) => {
     const itemPath: OutputPath = [...path, `${index}`];
-    const itemOutput = applySchema(
-      codeGenerator,
-      itemSchema,
-      itemPath,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    const itemOutput = applySchema(codeGenerator, itemSchema, itemPath, ctx);
     itemCodeOutputs.push(itemOutput);
   });
   return {
@@ -393,8 +337,7 @@ function applyAllOfSchema(
   codeGenerator: CodeGenerator,
   schema: AllOfSchema,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const itemCodeOutputs: CodeGenerationOutput[] = [];
   schema.allOf.forEach((itemSchema: Schema, index) => {
@@ -402,13 +345,7 @@ function applyAllOfSchema(
       return;
     }
     const itemPath: OutputPath = [...path, `${index}`];
-    const itemOutput = applySchema(
-      codeGenerator,
-      itemSchema,
-      itemPath,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    const itemOutput = applySchema(codeGenerator, itemSchema, itemPath, ctx);
     itemCodeOutputs.push(itemOutput);
   });
   return {
@@ -443,8 +380,7 @@ function applyAnyOfSchema(
   codeGenerator: CodeGenerator,
   schema: AnyOfSchema,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   type ItemResult = {
     codeOutput: CodeGenerationOutput;
@@ -453,13 +389,7 @@ function applyAnyOfSchema(
   const itemResults: ItemResult[] = [];
   schema.anyOf.forEach((itemSchema, index) => {
     const itemPath: OutputPath = [...path, `${index}`];
-    const itemOutput = applySchema(
-      codeGenerator,
-      itemSchema,
-      itemPath,
-      ctx,
-      preventFromAddingComponentRefs
-    );
+    const itemOutput = applySchema(codeGenerator, itemSchema, itemPath, ctx);
     const concreteSchema = findConcreteSchema(
       codeGenerator.getSpecification(),
       itemSchema
@@ -520,8 +450,7 @@ function applyNotSchema(
   _codeGenerator: CodeGenerator,
   _schema: NotSchema,
   path: OutputPath,
-  _ctx: Context,
-  _preventFromAddingComponentRefs: string[] = []
+  _ctx: Context
 ): CodeGenerationOutput {
   return {
     createCode: () => {

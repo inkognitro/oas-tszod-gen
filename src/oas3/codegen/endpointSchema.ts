@@ -156,8 +156,7 @@ function applyEndpointSchemaRequestBodyComponentRef(
   codeGenerator: CodeGenerator,
   schema: RequestBodyComponentRef,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
@@ -177,7 +176,7 @@ function applyEndpointSchemaRequestBodyComponentRef(
       ),
     ],
   };
-  codeGenerator.addOutput(output, ctx, preventFromAddingComponentRefs);
+  codeGenerator.addOutput(output, ctx);
   return {
     ...output,
     createCode: referencingPath => {
@@ -194,16 +193,14 @@ export function applyEndpointSchemaRequestBody(
   codeGenerator: CodeGenerator,
   requestBody: RequestBody,
   path: OutputPath,
-  ctx: Context,
-  preventFromAddingComponentRefs: string[] = []
+  ctx: Context
 ): CodeGenerationOutput {
   if (isRequestBodyComponentRef(requestBody)) {
     return applyEndpointSchemaRequestBodyComponentRef(
       codeGenerator,
       requestBody,
       path,
-      ctx,
-      preventFromAddingComponentRefs
+      ctx
     );
   }
   if (isConcreteRequestBody(requestBody)) {

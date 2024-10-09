@@ -182,6 +182,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       operationType: null,
       response: null,
       config,
+      preventFromAddingComponentRefs: [],
     };
     this.reset(ctx);
     for (const path in this.oas3Specs.paths) {
@@ -478,9 +479,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     };
     const typeOutput: AnyDefinitionOutput = {
       type: OutputType.DEFINITION,
-      ...applyResponse(this, response, typeOutputPath, applyResponseCtx, [
-        componentRef,
-      ]),
+      ...applyResponse(this, response, typeOutputPath, applyResponseCtx),
       definitionType: 'type',
       createGenericsDeclarationCode: () => {
         return 'S extends number = any';
@@ -498,9 +497,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       this.createResponseComponentSchemaConstOutputPath(componentRef, ctx);
     const schemaConstOutput: AnyDefinitionOutput = {
       type: OutputType.DEFINITION,
-      ...applyResponseSchema(this, response, schemaConstOutputPath, ctx, [
-        componentRef,
-      ]),
+      ...applyResponseSchema(this, response, schemaConstOutputPath, ctx),
       definitionType: 'const',
       createName: referencingPath =>
         this.createResponseComponentConstName(
@@ -532,9 +529,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     }
     const typeOutput: DefinitionOutput = {
       type: OutputType.DEFINITION,
-      ...applyRequestBody(this, requestBody, typeOutputPath, ctx, [
-        componentRef,
-      ]),
+      ...applyRequestBody(this, requestBody, typeOutputPath, ctx),
       definitionType: 'type',
       createName: referencingPath =>
         this.createRequestBodyComponentTypeName(
@@ -553,8 +548,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
         this,
         requestBody,
         schemaConstOutputPath,
-        ctx,
-        [componentRef]
+        ctx
       ),
       definitionType: 'const',
       createName: referencingPath =>
@@ -581,7 +575,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     }
     const output: AnyDefinitionOutput = {
       type: OutputType.DEFINITION,
-      ...applySchema(this, schema, typeOutputPath, ctx, [componentRef]),
+      ...applySchema(this, schema, typeOutputPath, ctx),
       definitionType: 'type',
       createName: referencingPath =>
         this.createSchemaComponentTypeName(componentRef, referencingPath, ctx),
@@ -593,9 +587,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
         ctx
       );
       const zodSchemaOutput: AnyDefinitionOutput = {
-        ...applyZodSchema(this, schema, zodSchemaOutputPath, ctx, [
-          componentRef,
-        ]),
+        ...applyZodSchema(this, schema, zodSchemaOutputPath, ctx),
         type: OutputType.DEFINITION,
         definitionType: 'const',
         createName: referencingPath =>
@@ -928,16 +920,19 @@ export class DefaultCodeGenerator implements CodeGenerator {
     }
   }
 
-  addOutput(
-    output: Output,
-    ctx: Context,
-    preventFromAddingComponentRefs: string[] = []
-  ) {
+  addOutput(output: Output, ctx: Context) {
     switch (output.type) {
       case OutputType.COMPONENT_REF:
         this.outputs.push(output);
-        if (!preventFromAddingComponentRefs.includes(output.componentRef)) {
-          this.addOutputByComponentRef(output.componentRef, ctx);
+        if (!ctx.preventFromAddingComponentRefs.includes(output.componentRef)) {
+          const addOutputCtx: Context = {
+            ...ctx,
+            preventFromAddingComponentRefs: [
+              ...ctx.preventFromAddingComponentRefs,
+              output.componentRef,
+            ],
+          };
+          this.addOutputByComponentRef(output.componentRef, addOutputCtx);
         }
         break;
       case OutputType.DEFINITION:
