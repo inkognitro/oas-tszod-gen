@@ -333,7 +333,9 @@ export class DefaultCodeGenerator implements CodeGenerator {
           : '';
         const codeParts: string[] = [];
         if (typeDeclarationCode) {
-          codeParts.push('// @ts-ignore - due to ZodSchema recursion it is required to force the type like so');
+          codeParts.push(
+            '// @ts-ignore - due to ZodSchema recursion it is required to force the type like so'
+          );
         }
         codeParts.push(
           `export const ${o.createName(o.path)}${typeDeclarationCodePart} = ${o.createCode(o.path)}`
