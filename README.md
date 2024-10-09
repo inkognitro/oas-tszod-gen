@@ -183,33 +183,35 @@ import {
   AuthRequestHandlerExecutionConfig,
   AxiosRequestHandler,
   AxiosRequestHandlerExecutionConfig,
-  HttpBearerAuthenticationProvider,
+  BearerAuthProvider,
   ZodValidationRequestHandler,
   ZodValidationRequestHandlerExecutionConfig,
 } from './generated-api/core';
-import { authenticate } from './generated-api/auth';
+import {authenticate} from './generated-api/auth';
 import axios from 'axios';
-import { parse } from 'qs';
+import {parse} from 'qs';
+import {BearerAuthProvider} from "./authRequestHandler";
 
 declare global {
   interface RequestHandlerExecutionConfig
     extends AxiosRequestHandlerExecutionConfig,
       AuthRequestHandlerExecutionConfig,
-      ZodValidationRequestHandlerExecutionConfig {}
+      ZodValidationRequestHandlerExecutionConfig {
+  }
 }
 
-class MyJwtAuthProvider {
-  public readonly type: 'httpBearer';
-  
+class MyJwtAuthProvider implements BearerAuthProvider {
+  public readonly type: 'bearer';
+
   // This is the name of one of your security definition in your OAS3 specification
   public readonly securitySchemeName: 'myJwtAuth';
-  
+
   private readonly accessToken: null | string;
-  
+
   setToken(accessToken: string | null) {
     this.accessToken = accessToken;
   }
-  
+
   findToken(): null | string {
     return this.accessToken;
   }
@@ -219,7 +221,7 @@ export const myJwtAuthProvider = new MyJwtAuthProvider();
 
 const myAxiosInstance = axios.create({
   baseURL: 'https://api.acme.com',
-  
+
   // In case of browsers:
   // Allow cookies to be passed along with the request for a different api (sub-)domain (CORS)
   // Source: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
@@ -441,8 +443,11 @@ const fetchApiRequestHandler = new FetchApiRequestHandler({
 ```
 
 ### AuthRequestHandler
-This implementation can be taken for automatic `Authorization` request header enrichment.
-As of time of writing this, only `httpBearer` and `httpBasic` authentication headers are supported.
+This implementation can be taken to add authentication information to requests automatically.
+This is done as defined in the [OAS Authentication specs](https://swagger.io/docs/specification/v3_0/authentication/),
+according to the given
+[AuthProvider](https://github.com/inkognitro/oas-tszod-gen/blob/main/src/templates/core/authRequestHandler.ts#L29)(s).
+As of the time of writing this, only `basic`, `bearer` and `apiKey` authentication is supported.
 
 ### ScopedRequestHandler
 With this implementation you are able to make sure that the methods `cancelRequestById` and `cancelAllRequests` do only
