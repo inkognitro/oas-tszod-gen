@@ -1,0 +1,85 @@
+import {
+  z_Forwarding_Request,
+  z_Error,
+  Forwarding_Request,
+  Error,
+} from '@example-outputs/stripe-with-zod';
+import {z} from 'zod';
+import {
+  RequestUnion,
+  RequestBodyData,
+  ResponseBodyData,
+  ResponseUnion,
+  RequestResult,
+  SimpleRequestHandler,
+  createRequest,
+  RequestHandlerExecutionConfig,
+  RequestPayload,
+} from '@example-outputs/stripe-with-zod/core';
+
+export const getForwardingRequestsIdEndpointSchema = {
+  path: '/v1/forwarding/requests/{id}',
+  method: 'get',
+  supportedSecuritySchemas: [],
+  queryParamsZodSchema: z.object({
+    expand: z.array(z.string()).optional(),
+  }),
+  pathParamsZodSchema: z.object({
+    id: z.string(),
+  }),
+  bodyByContentType: {
+    'application/x-www-form-urlencoded': {
+      zodSchema: z.object({}),
+    },
+  },
+  responseByStatus: {
+    '200': {
+      bodyByContentType: {
+        'application/json': {
+          zodSchema: z_Forwarding_Request,
+        },
+      },
+    },
+    default: {
+      bodyByContentType: {
+        'application/json': {
+          zodSchema: z_Error,
+        },
+      },
+    },
+  },
+};
+
+export type GetForwardingRequestsIdRequest = RequestUnion<
+  RequestBodyData<'application/x-www-form-urlencoded', {}>,
+  {
+    id: string;
+  },
+  {
+    expand?: string[];
+  }
+>;
+
+export type GetForwardingRequestsIdResponse =
+  | ResponseUnion<200, ResponseBodyData<'application/json', Forwarding_Request>>
+  | ResponseUnion<any, ResponseBodyData<'application/json', Error>>;
+
+export type GetForwardingRequestsIdRequestResult = RequestResult<
+  GetForwardingRequestsIdRequest,
+  GetForwardingRequestsIdResponse
+>;
+
+export function getForwardingRequestsId(
+  requestHandler: SimpleRequestHandler,
+  payload: RequestPayload<
+    GetForwardingRequestsIdRequest,
+    'pathParams' | 'contentType' | 'body',
+    'queryParams'
+  >,
+  config?: RequestHandlerExecutionConfig
+): Promise<GetForwardingRequestsIdRequestResult> {
+  return requestHandler.execute(
+    createRequest(getForwardingRequestsIdEndpointSchema, payload),
+    config
+  );
+}

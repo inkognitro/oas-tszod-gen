@@ -138,8 +138,8 @@ export type ContentsObject = {
   contents?: ContentsObject[];
 };
 
-// @ts-ignore - due to schema recursion
-export const z_ContentsObject = z.object({
+// @ts-ignore - due to ZodSchema recursion it is required to force the type like so
+export const z_ContentsObject: z.ZodType<ContentsObject> = z.object({
   name: z.string(),
   id: z.string().optional(),
   drs_uri: z.array(z.string()).optional(),
@@ -173,7 +173,7 @@ export const z_DrsObject = z.object({
   mime_type: z.string().optional(),
   checksums: z.array(z_Checksum).min(1),
   access_methods: z.array(z_AccessMethod).min(1).optional(),
-  contents: z.array(z.lazy(() => z_ContentsObject)).optional(),
+  contents: z.array(z_ContentsObject).optional(),
   description: z.string().optional(),
   aliases: z.array(z.string()).optional(),
 });
