@@ -502,12 +502,17 @@ It is recommended to have separate definitions for read and write objects, espec
 (see also [CQRS pattern](https://martinfowler.com/bliki/CQRS.html)).
 Anyway, this is planned to be implemented but currently has low priority to me.
 
-## Caveats
-Request `headers` and `cookies` are always optional. At the moment there is no configuration setting for this.
+## Extra
+- Request `headers` and `cookies` are always optional. At the moment there is no configuration setting for this.
 This is because one might avoid defining common headers for every call of an endpoint caller function and define
 those in a separate underlying request handler. However, as soon as a request `headers` object is passed in to the
-endpoint caller function, it must fulfill the definition given from the OAS3 specs
-(e.g. `required: true` of a specific header key).
+endpoint caller function, it must fulfill the definition of the given OAS3 specs, e.g. `required: true`
+of a specific header.
+- [AnyOf](https://swagger.io/docs/specification/v3_0/data-models/oneof-anyof-allof-not/#anyof) does officially support
+only ObjectSchemas or ObjectSchemaComponentRefs.
+However, in case of an OAS3 spec which defines another type in the `anyOf` property
+(e.g. a [StringSchema](https://swagger.io/docs/specification/v3_0/data-models/data-types/#string)), the generator does
+generate code which treats non-ObjectSchema types as another union option.
 
 ## Out of scope
 Linting is out of scope of this package. The generator is responsible to generate valid TypeScript (and Zod) definitions.
@@ -520,6 +525,6 @@ That's what it does. Your code setup should be responsible for linting your code
 }
 ```
 
-## Pull request
-If you think an unsupported feature needs to be implemented, feel free to open a pull request.
-Please refer to the existing pull request criteria defined [here](.github/pull_request_template.md).
+## Bug report / feature request
+If you think an unsupported feature needs to be implemented, feel free to open an issue or create a new
+pull request. Please refer to the pull request criteria which is defined [here](.github/pull_request_template.md).
