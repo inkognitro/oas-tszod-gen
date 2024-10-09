@@ -62,9 +62,10 @@ generateOas3ToTs({
   outputFolderPath: './generated-api',
 
   // optional:
-  // The list of separators which should be considered for the outputPath creation from a component name
-  // The outputPath itself is an array of strings (see explanation in one of the sections below)
-  // By default the following configuration is taken: ['.', '/', '\\']
+  // The list of separators which should be considered for the outputPath creation from a
+  // component name. The outputPath itself is an array of strings (see explanation in one
+  // of the sections below). By default the following configuration is taken:
+  // ['.', '/', '\\']
   componentOutputPathSeparators: ['.', '/', '\\', '_'],
   
   // optional:
