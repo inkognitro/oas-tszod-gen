@@ -392,7 +392,7 @@ And finally:
 ```typescript
 const requestHandler = new AxiosRequestHandler({
   axios: axios.create({
-    baseURL: `http://localhost:${port}`,
+    baseURL: `http://localhost:3000`,
   }),
   urlDecodeQueryString: (queryString: string) => {
     return parse(queryString);
