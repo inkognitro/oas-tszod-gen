@@ -18,8 +18,11 @@
   "main": "dist/index.js",
   "description": "A code generator to convert OpenApi version 3 (OAS3) specifications into endpoint caller functions for TS and Zod.",
   "scripts": {
-    "build": "tspc && npm run optimizeBuildFiles",
-    "optimizeBuildFiles": "node ./optimize-build-files.js",
+    "publish:patch": "npm run ci:refreshAndTest && npm run build && npm version patch && npm publish",
+    "build": "npm run build:clean && tspc && npm run build:optimize",
+    "build:clean": "node ./scripts/remove-build-files.js",
+    "build:optimize": "node ./scripts/optimize-build-files.js",
+    "ci:refreshAndTest": "npm run test && npm run lint:fix && npm run tsc",
     "lint": "gts lint",
     "lint:fix": "tsc --noEmit && gts fix",
     "test": "jest",

@@ -12,8 +12,8 @@ const templateFiles = [
 
 function copyCoreTemplateFiles() {
   templateFiles.forEach(filePath => {
-    const source = path.resolve(__dirname, './src', filePath);
-    const destination = path.resolve(__dirname, './dist', filePath);
+    const source = path.resolve(__dirname, '../src', filePath);
+    const destination = path.resolve(__dirname, '../dist', filePath);
     const dirPath = destination
       .split('\\')
       .join('/')
@@ -66,11 +66,11 @@ async function moveFiles(sourceDir, targetDir) {
 }
 
 async function extractRequiredBuildFiles() {
-  const sourceDirectory = path.resolve(__dirname, './dist/src');
-  const destination = path.resolve(__dirname, './dist');
+  const sourceDirectory = path.resolve(__dirname, '../dist/src');
+  const destination = path.resolve(__dirname, '../dist');
   await moveFiles(sourceDirectory, destination).then(() => {
     fs.rmSync(sourceDirectory, {recursive: true, force: true});
-    fs.rmSync(path.resolve(__dirname, './dist/example-outputs'), {
+    fs.rmSync(path.resolve(__dirname, '../dist/example-outputs'), {
       recursive: true,
       force: true,
     });
