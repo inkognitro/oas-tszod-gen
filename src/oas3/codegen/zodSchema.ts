@@ -122,7 +122,7 @@ function applyZodStringSchema(
           pattern = schema.pattern;
         }
         if (pattern) {
-          code += `.regex(/${schema.pattern}/)`;
+          code += `.regex(/${pattern.replace(/[/.*+\-?^${}()|[\]\\]/g, '\\$&')}/)`;
         }
         if (!schema.enum && !pattern && schema.format) {
           switch (schema.format) {

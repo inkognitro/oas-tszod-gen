@@ -135,7 +135,6 @@ describe('Generator', () => {
             resolve(stripeSpecs);
           });
         },
-        componentOutputPathSeparators: [],
         outputFolderPath: './example-outputs/stripe-with-zod',
         logger: {
           log: () => {},
