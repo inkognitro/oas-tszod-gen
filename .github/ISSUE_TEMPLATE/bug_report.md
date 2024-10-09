@@ -10,6 +10,9 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
+**Version**
+Specificy on which version did the bug occur.
+
 **OAS3 specification**
 A link / attachment to a specific OAS3 specification to be able to reproduce the bug.
 
