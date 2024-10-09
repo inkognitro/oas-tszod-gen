@@ -122,7 +122,8 @@ export interface CodeGenerator {
     ctx: Context
   ): OutputPath;
   addOutput(output: Output, ctx: Context): void;
-  addOutputPathWithZodSchemaRecursion(outputPath: OutputPath): void;
+  addOutputPathWhichHasRecursion(outputPath: OutputPath): void;
+  hasOutputPathRecursion(outputPath: OutputPath): boolean;
 }
 
 export enum OutputType {

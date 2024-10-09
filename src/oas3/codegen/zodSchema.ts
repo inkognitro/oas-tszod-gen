@@ -291,9 +291,8 @@ export function applyZodComponentRefSchema(
     ],
   };
   codeGenerator.addOutput(output, ctx);
-  const isRecursive = ctx.preventFromAddingComponentRefs.includes(schema.$ref);
-  if (isRecursive) {
-    codeGenerator.addOutputPathWithZodSchemaRecursion(
+  function isRecursive(): boolean {
+    return codeGenerator.hasOutputPathRecursion(
       codeGenerator.createSchemaComponentZodConstOutputPath(schema.$ref, ctx)
     );
   }
@@ -305,14 +304,14 @@ export function applyZodComponentRefSchema(
         referencingPath,
         ctx
       );
-      if (isRecursive) {
+      if (isRecursive()) {
         return `z.lazy(() => ${constName})`;
       }
       return constName;
     },
     getRequiredOutputPaths: () => {
       const outputPaths = [...output.getRequiredOutputPaths()];
-      if (isRecursive) {
+      if (isRecursive()) {
         outputPaths.push(templateZOfZodLibrary.path);
       }
       return outputPaths;
