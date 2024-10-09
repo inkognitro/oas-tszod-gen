@@ -1,31 +1,46 @@
 import {Request, RequestHandler, RequestResult} from './core';
 
-export type HttpBasicAuthenticationProvider = {
-  type: 'httpBasic';
+function base64Encode(value: string): string {
+  const isBrowserEnv = typeof window !== 'undefined';
+  const buffer = Buffer.from(value);
+  return isBrowserEnv ? btoa(value) : buffer.toString('base64');
+}
+
+export type BasicAuthProvider = {
+  type: 'basic';
+  securitySchemeName: string;
+  findUserCredentials: () => null | {username: string; password: string};
+};
+
+export type BearerAuthProvider = {
+  type: 'bearer';
   securitySchemeName: string;
   findToken: () => null | string;
 };
 
-export type HttpBearerAuthenticationProvider = {
-  type: 'httpBearer';
+export type ApiKeyAuthProvider = {
+  type: 'apiKey';
   securitySchemeName: string;
-  findToken: () => null | string;
+  apiKeyParamLocation: 'header' | 'query' | 'cookie';
+  apiKeyParamName: string;
+  findApiKey: () => null | string;
 };
 
-export type AuthenticationProvider =
-  | HttpBasicAuthenticationProvider
-  | HttpBearerAuthenticationProvider;
+export type AuthProvider =
+  | BasicAuthProvider
+  | BearerAuthProvider
+  | ApiKeyAuthProvider;
 
 export type AuthRequestHandlerExecutionConfig = {
   preventAuthentication?: boolean;
 };
 
 export class AuthRequestHandler implements RequestHandler {
-  private readonly authenticationProviders: AuthenticationProvider[];
+  private readonly authenticationProviders: AuthProvider[];
   private readonly nextRequestHandler: RequestHandler;
 
   constructor(
-    authenticationProviders: AuthenticationProvider[],
+    authenticationProviders: AuthProvider[],
     nextRequestHandler: RequestHandler
   ) {
     this.authenticationProviders = authenticationProviders;
@@ -63,29 +78,68 @@ export class AuthRequestHandler implements RequestHandler {
       if (!authProvider) {
         continue;
       }
-      const accessToken = authProvider.findToken();
-      if (!accessToken) {
-        return request;
-      }
       switch (authProvider.type) {
-        case 'httpBasic':
+        case 'basic':
+          const userCredentials = authProvider.findUserCredentials();
+          if (!userCredentials) {
+            return request;
+          }
+          const base64CredentialsStr = base64Encode(
+            `${userCredentials.username}:${userCredentials.password}`
+          );
           return {
             ...request,
             headers: {
               ...request.headers,
-              Authorization: accessToken,
-              securityScheme: securitySchemaName,
+              Authorization: `Basic ${base64CredentialsStr}`,
             },
           };
-        case 'httpBearer':
+        case 'bearer':
+          const httpBearerToken = authProvider.findToken();
+          if (!httpBearerToken) {
+            return request;
+          }
           return {
             ...request,
             headers: {
-              ...request.headers,
-              Authorization: `Bearer ${accessToken}`,
-              securityScheme: securitySchemaName,
+              ...(request.headers ?? {}),
+              Authorization: `Bearer ${httpBearerToken}`,
             },
           };
+        case 'apiKey':
+          const apiKey = authProvider.findApiKey();
+          if (!apiKey) {
+            return request;
+          }
+          const paramName = authProvider.apiKeyParamName;
+          switch (authProvider.apiKeyParamLocation) {
+            case 'header':
+              return {
+                ...request,
+                headers: {
+                  ...(request.headers ?? {}),
+                  [paramName]: apiKey,
+                },
+              };
+            case 'cookie':
+              return {
+                ...request,
+                cookies: {
+                  ...(request.cookies ?? {}),
+                  [paramName]: apiKey,
+                },
+              };
+            case 'query':
+              return {
+                ...request,
+                queryParams: {
+                  ...(request.queryParams ?? {}),
+                  [paramName]: apiKey,
+                },
+              };
+            default:
+              return request;
+          }
       }
     }
     return request;
