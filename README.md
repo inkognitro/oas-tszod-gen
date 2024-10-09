@@ -503,7 +503,7 @@ It is recommended to have separate definitions for read and write objects, espec
 Anyway, this is planned to be implemented but currently has low priority to me.
 
 ## Caveats
-Request `headers` and `cookies` are always optional. At the moment there is no configuration property about this.
+Request `headers` and `cookies` are always optional. At the moment there is no configuration setting for this.
 This is because one might avoid defining common headers for every call of an endpoint caller function and define
 those in a separate underlying request handler. However, as soon as a request `headers` object is passed in to the
 endpoint caller function, it must fulfill the definition given from the OAS3 specs
