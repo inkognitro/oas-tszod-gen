@@ -129,7 +129,6 @@ describe('Generator', () => {
     }).not.toThrow();
   });
 
-  /*
   it('can generate files from Stripe specs with Zod', () => {
     expect(() => {
       generateOas3ToTs({
@@ -140,5 +139,4 @@ describe('Generator', () => {
       });
     }).not.toThrow();
   });
-  */
 });

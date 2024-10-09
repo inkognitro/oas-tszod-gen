@@ -4,7 +4,6 @@ import {
   ComponentRefOutput,
   containsOutputPath,
   Context,
-  CreateCodeFunc,
   OutputPath,
   OutputType,
 } from './core';
@@ -36,12 +35,16 @@ import {
 } from '@/oas3/specification';
 import {templateZOfZodLibrary} from './template';
 
+type ZodSchemaCodeGenerationOutput = CodeGenerationOutput & {
+  referencesRecursiveComponents: () => boolean;
+};
+
 export function applyZodSchema(
   codeGenerator: CodeGenerator,
   schema: Schema,
   path: OutputPath,
   ctx: Context
-): CodeGenerationOutput {
+): ZodSchemaCodeGenerationOutput {
   if (isSchemaComponentRef(schema)) {
     return applyZodComponentRefSchema(codeGenerator, schema, path, ctx);
   }
@@ -81,7 +84,7 @@ export function applyZodSchema(
 function applyZodBooleanSchema(
   schema: BooleanSchema,
   path: OutputPath
-): CodeGenerationOutput {
+): ZodSchemaCodeGenerationOutput {
   return {
     createCode: () => {
       let code = 'z.boolean()';
@@ -91,6 +94,7 @@ function applyZodBooleanSchema(
       return code;
     },
     path,
+    referencesRecursiveComponents: () => false,
     getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
   };
 }
@@ -99,7 +103,7 @@ function applyZodStringSchema(
   schema: StringSchema,
   path: OutputPath,
   ctx: Context
-): CodeGenerationOutput {
+): ZodSchemaCodeGenerationOutput {
   let codeComment: undefined | string;
   return {
     createCode: () => {
@@ -166,6 +170,7 @@ function applyZodStringSchema(
       return code;
     },
     path,
+    referencesRecursiveComponents: () => false,
     getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
     codeComment,
   };
@@ -176,7 +181,7 @@ function applyZodArraySchema(
   schema: ArraySchema,
   path: OutputPath,
   ctx: Context
-): CodeGenerationOutput {
+): ZodSchemaCodeGenerationOutput {
   const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
   const itemOutputPath = [...path, 'item'];
   const itemSummary = applyZodSchema(
@@ -205,6 +210,8 @@ function applyZodArraySchema(
     },
     codeComment,
     path,
+    referencesRecursiveComponents: () =>
+      itemSummary.referencesRecursiveComponents(),
     getRequiredOutputPaths: () => requiredOutputPaths,
   };
 }
@@ -212,7 +219,7 @@ function applyZodArraySchema(
 function applyZodNumberSchema(
   schema: NumberSchema,
   path: OutputPath
-): CodeGenerationOutput {
+): ZodSchemaCodeGenerationOutput {
   return {
     createCode: () => {
       let code = 'z.number().safe().finite()';
@@ -235,6 +242,7 @@ function applyZodNumberSchema(
       return code;
     },
     path,
+    referencesRecursiveComponents: () => false,
     getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
   };
 }
@@ -242,7 +250,7 @@ function applyZodNumberSchema(
 function applyZodIntegerSchema(
   schema: IntegerSchema,
   path: OutputPath
-): CodeGenerationOutput {
+): ZodSchemaCodeGenerationOutput {
   return {
     createCode: () => {
       let code = 'z.number().int().safe().finite()';
@@ -265,6 +273,7 @@ function applyZodIntegerSchema(
       return code;
     },
     path,
+    referencesRecursiveComponents: () => false,
     getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
   };
 }
@@ -274,7 +283,7 @@ export function applyZodComponentRefSchema(
   schema: SchemaComponentRef,
   path: OutputPath,
   ctx: Context
-): CodeGenerationOutput {
+): ZodSchemaCodeGenerationOutput {
   const output: ComponentRefOutput = {
     type: OutputType.COMPONENT_REF,
     createName: referencingPath => {
@@ -291,11 +300,7 @@ export function applyZodComponentRefSchema(
     ],
   };
   codeGenerator.addOutput(output, ctx);
-  function isRecursive(): boolean {
-    return codeGenerator.hasOutputPathRecursion(
-      codeGenerator.createSchemaComponentZodConstOutputPath(schema.$ref, ctx)
-    );
-  }
+  const isRecursive = ctx.preventFromAddingComponentRefs.includes(schema.$ref);
   return {
     ...output,
     createCode: referencingPath => {
@@ -304,14 +309,17 @@ export function applyZodComponentRefSchema(
         referencingPath,
         ctx
       );
-      if (isRecursive()) {
+      if (isRecursive) {
         return `z.lazy(() => ${constName})`;
       }
       return constName;
     },
+    referencesRecursiveComponents: () => {
+      return isRecursive;
+    },
     getRequiredOutputPaths: () => {
       const outputPaths = [...output.getRequiredOutputPaths()];
-      if (isRecursive()) {
+      if (isRecursive) {
         outputPaths.push(templateZOfZodLibrary.path);
       }
       return outputPaths;
@@ -324,12 +332,9 @@ export function applyZodObjectSchema(
   schema: ObjectSchema,
   path: OutputPath,
   ctx: Context
-): CodeGenerationOutput {
+): ZodSchemaCodeGenerationOutput {
   const directOutputByPropNameMap: {
-    [propName: string]: {
-      createCode: CreateCodeFunc;
-      codeComment?: string;
-    };
+    [propName: string]: ZodSchemaCodeGenerationOutput;
   } = {};
   const requiredOutputPaths: OutputPath[] = [templateZOfZodLibrary.path];
   for (const propName in schema.properties) {
@@ -387,6 +392,15 @@ export function applyZodObjectSchema(
       return code;
     },
     path,
+    referencesRecursiveComponents: () => {
+      for (const key in directOutputByPropNameMap) {
+        const codeOutput = directOutputByPropNameMap[key];
+        if (codeOutput.referencesRecursiveComponents()) {
+          return true;
+        }
+      }
+      return false;
+    },
     getRequiredOutputPaths: () => requiredOutputPaths,
   };
 }
@@ -396,8 +410,8 @@ function applyZodOneOfSchema(
   schema: OneOfSchema,
   path: OutputPath,
   ctx: Context
-): CodeGenerationOutput {
-  const itemCodeOutputs: CodeGenerationOutput[] = [];
+): ZodSchemaCodeGenerationOutput {
+  const itemCodeOutputs: ZodSchemaCodeGenerationOutput[] = [];
   schema.oneOf.forEach((itemSchema, index) => {
     const itemPath: OutputPath = [...path, `${index}`];
     const itemOutput = applyZodSchema(codeGenerator, itemSchema, itemPath, ctx);
@@ -422,6 +436,9 @@ function applyZodOneOfSchema(
       return `z.union([${codeRows.join(',')}])`;
     },
     path,
+    referencesRecursiveComponents: () => {
+      return !!itemCodeOutputs.find(o => o.referencesRecursiveComponents());
+    },
     getRequiredOutputPaths: () => {
       const outputPaths: OutputPath[] = [templateZOfZodLibrary.path];
       itemCodeOutputs.forEach(itemCodeOutput => {
@@ -441,8 +458,8 @@ function applyZodAllOfSchema(
   schema: AllOfSchema,
   path: OutputPath,
   ctx: Context
-): CodeGenerationOutput {
-  const itemCodeOutputs: CodeGenerationOutput[] = [];
+): ZodSchemaCodeGenerationOutput {
+  const itemCodeOutputs: ZodSchemaCodeGenerationOutput[] = [];
   schema.allOf.forEach((itemSchema, index) => {
     if (!isSchema(itemSchema)) {
       return;
@@ -466,6 +483,9 @@ function applyZodAllOfSchema(
       return `z.intersection(${codeRows.join(',')})`;
     },
     path,
+    referencesRecursiveComponents: () => {
+      return !!itemCodeOutputs.find(o => o.referencesRecursiveComponents());
+    },
     getRequiredOutputPaths: () => {
       const outputPaths: OutputPath[] = [templateZOfZodLibrary.path];
       itemCodeOutputs.forEach(itemCodeOutput => {
@@ -485,8 +505,8 @@ function applyZodAnyOfSchema(
   schema: AnyOfSchema,
   path: OutputPath,
   ctx: Context
-): CodeGenerationOutput {
-  const itemResults: CodeGenerationOutput[] = [];
+): ZodSchemaCodeGenerationOutput {
+  const itemResults: ZodSchemaCodeGenerationOutput[] = [];
   schema.anyOf.forEach((itemSchema, index) => {
     const itemPath: OutputPath = [...path, `${index}`];
     const itemOutput = applyZodSchema(codeGenerator, itemSchema, itemPath, ctx);
@@ -506,6 +526,9 @@ function applyZodAnyOfSchema(
         : `z.union([\n${itemCodes.join(',\n')}\n])`;
     },
     path,
+    referencesRecursiveComponents: () => {
+      return !!itemResults.find(o => o.referencesRecursiveComponents());
+    },
     getRequiredOutputPaths: () => {
       const outputPaths: OutputPath[] = [templateZOfZodLibrary.path];
       itemResults.forEach(itemCodeOutput => {
@@ -525,12 +548,13 @@ function applyNotSchema(
   _schema: NotSchema,
   path: OutputPath,
   _ctx: Context
-): CodeGenerationOutput {
+): ZodSchemaCodeGenerationOutput {
   return {
     createCode: () => {
       return 'z.any()';
     },
     path,
+    referencesRecursiveComponents: () => false,
     getRequiredOutputPaths: () => [templateZOfZodLibrary.path],
   };
 }

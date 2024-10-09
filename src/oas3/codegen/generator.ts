@@ -3,6 +3,7 @@ import {
   areOutputPathsEqual,
   capitalizeFirstLetter,
   CodeGenerator,
+  containsOutputPath,
   Context,
   DefinitionOutput,
   doesOutputPathStartWithOtherOutputPath,
@@ -33,7 +34,7 @@ import {
   zSpecification,
 } from '@/oas3/specification';
 import {applyEndpointCallerFunction} from './endpoint';
-import {templateDefinitionOutputs} from './template';
+import {templateDefinitionOutputs, templateZOfZodLibrary} from './template';
 import {applySchema} from './schema';
 import {applyZodSchema} from './zodSchema';
 import {applyResponse} from './response';
@@ -163,7 +164,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
   private readonly logger: Logger;
   private outputs: Output[];
   private operationFolderOutputPaths: OutputPath[];
-  private outputPathsWhichHaveRecursion: OutputPath[];
 
   constructor(oas3Specs: Specification, logger: Logger) {
     zSpecification.parse(oas3Specs);
@@ -171,7 +171,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
     this.logger = logger;
     this.outputs = [];
     this.operationFolderOutputPaths = [];
-    this.outputPathsWhichHaveRecursion = [];
   }
 
   public getSpecification(): Specification {
@@ -196,7 +195,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
   private reset(ctx: Context) {
     this.outputs = [...templateDefinitionOutputs];
-    this.outputPathsWhichHaveRecursion = [];
     this.resetOperationFolderOutputPaths(ctx);
   }
 
@@ -325,15 +323,20 @@ export class DefaultCodeGenerator implements CodeGenerator {
       case 'function':
         return `export function ${o.createName(o.path)}${o.createCode(o.path)}`;
       case 'const':
-        const isRecursiveZodSchema = this.outputPathsWhichHaveRecursion.find(
-          p => areOutputPathsEqual(p, o.path)
-        );
-        const codeParts = [];
-        if (isRecursiveZodSchema) {
-          codeParts.push('// @ts-ignore - due to schema recursion');
+        let typeDeclarationCode = '';
+        if (o.createNullableExplicitTypeDeclarationCode) {
+          typeDeclarationCode =
+            o.createNullableExplicitTypeDeclarationCode() ?? '';
+        }
+        const typeDeclarationCodePart = typeDeclarationCode
+          ? `: ${typeDeclarationCode}`
+          : '';
+        const codeParts: string[] = [];
+        if (typeDeclarationCode) {
+          codeParts.push('// @ts-ignore - due to ZodSchema recursion it is required to force the type like so');
         }
         codeParts.push(
-          `export const ${o.createName(o.path)} = ${o.createCode(o.path)}`
+          `export const ${o.createName(o.path)}${typeDeclarationCodePart} = ${o.createCode(o.path)}`
         );
         return codeParts.join('\n');
       case 'type':
@@ -468,7 +471,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
         genericStatusVariableValue: 'S',
       },
     };
-    const typeOutput: AnyDefinitionOutput = {
+    const typeOutput: DefinitionOutput = {
       type: OutputType.DEFINITION,
       ...applyResponse(this, response, typeOutputPath, applyResponseCtx),
       definitionType: 'type',
@@ -486,7 +489,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
 
     const schemaConstOutputPath =
       this.createResponseComponentSchemaConstOutputPath(componentRef, ctx);
-    const schemaConstOutput: AnyDefinitionOutput = {
+    const schemaConstOutput: DefinitionOutput = {
       type: OutputType.DEFINITION,
       ...applyResponseSchema(this, response, schemaConstOutputPath, ctx),
       definitionType: 'const',
@@ -564,29 +567,58 @@ export class DefaultCodeGenerator implements CodeGenerator {
     if (this.findOutputByOutputPath(typeOutputPath)) {
       return;
     }
-    const output: AnyDefinitionOutput = {
+    const schemaTypeOutput: DefinitionOutput = {
       type: OutputType.DEFINITION,
       ...applySchema(this, schema, typeOutputPath, ctx),
       definitionType: 'type',
       createName: referencingPath =>
         this.createSchemaComponentTypeName(componentRef, referencingPath, ctx),
     };
-    this.addOutput(output, ctx);
+    this.addOutput(schemaTypeOutput, ctx);
     if (ctx.config.withZod) {
       const zodSchemaOutputPath = this.createSchemaComponentZodConstOutputPath(
         componentRef,
         ctx
       );
-      const zodSchemaOutput: AnyDefinitionOutput = {
-        ...applyZodSchema(this, schema, zodSchemaOutputPath, ctx),
+      const zodSchemaCode = applyZodSchema(
+        this,
+        schema,
+        zodSchemaOutputPath,
+        ctx
+      );
+      const zodSchemaOutput: DefinitionOutput = {
+        ...zodSchemaCode,
         type: OutputType.DEFINITION,
         definitionType: 'const',
+        createNullableExplicitTypeDeclarationCode: () => {
+          if (zodSchemaCode.referencesRecursiveComponents()) {
+            return `${templateZOfZodLibrary.createName(
+              zodSchemaOutputPath
+            )}.ZodType<${schemaTypeOutput.createName(zodSchemaOutputPath)}>`;
+          }
+          return null;
+        },
         createName: referencingPath =>
           this.createSchemaComponentZodConstName(
             componentRef,
             referencingPath,
             ctx
           ),
+        getRequiredOutputPaths: () => {
+          if (!zodSchemaCode.referencesRecursiveComponents()) {
+            return zodSchemaCode.getRequiredOutputPaths();
+          }
+          const outputPaths: OutputPath[] = [
+            ...zodSchemaCode.getRequiredOutputPaths(),
+          ];
+          if (!containsOutputPath(outputPaths, schemaTypeOutput.path)) {
+            outputPaths.push(schemaTypeOutput.path);
+          }
+          if (!containsOutputPath(outputPaths, templateZOfZodLibrary.path)) {
+            outputPaths.push(templateZOfZodLibrary.path);
+          }
+          return outputPaths;
+        },
       };
       this.addOutput(zodSchemaOutput, ctx);
     }
@@ -901,22 +933,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
     };
   }
 
-  public addOutputPathWhichHasRecursion(outputPath: OutputPath) {
-    if (
-      !this.outputPathsWhichHaveRecursion.find(p =>
-        areOutputPathsEqual(p, outputPath)
-      )
-    ) {
-      this.outputPathsWhichHaveRecursion.push(outputPath);
-    }
-  }
-
-  public hasOutputPathRecursion(outputPath: OutputPath): boolean {
-    return !!this.outputPathsWhichHaveRecursion.find(p =>
-      areOutputPathsEqual(p, outputPath)
-    );
-  }
-
   addOutput(output: Output, ctx: Context) {
     switch (output.type) {
       case OutputType.COMPONENT_REF:
@@ -930,13 +946,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
             ],
           };
           this.addOutputByComponentRef(output.componentRef, addOutputCtx);
-        } else {
-          this.addOutputPathWhichHasRecursion(
-            this.createSchemaComponentZodConstOutputPath(
-              output.componentRef,
-              ctx
-            )
-          );
         }
         break;
       case OutputType.DEFINITION:

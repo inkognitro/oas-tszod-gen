@@ -122,8 +122,6 @@ export interface CodeGenerator {
     ctx: Context
   ): OutputPath;
   addOutput(output: Output, ctx: Context): void;
-  addOutputPathWhichHasRecursion(outputPath: OutputPath): void;
-  hasOutputPathRecursion(outputPath: OutputPath): boolean;
 }
 
 export enum OutputType {
@@ -195,6 +193,7 @@ export type DefinitionOutput = GenericOutput<
   {
     definitionType: DefinitionType;
     createCode: CreateCodeFunc;
+    createNullableExplicitTypeDeclarationCode?: () => null | string;
     createGenericsDeclarationCode?: () => string;
     codeComment?: string;
     getRequiredOutputPaths: () => OutputPath[];
