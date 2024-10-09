@@ -1,4 +1,5 @@
 import {
+  Endpoint,
   Endpoint as Oas3Endpoint,
   RequestBodyContentByContentTypeMap,
   ResponseBodyContentByContentTypeMap,
@@ -25,11 +26,17 @@ export type GenerateConfigTemplateName =
 export type GenerateConfig = {
   outputFolderPath: string;
   importRootAlias?: string;
-  outputPathSeparators?: string[];
+  operationIdOutputPathSeparators?: string[];
+  componentOutputPathSeparators?: string[];
   predefinedFolderOutputPaths?: OutputPath[];
   withZod?: boolean;
   templates?: GenerateConfigTemplateName[];
-  createModifiedOperationOutputPath?: (outputPath: OutputPath) => OutputPath;
+  createOperationOutputPath?: (
+    path: string,
+    method: string,
+    schema: Oas3Endpoint,
+    defaultOutputPath: OutputPath
+  ) => OutputPath;
   shouldAddOperation?: (
     path: string,
     method: string,
@@ -78,14 +85,18 @@ export interface CodeGenerator {
     referencingPath: OutputPath,
     ctx: Context
   ): string;
-  generateEndpointOperationId(method: string, path: string): string;
   createTypeName(outputPath: OutputPath, referencingPath: OutputPath): string;
   createConstName(outputPath: OutputPath, referencingPath: OutputPath): string;
   createFunctionName(
     outputPath: OutputPath,
     referencingPath: OutputPath
   ): string;
-  createOperationIdOutputPath(operationId: string, ctx: Context): OutputPath;
+  createOperationOutputPath(
+    path: string,
+    method: string,
+    endpointSchema: Endpoint,
+    ctx: Context
+  ): OutputPath;
   createSchemaComponentTypeOutputPath(
     componentRef: string,
     ctx: Context

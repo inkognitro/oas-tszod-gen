@@ -20,6 +20,7 @@ import {
   zodSchemaOutputPathPart,
 } from './core';
 import {
+  Endpoint,
   findComponentRequestBodyByRef,
   findComponentResponseByRef,
   findComponentSchemaByRef,
@@ -214,10 +215,12 @@ export class DefaultCodeGenerator implements CodeGenerator {
         ) {
           continue;
         }
-        const operationId =
-          endpointSchema.operationId ??
-          this.generateEndpointOperationId(method, path);
-        const outputPath = this.createOperationIdOutputPath(operationId, ctx);
+        const outputPath = this.createOperationOutputPath(
+          path,
+          method,
+          endpointSchema,
+          ctx
+        );
         if (outputPath.length < 2) {
           continue;
         }
@@ -225,17 +228,6 @@ export class DefaultCodeGenerator implements CodeGenerator {
         this.operationFolderOutputPaths.push(folderOutputPath);
       }
     }
-  }
-
-  generateEndpointOperationId(method: string, path: string): string {
-    const pathPart = path
-      .split('-')
-      .join('/')
-      .split('/')
-      .filter(p => !!p.length)
-      .map(p => capitalizeFirstLetter(p.toLowerCase()))
-      .join('');
-    return `${method.toLowerCase()}${pathPart}`;
   }
 
   private getTemplateFileInfosToGenerate(ctx: Context): TemplateFileInfo[] {
@@ -966,12 +958,53 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return outputPath.slice(folderOutputPath.length);
   }
 
-  createOperationIdOutputPath(operationId: string, ctx: Context): OutputPath {
-    const outputPath = this.createOutputPathFromString(operationId, ctx);
-    if (ctx.config.createModifiedOperationOutputPath) {
-      return ctx.config.createModifiedOperationOutputPath(outputPath);
+  private createDefaultOperationOutputPath(
+    path: string,
+    method: string,
+    endpointSchema: Endpoint,
+    ctx: Context
+  ): OutputPath {
+    if (endpointSchema.operationId) {
+      return this.createOutputPathFromString(
+        endpointSchema.operationId,
+        ctx.config.operationIdOutputPathSeparators
+      );
     }
-    return outputPath;
+    const parts = path
+      .split('-')
+      .join('/')
+      .split('/')
+      .filter(p => !!p.length)
+      .map(p => lowerCaseFirstLetter(p));
+    const verb = method.toLowerCase();
+    const lastPart = `${verb}${capitalizeFirstLetter(parts[parts.length - 1])}`;
+    if (parts.length === 1) {
+      return [lastPart];
+    }
+    return [...parts.slice(0, parts.length - 1), lastPart];
+  }
+
+  createOperationOutputPath(
+    path: string,
+    method: string,
+    endpointSchema: Endpoint,
+    ctx: Context
+  ): OutputPath {
+    const defaultOutputPath = this.createDefaultOperationOutputPath(
+      path,
+      method,
+      endpointSchema,
+      ctx
+    );
+    if (ctx.config.createOperationOutputPath) {
+      return ctx.config.createOperationOutputPath(
+        method,
+        path,
+        endpointSchema,
+        defaultOutputPath
+      );
+    }
+    return defaultOutputPath;
   }
 
   private isEndpointSchemaOutputPath(outputPath: OutputPath): boolean {
@@ -1065,7 +1098,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
     return mostAccurateFolderOutputPath;
   }
 
-  createOutputPathFromString(str: string, ctx: Context): OutputPath {
+  createOutputPathFromString(str: string, separators?: string[]): OutputPath {
     function createSeparated(parts: string[], separators: string[]): string[] {
       let nextParts: string[] = [];
       const [currentSeparator, ...nextSeparators] = separators;
@@ -1078,8 +1111,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       });
       return nextParts;
     }
-    const separators = ctx.config.outputPathSeparators ?? ['.', '/', '\\'];
-    const parts = createSeparated([str], separators);
+    const parts = createSeparated([str], separators ?? ['.', '/', '\\']);
     return parts.filter(p => !!p.length).map(p => lowerCaseFirstLetter(p));
   }
 
@@ -1094,7 +1126,7 @@ export class DefaultCodeGenerator implements CodeGenerator {
       .replace(schemaComponentRefPrefix, '');
     const outputPathParts: OutputPath = this.createOutputPathFromString(
       componentRefWithoutPrefix,
-      ctx
+      ctx.config.componentOutputPathSeparators
     );
     let folderOutputPathParts: OutputPath = [];
     if (outputPathParts.length >= 2) {

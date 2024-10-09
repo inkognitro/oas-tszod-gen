@@ -104,10 +104,12 @@ export function applyEndpointCallerFunction(
     ...ctx,
     operationType: requestMethod.toLowerCase() === 'get' ? 'read' : 'write',
   };
-  const operationId =
-    schema.operationId ??
-    codeGenerator.generateEndpointOperationId(requestMethod, urlPath);
-  const path = codeGenerator.createOperationIdOutputPath(operationId, ctx);
+  const path = codeGenerator.createOperationOutputPath(
+    urlPath,
+    requestMethod,
+    schema,
+    ctx
+  );
   const endpointSchemaConstDefinition = applyEndpointSchemaConstDefinition(
     codeGenerator,
     urlPath,

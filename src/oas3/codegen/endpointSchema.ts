@@ -344,7 +344,7 @@ export function applyEndpointSchemaConstDefinition(
   const definition: DefinitionOutput = {
     type: OutputType.DEFINITION,
     definitionType: 'const',
-    path: outputPath,
+    path: [...outputPath],
     createName: referencingPath => {
       return codeGenerator.createConstName(outputPath, referencingPath);
     },
