@@ -21,8 +21,5 @@ test('parses Binance specification as correct input', () => {
 });
 
 test('parses Stripe specification as correct input', () => {
-  const result = zSpecification.safeParse(stripeSpecs);
-  console.log(result.error);
-
-  // expect(() => zSpecification.parse(stripeSpecs)).not.toThrow();
+  expect(() => zSpecification.parse(stripeSpecs)).not.toThrow();
 });
