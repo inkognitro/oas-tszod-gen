@@ -447,7 +447,7 @@ This implementation can be taken to add authentication information to requests a
 This is done as defined in the [OAS Authentication specs](https://swagger.io/docs/specification/v3_0/authentication/),
 according to the given
 [AuthProvider](https://github.com/inkognitro/oas-tszod-gen/blob/main/src/templates/core/authRequestHandler.ts#L29)(s).
-As of the time of writing this, only `basic`, `bearer` and `apiKey` authentication is supported.
+As of the time of writing this, `basic`, `bearer` and `apiKey` authentication is supported.
 
 ### ScopedRequestHandler
 With this implementation you are able to make sure that the methods `cancelRequestById` and `cancelAllRequests` do only
