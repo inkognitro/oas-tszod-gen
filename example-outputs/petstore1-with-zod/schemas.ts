@@ -173,7 +173,7 @@ export const z_DrsObject = z.object({
   mime_type: z.string().optional(),
   checksums: z.array(z_Checksum).min(1),
   access_methods: z.array(z_AccessMethod).min(1).optional(),
-  contents: z.array(z_ContentsObject).optional(),
+  contents: z.array(z.lazy(() => z_ContentsObject)).optional(),
   description: z.string().optional(),
   aliases: z.array(z.string()).optional(),
 });

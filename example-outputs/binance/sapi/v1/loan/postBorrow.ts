@@ -1,59 +1,84 @@
-import {RequestUnion, ResponseBodyData, ResponseUnion, RequestResult, SimpleRequestHandler, createRequest, RequestHandlerExecutionConfig, RequestPayload} from '@example-outputs/binance/core';
+import {
+  RequestUnion,
+  ResponseBodyData,
+  ResponseUnion,
+  RequestResult,
+  SimpleRequestHandler,
+  createRequest,
+  RequestHandlerExecutionConfig,
+  RequestPayload,
+} from '@example-outputs/binance/core';
 import {Error} from '@example-outputs/binance';
 
 export const postBorrowEndpointSchema = {
-path: '/sapi/v1/loan/borrow', 
-method: 'post', 
-supportedSecuritySchemas: [{ name: 'ApiKeyAuth', scopes: []}], 
-bodyByContentType: {}, 
-responseByStatus: {
-'200': {
-bodyByContentType: {
-'application/json': {
+  path: '/sapi/v1/loan/borrow',
+  method: 'post',
+  supportedSecuritySchemas: [{name: 'ApiKeyAuth', scopes: []}],
+  bodyByContentType: {},
+  responseByStatus: {
+    '200': {
+      bodyByContentType: {
+        'application/json': {},
+      },
+    },
+    '400': {
+      bodyByContentType: {
+        'application/json': {},
+      },
+    },
+    '401': {
+      bodyByContentType: {
+        'application/json': {},
+      },
+    },
+  },
+};
 
-}
-}
-},
-'400': {
-bodyByContentType: {
-'application/json': {
+export type PostBorrowRequest = RequestUnion<
+  any,
+  any,
+  {
+    loanCoin: string;
+    loanAmount?: number;
+    collateralCoin: string;
+    collateralAmount?: number;
+    loanTerm: number; // int
+    recvWindow?: number; // int
+    timestamp: number; // int
+    signature: string;
+  }
+>;
 
-}
-}
-},
-'401': {
-bodyByContentType: {
-'application/json': {
+export type PostBorrowResponse =
+  | ResponseUnion<
+      200,
+      ResponseBodyData<
+        'application/json',
+        {
+          loanCoin: string;
+          loanAmount: string;
+          collateralCoin: string;
+          collateralAmount: string;
+          hourlyInterestRate: string;
+          orderId: string;
+        }
+      >
+    >
+  | ResponseUnion<400, ResponseBodyData<'application/json', Error>>
+  | ResponseUnion<401, ResponseBodyData<'application/json', Error>>;
 
-}
-}
-}
-}
-}
+export type PostBorrowRequestResult = RequestResult<
+  PostBorrowRequest,
+  PostBorrowResponse
+>;
 
-export type PostBorrowRequest = RequestUnion<any,
-any,
-{
-'loanCoin': string;
-'loanAmount'?: number;
-'collateralCoin': string;
-'collateralAmount'?: number;
-'loanTerm': number; // int
-'recvWindow'?: number; // int
-'timestamp': number; // int
-'signature': string;
-}>
-
-export type PostBorrowResponse = ResponseUnion<200, ResponseBodyData<'application/json', {
-'loanCoin': string;
-'loanAmount': string;
-'collateralCoin': string;
-'collateralAmount': string;
-'hourlyInterestRate': string;
-'orderId': string;
-}>> | ResponseUnion<400, ResponseBodyData<'application/json', Error>> | ResponseUnion<401, ResponseBodyData<'application/json', Error>>
-
-export type PostBorrowRequestResult = RequestResult<PostBorrowRequest, PostBorrowResponse>
-
-export function postBorrow(requestHandler: SimpleRequestHandler, payload: RequestPayload<PostBorrowRequest, 'queryParams', never>, config?: RequestHandlerExecutionConfig): Promise<PostBorrowRequestResult> {return requestHandler.execute(createRequest(postBorrowEndpointSchema,
-payload), config);}
+export function postBorrow(
+  requestHandler: SimpleRequestHandler,
+  payload: RequestPayload<PostBorrowRequest, 'queryParams', never>,
+  config?: RequestHandlerExecutionConfig
+): Promise<PostBorrowRequestResult> {
+  return requestHandler.execute(
+    createRequest(postBorrowEndpointSchema, payload),
+    config
+  );
+}
