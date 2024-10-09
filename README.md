@@ -65,22 +65,28 @@ generateOas3ToTs({
   outputFolderPath: './generated-api',
 
   // optional:
-  // The list of separators which should be considered for the outputPath creation from a string
+  // The list of separators which should be considered for the outputPath creation from a component name
   // The outputPath itself is an array of strings (see explanation in one of the sections below)
   // By default the following configuration is taken: ['.', '/', '\\']
-  outputPathSeparators: ['.', '/', '\\', '_'],
+  componentOutputPathSeparators: ['.', '/', '\\', '_'],
+  
+  // optional:
+  // Same as "componentOutputPathSeparators" but in the context of defined "operationId" properties
+  // of an endpoint
+  operationIdOutputPathSeparators: ['.', '/', '\\', '_'],
   
   // optional:
   // The folder structure is generated from resulting outputPaths of the given operationIds.
   // If some additional sub folders are required the configuration can be done as follow:
   predefinedFolderOutputPaths: [
-    ['core'],
+    
     // For outputs having an `OutputPath` starting with ['core']:
     // Variables and type definitions are put in the `{outputFolderPath}/core` folder
+    ['core'],
     
-    ['util', 'foo'],
     // For outputs having an `OutputPath` starting with ['util', 'foo']:
     // Variables and type definitions are put in the `{outputFolderPath}/util/foo` folder
+    ['util', 'foo'],
   ],
   
   // required:
@@ -105,18 +111,18 @@ generateOas3ToTs({
     'ZodValidationRequestHandler'
   ],
 
-  // optional: Modify output paths which resulted from an operation
-  createModifiedOperationOutputPath: (outputPath) => {
-    return outputPath[0] === 'v1' ? outputPath.slice(1) : outputPath;
+  // optional: Modify output paths which result from an operation
+  createOperationOutputPath: (_path, _method, _endpointSchema, defaultOutputPath) => {
+    return defaultOutputPath[0] === 'v1' ? defaultOutputPath.slice(1) : defaultOutputPath;
   },
   
   // optional: Whether a specific operation (endpoint respectively) should be added
-  shouldAddOperation: (path, method, endpointSchema) => {
+  shouldAddOperation: (_path, _method, _endpointSchema) => {
     return true; // adjust according to your needs
   },
   
   // optional: Whether a specific content type request body should be added
-  shouldAddRequestBodyContent: (contentType, requestBodyContentSchema) => {
+  shouldAddRequestBodyContent: (contentType, bodyByContentTypeMap) => {
     const lowerCaseContentType = contentType.toLowerCase();
     if (lowerCaseContentType.match(/application\/[^+]*[+]?(json);?.*/)) {
       return true;
@@ -131,7 +137,7 @@ generateOas3ToTs({
   },
   
   // optional: Whether a specific content type response body should be added
-  shouldAddResponseBodyContent: (contentType, responseBodyContentSchema) => {
+  shouldAddResponseBodyContent: (contentType, _bodyByContentTypeMap) => {
     return ['multipart/form-data', 'application/json'].includes(contentType);
   },
 });
