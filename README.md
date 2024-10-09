@@ -76,7 +76,6 @@ generateOas3ToTs({
   // The folder structure is generated from resulting outputPaths of the given operationIds.
   // If some additional sub folders are required the configuration can be done as follow:
   predefinedFolderOutputPaths: [
-    
     // For outputs having an `OutputPath` starting with ['core']:
     // Variables and type definitions are put in the `{outputFolderPath}/core` folder
     ['core'],
