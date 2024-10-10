@@ -1,5 +1,5 @@
 [![continuous integration pipeline](https://github.com/inkognitro/oas-tszod-gen/actions/workflows/ci.yml/badge.svg)](https://github.com/inkognitro/oas-tszod-gen/actions?query=workflow%3Aci)
-![test coverage](https://github.com/inkognitro/oas-tszod-gen/blob/main/badge.ts)
+![test coverage](https://github.com/inkognitro/oas-tszod-gen/blob/main/badges/jest/coverage-total.svg)
 
 # oas-tszod-gen
 A code generator to convert [OpenApi version 3 (OAS3)](https://swagger.io/specification/) specifications into endpoint caller functions for [TS](https://www.typescriptlang.org/) and [Zod](https://zod.dev).
