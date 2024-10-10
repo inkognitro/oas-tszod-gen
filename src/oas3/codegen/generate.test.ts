@@ -1,8 +1,8 @@
 import {generateOas3ToTs, Oas3ToTsConfig} from './generate';
-const petStore1Specs = require('../../../example-specs/petstore1.oas3.json');
-const petStore2Specs = require('../../../example-specs/petstore2.oas3.json');
-const binanceSpecs = require('../../../example-specs/binance.oas3.json');
-const stripeSpecs = require('../../../example-specs/stripe.oas3.json');
+const petStore1Specs = require('../../../examples/specs/petstore1.oas3.json');
+const petStore2Specs = require('../../../examples/specs/petstore2.oas3.json');
+const binanceSpecs = require('../../../examples/specs/binance.oas3.json');
+const stripeSpecs = require('../../../examples/specs/stripe.oas3.json');
 
 describe('Generator', () => {
   it('can generate files from PetStore1 specs', () => {
@@ -13,8 +13,8 @@ describe('Generator', () => {
             resolve(petStore1Specs);
           });
         },
-        outputFolderPath: './example-outputs/petstore1',
-        importRootAlias: '@example-outputs/petstore1',
+        outputFolderPath: './src/test-outputs/petstore1',
+        importRootAlias: '@/test-outputs/petstore1',
         logger: {
           log: () => {},
         },
@@ -30,8 +30,8 @@ describe('Generator', () => {
             resolve(petStore1Specs);
           });
         },
-        outputFolderPath: './example-outputs/petstore1-with-zod',
-        importRootAlias: '@example-outputs/petstore1-with-zod',
+        outputFolderPath: './src/test-outputs/petstore1-with-zod',
+        importRootAlias: '@/test-outputs/petstore1-with-zod',
         logger: {
           log: () => {},
         },
@@ -48,8 +48,8 @@ describe('Generator', () => {
             resolve(petStore2Specs);
           });
         },
-        outputFolderPath: './example-outputs/petstore2',
-        importRootAlias: '@example-outputs/petstore2',
+        outputFolderPath: './src/test-outputs/petstore2',
+        importRootAlias: '@/test-outputs/petstore2',
         logger: {
           log: () => {},
         },
@@ -65,8 +65,8 @@ describe('Generator', () => {
             resolve(petStore2Specs);
           });
         },
-        outputFolderPath: './example-outputs/petstore2-with-zod',
-        importRootAlias: '@example-outputs/petstore2-with-zod',
+        outputFolderPath: './src/test-outputs/petstore2-with-zod',
+        importRootAlias: '@/test-outputs/petstore2-with-zod',
         logger: {
           log: () => {},
         },
@@ -83,8 +83,8 @@ describe('Generator', () => {
             resolve(binanceSpecs);
           });
         },
-        outputFolderPath: './example-outputs/binance',
-        importRootAlias: '@example-outputs/binance',
+        outputFolderPath: './src/test-outputs/binance',
+        importRootAlias: '@/test-outputs/binance',
         logger: {
           log: () => {},
         },
@@ -100,8 +100,8 @@ describe('Generator', () => {
             resolve(binanceSpecs);
           });
         },
-        outputFolderPath: './example-outputs/binance-with-zod',
-        importRootAlias: '@example-outputs/binance-with-zod',
+        outputFolderPath: './src/test-outputs/binance-with-zod',
+        importRootAlias: '@/test-outputs/binance-with-zod',
         logger: {
           log: () => {},
         },
@@ -116,8 +116,8 @@ describe('Generator', () => {
         resolve(stripeSpecs);
       });
     },
-    outputFolderPath: './example-outputs/stripe',
-    importRootAlias: '@example-outputs/stripe',
+    outputFolderPath: './src/test-outputs/stripe',
+    importRootAlias: '@/test-outputs/stripe',
     logger: {
       log: () => {},
     },
@@ -133,9 +133,9 @@ describe('Generator', () => {
     expect(() => {
       generateOas3ToTs({
         ...stripeConfig,
-        outputFolderPath: './example-outputs/stripe-with-zod',
+        outputFolderPath: './src/test-outputs/stripe-with-zod',
         withZod: true,
-        importRootAlias: '@example-outputs/stripe-with-zod',
+        importRootAlias: '@/test-outputs/stripe-with-zod',
       });
     }).not.toThrow();
   });

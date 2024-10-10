@@ -3,7 +3,7 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - main
+      - '**'
 
 jobs:
   testing:
@@ -16,14 +16,8 @@ jobs:
       - name: Install modules
         run: npm install
 
-      - name: Check linting
-        run: npm run lint
-
-      - name: Run tests
-        run: npm run test:withCoverage
-
-      - name: Type checks including generated code
-        run: npm run tsc
+      - name: Run CI checks
+        run: npm run ci
 
       - name: Generating coverage badges
         uses: jpb06/coverage-badges-action@latest

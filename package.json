@@ -7,27 +7,20 @@
     "./package.json",
     "./README.md"
   ],
-  "paths": {
-    "@/*": [
-      "./dist/*"
-    ]
-  },
   "engines": {
     "node": ">=18.0.0"
   },
   "main": "dist/index.js",
   "description": "A code generator to convert OpenApi version 3 (OAS3) specifications into endpoint caller functions for TS and Zod.",
   "scripts": {
-    "publish:patch": "npm run ci:refreshAndTest && npm run build && npm version patch && npm publish",
-    "build": "npm run build:clean && tspc && npm run build:optimize",
-    "build:clean": "node ./scripts/remove-build-files.js",
-    "build:optimize": "node ./scripts/optimize-build-files.js",
-    "ci:refreshAndTest": "npm run test && npm run lint:fix && npm run tsc",
+    "build": "node ./scripts/remove-build-folder.js && tsc --project tsconfig.build.json && tsc-alias --project tsconfig.build.json && node ./scripts/copy-templates-to-build-folder.js",
+    "build:examples": "node ./scripts/generate-example-outputs.js && eslint --fix ./examples/outputs",
+    "ci": "npm run test:withCoverage && tsc && npm run lint:fix",
+    "ci:prepareCommit": "npm run test && tsc && eslint --fix ./src/oas3 && eslint --fix ./src/templates && npm run build:dist && npm run build:examples",
     "lint": "gts lint",
     "lint:fix": "tsc --noEmit && gts fix",
     "test": "jest",
-    "test:withCoverage": "jest --ci --coverage",
-    "tsc": "tsc --noEmit"
+    "test:withCoverage": "jest --ci --coverage"
   },
   "repository": {
     "type": "git",
@@ -60,8 +53,7 @@
     "multer": "^1.4.5-lts.1",
     "qs": "^6.13.0",
     "ts-jest": "^29.1.2",
-    "ts-patch": "^3.1.2",
-    "typescript-transform-paths": "^3.4.7"
+    "tsc-alias": "^1.8.10"
   },
   "dependencies": {
     "zod": "^3.23.8"

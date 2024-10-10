@@ -1,8 +1,8 @@
 import {zSpecification} from './specification';
-const petStore1Specs = require('../../../example-specs/petstore1.oas3.json');
-const petStore2Specs = require('../../../example-specs/petstore2.oas3.json');
-const binanceSpecs = require('../../../example-specs/binance.oas3.json');
-const stripeSpecs = require('../../../example-specs/stripe.oas3.json');
+const petStore1Specs = require('../../../examples/specs/petstore1.oas3.json');
+const petStore2Specs = require('../../../examples/specs/petstore2.oas3.json');
+const binanceSpecs = require('../../../examples/specs/binance.oas3.json');
+const stripeSpecs = require('../../../examples/specs/stripe.oas3.json');
 
 test('throws error with incorrect input', () => {
   expect(() => zSpecification.parse('foo')).toThrow();
