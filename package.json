@@ -13,10 +13,11 @@
   "main": "dist/index.js",
   "description": "A code generator to convert OpenApi version 3 (OAS3) specifications into endpoint caller functions for TS and Zod.",
   "scripts": {
+    "buildAndPublish:newPatchVersion": "npm run build && npm version patch && npm publish",
     "build": "node ./scripts/remove-build-folder.js && tsc --project tsconfig.build.json && tsc-alias --project tsconfig.build.json && node ./scripts/copy-templates-to-build-folder.js",
     "build:examples": "node ./scripts/generate-example-outputs.js && eslint --fix ./examples/outputs",
     "ci": "npm run test:withCoverage && tsc && npm run lint:fix",
-    "ci:prepareCommit": "npm run test && tsc && eslint --fix ./src/oas3 && eslint --fix ./src/templates && npm run build:dist && npm run build:examples",
+    "ci:prepareCommit": "npm run test && tsc && eslint --fix ./src/oas3 && eslint --fix ./src/templates && npm run build && npm run build:examples",
     "lint": "gts lint",
     "lint:fix": "tsc --noEmit && gts fix",
     "test": "jest",

@@ -3,6 +3,7 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "dist",
+    "declaration": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
@@ -19,5 +20,6 @@
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
     "src/templates/**",
+    "src/test-outputs/**",
   ]
 }

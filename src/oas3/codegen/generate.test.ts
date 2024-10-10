@@ -125,17 +125,35 @@ describe('Generator', () => {
 
   it('can generate files from Stripe specs', () => {
     expect(() => {
-      generateOas3ToTs(stripeConfig);
+      generateOas3ToTs({
+        getSpecification: () => {
+          return new Promise(resolve => {
+            resolve(stripeSpecs);
+          });
+        },
+        outputFolderPath: './src/test-outputs/stripe',
+        importRootAlias: '@/test-outputs/stripe',
+        logger: {
+          log: () => {},
+        },
+      });
     }).not.toThrow();
   });
 
   it('can generate files from Stripe specs with Zod', () => {
     expect(() => {
       generateOas3ToTs({
-        ...stripeConfig,
+        getSpecification: () => {
+          return new Promise(resolve => {
+            resolve(stripeSpecs);
+          });
+        },
         outputFolderPath: './src/test-outputs/stripe-with-zod',
-        withZod: true,
         importRootAlias: '@/test-outputs/stripe-with-zod',
+        logger: {
+          log: () => {},
+        },
+        withZod: true,
       });
     }).not.toThrow();
   });
