@@ -359,7 +359,7 @@ There exist another two extractor functions `getResponseOrReject` and `findRespo
 These two functions do return a response with a body which was not yet **revealed**.
 Anyway, this is for convenience, so we don't have to write that much code.
 
-> :bulb: The `response.contentType` property does not always match the exact value of the actual `request.headers['content-type']`
+> :bulb: The `response.contentType` property does not always match the exact value of the actual `response.headers['content-type']`
 > which was received from the server. The `response.contentType` property's reason to exist is to make sure that we
 > are able to distinguish between different response types which were defined by the OAS3 specs.
 > The OAS3 content type that has the most characters matching the actual `content-type` header is adopted during runtime.
