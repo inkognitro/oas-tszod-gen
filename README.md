@@ -47,7 +47,7 @@ code into it:
 ```typescript
 // api.generate.js
 
-import { generateOas3ToTs } from 'oas-tszod-gen';
+const {generateOas3ToTs} = require('oas-tszod-gen');
 const oas3Specification = require('./api.specs.json');
 
 generateOas3ToTs({
@@ -64,7 +64,7 @@ generateOas3ToTs({
   // optional:
   // The list of separators which should be considered for the outputPath creation from a
   // component name. The outputPath itself is an array of strings (see explanation in one
-  // of the sections below). By default the following configuration is taken:
+  // of the sections below). By default, the following configuration is taken:
   // ['.', '/', '\\']
   componentOutputPathSeparators: ['.', '/', '\\', '_'],
   
