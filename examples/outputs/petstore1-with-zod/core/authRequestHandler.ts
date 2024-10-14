@@ -1,6 +1,7 @@
 import {Request, RequestHandler, RequestResult} from './core';
 
 function base64Encode(value: string): string {
+  // @ts-ignore
   const isBrowserEnv = typeof window !== 'undefined';
   const buffer = Buffer.from(value);
   return isBrowserEnv ? btoa(value) : buffer.toString('base64');
