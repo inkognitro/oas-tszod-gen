@@ -168,7 +168,8 @@ Let's consider some example endpoints which might be defined in your OAS3 specif
 3. The generated code for the endpoint with the operationId `userManagement.admin.getUsers` will be put into `./user-management/admin/getUsers.ts`
 
 The same principles that apply to dots `.` do also apply to slashes `/` and backslashes `\` by default.
-This can be configured by the `outputPathSeparators` configuration (see above).
+This can be configured with the configuration prop `operationIdOutputPathSeparators` for operationIds and
+with `componentOutputPathSeparators` for component names (see above).
 
 After generating endpoint caller functions from an OAS3 specification into your codebase,
 it's time to understand how the generated code can be used. The following sections should bring some clarity.
@@ -529,7 +530,7 @@ That's what it does. Your code setup should be responsible for linting your code
 `package.json` like so:
 ```json
 "scripts": {
-  "api:generate": "node api.generate.js && eslint --fix ./generated-api"
+  "api:generate": "node api.generate.js && eslint --fix --quiet ./generated-api"
 }
 ```
 
