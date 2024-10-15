@@ -5,6 +5,7 @@
 A code generator to convert [OpenApi version 3 (OAS3)](https://swagger.io/specification/) specifications into endpoint caller functions for [TS](https://www.typescriptlang.org/) and [Zod](https://zod.dev).
 
 [![Demo Video](https://img.youtube.com/vi/D_bG0UCHr5M/0.jpg)](https://www.youtube.com/watch?v=D_bG0UCHr5M)
+The code of the demo video is available [here](https://github.com/inkognitro/oas-tszod-gen-demo).
 
 ## Why yet another library for this task?
 Before you consider using this library, I suggest having a look at the combination of [Zodios](https://www.zodios.org/)
